@@ -106,7 +106,7 @@ export const SkillInvocationSchema = z.object({
 });
 
 export const TranscribeRequestSchema = z.object({
-  audio: z.instanceof(File),
+  audio: z.any(), // File validation is handled in the API route
 });
 
 export const CoachRequestSchema = z.object({
