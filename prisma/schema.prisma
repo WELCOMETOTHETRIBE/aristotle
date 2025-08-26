@@ -1,0 +1,264 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String   @id @default(cuid())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  name           String
+  email          String?
+  voicePreference String  @default("alloy")
+  coachTone      String   @default("gentle") // "gentle" | "direct" | "sage"
+  timezone       String   @default("UTC")
+  privacyPrefs   String   @default("{}") // JSON stored as string
+
+  // Relations
+  userFacts      UserFact[]
+  goals          Goal[]
+  habits         Habit[]
+  tasks          Task[]
+  sessions       Session[]
+  breathworkPlans BreathworkPlan[]
+  challenges     Challenge[]
+  conversationSummary ConversationSummary?
+  automations    Automation[]
+  skillRunLogs   SkillRunLog[]
+  journals       Journal[]
+  fastingSessions FastingSession[]
+  fastingBenefits FastingBenefit[]
+
+  @@map("users")
+}
+
+model UserFact {
+  id        String   @id @default(cuid())
+  userId    String
+  kind      String   // "bio" | "value" | "constraint" | "preference" | "insight"
+  content   String
+  embedding String   // Vector for semantic search (JSON string)
+  createdAt DateTime @default(now())
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_facts")
+}
+
+model Goal {
+  id           String   @id @default(cuid())
+  userId       String
+  title        String
+  description  String?
+  category     String   // "spiritual" | "fitness" | "career" | "relationships" | "learning" | "finance" | "misc"
+  cadence      String   // "daily" | "weekly" | "ad-hoc"
+  targetMetric String?  // Store goal metrics as JSON string
+  status       String   @default("active") // "active" | "paused" | "completed"
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("goals")
+}
+
+model Habit {
+  id            String    @id @default(cuid())
+  userId        String
+  name          String
+  description   String?
+  frequency     String    // "daily" | "x_per_week" | "custom"
+  streakCount   Int       @default(0)
+  lastCheckInAt DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("habits")
+}
+
+model Task {
+  id          String    @id @default(cuid())
+  userId      String
+  sessionId   String?
+  title       String
+  description String?
+  dueAt       DateTime?
+  completedAt DateTime?
+  tag         String?   // "breathwork" | "reflection" | "practice" | "log" | "misc"
+  priority    String    @default("M") // "L" | "M" | "H"
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  session     Session?  @relation(fields: [sessionId], references: [id])
+
+  @@index([userId])
+  @@index([sessionId])
+  @@map("tasks")
+}
+
+model Session {
+  id            String   @id @default(cuid())
+  userId        String
+  startedAt     DateTime @default(now())
+  endedAt       DateTime?
+  inputMode     String   // "voice" | "text"
+  transcript    String
+  coachReply    String
+  coachJSON     String   // Store CoachPlan JSON as string
+  audioReplyUrl String?
+
+  // Relations
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tasks         Task[]
+
+  @@index([userId])
+  @@map("sessions")
+}
+
+model BreathworkPlan {
+  id         String   @id @default(cuid())
+  userId     String
+  name       String
+  pattern    String   // Store breath pattern as JSON string
+  durationSec Int
+  notes      String?
+
+  // Relations
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("breathwork_plans")
+}
+
+model Challenge {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  description String?
+  startDate   DateTime
+  endDate     DateTime
+  category    String
+  progressJson String  @default("{}") // JSON stored as string
+
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("challenges")
+}
+
+model ConversationSummary {
+  id      String   @id @default(cuid())
+  userId  String   @unique
+  rolling String   // Rolling summary text (≤ 1k tokens)
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("conversation_summaries")
+}
+
+model Automation {
+  id        String    @id @default(cuid())
+  userId    String
+  name      String
+  type      String    // "reminder" | "review" | "sync" | "custom"
+  config    String    // Store automation config as JSON string
+  isActive  Boolean   @default(true)
+  lastRunAt DateTime?
+
+  // Relations
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("automations")
+}
+
+model SkillRunLog {
+  id        String   @id @default(cuid())
+  userId    String
+  skillKey  String
+  inputJson String  // JSON stored as string
+  outputJson String // JSON stored as string
+  createdAt DateTime @default(now())
+  status    String   @default("success") // "success" | "error" | "pending"
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([skillKey])
+  @@map("skill_run_logs")
+}
+
+model Journal {
+  id        String   @id @default(cuid())
+  userId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("journals")
+}
+
+model FastingSession {
+  id          String    @id @default(cuid())
+  userId      String
+  startTime   DateTime
+  endTime     DateTime?
+  duration    Int?      // Duration in minutes
+  type        String    // "16:8", "18:6", "20:4", "24h", "36h", "48h", "72h", "custom"
+  status      String    @default("active") // "active", "completed", "broken"
+  notes       String?
+  benefits    String?   // JSON string of tracked benefits
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fastingBenefits FastingBenefit[]
+
+  @@index([userId])
+  @@index([startTime])
+  @@map("fasting_sessions")
+}
+
+model FastingBenefit {
+  id              String   @id @default(cuid())
+  userId          String
+  fastingSessionId String
+  benefitType     String   // "energy", "clarity", "weight_loss", "inflammation", "autophagy", "insulin_sensitivity"
+  intensity       Int      // 1-10 scale
+  notes           String?
+  recordedAt      DateTime @default(now())
+
+  // Relations
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fastingSession  FastingSession @relation(fields: [fastingSessionId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([fastingSessionId])
+  @@map("fasting_benefits")
+} 
