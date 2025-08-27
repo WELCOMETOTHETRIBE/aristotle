@@ -3,9 +3,9 @@ import OpenAI from 'openai';
 import { z } from 'zod';
 import { CoachRequestSchema } from '@/lib/validators';
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 // Fallback responses when OpenAI is not available
 const fallbackResponses = [
@@ -78,6 +78,10 @@ export async function POST(request: NextRequest) {
     const { text } = CoachRequestSchema.parse(body);
 
     // Try to use OpenAI if available
+    if (!openai) {
+      throw new Error('OpenAI not configured');
+    }
+    
     try {
       const messages = [
         { 

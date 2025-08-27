@@ -4,12 +4,19 @@ import { TTSRequestSchema } from '@/lib/validators';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 export async function POST(request: NextRequest) {
   try {
+    if (!openai) {
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured' },
+        { status: 400 }
+      );
+    }
+    
     const body = await request.json();
     const { text, voice = 'alloy' } = TTSRequestSchema.parse(body);
 
