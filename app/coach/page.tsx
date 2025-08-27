@@ -65,11 +65,13 @@ export default function CoachPage() {
           throw new Error('Microphone access not supported in this browser');
         }
         
+        // Request microphone permission with better error handling
         const stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
             echoCancellation: true,
             noiseSuppression: true,
             sampleRate: 44100,
+            channelCount: 1,
           } 
         });
         
@@ -133,12 +135,22 @@ export default function CoachPage() {
         setMediaRecorder(recorder);
         setMicrophoneAvailable(true);
         setIsInitializing(false);
+        console.log('✅ MediaRecorder initialized successfully');
       } catch (error: any) {
         console.error('Error accessing microphone:', error);
-        setError(error.message === 'Permission denied' 
-          ? 'Microphone access denied. You can still type your messages below.'
-          : 'Microphone not available. You can still type your messages below.'
-        );
+        
+        // More specific error messages
+        let errorMessage = 'Microphone not available. You can still type your messages below.';
+        
+        if (error.name === 'NotAllowedError' || error.message.includes('Permission denied')) {
+          errorMessage = 'Microphone access denied. Please allow microphone access in your browser settings and refresh the page.';
+        } else if (error.name === 'NotFoundError') {
+          errorMessage = 'No microphone found. Please connect a microphone and try again.';
+        } else if (error.name === 'NotSupportedError') {
+          errorMessage = 'Audio recording not supported in this browser. Please use a modern browser like Chrome, Firefox, or Safari.';
+        }
+        
+        setError(errorMessage);
         setMicrophoneAvailable(false);
         setIsInitializing(false);
       }
@@ -234,19 +246,25 @@ export default function CoachPage() {
       // Generate TTS for coach reply (optional - don't block if it fails)
       let audioUrl: string | undefined;
       try {
+        console.log('Generating TTS for coach reply...');
         const ttsResponse = await fetch('/api/tts', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ text: data.reply }),
+          body: JSON.stringify({ 
+            text: data.reply,
+            voice: 'nova' // Use a clear voice for coach responses
+          }),
         });
 
         if (ttsResponse.ok) {
           const ttsData = await ttsResponse.json();
           audioUrl = ttsData.url;
+          console.log('✅ TTS generated successfully:', audioUrl);
         } else {
-          console.warn('TTS API not available, audio will be text-only');
+          const errorData = await ttsResponse.json();
+          console.warn('TTS API error:', errorData);
         }
       } catch (error) {
         console.warn('TTS error (non-critical):', error);
@@ -285,6 +303,7 @@ export default function CoachPage() {
 
     try {
       setIsPlayingAudio(true);
+      console.log('Playing audio:', audioUrl);
       
       if (audioElement) {
         audioElement.pause();
@@ -292,11 +311,28 @@ export default function CoachPage() {
       }
 
       const audio = new Audio(audioUrl);
-      audio.onended = () => setIsPlayingAudio(false);
-      audio.onerror = () => setIsPlayingAudio(false);
+      audio.volume = 0.8; // Set volume to 80%
+      
+      audio.onended = () => {
+        console.log('Audio playback ended');
+        setIsPlayingAudio(false);
+      };
+      
+      audio.onerror = (error) => {
+        console.error('Audio playback error:', error);
+        setIsPlayingAudio(false);
+      };
+      
+      audio.onloadstart = () => console.log('Audio loading started');
+      audio.oncanplay = () => console.log('Audio can play');
       
       setAudioElement(audio);
-      await audio.play();
+      
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        await playPromise;
+        console.log('✅ Audio playback started successfully');
+      }
     } catch (error) {
       console.error('Audio playback error:', error);
       setIsPlayingAudio(false);
@@ -477,7 +513,7 @@ export default function CoachPage() {
                     ) : (
                       <div className="text-center">
                         <div className="flex justify-center gap-4 mb-4">
-                          {microphoneAvailable && (
+                          {microphoneAvailable ? (
                             <Button
                               onClick={handleVoiceRecord}
                               size="lg"
@@ -495,6 +531,19 @@ export default function CoachPage() {
                                 <Mic className="h-6 w-6" />
                               )}
                             </Button>
+                          ) : (
+                            <Button
+                              onClick={() => {
+                                // Try to reinitialize microphone
+                                window.location.reload();
+                              }}
+                              size="lg"
+                              variant="outline"
+                              className="w-16 h-16 rounded-full border-2 border-orange-300 hover:border-orange-500"
+                              disabled={isProcessing}
+                            >
+                              <Mic className="h-6 w-6 text-orange-600" />
+                            </Button>
                           )}
                           
                           <Button
@@ -510,8 +559,8 @@ export default function CoachPage() {
                         <p className="text-sm text-muted-foreground">
                           {isRecording ? 'Recording... Speak now' : 
                            isProcessing ? 'Processing...' :
-                           isInitializing ? 'Initializing...' :
-                           !microphoneAvailable ? 'Type your message to begin' :
+                           isInitializing ? 'Initializing microphone...' :
+                           !microphoneAvailable ? 'Microphone not available - tap to retry or type your message' :
                            'Tap to record or type your message'}
                         </p>
                       </div>
