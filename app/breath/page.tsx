@@ -270,9 +270,11 @@ export default function BreathPage() {
             
             const newDuration = getPhaseDuration(nextPhase);
             
-            // Play audio guidance for new phase
+            // Play audio guidance for new phase with slight delay for smooth transition
             if (audioEnabled) {
-              playAudioGuidance(nextPhase);
+              setTimeout(() => {
+                playAudioGuidance(nextPhase);
+              }, 100); // Small delay to ensure smooth phase transition
             }
             
             return newDuration;
@@ -280,7 +282,10 @@ export default function BreathPage() {
           
           // Play counting audio for the last 3 seconds of each phase
           if (audioEnabled && prev <= 3 && prev > 1) {
-            playCountingAudio(prev);
+            // Add small delay to prevent audio overlap
+            setTimeout(() => {
+              playCountingAudio(prev);
+            }, 50);
           }
           
           return prev - 1;
@@ -308,11 +313,34 @@ export default function BreathPage() {
     };
   }, [isActive, currentPhase, currentCycle, totalCycles, audioEnabled]);
 
-  // Animate breath circle
+  // Animate breath circle with smooth transitions
   useEffect(() => {
     if (isActive) {
-      const scale = currentPhase === 'inhale' ? 1.2 : 
-                   currentPhase === 'exhale' ? 0.8 : 1;
+      let scale = 1;
+      let opacity = 1;
+      
+      switch (currentPhase) {
+        case 'inhale':
+          scale = 1.3;
+          opacity = 1;
+          break;
+        case 'hold':
+          scale = 1.1;
+          opacity = 0.9;
+          break;
+        case 'exhale':
+          scale = 0.7;
+          opacity = 0.8;
+          break;
+        case 'hold2':
+          scale = 0.9;
+          opacity = 0.7;
+          break;
+        default:
+          scale = 1;
+          opacity = 1;
+      }
+      
       setBreathScale(scale);
     } else {
       setBreathScale(1);
@@ -346,6 +374,36 @@ export default function BreathPage() {
       case 'exhale': return 'Exhale';
       case 'hold2': return 'Hold';
       default: return '';
+    }
+  };
+
+  const getPhaseBorderColor = (phase: string): string => {
+    switch (phase) {
+      case 'inhale': return '#3b82f6'; // blue-500
+      case 'hold': return '#8b5cf6'; // purple-500
+      case 'exhale': return '#10b981'; // emerald-500
+      case 'hold2': return '#f59e0b'; // amber-500
+      default: return '#e5e7eb'; // gray-200
+    }
+  };
+
+  const getPhaseGlowColor = (phase: string): string => {
+    switch (phase) {
+      case 'inhale': return 'rgba(59, 130, 246, 0.5)'; // blue-500 with opacity
+      case 'hold': return 'rgba(139, 92, 246, 0.5)'; // purple-500 with opacity
+      case 'exhale': return 'rgba(16, 185, 129, 0.5)'; // emerald-500 with opacity
+      case 'hold2': return 'rgba(245, 158, 11, 0.5)'; // amber-500 with opacity
+      default: return 'rgba(59, 130, 246, 0.3)'; // default blue with opacity
+    }
+  };
+
+  const getPhaseProgressColor = (phase: string): string => {
+    switch (phase) {
+      case 'inhale': return '#3b82f6'; // blue-500
+      case 'hold': return '#8b5cf6'; // purple-500
+      case 'exhale': return '#10b981'; // emerald-500
+      case 'hold2': return '#f59e0b'; // amber-500
+      default: return '#3b82f6'; // blue-500
     }
   };
 
@@ -540,25 +598,35 @@ export default function BreathPage() {
                   {/* Animated Breath Circle */}
                   <div className="flex justify-center mb-8">
                     <div className="relative">
-                      {/* Outer ring */}
-                      <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 border-gray-200 flex items-center justify-center transition-all duration-1000 ease-in-out`}
-                           style={{ transform: `scale(${breathScale})` }}>
+                      {/* Outer ring with pulsing effect */}
+                      <div 
+                        className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 flex items-center justify-center transition-all duration-700 ease-out`}
+                        style={{ 
+                          transform: `scale(${breathScale})`,
+                          borderColor: isActive ? getPhaseBorderColor(currentPhase) : '#e5e7eb'
+                        }}
+                      >
                         
-                        {/* Inner circle with gradient */}
-                        <div className={`w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-lg`}>
+                        {/* Inner circle with gradient and glow */}
+                        <div 
+                          className={`w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-lg transition-all duration-700 ease-out`}
+                          style={{
+                            boxShadow: isActive ? `0 0 20px ${getPhaseGlowColor(currentPhase)}` : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                          }}
+                        >
                           <div className="text-center">
-                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
+                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 transition-all duration-300">
                               {formatTime(timeLeft)}
                             </div>
-                            <div className={`inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getPhaseColor(currentPhase)}`}>
-                              <Heart className="h-3 w-3" />
+                            <div className={`inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${getPhaseColor(currentPhase)}`}>
+                              <Heart className={`h-3 w-3 transition-all duration-300 ${isActive ? 'animate-pulse' : ''}`} />
                               <span className="hidden sm:inline">{getPhaseLabel(currentPhase)}</span>
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Progress ring */}
+                      {/* Progress ring with smooth animation */}
                       <div className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
                         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                           <circle
@@ -567,7 +635,7 @@ export default function BreathPage() {
                             r="45"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="2"
+                            strokeWidth="3"
                             className="text-gray-200"
                           />
                           <circle
@@ -576,14 +644,35 @@ export default function BreathPage() {
                             r="45"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="2"
+                            strokeWidth="3"
                             strokeLinecap="round"
-                            className={`text-blue-500 transition-all duration-1000 ease-in-out`}
-                            strokeDasharray={`${2 * Math.PI * 45}`}
-                            strokeDashoffset={`${2 * Math.PI * 45 * (1 - (getPhaseDuration(currentPhase) - timeLeft) / getPhaseDuration(currentPhase))}`}
+                            className={`transition-all duration-700 ease-out`}
+                            style={{
+                              stroke: getPhaseProgressColor(currentPhase),
+                              strokeDasharray: `${2 * Math.PI * 45}`,
+                              strokeDashoffset: `${2 * Math.PI * 45 * (1 - (getPhaseDuration(currentPhase) - timeLeft) / getPhaseDuration(currentPhase))}`
+                            }}
                           />
                         </svg>
                       </div>
+                      
+                      {/* Phase indicator dots */}
+                      {isActive && (
+                        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+                          {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => (
+                            <div
+                              key={phase}
+                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                currentPhase === phase 
+                                  ? 'bg-blue-500 scale-125' 
+                                  : selectedPattern.pattern[phase as keyof typeof selectedPattern.pattern] > 0 
+                                    ? 'bg-gray-300' 
+                                    : 'bg-transparent'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 

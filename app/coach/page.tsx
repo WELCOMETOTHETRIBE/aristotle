@@ -192,19 +192,41 @@ export default function CoachPage() {
   };
 
   const handleVoiceRecord = async () => {
-    if (!mediaRecorder) return;
+    console.log('handleVoiceRecord called, mediaRecorder:', !!mediaRecorder, 'isRecording:', isRecording);
+    
+    if (!mediaRecorder) {
+      console.error('MediaRecorder not available');
+      setError('Recording not available. Please refresh the page and try again.');
+      return;
+    }
 
     if (!isRecording) {
-      setIsRecording(true);
-      setAudioChunks([]);
-      setTranscript('');
-      setError(null);
-      
-      // Start recording with a small timeslice to get data more frequently
-      mediaRecorder.start(1000); // Get data every second
+      try {
+        console.log('Starting recording...');
+        setIsRecording(true);
+        setAudioChunks([]);
+        setTranscript('');
+        setError(null);
+        
+        // Start recording with a small timeslice to get data more frequently
+        mediaRecorder.start(500); // Get data every 500ms for more responsive recording
+        console.log('Recording started successfully');
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        setIsRecording(false);
+        setError('Failed to start recording. Please try again.');
+      }
     } else {
-      setIsRecording(false);
-      mediaRecorder.stop();
+      try {
+        console.log('Stopping recording...');
+        setIsRecording(false);
+        mediaRecorder.stop();
+        console.log('Recording stopped successfully');
+      } catch (error) {
+        console.error('Error stopping recording:', error);
+        setIsRecording(false);
+        setError('Failed to stop recording. Please try again.');
+      }
     }
   };
 
@@ -514,23 +536,29 @@ export default function CoachPage() {
                       <div className="text-center">
                         <div className="flex justify-center gap-4 mb-4">
                           {microphoneAvailable ? (
-                            <Button
-                              onClick={handleVoiceRecord}
-                              size="lg"
-                              variant={isRecording ? "destructive" : "default"}
-                              className={`w-16 h-16 rounded-full ${
-                                isRecording 
-                                  ? 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700' 
-                                  : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
-                              }`}
-                              disabled={isProcessing || isInitializing}
-                            >
-                              {isRecording ? (
-                                <MicOff className="h-6 w-6" />
-                              ) : (
-                                <Mic className="h-6 w-6" />
+                            <div className="relative">
+                              <Button
+                                onClick={handleVoiceRecord}
+                                size="lg"
+                                variant={isRecording ? "destructive" : "default"}
+                                className={`w-16 h-16 rounded-full transition-all duration-300 ${
+                                  isRecording 
+                                    ? 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 animate-pulse' 
+                                    : 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700'
+                                }`}
+                                disabled={isProcessing || isInitializing}
+                              >
+                                {isRecording ? (
+                                  <MicOff className="h-6 w-6" />
+                                ) : (
+                                  <Mic className="h-6 w-6" />
+                                )}
+                              </Button>
+                              {/* Recording indicator */}
+                              {isRecording && (
+                                <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-ping" />
                               )}
-                            </Button>
+                            </div>
                           ) : (
                             <Button
                               onClick={() => {
