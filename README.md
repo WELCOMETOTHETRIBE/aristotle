@@ -82,11 +82,13 @@ The app uses PostgreSQL for data persistence. To set up the database:
 1. **Set DATABASE_URL in Railway**
    - Go to your Railway project dashboard
    - Add environment variable: `DATABASE_URL`
-   - Use the PostgreSQL connection string from your database
+   - Use the **external** PostgreSQL connection string (not the internal one)
+   - Format: `postgresql://postgres:password@postgres-production-bc3a.up.railway.app:5432/railway`
 
 2. **Deploy to Railway**
-   - The database schema will be automatically created during deployment
+   - The database schema will be automatically created when the app starts
    - Tables will be created based on the Prisma schema
+   - The app will work even if the database is not available (with fallback data)
 
 3. **Local Development**
    ```bash
@@ -97,6 +99,8 @@ The app uses PostgreSQL for data persistence. To set up the database:
    npm run db:generate
    npm run db:push
    ```
+
+**Note**: The app includes fallback handling for when the database is not available, so it will continue to function even if there are database connection issues.
 
 ### Audio File Generation
 
