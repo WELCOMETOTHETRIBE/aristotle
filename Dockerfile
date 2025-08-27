@@ -3,6 +3,8 @@ FROM node:18-slim AS base
 
 # Install dependencies only when needed
 FROM base AS deps
+# Install OpenSSL for Prisma compatibility
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 # Copy package files and Prisma schema
