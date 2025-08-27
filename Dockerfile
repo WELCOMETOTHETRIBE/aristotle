@@ -1,10 +1,11 @@
 # Use Node.js 18 Debian for better Prisma compatibility
-FROM node:18-slim AS base
+FROM node:18 AS base
 
 # Install dependencies only when needed
 FROM base AS deps
-# Install OpenSSL for Prisma compatibility
+# Install OpenSSL for Prisma compatibility and verify installation
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+RUN openssl version && which openssl
 WORKDIR /app
 
 # Copy package files and Prisma schema
@@ -31,6 +32,8 @@ RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
+# Install OpenSSL in production image for Prisma compatibility
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 ENV NODE_ENV production
