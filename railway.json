@@ -4,6 +4,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && ls -la && echo 'Starting server...' && node server.js"
+    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && ls -la && echo 'Files in standalone:' && ls -la .next/standalone/ 2>/dev/null || echo 'No standalone dir' && echo 'Starting server...' && node server.js"
   }
 } 
