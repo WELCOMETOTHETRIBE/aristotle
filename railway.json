@@ -4,10 +4,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && ls -la && echo 'Starting server...' && node server.js",
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 100,
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10
+    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && ls -la && echo 'Starting server...' && node server.js"
   }
 } 
