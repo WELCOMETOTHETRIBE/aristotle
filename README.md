@@ -67,8 +67,29 @@ A voice-first personal assistant for flourishing, wellness, and intentional livi
    npm run dev
    ```
 
-6. **Open your browser**
+6. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+7. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
+
+### Audio File Generation
+
+The breathwork feature uses pre-generated audio files for reliable performance. To regenerate these files:
+
+1. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+2. **Generate audio files**
+   ```bash
+   npm run generate-breathwork-audio
+   ```
+
+This will create all necessary audio files for breathing instructions, counting, and session messages.
 
 ## 📁 Project Structure
 
@@ -100,12 +121,12 @@ aristotle/
 - Hedonic pattern analysis
 
 ### **Breathwork** (`/breath`)
-- **Audio Guidance**: Soft spoken directions and counting with TTS
+- **Pre-Generated Audio**: Soft spoken directions and counting using pre-recorded TTS files
 - **Multiple Patterns**: Box Breathing, 4-7-8, Wim Hof, Coherent, Triangle, Ocean Breath
 - **Mobile-Optimized**: Collapsible pattern details for better mobile experience
 - **Visual Timer**: Animated breath circle with progress indicators
 - **Session Tracking**: Automatic logging of breathwork sessions
-- **Graceful Fallback**: Works without audio when TTS API is unavailable
+- **Reliable Audio**: Works consistently without depending on external TTS APIs
 - Multiple breathing patterns (Box, 4-7-8, Wim Hof, etc.)
 - Visual breathing timer with animations
 - Pattern selection and benefits display

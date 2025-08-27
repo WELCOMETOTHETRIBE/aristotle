@@ -83,102 +83,97 @@ export default function BreathPage() {
   const [breathScale, setBreathScale] = useState(1);
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
-  const [audioUrl, setAudioUrl] = useState<string | null>(null);
-  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
+  const [audioMapping, setAudioMapping] = useState<any>(null);
+  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const sessionIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // Generate audio guidance for current phase
-  const generateAudioGuidance = async (phase: string, timeLeft: number) => {
-    if (!audioEnabled || isGeneratingAudio) return;
+  // Load audio mapping on component mount
+  useEffect(() => {
+    const loadAudioMapping = async () => {
+      try {
+        const response = await fetch('/audio/breathwork/audio-mapping.json');
+        if (response.ok) {
+          const mapping = await response.json();
+          setAudioMapping(mapping);
+        }
+      } catch (error) {
+        console.error('Error loading audio mapping:', error);
+      }
+    };
     
-    setIsGeneratingAudio(true);
+    loadAudioMapping();
+  }, []);
+
+  // Play pre-generated audio guidance for current phase
+  const playAudioGuidance = (phase: string) => {
+    if (!audioEnabled || !audioMapping || isLoadingAudio) return;
     
-    let guidanceText = '';
+    setIsLoadingAudio(true);
+    
+    let audioUrl = '';
     switch (phase) {
       case 'inhale':
-        guidanceText = `Breathe in deeply. ${timeLeft} seconds.`;
+        audioUrl = audioMapping.instructions.inhale;
         break;
       case 'hold':
-        guidanceText = `Hold your breath. ${timeLeft} seconds.`;
+        audioUrl = audioMapping.instructions.hold;
         break;
       case 'exhale':
-        guidanceText = `Release your breath slowly. ${timeLeft} seconds.`;
+        audioUrl = audioMapping.instructions.exhale;
         break;
       case 'hold2':
-        guidanceText = `Hold empty. ${timeLeft} seconds.`;
+        audioUrl = audioMapping.instructions.holdEmpty;
         break;
     }
 
-    try {
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: guidanceText,
-          voice: 'nova', // Soft, calming voice
-        }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setAudioUrl(data.url);
-        
-        // Play the audio
-        if (audioRef.current) {
-          audioRef.current.src = data.url;
-          audioRef.current.play().catch(console.error);
-        }
-      } else {
-        // If TTS API is not available, disable audio gracefully
-        console.warn('TTS API not available, audio guidance disabled');
-        setAudioEnabled(false);
-      }
-    } catch (error) {
-      console.error('Error generating audio guidance:', error);
-      // Disable audio on error to prevent repeated failures
-      setAudioEnabled(false);
-    } finally {
-      setIsGeneratingAudio(false);
+    if (audioUrl && audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play()
+        .then(() => {
+          setIsLoadingAudio(false);
+        })
+        .catch((error) => {
+          console.error('Error playing audio guidance:', error);
+          setIsLoadingAudio(false);
+        });
+    } else {
+      setIsLoadingAudio(false);
     }
   };
 
-  // Generate soft counting audio
-  const generateCountingAudio = async (count: number) => {
-    if (!audioEnabled || isGeneratingAudio) return;
+  // Play pre-generated counting audio
+  const playCountingAudio = (count: number) => {
+    if (!audioEnabled || !audioMapping || isLoadingAudio) return;
     
-    setIsGeneratingAudio(true);
-    
-    try {
-      const response = await fetch('/api/tts', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          text: count.toString(),
-          voice: 'nova',
-        }),
-      });
+    const audioUrl = audioMapping.counting[count.toString()];
+    if (audioUrl && audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play().catch(console.error);
+    }
+  };
 
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Play the counting audio
-        if (audioRef.current) {
-          audioRef.current.src = data.url;
-          audioRef.current.play().catch(console.error);
-        }
-      } else {
-        // If TTS API is not available, disable audio gracefully
-        setAudioEnabled(false);
-      }
-    } catch (error) {
-      console.error('Error generating counting audio:', error);
-      // Disable audio on error to prevent repeated failures
-      setAudioEnabled(false);
-    } finally {
-      setIsGeneratingAudio(false);
+  // Play session start audio
+  const playSessionStartAudio = () => {
+    if (!audioEnabled || !audioMapping) return;
+    
+    const audioUrl = audioMapping.session.start;
+    if (audioUrl && audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play().catch(console.error);
+    }
+  };
+
+  // Play session complete audio
+  const playSessionCompleteAudio = () => {
+    if (!audioEnabled || !audioMapping) return;
+    
+    const audioUrl = audioMapping.session.complete;
+    if (audioUrl && audioRef.current) {
+      audioRef.current.src = audioUrl;
+      audioRef.current.play().catch(console.error);
     }
   };
 
@@ -204,17 +199,17 @@ export default function BreathPage() {
             
             const newDuration = getPhaseDuration(nextPhase);
             
-            // Generate audio guidance for new phase
+            // Play audio guidance for new phase
             if (audioEnabled) {
-              generateAudioGuidance(nextPhase, newDuration);
+              playAudioGuidance(nextPhase);
             }
             
             return newDuration;
           }
           
-          // Generate counting audio for the last 3 seconds of each phase
+          // Play counting audio for the last 3 seconds of each phase
           if (audioEnabled && prev <= 3 && prev > 1) {
-            generateCountingAudio(prev);
+            playCountingAudio(prev);
           }
           
           return prev - 1;
@@ -301,9 +296,9 @@ export default function BreathPage() {
     setSessionStartTime(new Date());
     setSessionDuration(0);
 
-    // Generate initial audio guidance
+    // Play session start audio
     if (audioEnabled) {
-      generateAudioGuidance('inhale', selectedPattern.pattern.inhale);
+      playSessionStartAudio();
     }
 
     // Log breathwork session start
@@ -342,33 +337,9 @@ export default function BreathPage() {
     setCurrentPhase('inhale');
     setTimeLeft(0);
     
-    // Play completion audio
+    // Play session completion audio
     if (audioEnabled) {
-      try {
-        const response = await fetch('/api/tts', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: 'Session complete. Well done.',
-            voice: 'nova',
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          if (audioRef.current) {
-            audioRef.current.src = data.url;
-            audioRef.current.play().catch(console.error);
-          }
-        } else {
-          // If TTS API is not available, disable audio gracefully
-          setAudioEnabled(false);
-        }
-      } catch (error) {
-        console.error('Error generating completion audio:', error);
-        // Disable audio on error to prevent repeated failures
-        setAudioEnabled(false);
-      }
+      playSessionCompleteAudio();
     }
     
     // Log session completion
@@ -436,17 +407,17 @@ export default function BreathPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => setAudioEnabled(!audioEnabled)}
-                      disabled={isGeneratingAudio}
+                      disabled={isLoadingAudio}
                       className={`flex items-center gap-2 ${audioEnabled ? 'text-blue-600 border-blue-200' : 'text-gray-500 border-gray-200'}`}
                     >
-                      {isGeneratingAudio ? (
+                      {isLoadingAudio ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
                       ) : audioEnabled ? (
                         <Volume2 className="h-4 w-4" />
                       ) : (
                         <VolumeX className="h-4 w-4" />
                       )}
-                      {isGeneratingAudio ? 'Generating...' : audioEnabled ? 'Audio On' : 'Audio Off'}
+                      {isLoadingAudio ? 'Loading...' : audioEnabled ? 'Audio On' : 'Audio Off'}
                     </Button>
                   </div>
 

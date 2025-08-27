@@ -15,7 +15,8 @@
     "railway:start": "next start",
     "test": "vitest",
     "test:ui": "vitest --ui",
-    "test:coverage": "vitest --coverage"
+    "test:coverage": "vitest --coverage",
+    "generate-breathwork-audio": "node scripts/generate-breathwork-audio.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
