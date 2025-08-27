@@ -75,6 +75,29 @@ A voice-first personal assistant for flourishing, wellness, and intentional livi
 7. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
+### Database Setup
+
+The app uses PostgreSQL for data persistence. To set up the database:
+
+1. **Set DATABASE_URL in Railway**
+   - Go to your Railway project dashboard
+   - Add environment variable: `DATABASE_URL`
+   - Use the PostgreSQL connection string from your database
+
+2. **Deploy to Railway**
+   - The database schema will be automatically created during deployment
+   - Tables will be created based on the Prisma schema
+
+3. **Local Development**
+   ```bash
+   # Set up local database
+   npm run db:setup
+   
+   # Or manually
+   npm run db:generate
+   npm run db:push
+   ```
+
 ### Audio File Generation
 
 The breathwork feature uses pre-generated audio files for reliable performance. To regenerate these files:

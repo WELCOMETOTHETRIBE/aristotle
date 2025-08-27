@@ -11,12 +11,15 @@
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
-    "railway:build": "prisma generate && next build",
+    "railway:build": "prisma generate && prisma db push && next build",
     "railway:start": "next start",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "generate-breathwork-audio": "node scripts/generate-breathwork-audio.js"
+    "generate-breathwork-audio": "node scripts/generate-breathwork-audio.js",
+    "db:setup": "node scripts/setup-database.js",
+    "db:push": "prisma db push",
+    "db:generate": "prisma generate"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",
