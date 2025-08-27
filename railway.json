@@ -4,6 +4,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "echo 'Starting test server first...' && node test-server.js & echo 'Test server started in background' && echo 'Now initializing database...' && node scripts/init-database.js && echo 'Database init complete' && echo 'Keeping container alive...' && wait"
+    "startCommand": "echo 'Starting simple test server...' && node -e \"const http = require('http'); const server = http.createServer((req, res) => { res.writeHead(200, {'Content-Type': 'text/plain'}); res.end('Hello World!'); }); server.listen(8080, '0.0.0.0', () => console.log('Simple test server running on port 8080'));\""
   }
 } 
