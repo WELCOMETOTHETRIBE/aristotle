@@ -86,6 +86,7 @@ export default function BreathPage() {
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
   const [audioMapping, setAudioMapping] = useState<any>(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
+  const [databaseAvailable, setDatabaseAvailable] = useState(true);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const sessionIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -376,21 +377,31 @@ export default function BreathPage() {
       playSessionStartAudio();
     }
 
-    // Log breathwork session start
-    try {
-      await fetch('/api/skills/invoke', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          skill: 'breathwork.start',
-          args: {
-            pattern: selectedPattern.name,
-            cycles: selectedPattern.pattern.cycles,
-          },
-        }),
-      });
-    } catch (error) {
-      console.error('Error logging breathwork session:', error);
+    // Log breathwork session start (optional - don't block session if it fails)
+    if (databaseAvailable) {
+      try {
+        await fetch('/api/skills/invoke', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            skill: 'breathwork.start',
+            args: {
+              name: selectedPattern.name,
+              pattern: selectedPattern.pattern,
+              durationSec: selectedPattern.pattern.cycles * (
+                selectedPattern.pattern.inhale + 
+                selectedPattern.pattern.hold + 
+                selectedPattern.pattern.exhale + 
+                (selectedPattern.pattern.hold2 || 0)
+              ),
+            },
+          }),
+        });
+      } catch (error) {
+        // Don't block the breathwork session if logging fails
+        console.warn('Breathwork session logging failed (non-critical):', error);
+        setDatabaseAvailable(false);
+      }
     }
   };
 
@@ -417,12 +428,16 @@ export default function BreathPage() {
       playSessionCompleteAudio();
     }
     
-    // Log session completion
-    console.log('Breathwork session completed:', {
-      pattern: selectedPattern.name,
-      duration: sessionDuration,
-      cycles: totalCycles,
-    });
+    // Log session completion (optional - don't block if it fails)
+    try {
+      console.log('Breathwork session completed:', {
+        pattern: selectedPattern.name,
+        duration: sessionDuration,
+        cycles: totalCycles,
+      });
+    } catch (error) {
+      console.warn('Session completion logging failed (non-critical):', error);
+    }
   };
 
   const formatTime = (seconds: number): string => {
