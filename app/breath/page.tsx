@@ -105,10 +105,28 @@ export default function BreathPage() {
           setAudioMapping(mapping);
           console.log('Audio mapping loaded successfully:', mapping);
         } else {
-          console.error('Failed to load audio mapping:', response.status, response.statusText);
+          console.warn('⚠️ Audio mapping not found, attempting to generate audio files...');
+          // Try to generate audio files if mapping is missing
+          try {
+            const generateResponse = await fetch('/api/generate-breathwork-audio', {
+              method: 'POST'
+            });
+            if (generateResponse.ok) {
+              const newMapping = await generateResponse.json();
+              setAudioMapping(newMapping);
+              console.log('✅ Audio files generated successfully');
+            } else {
+              console.warn('⚠️ Could not generate audio files, audio will be disabled');
+              setAudioMapping(null);
+            }
+          } catch (generateError) {
+            console.warn('⚠️ Audio generation failed, audio will be disabled');
+            setAudioMapping(null);
+          }
         }
       } catch (error) {
         console.error('Error loading audio mapping:', error);
+        setAudioMapping(null);
       }
     };
     
@@ -595,58 +613,77 @@ export default function BreathPage() {
                     )}
                   </div>
 
-                  {/* Animated Breath Circle */}
+                  {/* Enhanced Breath Circle */}
                   <div className="flex justify-center mb-8">
                     <div className="relative">
-                      {/* Outer ring with pulsing effect */}
+                      {/* Main breath circle with enhanced visual effects */}
                       <div 
-                        className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 flex items-center justify-center transition-all duration-700 ease-out`}
+                        className={`w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full border-4 flex items-center justify-center transition-all duration-500 ease-out relative overflow-hidden`}
                         style={{ 
                           transform: `scale(${breathScale})`,
-                          borderColor: isActive ? getPhaseBorderColor(currentPhase) : '#e5e7eb'
+                          borderColor: isActive ? getPhaseBorderColor(currentPhase) : '#e5e7eb',
+                          background: isActive ? `radial-gradient(circle, ${getPhaseGlowColor(currentPhase)}20, transparent 70%)` : 'transparent'
                         }}
                       >
+                        {/* Animated background rings */}
+                        {isActive && (
+                          <>
+                            <div 
+                              className="absolute inset-0 rounded-full border-2 border-current opacity-20 animate-ping"
+                              style={{ borderColor: getPhaseBorderColor(currentPhase) }}
+                            />
+                            <div 
+                              className="absolute inset-2 rounded-full border border-current opacity-30 animate-pulse"
+                              style={{ borderColor: getPhaseBorderColor(currentPhase) }}
+                            />
+                          </>
+                        )}
                         
-                        {/* Inner circle with gradient and glow */}
+                        {/* Inner circle with enhanced styling */}
                         <div 
-                          className={`w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-lg transition-all duration-700 ease-out`}
+                          className={`w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-2xl transition-all duration-500 ease-out relative`}
                           style={{
-                            boxShadow: isActive ? `0 0 20px ${getPhaseGlowColor(currentPhase)}` : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                            boxShadow: isActive 
+                              ? `0 0 30px ${getPhaseGlowColor(currentPhase)}, 0 8px 32px rgba(0,0,0,0.1)` 
+                              : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                           }}
                         >
-                          <div className="text-center">
-                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2 transition-all duration-300">
+                          {/* Time display */}
+                          <div className="text-center z-10">
+                            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 transition-all duration-300">
                               {formatTime(timeLeft)}
                             </div>
-                            <div className={`inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full text-xs font-medium transition-all duration-300 ${getPhaseColor(currentPhase)}`}>
-                              <Heart className={`h-3 w-3 transition-all duration-300 ${isActive ? 'animate-pulse' : ''}`} />
+                            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${getPhaseColor(currentPhase)} backdrop-blur-sm`}>
+                              <div className={`w-2 h-2 rounded-full ${isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: getPhaseBorderColor(currentPhase) }} />
                               <span className="hidden sm:inline">{getPhaseLabel(currentPhase)}</span>
                             </div>
                           </div>
                         </div>
                       </div>
                       
-                      {/* Progress ring with smooth animation */}
-                      <div className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
+                      {/* Enhanced progress ring */}
+                      <div className="absolute inset-0 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56">
                         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                          {/* Background circle */}
                           <circle
                             cx="50"
                             cy="50"
                             r="45"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="3"
-                            className="text-gray-200"
+                            strokeWidth="4"
+                            className="text-gray-100"
                           />
+                          {/* Progress circle */}
                           <circle
                             cx="50"
                             cy="50"
                             r="45"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="3"
+                            strokeWidth="4"
                             strokeLinecap="round"
-                            className={`transition-all duration-700 ease-out`}
+                            className="transition-all duration-500 ease-out drop-shadow-sm"
                             style={{
                               stroke: getPhaseProgressColor(currentPhase),
                               strokeDasharray: `${2 * Math.PI * 45}`,
@@ -656,20 +693,26 @@ export default function BreathPage() {
                         </svg>
                       </div>
                       
-                      {/* Phase indicator dots */}
+                      {/* Enhanced phase indicators */}
                       {isActive && (
-                        <div className="absolute -bottom-8 left-1/2 transform -translate-x-1/2 flex gap-2">
+                        <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex gap-3">
                           {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => (
-                            <div
-                              key={phase}
-                              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                                currentPhase === phase 
-                                  ? 'bg-blue-500 scale-125' 
-                                  : selectedPattern.pattern[phase as keyof typeof selectedPattern.pattern] > 0 
-                                    ? 'bg-gray-300' 
-                                    : 'bg-transparent'
-                              }`}
-                            />
+                            <div key={phase} className="flex flex-col items-center gap-1">
+                              <div
+                                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                                  currentPhase === phase 
+                                    ? 'bg-blue-500 scale-125 shadow-lg' 
+                                    : selectedPattern.pattern[phase as keyof typeof selectedPattern.pattern] > 0 
+                                      ? 'bg-gray-300' 
+                                      : 'bg-transparent'
+                                }`}
+                              />
+                              <span className={`text-xs font-medium transition-all duration-300 ${
+                                currentPhase === phase ? 'text-blue-600' : 'text-gray-400'
+                              }`}>
+                                {phase === 'hold2' ? 'Hold' : phase.charAt(0).toUpperCase() + phase.slice(1)}
+                              </span>
+                            </div>
                           ))}
                         </div>
                       )}

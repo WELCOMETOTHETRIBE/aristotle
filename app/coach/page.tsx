@@ -52,6 +52,7 @@ export default function CoachPage() {
   const [microphoneAvailable, setMicrophoneAvailable] = useState(false);
   const [showTextInput, setShowTextInput] = useState(true); // Always show text input as fallback
   const [textInput, setTextInput] = useState('');
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
   // Initialize media recorder
   useEffect(() => {
@@ -65,6 +66,12 @@ export default function CoachPage() {
           throw new Error('Microphone access not supported in this browser');
         }
         
+        // Initialize AudioContext for better audio handling
+        if (!audioContext) {
+          const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+          setAudioContext(ctx);
+        }
+        
         // Request microphone permission with better error handling
         const stream = await navigator.mediaDevices.getUserMedia({ 
           audio: {
@@ -72,6 +79,7 @@ export default function CoachPage() {
             noiseSuppression: true,
             sampleRate: 44100,
             channelCount: 1,
+            autoGainControl: true,
           } 
         });
         
@@ -191,8 +199,17 @@ export default function CoachPage() {
     }
   };
 
+  const initializeAudioContext = () => {
+    if (audioContext && audioContext.state === 'suspended') {
+      audioContext.resume();
+    }
+  };
+
   const handleVoiceRecord = async () => {
     console.log('handleVoiceRecord called, mediaRecorder:', !!mediaRecorder, 'isRecording:', isRecording);
+    
+    // Initialize audio context on first interaction
+    initializeAudioContext();
     
     if (!mediaRecorder) {
       console.error('MediaRecorder not available');
