@@ -100,6 +100,12 @@ aristotle/
 - Hedonic pattern analysis
 
 ### **Breathwork** (`/breath`)
+- **Audio Guidance**: Soft spoken directions and counting with TTS
+- **Multiple Patterns**: Box Breathing, 4-7-8, Wim Hof, Coherent, Triangle, Ocean Breath
+- **Mobile-Optimized**: Collapsible pattern details for better mobile experience
+- **Visual Timer**: Animated breath circle with progress indicators
+- **Session Tracking**: Automatic logging of breathwork sessions
+- **Graceful Fallback**: Works without audio when TTS API is unavailable
 - Multiple breathing patterns (Box, 4-7-8, Wim Hof, etc.)
 - Visual breathing timer with animations
 - Pattern selection and benefits display

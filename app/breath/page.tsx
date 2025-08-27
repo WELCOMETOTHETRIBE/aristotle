@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Play, Pause, RotateCcw, Settings, Heart, Timer, Target, Sparkles } from 'lucide-react';
+import { Play, Pause, RotateCcw, Settings, Heart, Timer, Target, Sparkles, ChevronDown, ChevronUp, Volume2, VolumeX } from 'lucide-react';
 
 interface BreathPattern {
   name: string;
@@ -53,6 +53,22 @@ const breathPatterns: BreathPattern[] = [
     color: 'from-green-500 to-emerald-500',
     icon: '🌿',
   },
+  {
+    name: 'Triangle Breathing',
+    description: 'Equal inhale and exhale with no holds for simplicity',
+    pattern: { inhale: 6, hold: 0, exhale: 6, hold2: 0, cycles: 10 },
+    benefits: ['Simple and accessible', 'Reduces heart rate', 'Promotes relaxation'],
+    color: 'from-indigo-500 to-blue-500',
+    icon: '🔺',
+  },
+  {
+    name: 'Ocean Breath',
+    description: 'Gentle breathing with soft sound to calm the mind',
+    pattern: { inhale: 4, hold: 2, exhale: 6, hold2: 0, cycles: 8 },
+    benefits: ['Soothes nervous system', 'Improves concentration', 'Reduces tension'],
+    color: 'from-teal-500 to-cyan-500',
+    icon: '🌊',
+  },
 ];
 
 export default function BreathPage() {
@@ -65,9 +81,106 @@ export default function BreathPage() {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [breathScale, setBreathScale] = useState(1);
+  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
+  const [isGeneratingAudio, setIsGeneratingAudio] = useState(false);
   
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const sessionIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  // Generate audio guidance for current phase
+  const generateAudioGuidance = async (phase: string, timeLeft: number) => {
+    if (!audioEnabled || isGeneratingAudio) return;
+    
+    setIsGeneratingAudio(true);
+    
+    let guidanceText = '';
+    switch (phase) {
+      case 'inhale':
+        guidanceText = `Breathe in deeply. ${timeLeft} seconds.`;
+        break;
+      case 'hold':
+        guidanceText = `Hold your breath. ${timeLeft} seconds.`;
+        break;
+      case 'exhale':
+        guidanceText = `Release your breath slowly. ${timeLeft} seconds.`;
+        break;
+      case 'hold2':
+        guidanceText = `Hold empty. ${timeLeft} seconds.`;
+        break;
+    }
+
+    try {
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: guidanceText,
+          voice: 'nova', // Soft, calming voice
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setAudioUrl(data.url);
+        
+        // Play the audio
+        if (audioRef.current) {
+          audioRef.current.src = data.url;
+          audioRef.current.play().catch(console.error);
+        }
+      } else {
+        // If TTS API is not available, disable audio gracefully
+        console.warn('TTS API not available, audio guidance disabled');
+        setAudioEnabled(false);
+      }
+    } catch (error) {
+      console.error('Error generating audio guidance:', error);
+      // Disable audio on error to prevent repeated failures
+      setAudioEnabled(false);
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
+
+  // Generate soft counting audio
+  const generateCountingAudio = async (count: number) => {
+    if (!audioEnabled || isGeneratingAudio) return;
+    
+    setIsGeneratingAudio(true);
+    
+    try {
+      const response = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: count.toString(),
+          voice: 'nova',
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Play the counting audio
+        if (audioRef.current) {
+          audioRef.current.src = data.url;
+          audioRef.current.play().catch(console.error);
+        }
+      } else {
+        // If TTS API is not available, disable audio gracefully
+        setAudioEnabled(false);
+      }
+    } catch (error) {
+      console.error('Error generating counting audio:', error);
+      // Disable audio on error to prevent repeated failures
+      setAudioEnabled(false);
+    } finally {
+      setIsGeneratingAudio(false);
+    }
+  };
 
   useEffect(() => {
     if (isActive) {
@@ -89,8 +202,21 @@ export default function BreathPage() {
               }
             }
             
-            return getPhaseDuration(nextPhase);
+            const newDuration = getPhaseDuration(nextPhase);
+            
+            // Generate audio guidance for new phase
+            if (audioEnabled) {
+              generateAudioGuidance(nextPhase, newDuration);
+            }
+            
+            return newDuration;
           }
+          
+          // Generate counting audio for the last 3 seconds of each phase
+          if (audioEnabled && prev <= 3 && prev > 1) {
+            generateCountingAudio(prev);
+          }
+          
           return prev - 1;
         });
       }, 1000);
@@ -114,7 +240,7 @@ export default function BreathPage() {
       if (intervalRef.current) clearInterval(intervalRef.current);
       if (sessionIntervalRef.current) clearInterval(sessionIntervalRef.current);
     };
-  }, [isActive, currentPhase, currentCycle, totalCycles]);
+  }, [isActive, currentPhase, currentCycle, totalCycles, audioEnabled]);
 
   // Animate breath circle
   useEffect(() => {
@@ -175,6 +301,11 @@ export default function BreathPage() {
     setSessionStartTime(new Date());
     setSessionDuration(0);
 
+    // Generate initial audio guidance
+    if (audioEnabled) {
+      generateAudioGuidance('inhale', selectedPattern.pattern.inhale);
+    }
+
     // Log breathwork session start
     try {
       await fetch('/api/skills/invoke', {
@@ -206,10 +337,39 @@ export default function BreathPage() {
     setSessionDuration(0);
   };
 
-  const handleSessionComplete = () => {
+  const handleSessionComplete = async () => {
     setIsActive(false);
     setCurrentPhase('inhale');
     setTimeLeft(0);
+    
+    // Play completion audio
+    if (audioEnabled) {
+      try {
+        const response = await fetch('/api/tts', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            text: 'Session complete. Well done.',
+            voice: 'nova',
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          if (audioRef.current) {
+            audioRef.current.src = data.url;
+            audioRef.current.play().catch(console.error);
+          }
+        } else {
+          // If TTS API is not available, disable audio gracefully
+          setAudioEnabled(false);
+        }
+      } catch (error) {
+        console.error('Error generating completion audio:', error);
+        // Disable audio on error to prevent repeated failures
+        setAudioEnabled(false);
+      }
+    }
     
     // Log session completion
     console.log('Breathwork session completed:', {
@@ -231,8 +391,15 @@ export default function BreathPage() {
     return `${mins}m ${secs}s`;
   };
 
+  const togglePatternExpansion = (patternName: string) => {
+    setExpandedPattern(expandedPattern === patternName ? null : patternName);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
+      {/* Hidden audio element for TTS playback */}
+      <audio ref={audioRef} preload="auto" />
+      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -250,9 +417,9 @@ export default function BreathPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
             {/* Main Timer Widget */}
-            <div>
+            <div className="xl:col-span-2">
               <Card className="glass-effect border-0 shadow-2xl bg-white/80 backdrop-blur-xl h-full">
                 <CardHeader className="text-center pb-6">
                   <div className="flex items-center justify-center gap-3 mb-4">
@@ -263,29 +430,49 @@ export default function BreathPage() {
                 </CardHeader>
                 
                 <CardContent className="text-center pb-8">
+                  {/* Audio Controls */}
+                  <div className="flex justify-center mb-4">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setAudioEnabled(!audioEnabled)}
+                      disabled={isGeneratingAudio}
+                      className={`flex items-center gap-2 ${audioEnabled ? 'text-blue-600 border-blue-200' : 'text-gray-500 border-gray-200'}`}
+                    >
+                      {isGeneratingAudio ? (
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
+                      ) : audioEnabled ? (
+                        <Volume2 className="h-4 w-4" />
+                      ) : (
+                        <VolumeX className="h-4 w-4" />
+                      )}
+                      {isGeneratingAudio ? 'Generating...' : audioEnabled ? 'Audio On' : 'Audio Off'}
+                    </Button>
+                  </div>
+
                   {/* Animated Breath Circle */}
                   <div className="flex justify-center mb-8">
                     <div className="relative">
                       {/* Outer ring */}
-                      <div className={`w-48 h-48 rounded-full border-4 border-gray-200 flex items-center justify-center transition-all duration-1000 ease-in-out`}
+                      <div className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full border-4 border-gray-200 flex items-center justify-center transition-all duration-1000 ease-in-out`}
                            style={{ transform: `scale(${breathScale})` }}>
                         
                         {/* Inner circle with gradient */}
-                        <div className={`w-36 h-36 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-lg`}>
+                        <div className={`w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-lg`}>
                           <div className="text-center">
-                            <div className="text-3xl font-bold text-white mb-2">
+                            <div className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
                               {formatTime(timeLeft)}
                             </div>
-                            <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium ${getPhaseColor(currentPhase)}`}>
+                            <div className={`inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full text-xs font-medium ${getPhaseColor(currentPhase)}`}>
                               <Heart className="h-3 w-3" />
-                              {getPhaseLabel(currentPhase)}
+                              <span className="hidden sm:inline">{getPhaseLabel(currentPhase)}</span>
                             </div>
                           </div>
                         </div>
                       </div>
                       
                       {/* Progress ring */}
-                      <div className="absolute inset-0 w-48 h-48">
+                      <div className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48">
                         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                           <circle
                             cx="50"
@@ -393,8 +580,8 @@ export default function BreathPage() {
                         3
                       </div>
                       <div>
-                        <h4 className="font-medium">Follow the timer</h4>
-                        <p className="text-muted-foreground">Breathe according to the visual cues</p>
+                        <h4 className="font-medium">Follow the guidance</h4>
+                        <p className="text-muted-foreground">Listen to audio cues and follow visual indicators</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
@@ -428,7 +615,7 @@ export default function BreathPage() {
             </div>
 
             {/* Choose Pattern Panel */}
-            <div>
+            <div className="xl:col-span-1">
               <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl h-full">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -437,50 +624,99 @@ export default function BreathPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-3">
+                  <div className="space-y-3 max-h-96 overflow-y-auto">
                     {breathPatterns.map((pattern) => (
                       <div
                         key={pattern.name}
-                        className={`p-3 rounded-xl border-2 cursor-pointer transition-all duration-300 hover:shadow-lg ${
+                        className={`rounded-xl border-2 transition-all duration-300 ${
                           selectedPattern.name === pattern.name
                             ? `border-primary bg-gradient-to-r ${pattern.color} bg-opacity-10 shadow-lg`
-                            : 'border-gray-200 hover:border-primary/50 bg-white/50'
+                            : 'border-gray-200 bg-white/50'
                         }`}
-                        onClick={() => {
-                          setSelectedPattern(pattern);
-                          setTotalCycles(pattern.pattern.cycles);
-                          if (!isActive) {
-                            setTimeLeft(pattern.pattern.inhale);
-                          }
-                        }}
                       >
-                        <div className="flex items-start gap-3">
-                          <span className="text-xl">{pattern.icon}</span>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-sm mb-1">{pattern.name}</h4>
-                            <p className="text-xs text-muted-foreground mb-2">
-                              {pattern.description}
-                            </p>
-                            <div className="flex flex-wrap gap-1">
-                              <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
-                                {pattern.pattern.inhale}s inhale
-                              </span>
-                              {pattern.pattern.hold > 0 && (
-                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-                                  {pattern.pattern.hold}s hold
-                                </span>
-                              )}
-                              <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                                {pattern.pattern.exhale}s exhale
-                              </span>
-                              {pattern.pattern.hold2 > 0 && (
-                                <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
-                                  {pattern.pattern.hold2}s hold
-                                </span>
-                              )}
+                        {/* Pattern Header - Always Visible */}
+                        <div
+                          className="p-3 cursor-pointer"
+                          onClick={() => {
+                            setSelectedPattern(pattern);
+                            setTotalCycles(pattern.pattern.cycles);
+                            if (!isActive) {
+                              setTimeLeft(pattern.pattern.inhale);
+                            }
+                          }}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="text-xl">{pattern.icon}</span>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm mb-1 truncate">{pattern.name}</h4>
+                              <p className="text-xs text-muted-foreground line-clamp-2">
+                                {pattern.description}
+                              </p>
                             </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                togglePatternExpansion(pattern.name);
+                              }}
+                              className="p-1 hover:bg-gray-100 rounded flex-shrink-0"
+                            >
+                              {expandedPattern === pattern.name ? (
+                                <ChevronUp className="h-4 w-4 text-gray-500" />
+                              ) : (
+                                <ChevronDown className="h-4 w-4 text-gray-500" />
+                              )}
+                            </button>
                           </div>
                         </div>
+
+                        {/* Expanded Content */}
+                        {expandedPattern === pattern.name && (
+                          <div className="px-3 pb-3 border-t border-gray-100">
+                            <div className="pt-3 space-y-3">
+                              {/* Pattern Details */}
+                              <div>
+                                <h5 className="text-xs font-medium text-gray-700 mb-2">Breathing Pattern</h5>
+                                <div className="flex flex-wrap gap-1">
+                                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full">
+                                    {pattern.pattern.inhale}s inhale
+                                  </span>
+                                  {pattern.pattern.hold > 0 && (
+                                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
+                                      {pattern.pattern.hold}s hold
+                                    </span>
+                                  )}
+                                  <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                                    {pattern.pattern.exhale}s exhale
+                                  </span>
+                                  {pattern.pattern.hold2 > 0 && (
+                                    <span className="text-xs bg-orange-100 text-orange-700 px-2 py-1 rounded-full">
+                                      {pattern.pattern.hold2}s hold
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              {/* Benefits */}
+                              <div>
+                                <h5 className="text-xs font-medium text-gray-700 mb-2">Benefits</h5>
+                                <div className="space-y-1">
+                                  {pattern.benefits.map((benefit, index) => (
+                                    <div key={index} className="flex items-center gap-2">
+                                      <div className="w-1.5 h-1.5 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex-shrink-0" />
+                                      <span className="text-xs text-gray-600">{benefit}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+
+                              {/* Cycles Info */}
+                              <div>
+                                <h5 className="text-xs font-medium text-gray-700 mb-1">Total Cycles</h5>
+                                <span className="text-xs text-gray-600">{pattern.pattern.cycles} cycles</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
