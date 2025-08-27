@@ -50,7 +50,7 @@ export default function CoachPage() {
   const [error, setError] = useState<string | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [microphoneAvailable, setMicrophoneAvailable] = useState(false);
-  const [showTextInput, setShowTextInput] = useState(false);
+  const [showTextInput, setShowTextInput] = useState(true); // Always show text input as fallback
   const [textInput, setTextInput] = useState('');
 
   // Initialize media recorder
@@ -171,7 +171,9 @@ export default function CoachPage() {
       setTranscript(data.text);
     } catch (error: any) {
       console.error('Transcription error:', error);
-      setError(`Transcription failed: ${error.message}. You can still type your message.`);
+      setError(`Voice transcription is currently unavailable. Please type your message below.`);
+      // Show text input as fallback
+      setShowTextInput(true);
     } finally {
       setIsProcessing(false);
     }
@@ -229,7 +231,7 @@ export default function CoachPage() {
 
       const data = await response.json();
       
-      // Generate TTS for coach reply
+      // Generate TTS for coach reply (optional - don't block if it fails)
       let audioUrl: string | undefined;
       try {
         const ttsResponse = await fetch('/api/tts', {
@@ -243,9 +245,11 @@ export default function CoachPage() {
         if (ttsResponse.ok) {
           const ttsData = await ttsResponse.json();
           audioUrl = ttsData.url;
+        } else {
+          console.warn('TTS API not available, audio will be text-only');
         }
       } catch (error) {
-        console.error('TTS error:', error);
+        console.warn('TTS error (non-critical):', error);
         // Don't fail the whole request if TTS fails
       }
 
@@ -261,13 +265,13 @@ export default function CoachPage() {
       setCurrentPlan(data.plan);
     } catch (error: any) {
       console.error('Coach API error:', error);
-      setError(`Failed to get coach response: ${error.message}`);
+      setError(`I'm experiencing some technical difficulties. Please try typing your message again.`);
       
-      // Fallback message
+      // Fallback message with helpful guidance
       const fallbackMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'coach',
-        content: 'I apologize, but I\'m having trouble processing your request right now. Please try again.',
+        content: 'I understand you\'re reaching out, and I want to support you. While I\'m having some technical difficulties right now, I encourage you to take a moment to breathe deeply and consider what would be most helpful for you in this moment. You can try typing your message again, or simply take some time for self-reflection.',
         timestamp: new Date(),
       };
       setMessages(prev => [...prev, fallbackMessage]);

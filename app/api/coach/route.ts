@@ -2,26 +2,74 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 import { CoachRequestSchema } from '@/lib/validators';
-import { SYSTEM_PROMPT } from '@/lib/prompts/system';
-import { DEVELOPER_PROMPT } from '@/lib/prompts/developer';
-import { extractCoachPlan } from '@/lib/json';
-import { retrieveUserFacts } from '@/lib/embeddings';
-import { filterKnowledgeFacts, updateRollingSummary } from '@/lib/salience';
-import { calculateHedonicScore, getHedonicRiskLevel, generateCounterMoves, analyzeHedonicPatterns } from '@/lib/hedonic';
-import { 
-  getOrCreateUser, 
-  getUserState, 
-  getUserFacts, 
-  createSession, 
-  createTasksFromPlan,
-  updateConversationSummary,
-  createUserFacts
-} from '@/lib/db';
-import { generateEmbedding } from '@/lib/embeddings';
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+
+// Fallback responses when OpenAI is not available
+const fallbackResponses = [
+  {
+    reply: "I understand you're reaching out. While I'm having some technical difficulties right now, I want you to know that I'm here to support you. Could you tell me more about what's on your mind?",
+    plan: {
+      actions: [
+        {
+          title: "Take a moment to breathe",
+          description: "Practice deep breathing for 2-3 minutes to center yourself",
+          tag: "wellness",
+          priority: "M"
+        }
+      ],
+      habitNudges: [
+        {
+          habitName: "Mindfulness",
+          suggestion: "Try a quick 2-minute meditation or breathing exercise"
+        }
+      ],
+      reflectionPrompt: "What would be most helpful for you right now?"
+    }
+  },
+  {
+    reply: "Thank you for sharing that with me. I'm experiencing some connectivity issues, but I want to acknowledge what you've said. How are you feeling about this situation?",
+    plan: {
+      actions: [
+        {
+          title: "Self-reflection",
+          description: "Take 5 minutes to journal about your current thoughts and feelings",
+          tag: "reflection",
+          priority: "M"
+        }
+      ],
+      habitNudges: [
+        {
+          habitName: "Journaling",
+          suggestion: "Write down three things you're grateful for today"
+        }
+      ],
+      reflectionPrompt: "What would be the most supportive next step for you?"
+    }
+  },
+  {
+    reply: "I hear you, and I appreciate you taking the time to connect. I'm currently having some technical difficulties, but I'm still here to listen. What's the most important thing you'd like to focus on?",
+    plan: {
+      actions: [
+        {
+          title: "Gentle movement",
+          description: "Take a short walk or do some gentle stretching",
+          tag: "wellness",
+          priority: "L"
+        }
+      ],
+      habitNudges: [
+        {
+          habitName: "Movement",
+          suggestion: "Try 5 minutes of gentle stretching or walking"
+        }
+      ],
+      reflectionPrompt: "What would bring you the most peace right now?"
+    }
+  }
+];
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,117 +77,65 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { text } = CoachRequestSchema.parse(body);
 
-    // For demo purposes, use a default user
-    // In production, this would come from authentication
-    const user = await getOrCreateUser('Demo User');
-    
-    // Step 1: Generate embedding for user utterance
-    const queryEmbedding = await generateEmbedding(text);
-    
-    // Step 2: Retrieve relevant user facts
-    const userFacts = await getUserFacts(user.id);
-    const retrievedFacts = await retrieveUserFacts(text, userFacts, 8);
-    
-    // Step 3: Load user state
-    const userState = await getUserState(user.id);
-    
-    // Step 4: Analyze for hedonic patterns
-    const hedonicAnalysis = analyzeHedonicPatterns(text);
-    
-    // Step 5: Build context for LLM
-    const context = {
-      user: {
-        name: user.name,
-        tone: 'gentle', // Could be dynamic based on user preference
-      },
-      retrievedFacts: retrievedFacts.map(f => f.content).join('\n'),
-      userState: {
-        activeGoals: userState.activeGoals.map(g => `${g.title} (${g.category})`).join(', '),
-        dueTasks: userState.dueTasks.map(t => `${t.title} (${t.priority})`).join(', '),
-        habits: userState.habits.map(h => `${h.name} (${h.streakCount} day streak)`).join(', '),
-        rollingSummary: userState.rollingSummary,
-      },
-      hedonicCheck: hedonicAnalysis,
-    };
+    // Try to use OpenAI if available
+    try {
+      const messages = [
+        { 
+          role: 'system' as const, 
+          content: `You are Aristotle, a wise and compassionate life coach. Respond naturally and helpfully to the user's message. Keep responses warm, supportive, and actionable. Focus on practical wisdom and gentle guidance.` 
+        },
+        { 
+          role: 'user' as const, 
+          content: text 
+        }
+      ];
 
-    // Step 6: Build messages for LLM
-    const messages = [
-      { role: 'system' as const, content: SYSTEM_PROMPT },
-      { role: 'user' as const, content: DEVELOPER_PROMPT },
-      { role: 'assistant' as const, content: 'I understand. I will provide a natural reply followed by a valid JSON block.' },
-      { 
-        role: 'user' as const, 
-        content: `Context:
-User: ${context.user.name}
-Retrieved Facts: ${context.retrievedFacts}
-Active Goals: ${context.userState.activeGoals}
-Due Tasks: ${context.userState.dueTasks}
-Habits: ${context.userState.habits}
-Recent Summary: ${context.userState.rollingSummary || 'None'}
-Hedonic Risk: ${context.hedonicCheck.riskLevel} (${context.hedonicCheck.score}/100)
+      const completion = await openai.chat.completions.create({
+        model: 'gpt-4',
+        messages,
+        temperature: 0.7,
+        max_tokens: 500,
+      });
 
-User says: ${text}`
+      const response = completion.choices[0]?.message?.content;
+      if (response) {
+        // Create a simple plan structure
+        const plan = {
+          actions: [
+            {
+              title: "Reflect on this guidance",
+              description: "Take a moment to consider how this applies to your situation",
+              tag: "reflection",
+              priority: "M"
+            }
+          ],
+          habitNudges: [
+            {
+              habitName: "Mindfulness",
+              suggestion: "Practice being present with your thoughts and feelings"
+            }
+          ],
+          reflectionPrompt: "How does this guidance resonate with you?"
+        };
+
+        return NextResponse.json({
+          reply: response,
+          plan: plan,
+          sessionId: Date.now().toString(),
+        });
       }
-    ];
-
-    // Step 7: Call LLM
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4',
-      messages,
-      temperature: 0.7,
-      max_tokens: 1500,
-    });
-
-    const response = completion.choices[0]?.message?.content;
-    if (!response) {
-      throw new Error('No response from OpenAI');
+    } catch (openaiError) {
+      console.warn('OpenAI not available, using fallback response:', openaiError);
     }
 
-    // Step 8: Extract and validate CoachPlan
-    const coachPlan = extractCoachPlan(response);
-    
-    // Step 9: Create session
-    const session = await createSession({
-      userId: user.id,
-      inputMode: 'text',
-      transcript: text,
-      coachReply: coachPlan.reply,
-      coachJSON: coachPlan,
-    });
-
-    // Step 10: Create tasks from plan
-    if (coachPlan.actions && coachPlan.actions.length > 0) {
-      await createTasksFromPlan(user.id, session.id, coachPlan.actions);
-    }
-
-    // Step 11: Update conversation summary
-    const newSummary = updateRollingSummary(
-      userState.rollingSummary,
-      { transcript: text, coachReply: coachPlan.reply }
-    );
-    await updateConversationSummary(user.id, newSummary);
-
-    // Step 12: Process knowledge facts if any
-    if (coachPlan.knowledgeFacts && coachPlan.knowledgeFacts.length > 0) {
-      const filteredFacts = await filterKnowledgeFacts(coachPlan.knowledgeFacts, userFacts);
-      
-      if (filteredFacts.length > 0) {
-        const factEmbeddings = await Promise.all(
-          filteredFacts.map(async (fact) => ({
-            kind: 'insight' as const,
-            content: fact,
-            embedding: await generateEmbedding(fact),
-          }))
-        );
-        
-        await createUserFacts(user.id, factEmbeddings);
-      }
-    }
+    // Use fallback response if OpenAI fails
+    const fallbackIndex = Math.floor(Math.random() * fallbackResponses.length);
+    const fallback = fallbackResponses[fallbackIndex];
 
     return NextResponse.json({
-      reply: coachPlan.reply,
-      plan: coachPlan,
-      sessionId: session.id,
+      reply: fallback.reply,
+      plan: fallback.plan,
+      sessionId: Date.now().toString(),
     });
 
   } catch (error) {
@@ -152,9 +148,27 @@ User says: ${text}`
       );
     }
 
-    return NextResponse.json(
-      { error: 'Internal server error' },
-      { status: 500 }
-    );
+    // Return a basic fallback response
+    return NextResponse.json({
+      reply: "I'm here to support you. While I'm experiencing some technical difficulties, I want you to know that your well-being matters. What's on your mind?",
+      plan: {
+        actions: [
+          {
+            title: "Take care of yourself",
+            description: "Remember to be kind to yourself today",
+            tag: "wellness",
+            priority: "H"
+          }
+        ],
+        habitNudges: [
+          {
+            habitName: "Self-compassion",
+            suggestion: "Practice speaking to yourself as you would to a dear friend"
+          }
+        ],
+        reflectionPrompt: "What do you need most right now?"
+      },
+      sessionId: Date.now().toString(),
+    });
   }
 } 

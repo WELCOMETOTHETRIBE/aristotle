@@ -23,8 +23,8 @@ dist/
 *.sqlite3
 prisma/dev.db
 
-# Audio files (generated TTS)
-public/audio/
+# Audio files (generated TTS) - but keep breathwork audio
+public/audio/tts_*.mp3
 
 # Logs
 logs
@@ -79,7 +79,6 @@ jspm_packages/
 
 # Gatsby files
 .cache/
-public
 
 # Storybook build outputs
 .out
