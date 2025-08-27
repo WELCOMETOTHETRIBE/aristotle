@@ -4,6 +4,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && echo 'Starting test server...' && node test-server.js"
+    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && echo 'Keeping container alive...' && sleep 30 && echo 'Starting test server...' && node test-server.js"
   }
 } 
