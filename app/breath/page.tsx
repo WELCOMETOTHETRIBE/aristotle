@@ -738,18 +738,38 @@ export default function BreathPage() {
                   {/* Controls */}
                   <div className="flex justify-center gap-3 mb-6">
                     {!isActive ? (
-                      <Button onClick={handleStart} size="lg" className="px-8 py-4 text-base bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg">
+                      <Button 
+                        onClick={handleStart} 
+                        size="lg" 
+                        className="px-8 py-4 text-base bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+                        data-test="clickable"
+                        data-clickable-name="start-breathwork-session"
+                      >
                         <Play className="h-5 w-5 mr-2" />
                         Start Session
                       </Button>
                     ) : (
-                      <Button onClick={handlePause} variant="outline" size="lg" className="px-8 py-4 text-base border-2">
+                      <Button 
+                        onClick={handlePause} 
+                        variant="outline" 
+                        size="lg" 
+                        className="px-8 py-4 text-base border-2"
+                        data-test="clickable"
+                        data-clickable-name="pause-breathwork-session"
+                      >
                         <Pause className="h-5 w-5 mr-2" />
                         Pause
                       </Button>
                     )}
                     
-                    <Button onClick={handleReset} variant="outline" size="lg" className="px-4 py-4">
+                    <Button 
+                      onClick={handleReset} 
+                      variant="outline" 
+                      size="lg" 
+                      className="px-4 py-4"
+                      data-test="clickable"
+                      data-clickable-name="reset-breathwork-session"
+                    >
                       <RotateCcw className="h-5 w-5" />
                     </Button>
                   </div>

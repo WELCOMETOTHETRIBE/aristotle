@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { QueryProvider } from '@/components/providers/query-provider';
 import { Navigation } from '@/components/navigation';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -25,11 +26,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <QueryProvider>
-          <Navigation />
+          <ErrorBoundary>
+            <Navigation />
 
-          <main>
-            {children}
-          </main>
+            <main>
+              {children}
+            </main>
+          </ErrorBoundary>
 
           {/* Footer */}
           <footer className="bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 mt-16">

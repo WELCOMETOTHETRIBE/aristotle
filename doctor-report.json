@@ -1,0 +1,119 @@
+{
+  "timestamp": "2025-08-27T06:56:00.223Z",
+  "environment": {
+    "missing": [
+      "OPENAI_API_KEY",
+      "DATABASE_URL",
+      "NEXT_PUBLIC_APP_NAME"
+    ],
+    "present": []
+  },
+  "database": {
+    "status": "fail",
+    "error": "\nInvalid `prisma.$queryRaw()` invocation:\n\n\nerror: Environment variable not found: DATABASE_URL.\n  -->  schema.prisma:10\n   | \n 9 |   provider = \"sqlite\"\n10 |   url      = env(\"DATABASE_URL\")\n   | \n\nValidation Error Count: 1"
+  },
+  "routes": [
+    {
+      "path": "/api/coach",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/tts",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/transcribe",
+      "status": "error",
+      "issues": [
+        "No input validation found"
+      ]
+    },
+    {
+      "path": "/api/skills/invoke",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/generate-breathwork-audio",
+      "status": "error",
+      "issues": [
+        "No input validation found"
+      ]
+    },
+    {
+      "path": "/api/health",
+      "status": "error",
+      "issues": [
+        "No input validation found"
+      ]
+    },
+    {
+      "path": "/api/health-doctor",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/fasting",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/habits",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/tasks",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/goals",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "/api/user-facts",
+      "status": "ok",
+      "issues": []
+    }
+  ],
+  "components": [
+    {
+      "path": "app/breath/page.tsx",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "app/coach/page.tsx",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "app/dashboard/page.tsx",
+      "status": "ok",
+      "issues": []
+    },
+    {
+      "path": "app/onboarding/page.tsx",
+      "status": "ok",
+      "issues": []
+    }
+  ],
+  "audio": {
+    "breathwork": {
+      "mappingExists": true,
+      "filesGenerated": true
+    }
+  },
+  "fixes": [],
+  "todos": [
+    "Set missing environment variables: OPENAI_API_KEY, DATABASE_URL, NEXT_PUBLIC_APP_NAME",
+    "Fix database connection: \nInvalid `prisma.$queryRaw()` invocation:\n\n\nerror: Environment variable not found: DATABASE_URL.\n  -->  schema.prisma:10\n   | \n 9 |   provider = \"sqlite\"\n10 |   url      = env(\"DATABASE_URL\")\n   | \n\nValidation Error Count: 1",
+    "Fix /api/transcribe: No input validation found",
+    "Fix /api/generate-breathwork-audio: No input validation found",
+    "Fix /api/health: No input validation found"
+  ]
+}
