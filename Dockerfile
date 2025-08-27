@@ -42,6 +42,7 @@ RUN adduser --system --uid 1001 nextjs
 
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
+COPY --from=builder /app/prisma ./prisma
 
 # Set the correct permission for prerender cache
 RUN mkdir .next

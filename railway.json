@@ -4,7 +4,7 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "npm run railway:start",
+    "startCommand": "node scripts/init-database.js && node server.js",
     "healthcheckPath": "/api/health",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
