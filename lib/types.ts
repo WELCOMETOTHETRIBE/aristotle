@@ -164,3 +164,107 @@ export interface FastingProgress {
   benefits: FastingBenefitAnalysis[];
   recommendations: string[];
 } 
+
+// Ancient Wisdom Wellness System Types
+export interface AncientPractice {
+  id: string;
+  name: string;
+  description: string;
+  tradition: string;
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  duration: string;
+  benefits: string[];
+  instructions: string[];
+  scientificValidation?: string;
+  culturalContext: string;
+  prerequisites?: string[];
+  resources: {
+    books: string[];
+    videos: string[];
+    articles: string[];
+    teachers: string[];
+  };
+}
+
+export interface VirtueDimension {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  ancientPractices: AncientPractice[];
+  modernApplications: string[];
+  scientificBasis: string[];
+  progress: number;
+}
+
+export interface WellnessDimension {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  color: string;
+  practices: AncientPractice[];
+  dailyRoutines: string[];
+  weeklyPractices: string[];
+  seasonalAlignments: string[];
+}
+
+export interface PracticeModule {
+  id: string;
+  title: string;
+  description: string;
+  category: 'virtue' | 'wellness' | 'physical' | 'mental' | 'emotional' | 'spiritual';
+  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
+  duration: string;
+  lessons: number;
+  rating: number;
+  students: number;
+  practices: AncientPractice[];
+  prerequisites: string[];
+  outcomes: string[];
+  certification?: boolean;
+}
+
+export interface DailyRoutine {
+  id: string;
+  name: string;
+  timeOfDay: 'morning' | 'midday' | 'evening' | 'anytime';
+  duration: string;
+  practices: string[];
+  description: string;
+  benefits: string[];
+}
+
+export interface LifeTransition {
+  id: string;
+  name: string;
+  description: string;
+  practices: AncientPractice[];
+  guidance: string[];
+  communitySupport: string[];
+  duration: string;
+}
+
+export interface WisdomCircle {
+  id: string;
+  name: string;
+  description: string;
+  focus: string;
+  meetingFrequency: string;
+  maxParticipants: number;
+  currentParticipants: number;
+  practices: string[];
+  mentors: string[];
+}
+
+export interface CertificationPath {
+  id: string;
+  name: string;
+  description: string;
+  requirements: string[];
+  duration: string;
+  cost: string;
+  benefits: string[];
+  curriculum: string[];
+} 

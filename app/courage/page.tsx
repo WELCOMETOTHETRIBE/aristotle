@@ -3,74 +3,21 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Shield, Target, Zap, TrendingUp, Award, Sparkles, ArrowRight, Play, Users, Calendar, Flame } from 'lucide-react';
+import { 
+  Shield, BookOpen, Play, Clock, Star, ChevronRight, Users, Target, 
+  Flame, Zap, Globe, Compass, ArrowRight, CheckCircle, ExternalLink,
+  Sword, Activity, Heart, Mountain
+} from 'lucide-react';
 import Link from 'next/link';
+import { enhancedVirtueDimensions } from '@/lib/ancient-wisdom-data';
 
-const courageChallenges = [
-  {
-    title: 'Face Your Fears',
-    description: 'Identify and confront one fear each day',
-    icon: Shield,
-    color: 'from-red-500 to-orange-600',
-    duration: '5 min',
-    difficulty: 'Beginner',
-    reward: '+10 Courage Points'
-  },
-  {
-    title: 'Take Action',
-    description: 'Complete one challenging task you\'ve been avoiding',
-    icon: Zap,
-    color: 'from-orange-500 to-yellow-600',
-    duration: '30 min',
-    difficulty: 'Intermediate',
-    reward: '+25 Courage Points'
-  },
-  {
-    title: 'Growth Challenge',
-    description: 'Learn a new skill outside your comfort zone',
-    icon: TrendingUp,
-    color: 'from-yellow-500 to-red-600',
-    duration: '1 hour',
-    difficulty: 'Advanced',
-    reward: '+50 Courage Points'
-  },
-  {
-    title: 'Leadership',
-    description: 'Take initiative in a group or community setting',
-    icon: Award,
-    color: 'from-red-600 to-pink-600',
-    duration: '2 hours',
-    difficulty: 'Expert',
-    reward: '+100 Courage Points'
-  }
-];
-
-const courageProgress = [
-  {
-    title: 'Daily Challenges',
-    description: 'Facing fears and taking action',
-    completed: 12,
-    total: 30,
-    streak: 5
-  },
-  {
-    title: 'Growth Goals',
-    description: 'Learning new skills and abilities',
-    completed: 3,
-    total: 10,
-    streak: 2
-  },
-  {
-    title: 'Leadership Moments',
-    description: 'Taking initiative and leading others',
-    completed: 1,
-    total: 5,
-    streak: 1
-  }
-];
+const courageData = enhancedVirtueDimensions.find(v => v.id === 'courage');
 
 export default function CouragePage() {
-  const [selectedChallenge, setSelectedChallenge] = useState(courageChallenges[0]);
+  const [selectedPractice, setSelectedPractice] = useState(courageData?.ancientPractices[0]);
+  const [activeTab, setActiveTab] = useState<'practices' | 'modern' | 'science' | 'resources'>('practices');
+
+  if (!courageData) return <div>Loading...</div>;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-yellow-50">
@@ -78,200 +25,360 @@ export default function CouragePage() {
         {/* Header */}
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-4">
-            <Shield className="w-8 h-8 text-red-600 mr-3" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
-              Courage
+            <Shield className="w-12 h-12 text-red-600 mr-4" />
+            <h1 className="text-5xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent">
+              Warrior Traditions
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            The virtue of facing challenges with strength. Build resilience, take action, and grow through adversity.
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-6">
+            {courageData.description}
           </p>
+          <div className="flex flex-wrap justify-center gap-4 text-sm text-gray-500">
+            <span className="flex items-center gap-1">
+              <Sword className="w-4 h-4" />
+              Mental Toughness
+            </span>
+            <span className="flex items-center gap-1">
+              <Flame className="w-4 h-4" />
+              Resilience
+            </span>
+            <span className="flex items-center gap-1">
+              <Activity className="w-4 h-4" />
+              Discipline
+            </span>
+            <span className="flex items-center gap-1">
+              <Mountain className="w-4 h-4" />
+              Strength
+            </span>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Daily Challenge */}
+        {/* Progress Overview */}
+        <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl mb-8">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Your Warrior Journey</h2>
+                <p className="text-gray-600">Progress through ancient warrior traditions</p>
+              </div>
+              <div className="text-right">
+                <div className="text-3xl font-bold text-red-600">{courageData.progress}%</div>
+                <div className="text-sm text-gray-500">Complete</div>
+              </div>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-red-500 to-orange-600 h-3 rounded-full transition-all duration-300"
+                style={{ width: `${courageData.progress}%` }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Navigation Tabs */}
+        <div className="flex flex-wrap justify-center gap-2 mb-8">
+          {[
+            { id: 'practices', label: 'Warrior Practices', icon: Shield },
+            { id: 'modern', label: 'Modern Applications', icon: Flame },
+            { id: 'science', label: 'Scientific Basis', icon: Target },
+            { id: 'resources', label: 'Resources', icon: Users }
+          ].map((tab) => {
+            const IconComponent = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                  activeTab === tab.id
+                    ? 'bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg'
+                    : 'bg-white/80 hover:bg-white text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <IconComponent className="w-4 h-4" />
+                {tab.label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Content Sections */}
+        {activeTab === 'practices' && (
+          <div className="space-y-8">
+            {/* Warrior Practices Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              {courageData.ancientPractices.map((practice) => (
+                <Card key={practice.id} className="border border-gray-200 hover:shadow-lg transition-all duration-200">
+                  <CardHeader>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <CardTitle className="text-xl mb-2">{practice.name}</CardTitle>
+                        <CardDescription className="text-base">{practice.description}</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <Clock className="w-4 h-4" />
+                        {practice.duration}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                        {practice.tradition}
+                      </span>
+                      <span className="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded-full">
+                        {practice.difficulty}
+                      </span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {/* Benefits */}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm text-gray-700">Warrior Benefits:</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {practice.benefits.map((benefit, index) => (
+                          <span key={index} className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
+                            {benefit}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Instructions Preview */}
+                    <div className="space-y-2">
+                      <h4 className="font-semibold text-sm text-gray-700">Training Steps:</h4>
+                      <div className="space-y-1">
+                        {practice.instructions.slice(0, 3).map((instruction, index) => (
+                          <div key={index} className="flex items-start gap-2 text-sm text-gray-600">
+                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span>{instruction}</span>
+                          </div>
+                        ))}
+                        {practice.instructions.length > 3 && (
+                          <div className="text-sm text-red-600 font-medium">
+                            +{practice.instructions.length - 3} more steps
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Scientific Validation */}
+                    {practice.scientificValidation && (
+                      <div className="space-y-2">
+                        <h4 className="font-semibold text-sm text-gray-700">Scientific Validation:</h4>
+                        <p className="text-sm text-gray-600 bg-red-50 p-3 rounded-lg">
+                          {practice.scientificValidation}
+                        </p>
+                      </div>
+                    )}
+
+                    <Button 
+                      className="w-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700"
+                      onClick={() => setSelectedPractice(practice)}
+                    >
+                      <Play className="w-4 h-4 mr-2" />
+                      Begin Training
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+
+            {/* Warrior Code */}
             <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Flame className="w-5 h-5 text-red-600" />
-                  Today's Courage Challenge
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Sword className="w-6 h-6 text-red-600" />
+                  Warrior Code
                 </CardTitle>
-                <CardDescription>
-                  Choose a challenge to build your courage today
+                <CardDescription className="text-lg">
+                  The principles and values that guide warrior traditions across cultures
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {courageChallenges.map((challenge) => {
-                    const IconComponent = challenge.icon;
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {[
+                    { title: 'Honor', description: 'Living with integrity and moral courage', icon: Heart },
+                    { title: 'Discipline', description: 'Consistent practice and self-control', icon: Activity },
+                    { title: 'Resilience', description: 'Bouncing back from adversity', icon: Mountain },
+                    { title: 'Mastery', description: 'Continuous improvement and excellence', icon: Target }
+                  ].map((principle, index) => {
+                    const IconComponent = principle.icon;
                     return (
-                      <Card
-                        key={challenge.title}
-                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                          selectedChallenge.title === challenge.title
-                            ? 'ring-2 ring-red-500 bg-red-50'
-                            : 'hover:bg-gray-50'
-                        }`}
-                        onClick={() => setSelectedChallenge(challenge)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start space-x-3">
-                            <div className={`w-10 h-10 bg-gradient-to-r ${challenge.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                              <IconComponent className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900 mb-1">{challenge.title}</h3>
-                              <p className="text-sm text-gray-600 mb-2">{challenge.description}</p>
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
-                                  <span>{challenge.duration}</span>
-                                  <span>•</span>
-                                  <span>{challenge.difficulty}</span>
-                                </div>
-                                <span className="text-xs font-medium text-green-600">{challenge.reward}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
+                      <div key={index} className="text-center space-y-3">
+                        <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-600 rounded-xl flex items-center justify-center mx-auto">
+                          <IconComponent className="w-6 h-6 text-white" />
+                        </div>
+                        <h3 className="font-semibold text-gray-900">{principle.title}</h3>
+                        <p className="text-sm text-gray-600">{principle.description}</p>
+                      </div>
                     );
                   })}
                 </div>
-                
-                <div className="mt-6">
-                  <Button className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700">
-                    <Play className="w-4 h-4 mr-2" />
-                    Accept {selectedChallenge.title}
-                  </Button>
-                </div>
               </CardContent>
             </Card>
+          </div>
+        )}
 
-            {/* Progress Tracking */}
+        {activeTab === 'modern' && (
+          <div className="space-y-8">
             <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-red-600" />
-                  Your Courage Journey
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Flame className="w-6 h-6 text-red-600" />
+                  Modern Applications
                 </CardTitle>
-                <CardDescription>
-                  Track your progress in building courage and resilience
+                <CardDescription className="text-lg">
+                  How warrior traditions apply to contemporary challenges and personal development
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {courageProgress.map((progress) => (
-                    <div key={progress.title} className="p-4 border border-gray-200 rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900">{progress.title}</h3>
-                        <span className="text-sm text-gray-500">{progress.completed}/{progress.total}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 mb-3">{progress.description}</p>
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-red-500 to-orange-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${(progress.completed / progress.total) * 100}%` }}
-                          />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {courageData.modernApplications.map((application, index) => (
+                    <Card key={index} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <Flame className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
+                          <div>
+                            <h3 className="font-semibold text-gray-900 mb-2">{application}</h3>
+                            <p className="text-sm text-gray-600">
+                              Practical ways to apply warrior principles to modern life challenges and personal growth.
+                            </p>
+                          </div>
                         </div>
-                        <span className="text-sm font-medium text-gray-700">{Math.round((progress.completed / progress.total) * 100)}%</span>
-                      </div>
-                      <div className="mt-2 text-xs text-gray-500">
-                        🔥 {progress.streak} day streak
-                      </div>
-                    </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               </CardContent>
             </Card>
           </div>
+        )}
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
+        {activeTab === 'science' && (
+          <div className="space-y-8">
             <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-red-600" />
-                  Quick Actions
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Target className="w-6 h-6 text-red-600" />
+                  Scientific Basis
                 </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link href="/coach">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Shield className="w-4 h-4 mr-2" />
-                    Get Courage Coaching
-                  </Button>
-                </Link>
-                <Link href="/community">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Users className="w-4 h-4 mr-2" />
-                    Join Courage Circle
-                  </Button>
-                </Link>
-                <Link href="/progress">
-                  <Button variant="outline" className="w-full justify-start">
-                    <Target className="w-4 h-4 mr-2" />
-                    View Progress
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
-
-            {/* Courage Benefits */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-red-600" />
-                  Courage Benefits
-                </CardTitle>
+                <CardDescription className="text-lg">
+                  Research and evidence supporting the effectiveness of warrior training methods
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm">Resilience</h4>
-                      <p className="text-xs text-gray-600">Bounce back from setbacks</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm">Confidence</h4>
-                      <p className="text-xs text-gray-600">Trust in your abilities</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm">Growth</h4>
-                      <p className="text-xs text-gray-600">Embrace challenges as opportunities</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-red-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm">Leadership</h4>
-                      <p className="text-xs text-gray-600">Take initiative and inspire others</p>
-                    </div>
-                  </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {courageData.scientificBasis.map((basis, index) => (
+                    <Card key={index} className="border border-gray-200">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <Target className="w-6 h-6 text-red-600 mt-1 flex-shrink-0" />
+                          <div>
+                            <h3 className="font-semibold text-gray-900 mb-2">{basis}</h3>
+                            <p className="text-sm text-gray-600">
+                              Scientific research and psychological studies that validate these warrior practices.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
                 </div>
               </CardContent>
             </Card>
+          </div>
+        )}
 
-            {/* Quote */}
-            <Card className="glass-effect border-0 shadow-xl bg-gradient-to-r from-red-500 to-orange-600 text-white">
-              <CardContent className="p-6">
-                <blockquote className="text-lg italic mb-4">
-                  "Courage is the first of human qualities because it is the quality which guarantees the others."
-                </blockquote>
-                <cite className="text-sm opacity-90">— Aristotle</cite>
+        {activeTab === 'resources' && (
+          <div className="space-y-8">
+            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-2xl">
+                  <Users className="w-6 h-6 text-red-600" />
+                  Training Resources
+                </CardTitle>
+                <CardDescription className="text-lg">
+                  Books, videos, articles, and masters to guide your warrior journey
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-6">
+                  {courageData.ancientPractices.map((practice) => (
+                    <Card key={practice.id} className="border border-gray-200">
+                      <CardHeader>
+                        <CardTitle className="text-lg">{practice.name} Resources</CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {/* Books */}
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <BookOpen className="w-4 h-4" />
+                            Essential Books
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {practice.resources.books.map((book, index) => (
+                              <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                                <CheckCircle className="w-3 h-3 text-green-500" />
+                                {book}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Videos */}
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <Play className="w-4 h-4" />
+                            Training Videos
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            {practice.resources.videos.map((video, index) => (
+                              <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                                <ExternalLink className="w-3 h-3 text-red-500" />
+                                {video}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Teachers */}
+                        <div className="space-y-2">
+                          <h4 className="font-semibold text-sm text-gray-700 flex items-center gap-2">
+                            <Users className="w-4 h-4" />
+                            Recommended Masters
+                          </h4>
+                          <div className="flex flex-wrap gap-2">
+                            {practice.resources.teachers.map((teacher, index) => (
+                              <span key={index} className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">
+                                {teacher}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </div>
+        )}
+
+        {/* Quick Actions */}
+        <div className="fixed bottom-6 right-6 space-y-3">
+          <Link href="/coach">
+            <Button className="w-12 h-12 rounded-full bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 shadow-lg">
+              <Shield className="w-6 h-6" />
+            </Button>
+          </Link>
+          <Link href="/academy">
+            <Button className="w-12 h-12 rounded-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 shadow-lg">
+              <BookOpen className="w-6 h-6" />
+            </Button>
+          </Link>
+          <Link href="/progress">
+            <Button className="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-lg">
+              <Target className="w-6 h-6" />
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
