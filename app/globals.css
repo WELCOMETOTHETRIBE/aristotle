@@ -2,31 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 0.75rem;
-  }
-
-  .dark {
+    /* Ancient Wisdom Design Tokens */
+    --bg: #0b0f14;
+    --surface: rgba(255,255,255,0.06);
+    --accent: #7ad7ff;
+    --accent-2: #a78bfa;
+    --glow: 0 0 40px color-mix(in oklab, var(--accent), white 10%);
+    --text: #e6eef7;
+    --muted: #9fb2c5;
+    
+    /* Legacy shadcn tokens for compatibility */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -46,6 +35,7 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+    --radius: 1rem;
   }
 }
 
@@ -53,60 +43,220 @@
   * {
     @apply border-border;
   }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
   body {
     @apply bg-background text-foreground;
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    line-height: 1.6;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Playfair Display', serif;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  
+  /* Fluid typography */
+  h1 {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+  }
+  
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  
+  h3 {
+    font-size: clamp(1.25rem, 3vw, 2rem);
+  }
+  
+  /* Focus styles for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  
+  /* Reduced motion support */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
 @layer components {
-  .philosopher-quote {
-    @apply italic text-muted-foreground text-sm border-l-2 border-primary/20 pl-4 my-4;
+  /* Glass effect utilities */
+  .glass {
+    background: var(--surface);
+    backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in oklab, var(--surface), white 18%);
+    box-shadow: 
+      0 10px 40px rgba(0,0,0,0.35), 
+      inset 0 1px 0 rgba(255,255,255,0.06);
   }
   
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent;
+  .glass-hover {
+    @apply glass transition-all duration-300;
   }
   
-  .glass-effect {
-    @apply backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border border-white/20;
+  .glass-hover:hover {
+    background: color-mix(in oklab, var(--surface), white 8%);
+    border-color: color-mix(in oklab, var(--surface), white 25%);
+    transform: translateY(-2px);
   }
   
-  .breath-animation {
-    animation: breathe 4s ease-in-out infinite;
+  .glow {
+    box-shadow: var(--glow);
+  }
+  
+  .glow-hover:hover {
+    box-shadow: var(--glow), 0 0 60px color-mix(in oklab, var(--accent), white 20%);
+  }
+  
+  /* Aurora background animation */
+  .aurora {
+    background: 
+      radial-gradient(60% 50% at 20% 10%, rgba(122,215,255,0.18), transparent 60%),
+      radial-gradient(50% 40% at 80% 20%, rgba(167,139,250,0.18), transparent 60%),
+      radial-gradient(40% 40% at 50% 90%, rgba(122,215,255,0.10), transparent 60%);
+    filter: blur(30px);
+  }
+  
+  /* Button styles */
+  .btn-primary {
+    @apply bg-[var(--accent)] text-black font-medium px-4 py-2 rounded-xl 
+           hover:bg-[color-mix(in_oklab,var(--accent),white_10%)] 
+           transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg)];
+  }
+  
+  .btn-secondary {
+    @apply bg-white/10 text-white font-medium px-4 py-2 rounded-xl 
+           hover:bg-white/15 
+           transition-all duration-200 
+           focus:outline-none focus:ring-2 focus:ring-white/20 focus:ring-offset-2 focus:ring-offset-[var(--bg)];
+  }
+  
+  /* Card styles */
+  .card-glass {
+    @apply glass rounded-2xl p-6 transition-all duration-300;
+  }
+  
+  .card-glass:hover {
+    @apply glass-hover;
+  }
+  
+  /* Text utilities */
+  .text-gradient {
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .text-muted {
+    color: var(--muted);
+  }
+  
+  /* Animation keyframes */
+  @keyframes aurora {
+    0%, 100% { 
+      opacity: 0.3;
+      transform: translate(0, 0) rotate(0deg);
+    }
+    50% { 
+      opacity: 0.5;
+      transform: translate(-10px, -10px) rotate(1deg);
+    }
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+  }
+  
+  @keyframes pulse-soft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
   }
   
   @keyframes breathe {
-    0%, 100% { transform: scale(1); opacity: 0.7; }
-    50% { transform: scale(1.1); opacity: 1; }
+    0%, 100% { 
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% { 
+      transform: scale(1.1);
+      opacity: 1;
+    }
   }
   
-  .waveform {
-    @apply flex items-center gap-1 h-8;
+  /* Animation classes */
+  .animate-aurora {
+    animation: aurora 20s ease-in-out infinite;
   }
   
-  .waveform-bar {
-    @apply bg-primary/60 rounded-full transition-all duration-150;
-    animation: waveform 1s ease-in-out infinite;
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
   }
   
-  @keyframes waveform {
-    0%, 100% { height: 4px; }
-    50% { height: 20px; }
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
   }
   
-  .waveform-bar:nth-child(1) { animation-delay: 0s; }
-  .waveform-bar:nth-child(2) { animation-delay: 0.1s; }
-  .waveform-bar:nth-child(3) { animation-delay: 0.2s; }
-  .waveform-bar:nth-child(4) { animation-delay: 0.3s; }
-  .waveform-bar:nth-child(5) { animation-delay: 0.4s; }
-  .waveform-bar:nth-child(6) { animation-delay: 0.5s; }
-  .waveform-bar:nth-child(7) { animation-delay: 0.6s; }
-  .waveform-bar:nth-child(8) { animation-delay: 0.7s; }
+  .animate-breathe {
+    animation: breathe 4s ease-in-out infinite;
+  }
   
+  /* Grid layout utilities */
+  .widget-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .widget-grid {
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    }
+  }
+  
+  @media (min-width: 1024px) {
+    .widget-grid {
+      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    }
+  }
+  
+  @media (min-width: 1280px) {
+    .widget-grid {
+      grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+    }
+  }
+  
+  /* Responsive container */
+  .container-academy {
+    @apply mx-auto w-full max-w-7xl px-4 py-10;
+  }
+  
+  /* Utility classes */
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }

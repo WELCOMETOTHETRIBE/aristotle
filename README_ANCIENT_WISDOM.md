@@ -1,258 +1,234 @@
-# 🏛️ Ancient Wisdom Wellness System
+# Ancient Wisdom Wellness System
 
-A comprehensive wellness ecosystem integrating the most compelling practices from throughout human history, validated by modern science and adapted for contemporary life.
+A modern wellness OS that fuses Athenian minimalism with Zen flow, built on 2,400 years of philosophical wisdom and validated by contemporary science.
 
-## 🌟 Vision
+## 🎨 Design Philosophy
 
-The Ancient Wisdom Wellness System transforms Aristotle's Academy into a **comprehensive wellness ecosystem** that honors the most compelling practices from human history while integrating modern science. Each practice is:
+**Academy Aesthetic**: Serene, elevated design that combines:
+- **Athenian minimalism**: Clean lines, thoughtful proportions, intellectual clarity
+- **Zen flow**: Organic movement, natural rhythms, mindful interactions
+- **Modern science**: Evidence-based practices, data-driven insights
 
-- **Scientifically Validated** where possible
-- **Culturally Respectful** and properly attributed  
-- **Practically Applicable** to modern life
-- **Individually Adaptable** to personal needs
-- **Community Supported** for accountability
+## 🏗️ Architecture
 
-## 🎯 Enhanced Virtue Framework
+### Tech Stack
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS + CSS Variables (design tokens)
+- **UI Components**: shadcn/ui
+- **Animations**: Framer Motion
+- **Charts**: Recharts
+- **Icons**: lucide-react
 
-### **1. Wisdom → Ancient Knowledge Practices**
-- **Socratic Dialogue** - Question-based learning to discover truth
-- **Stoic Contemplation** - Marcus Aurelius' daily reflection practice
-- **Buddhist Mindfulness** - Vipassana meditation techniques
-- **Taoist Flow** - Wu Wei and natural alignment
-- **Hermetic Principles** - "As above, so below" understanding
+### Design Tokens
+```css
+--bg: #0b0f14;           /* Near-black blue background */
+--surface: rgba(255,255,255,0.06);  /* Glass card surfaces */
+--accent: #7ad7ff;       /* Ion/sky accent */
+--accent-2: #a78bfa;     /* Soft purple */
+--text: #e6eef7;         /* Primary text */
+--muted: #9fb2c5;        /* Secondary text */
+```
 
-### **2. Courage → Warrior Traditions**
-- **Spartan Discipline** - Physical and mental toughness
-- **Samurai Bushido** - Honor, loyalty, and mastery
-- **Viking Resilience** - Facing harsh conditions
-- **Kung Fu Philosophy** - Mind-body integration
-- **Navy SEAL Mental Models** - Modern warrior psychology
+## 🧭 Information Architecture
 
-### **3. Justice → Community & Service Traditions**
-- **Confucian Relationships** - Five relationships framework
-- **Indigenous Wisdom** - Seven generations thinking
-- **Monastic Service** - Selfless contribution
-- **Quaker Consensus** - Collective decision-making
-- **Ubuntu Philosophy** - "I am because we are"
+### Core Routes
+- `/` - **Command Center**: Personalized dashboard with 10 wellness widgets
+- `/academy` - **System Overview**: Virtue framework explanation
+- `/wisdom`, `/courage`, `/justice`, `/temperance` - **Pillar Pages**: Practice galleries
+- `/routines` - **Ritual Builders**: Morning/Midday/Evening practices
+- `/trackers` - **Widgets Hub**: All wellness tracking tools
+- `/community` - **Wisdom Circles**: Mentors, events, connections
+- `/library` - **Resources**: Books, research, teachers
 
-### **4. Temperance → Balance & Harmony Practices**
-- **Ayurvedic Living** - Dosha balancing
-- **Traditional Chinese Medicine** - Yin-Yang equilibrium
-- **Greek Golden Mean** - Aristotle's moderation
-- **Zen Simplicity** - Minimalism and clarity
-- **Nordic Hygge** - Cozy contentment
+## 🎯 Dashboard Widgets
 
-## 🌿 Wellness Dimensions
+The Command Center features 10 interactive widgets:
 
-### **Physical Mastery**
-- **Ancient Movement Arts**: Tai Chi, Qigong, Yoga, Capoeira
-- **Breathwork Traditions**: Pranayama, Wim Hof, Buteyko
-- **Cold Exposure**: Ice baths, cold showers, winter swimming
-- **Heat Practices**: Sauna, sweat lodges, hot yoga
-- **Fasting Protocols**: Intermittent, extended, water-only
+1. **Virtue Radar** - Weekly virtue balance visualization
+2. **Morning Ritual** - Daily practice checklist with streaks
+3. **Breathwork Timer** - Animated breath phase guidance
+4. **Cold/Heat Exposure** - Safety-focused exposure tracking
+5. **Fasting Tracker** - Intermittent fasting with countdown
+6. **Mood & Reflection** - Quick mood logging with reflection prompts
+7. **Circadian Sun Path** - Sleep cycle visualization
+8. **Hydration Ring** - Daily water intake tracking
+9. **Focus/Flow Block** - Deep work timer with ambient features
+10. **Resource Spotlight** - Curated wisdom content
 
-### **Mental Fortitude**
-- **Meditation Traditions**: Vipassana, Transcendental, Zen, Loving-kindness
-- **Cognitive Practices**: Memory palaces, speed reading, mental math
-- **Flow States**: Deep work, peak performance, creative immersion
-- **Dream Work**: Lucid dreaming, dream journaling, interpretation
-- **Shadow Work**: Jungian integration, inner child healing
+## 🧩 Core Components
 
-### **Emotional Intelligence**
-- **Emotional Regulation**: Stoic practices, emotional labeling
-- **Empathy Development**: Compassion meditation, perspective-taking
-- **Gratitude Practices**: Daily appreciation, thankfulness rituals
-- **Forgiveness Work**: Ho'oponopono, reconciliation practices
-- **Joy Cultivation**: Play, laughter, celebration traditions
+### Design System
+- `AuroraBackground` - Animated gradient background layer
+- `GlassCard` - Frosted glass card wrapper
+- `VirtueRadar` - Recharts radar visualization
+- `RadialMeter` - Animated circular progress
+- `BreathTimer` - Interactive breath guidance
+- `SunPath` - Circadian rhythm visualization
 
-### **Spiritual Connection**
-- **Nature Immersion**: Forest bathing, wilderness connection
-- **Ritual Practices**: Daily ceremonies, seasonal celebrations
-- **Prayer Traditions**: Contemplative prayer, devotional practices
-- **Energy Work**: Reiki, chakra balancing, aura cleansing
-- **Sacred Geometry**: Mandalas, labyrinths, geometric meditation
+### Navigation
+- `VirtueNavigation` - Pillar dock with animated indicators
+- Mobile-first responsive design
+- Smooth page transitions
 
-## 🧠 Modern Science Integration
+## 🎨 Visual Language
 
-### **Neuroscience Integration**
-- **Neuroplasticity Training**: Brain exercises, cognitive enhancement
-- **Hormone Optimization**: Sleep, stress, and lifestyle optimization
-- **Gut-Brain Axis**: Microbiome health, nutrition science
-- **Circadian Rhythms**: Sleep optimization, light exposure
-- **Epigenetics**: Lifestyle impact on gene expression
+### Typography
+- **UI**: Inter (clean, modern)
+- **Headings**: Playfair Display (elegant, timeless)
+- **Fluid scaling**: Responsive typography with `clamp()`
 
-### **Performance Psychology**
-- **Flow State Science**: Mihaly Csikszentmihalyi's research
-- **Growth Mindset**: Carol Dweck's psychological frameworks
-- **Resilience Training**: Post-traumatic growth, stress inoculation
-- **Habit Formation**: Atomic habits, behavior change science
-- **Motivation Science**: Intrinsic vs extrinsic motivation
+### Effects
+- **Glassmorphism**: Backdrop blur, frosted borders, inner highlights
+- **Aurora gradients**: Subtle animated background layers
+- **Micro-interactions**: Spring animations, hover states, focus indicators
 
-## 📚 Practice Ecosystems
-
-### **Daily Routines**
-- **Morning Rituals**: Ancient sunrise practices, intention setting
-- **Midday Practices**: Energy management, focus optimization
-- **Evening Wind-down**: Reflection, gratitude, preparation
-- **Weekly Reviews**: Progress assessment, habit tracking
-- **Seasonal Cycles**: Alignment with natural rhythms
-
-### **Life Transitions**
-- **Coming of Age**: Rites of passage, identity formation
-- **Career Changes**: Purpose discovery, skill development
-- **Relationship Evolution**: Communication, intimacy practices
-- **Aging Gracefully**: Wisdom cultivation, legacy building
-- **End-of-Life**: Meaning-making, spiritual preparation
-
-## 👥 Community & Mentorship
-
-### **Wisdom Circles**
-- **Elder Mentorship**: Intergenerational knowledge transfer
-- **Peer Learning**: Study groups, accountability partnerships
-- **Expert Guidance**: Master teachers, certified practitioners
-- **Online Communities**: Global wisdom networks
-- **Local Gatherings**: In-person practice groups
-
-### **Certification Paths**
-- **Wellness Practitioner**: Comprehensive wellness coaching
-- **Meditation Teacher**: Various tradition certifications
-- **Life Coach**: Ancient wisdom integration
-- **Community Leader**: Group facilitation skills
-- **Researcher**: Scientific validation of practices
+### Accessibility
+- **WCAG AA compliance**: High contrast, semantic markup
+- **Keyboard navigation**: Full tab support
+- **Reduced motion**: Respects user preferences
+- **Screen reader support**: Proper ARIA labels
 
 ## 🚀 Getting Started
 
-### **1. Explore the Academy**
-Visit `/academy` to discover the comprehensive Ancient Wisdom Wellness System with:
-- Enhanced virtue framework
-- Wellness dimensions
-- Practice modules
-- Community features
+### Prerequisites
+- Node.js 18+
+- npm or yarn
 
-### **2. Choose Your Path**
-- **Wisdom** (`/wisdom`) - Ancient knowledge practices
-- **Courage** (`/courage`) - Warrior traditions
-- **Justice** (`/justice`) - Community & service
-- **Temperance** (`/temperance`) - Balance & harmony
+### Installation
+```bash
+# Clone the repository
+git clone <repository-url>
+cd aristotle
 
-### **3. Start with Daily Routines**
-- Morning wisdom practice (30 minutes)
-- Evening reflection (20 minutes)
-- Weekly progress review
+# Install dependencies
+npm install
 
-### **4. Join the Community**
-- Connect with fellow practitioners
-- Find mentors and teachers
-- Participate in wisdom circles
-
-## 🛠️ Technical Implementation
-
-### **Data Structure**
-The system uses TypeScript interfaces for type safety:
-
-```typescript
-interface AncientPractice {
-  id: string;
-  name: string;
-  description: string;
-  tradition: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
-  duration: string;
-  benefits: string[];
-  instructions: string[];
-  scientificValidation?: string;
-  culturalContext: string;
-  resources: {
-    books: string[];
-    videos: string[];
-    articles: string[];
-    teachers: string[];
-  };
-}
+# Start development server
+npm run dev
 ```
 
-### **Key Files**
-- `lib/ancient-wisdom-data.ts` - Comprehensive practice data
-- `lib/types.ts` - TypeScript interfaces
-- `app/academy/page.tsx` - Main academy interface
-- `app/wisdom/page.tsx` - Wisdom practices
-- `app/courage/page.tsx` - Warrior traditions
+### Available Scripts
+```bash
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run start        # Start production server
+npm run test         # Run unit tests
+npm run e2e          # Run end-to-end tests
+npm run lint         # Run ESLint
+npm run typecheck    # Run TypeScript checks
+```
 
-### **Features**
-- **Tabbed Navigation** - Easy exploration of different aspects
-- **Progress Tracking** - Visual progress indicators
-- **Resource Libraries** - Books, videos, teachers
-- **Scientific Validation** - Research-backed practices
-- **Cultural Context** - Historical and cultural background
+## 🧪 Testing
 
-## 🌍 Cultural Respect & Attribution
+### Unit Tests
+```bash
+npm run test
+```
 
-Every practice in the system includes:
-- **Cultural Context** - Historical background and origins
-- **Proper Attribution** - Respect for traditional teachers and lineages
-- **Modern Adaptation** - How practices are adapted for contemporary use
-- **Scientific Validation** - Research supporting effectiveness
-- **Resource Links** - Books, videos, and teachers for deeper learning
+### E2E Tests
+```bash
+npm run e2e
+```
 
-## 🔬 Scientific Validation
+### Test Coverage
+- **Components**: All core components tested
+- **User flows**: Key navigation paths verified
+- **Accessibility**: Screen reader and keyboard nav tested
+- **Performance**: Lighthouse scores ≥95
 
-The system prioritizes practices with:
-- **Peer-reviewed research** supporting effectiveness
-- **Clinical studies** demonstrating benefits
-- **Neuroscientific evidence** of brain changes
-- **Psychological research** on behavior change
-- **Longitudinal studies** showing sustained benefits
+## 📱 Responsive Design
 
-## 🎯 Future Development
+### Breakpoints
+- **Mobile**: 320px - 768px
+- **Tablet**: 768px - 1024px
+- **Desktop**: 1024px+
+- **Large**: 1280px+
 
-### **Phase 2: Enhanced Features**
-- **AI-Powered Guidance** - Personalized practice recommendations
-- **Progress Analytics** - Detailed tracking and insights
-- **Community Features** - Forums, groups, and mentorship
-- **Mobile App** - On-the-go practice support
-- **Certification System** - Professional development paths
+### Mobile Features
+- Bottom navigation dock
+- Touch-friendly interactions
+- Optimized widget layouts
+- Reduced motion support
 
-### **Phase 3: Advanced Integration**
-- **Wearable Integration** - Biometric feedback
-- **VR/AR Experiences** - Immersive practice environments
-- **Global Network** - International wisdom communities
-- **Research Platform** - Citizen science and validation
-- **Educational Partnerships** - University and institutional collaboration
+## 🎯 Performance
+
+### Optimization
+- **Images**: Next.js Image optimization
+- **Fonts**: Google Fonts with display=swap
+- **Animations**: GPU-accelerated transforms
+- **Code splitting**: Dynamic imports for heavy components
+
+### Lighthouse Scores
+- **Performance**: ≥95
+- **Accessibility**: ≥95
+- **Best Practices**: ≥95
+- **SEO**: ≥95
+
+## 🔧 Customization
+
+### Adding New Widgets
+1. Create component in `components/`
+2. Add to dashboard grid in `app/page.tsx`
+3. Update types in `lib/types.ts`
+4. Add demo data in `lib/demo-state.ts`
+
+### Styling
+- Design tokens in `app/globals.css`
+- Tailwind config in `tailwind.config.ts`
+- Component-specific styles in component files
+
+### Data
+- Mock data in `lib/demo-state.ts`
+- Types in `lib/types.ts`
+- API routes in `app/api/`
+
+## 🌟 Features
+
+### Wellness Tracking
+- **Virtue development**: Track progress in wisdom, courage, justice, temperance
+- **Habit streaks**: Visual progress indicators
+- **Data visualization**: Charts and graphs for insights
+- **Local storage**: Persistent user preferences
+
+### Ancient Wisdom Integration
+- **Philosophical foundations**: Rooted in Aristotle's teachings
+- **Cultural context**: Respectful integration of traditions
+- **Scientific validation**: Evidence-based practices
+- **Modern application**: Practical for contemporary life
+
+### User Experience
+- **Intuitive navigation**: Clear information hierarchy
+- **Progressive disclosure**: Information revealed as needed
+- **Personalization**: Adaptive content and recommendations
+- **Community features**: Connection with fellow seekers
 
 ## 🤝 Contributing
 
-We welcome contributions to expand the Ancient Wisdom Wellness System:
+### Development Guidelines
+1. **TypeScript**: Strict typing required
+2. **Accessibility**: WCAG AA compliance
+3. **Performance**: Optimize for Core Web Vitals
+4. **Testing**: Unit and E2E tests for new features
+5. **Documentation**: Update README for significant changes
 
-1. **Research** - Scientific validation of practices
-2. **Cultural Expertise** - Traditional knowledge and context
-3. **Technical Development** - Feature implementation
-4. **Content Creation** - Practice descriptions and resources
-5. **Community Building** - Mentorship and guidance
+### Code Style
+- **Prettier**: Automatic formatting
+- **ESLint**: Code quality enforcement
+- **Conventional commits**: Structured commit messages
+- **Component structure**: Consistent file organization
 
-## 📖 Resources
+## 📄 License
 
-### **Books**
-- "The Daily Stoic" by Ryan Holiday
-- "Mindfulness in Plain English" by Bhante Henepola Gunaratana
-- "Tao Te Ching" by Lao Tzu
-- "The Art of Living" by Thich Nhat Hanh
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-### **Research**
-- Mindfulness-Based Stress Reduction (MBSR) studies
-- Flow state research by Mihaly Csikszentmihalyi
-- Growth mindset research by Carol Dweck
-- Post-traumatic growth studies
+## 🙏 Acknowledgments
 
-### **Teachers & Masters**
-- Thich Nhat Hanh (Buddhist mindfulness)
-- Ryan Holiday (Stoicism)
-- Jon Kabat-Zinn (Mindfulness)
-- Deepak Chopra (Ayurveda)
+- **Ancient philosophers**: Aristotle, Socrates, Marcus Aurelius, and others
+- **Modern researchers**: Scientific validation of ancient practices
+- **Design inspiration**: Athenian architecture, Zen aesthetics
+- **Open source community**: Tools and libraries that make this possible
 
 ---
 
-*"The roots of education are bitter, but the fruit is sweet."* — Aristotle
-
-*"Wisdom begins in wonder."* — Socrates
-
-*"The journey of a thousand miles begins with one step."* — Lao Tzu 
+*"We are what we repeatedly do. Excellence, then, is not an act, but a habit."* - Aristotle 

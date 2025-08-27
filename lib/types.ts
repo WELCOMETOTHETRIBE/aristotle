@@ -168,103 +168,151 @@ export interface FastingProgress {
 // Ancient Wisdom Wellness System Types
 export interface AncientPractice {
   id: string;
-  name: string;
+  title: string;
   description: string;
-  tradition: string;
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
-  duration: string;
+  virtue: 'wisdom' | 'courage' | 'justice' | 'temperance';
+  category: string;
+  duration: number; // in minutes
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
   benefits: string[];
   instructions: string[];
-  scientificValidation?: string;
   culturalContext: string;
-  prerequisites?: string[];
+  scientificValidation?: string;
   resources: {
-    books: string[];
-    videos: string[];
-    articles: string[];
-    teachers: string[];
+    books?: string[];
+    articles?: string[];
+    teachers?: string[];
+  };
+  tags: string[];
+}
+
+export interface VirtueScore {
+  virtue: 'wisdom' | 'courage' | 'justice' | 'temperance';
+  score: number; // 0-1
+  trend: 'up' | 'down' | 'stable';
+  lastUpdated: Date;
+}
+
+export interface Routine {
+  id: string;
+  name: string;
+  type: 'morning' | 'midday' | 'evening';
+  practices: {
+    practiceId: string;
+    duration: number;
+    order: number;
+  }[];
+  isActive: boolean;
+  streak: number;
+  lastCompleted?: Date;
+}
+
+export interface TrackerRecord {
+  id: string;
+  type: 'fasting' | 'breathwork' | 'cold-exposure' | 'heat-exposure' | 'mood' | 'sleep' | 'hydration';
+  value: number;
+  unit: string;
+  timestamp: Date;
+  notes?: string;
+}
+
+export interface MoodLog {
+  id: string;
+  mood: 1 | 2 | 3 | 4 | 5; // 1=very low, 5=very high
+  energy: 1 | 2 | 3 | 4 | 5;
+  timestamp: Date;
+  reflection?: string;
+}
+
+export interface FastingSession {
+  id: string;
+  startTime: Date;
+  endTime?: Date;
+  targetHours: number;
+  isActive: boolean;
+  notes?: string;
+}
+
+export interface BreathworkSession {
+  id: string;
+  type: 'box' | 'wim-hof' | 'pranayama' | 'custom';
+  duration: number;
+  phases: {
+    name: string;
+    duration: number;
+  }[];
+  completedAt: Date;
+  notes?: string;
+}
+
+export interface ColdExposureSession {
+  id: string;
+  duration: number; // in seconds
+  temperature?: number; // in celsius
+  type: 'cold-shower' | 'ice-bath' | 'cold-plunge';
+  completedAt: Date;
+  notes?: string;
+}
+
+export interface HydrationLog {
+  id: string;
+  amount: number; // in ml
+  timestamp: Date;
+  type: 'water' | 'tea' | 'other';
+}
+
+export interface SleepLog {
+  id: string;
+  bedtime: Date;
+  wakeTime: Date;
+  quality: 1 | 2 | 3 | 4 | 5;
+  notes?: string;
+}
+
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  timezone: string;
+  preferences: {
+    theme: 'light' | 'dark' | 'auto';
+    notifications: boolean;
+    units: 'metric' | 'imperial';
+  };
+  goals: {
+    dailyHydration: number; // in ml
+    sleepHours: { start: string; end: string };
+    fastingHours: number;
+  };
+  streaks: {
+    morningRoutine: number;
+    breathwork: number;
+    fasting: number;
+    coldExposure: number;
   };
 }
 
-export interface VirtueDimension {
+export interface WidgetLayout {
   id: string;
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-  ancientPractices: AncientPractice[];
-  modernApplications: string[];
-  scientificBasis: string[];
-  progress: number;
+  type: string;
+  position: { x: number; y: number; w: number; h: number };
+  isVisible: boolean;
+  settings?: Record<string, any>;
 }
 
-export interface WellnessDimension {
-  id: string;
-  name: string;
-  description: string;
-  icon: string;
-  color: string;
-  practices: AncientPractice[];
-  dailyRoutines: string[];
-  weeklyPractices: string[];
-  seasonalAlignments: string[];
+export interface DashboardState {
+  widgets: WidgetLayout[];
+  lastUpdated: Date;
 }
 
-export interface PracticeModule {
+export interface Resource {
   id: string;
   title: string;
+  type: 'book' | 'article' | 'video' | 'teacher';
   description: string;
-  category: 'virtue' | 'wellness' | 'physical' | 'mental' | 'emotional' | 'spiritual';
-  difficulty: 'Beginner' | 'Intermediate' | 'Advanced' | 'Expert';
-  duration: string;
-  lessons: number;
-  rating: number;
-  students: number;
-  practices: AncientPractice[];
-  prerequisites: string[];
-  outcomes: string[];
-  certification?: boolean;
-}
-
-export interface DailyRoutine {
-  id: string;
-  name: string;
-  timeOfDay: 'morning' | 'midday' | 'evening' | 'anytime';
-  duration: string;
-  practices: string[];
-  description: string;
-  benefits: string[];
-}
-
-export interface LifeTransition {
-  id: string;
-  name: string;
-  description: string;
-  practices: AncientPractice[];
-  guidance: string[];
-  communitySupport: string[];
-  duration: string;
-}
-
-export interface WisdomCircle {
-  id: string;
-  name: string;
-  description: string;
-  focus: string;
-  meetingFrequency: string;
-  maxParticipants: number;
-  currentParticipants: number;
-  practices: string[];
-  mentors: string[];
-}
-
-export interface CertificationPath {
-  id: string;
-  name: string;
-  description: string;
-  requirements: string[];
-  duration: string;
-  cost: string;
-  benefits: string[];
-  curriculum: string[];
+  url?: string;
+  author?: string;
+  tags: string[];
+  virtue?: 'wisdom' | 'courage' | 'justice' | 'temperance';
+  isSaved: boolean;
 } 
