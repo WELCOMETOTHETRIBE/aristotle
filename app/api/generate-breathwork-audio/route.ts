@@ -3,9 +3,9 @@ import OpenAI from 'openai';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 
-const openai = new OpenAI({
+const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
-});
+}) : null;
 
 // Simplified audio files for smooth breathwork experience
 const audioFiles = [
@@ -39,6 +39,11 @@ const audioFiles = [
 
 async function generateAudioFile(text: string, filename: string) {
   try {
+    if (!openai) {
+      console.log(`Skipping TTS generation for: "${text}" - OpenAI not configured`);
+      return null;
+    }
+    
     console.log(`Generating TTS for: "${text}"`);
     
     const speech = await openai.audio.speech.create({
@@ -67,6 +72,13 @@ async function generateAudioFile(text: string, filename: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    if (!openai) {
+      return NextResponse.json(
+        { error: 'OpenAI API key not configured' },
+        { status: 400 }
+      );
+    }
+    
     console.log('🎵 Generating breathwork audio files...');
     
     const results = [];
