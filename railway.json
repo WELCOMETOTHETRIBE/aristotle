@@ -4,6 +4,6 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && echo 'Starting Next.js server...' && npm start"
+    "startCommand": "node scripts/init-database.js && echo 'Database init complete' && echo 'Starting Next.js server...' && echo 'About to run npm start' && PORT=3000 HOSTNAME=0.0.0.0 npm start 2>&1 || echo 'npm start failed'"
   }
 } 
