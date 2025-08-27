@@ -36,7 +36,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         type: 'react-error',
         error: error.message,
         stack: error.stack,
-        componentStack: errorInfo.componentStack
+        componentStack: errorInfo.componentStack || undefined
       });
     }
   }
@@ -123,6 +123,7 @@ declare global {
       error: string;
       stack?: string;
       componentStack?: string;
+      metadata?: Record<string, any>;
     }>;
   }
 }
