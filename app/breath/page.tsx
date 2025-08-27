@@ -81,7 +81,8 @@ export default function BreathPage() {
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [sessionDuration, setSessionDuration] = useState(0);
   const [breathScale, setBreathScale] = useState(1);
-  const [audioEnabled, setAudioEnabled] = useState(true);
+  const [audioEnabled, setAudioEnabled] = useState(false); // Start with audio disabled
+  const [audioInitialized, setAudioInitialized] = useState(false);
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
   const [audioMapping, setAudioMapping] = useState<any>(null);
   const [isLoadingAudio, setIsLoadingAudio] = useState(false);
@@ -94,10 +95,16 @@ export default function BreathPage() {
   useEffect(() => {
     const loadAudioMapping = async () => {
       try {
+        console.log('Loading audio mapping...');
         const response = await fetch('/audio/breathwork/audio-mapping.json');
+        console.log('Audio mapping response status:', response.status);
+        
         if (response.ok) {
           const mapping = await response.json();
           setAudioMapping(mapping);
+          console.log('Audio mapping loaded successfully:', mapping);
+        } else {
+          console.error('Failed to load audio mapping:', response.status, response.statusText);
         }
       } catch (error) {
         console.error('Error loading audio mapping:', error);
@@ -106,6 +113,19 @@ export default function BreathPage() {
     
     loadAudioMapping();
   }, []);
+
+  // Initialize audio context on user interaction
+  const initializeAudio = () => {
+    if (!audioInitialized && audioRef.current) {
+      // Create a silent audio context to enable audio playback
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      audioContext.resume().then(() => {
+        console.log('Audio context initialized');
+        setAudioInitialized(true);
+        setAudioEnabled(true);
+      });
+    }
+  };
 
   // Play pre-generated audio guidance for current phase
   const playAudioGuidance = (phase: string) => {
@@ -130,16 +150,29 @@ export default function BreathPage() {
     }
 
     if (audioUrl && audioRef.current) {
+      console.log('Playing audio guidance:', phase, audioUrl);
       audioRef.current.src = audioUrl;
-      audioRef.current.play()
-        .then(() => {
-          setIsLoadingAudio(false);
-        })
-        .catch((error) => {
-          console.error('Error playing audio guidance:', error);
-          setIsLoadingAudio(false);
-        });
+      audioRef.current.volume = 0.7; // Set volume to 70%
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            console.log('Audio guidance played successfully');
+            setIsLoadingAudio(false);
+          })
+          .catch((error) => {
+            console.error('Error playing audio guidance:', error);
+            // Try to enable audio context if it's suspended
+            if (audioRef.current) {
+              audioRef.current.muted = false;
+              audioRef.current.play().catch(console.error);
+            }
+            setIsLoadingAudio(false);
+          });
+      }
     } else {
+      console.log('No audio URL found for phase:', phase);
       setIsLoadingAudio(false);
     }
   };
@@ -150,8 +183,21 @@ export default function BreathPage() {
     
     const audioUrl = audioMapping.counting[count.toString()];
     if (audioUrl && audioRef.current) {
+      console.log('Playing counting audio:', count, audioUrl);
       audioRef.current.src = audioUrl;
-      audioRef.current.play().catch(console.error);
+      audioRef.current.volume = 0.5; // Lower volume for counting
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error('Error playing counting audio:', error);
+          // Try to enable audio context if it's suspended
+          if (audioRef.current) {
+            audioRef.current.muted = false;
+            audioRef.current.play().catch(console.error);
+          }
+        });
+      }
     }
   };
 
@@ -161,8 +207,20 @@ export default function BreathPage() {
     
     const audioUrl = audioMapping.session.start;
     if (audioUrl && audioRef.current) {
+      console.log('Playing session start audio:', audioUrl);
       audioRef.current.src = audioUrl;
-      audioRef.current.play().catch(console.error);
+      audioRef.current.volume = 0.7;
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error('Error playing session start audio:', error);
+          if (audioRef.current) {
+            audioRef.current.muted = false;
+            audioRef.current.play().catch(console.error);
+          }
+        });
+      }
     }
   };
 
@@ -172,8 +230,20 @@ export default function BreathPage() {
     
     const audioUrl = audioMapping.session.complete;
     if (audioUrl && audioRef.current) {
+      console.log('Playing session complete audio:', audioUrl);
       audioRef.current.src = audioUrl;
-      audioRef.current.play().catch(console.error);
+      audioRef.current.volume = 0.7;
+      
+      const playPromise = audioRef.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((error) => {
+          console.error('Error playing session complete audio:', error);
+          if (audioRef.current) {
+            audioRef.current.muted = false;
+            audioRef.current.play().catch(console.error);
+          }
+        });
+      }
     }
   };
 
@@ -289,6 +359,11 @@ export default function BreathPage() {
   };
 
   const handleStart = async () => {
+    // Initialize audio on first start
+    if (!audioInitialized) {
+      initializeAudio();
+    }
+    
     setIsActive(true);
     setCurrentPhase('inhale');
     setTimeLeft(selectedPattern.pattern.inhale);
@@ -402,13 +477,21 @@ export default function BreathPage() {
                 
                 <CardContent className="text-center pb-8">
                   {/* Audio Controls */}
-                  <div className="flex justify-center mb-4">
+                  <div className="flex justify-center gap-2 mb-4">
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => setAudioEnabled(!audioEnabled)}
+                      onClick={() => {
+                        if (!audioInitialized) {
+                          initializeAudio();
+                        } else {
+                          setAudioEnabled(!audioEnabled);
+                        }
+                      }}
                       disabled={isLoadingAudio}
-                      className={`flex items-center gap-2 ${audioEnabled ? 'text-blue-600 border-blue-200' : 'text-gray-500 border-gray-200'}`}
+                      className={`flex items-center gap-2 ${
+                        audioEnabled ? 'text-blue-600 border-blue-200' : 'text-gray-500 border-gray-200'
+                      }`}
                     >
                       {isLoadingAudio ? (
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
@@ -417,8 +500,26 @@ export default function BreathPage() {
                       ) : (
                         <VolumeX className="h-4 w-4" />
                       )}
-                      {isLoadingAudio ? 'Loading...' : audioEnabled ? 'Audio On' : 'Audio Off'}
+                      {isLoadingAudio 
+                        ? 'Loading...' 
+                        : !audioInitialized 
+                        ? 'Enable Audio' 
+                        : audioEnabled 
+                        ? 'Audio On' 
+                        : 'Audio Off'
+                      }
                     </Button>
+                    
+                    {audioEnabled && audioMapping && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => playAudioGuidance('inhale')}
+                        className="text-green-600 border-green-200"
+                      >
+                        Test Audio
+                      </Button>
+                    )}
                   </div>
 
                   {/* Animated Breath Circle */}
