@@ -613,27 +613,27 @@ export default function BreathPage() {
                     )}
                   </div>
 
-                  {/* Enhanced Breath Circle */}
-                  <div className="flex justify-center mb-8">
+                  {/* Enhanced Breath Circle - Mobile Optimized */}
+                  <div className="flex justify-center mb-6 sm:mb-8">
                     <div className="relative">
                       {/* Main breath circle with enhanced visual effects */}
                       <div 
-                        className={`w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-full border-4 flex items-center justify-center transition-all duration-500 ease-out relative overflow-hidden`}
+                        className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full border-4 flex items-center justify-center transition-all duration-500 ease-out relative overflow-hidden`}
                         style={{ 
                           transform: `scale(${breathScale})`,
                           borderColor: isActive ? getPhaseBorderColor(currentPhase) : '#e5e7eb',
                           background: isActive ? `radial-gradient(circle, ${getPhaseGlowColor(currentPhase)}20, transparent 70%)` : 'transparent'
                         }}
                       >
-                        {/* Animated background rings */}
+                        {/* Animated background rings - hidden on mobile for less clutter */}
                         {isActive && (
                           <>
                             <div 
-                              className="absolute inset-0 rounded-full border-2 border-current opacity-20 animate-ping"
+                              className="absolute inset-0 rounded-full border-2 border-current opacity-20 animate-ping hidden sm:block"
                               style={{ borderColor: getPhaseBorderColor(currentPhase) }}
                             />
                             <div 
-                              className="absolute inset-2 rounded-full border border-current opacity-30 animate-pulse"
+                              className="absolute inset-2 rounded-full border border-current opacity-30 animate-pulse hidden sm:block"
                               style={{ borderColor: getPhaseBorderColor(currentPhase) }}
                             />
                           </>
@@ -641,20 +641,20 @@ export default function BreathPage() {
                         
                         {/* Inner circle with enhanced styling */}
                         <div 
-                          className={`w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-2xl transition-all duration-500 ease-out relative`}
+                          className={`w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-2xl transition-all duration-500 ease-out relative`}
                           style={{
                             boxShadow: isActive 
-                              ? `0 0 30px ${getPhaseGlowColor(currentPhase)}, 0 8px 32px rgba(0,0,0,0.1)` 
+                              ? `0 0 20px ${getPhaseGlowColor(currentPhase)}, 0 4px 16px rgba(0,0,0,0.1)` 
                               : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                           }}
                         >
                           {/* Time display */}
                           <div className="text-center z-10">
-                            <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-1 transition-all duration-300">
+                            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1 transition-all duration-300">
                               {formatTime(timeLeft)}
                             </div>
-                            <div className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${getPhaseColor(currentPhase)} backdrop-blur-sm`}>
-                              <div className={`w-2 h-2 rounded-full ${isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: getPhaseBorderColor(currentPhase) }} />
+                            <div className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 ${getPhaseColor(currentPhase)} backdrop-blur-sm`}>
+                              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: getPhaseBorderColor(currentPhase) }} />
                               <span className="hidden sm:inline">{getPhaseLabel(currentPhase)}</span>
                             </div>
                           </div>
@@ -662,7 +662,7 @@ export default function BreathPage() {
                       </div>
                       
                       {/* Enhanced progress ring */}
-                      <div className="absolute inset-0 w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56">
+                      <div className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56">
                         <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
                           {/* Background circle */}
                           <circle
@@ -671,7 +671,7 @@ export default function BreathPage() {
                             r="45"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="4"
+                            strokeWidth="3"
                             className="text-gray-100"
                           />
                           {/* Progress circle */}
@@ -681,7 +681,7 @@ export default function BreathPage() {
                             r="45"
                             fill="none"
                             stroke="currentColor"
-                            strokeWidth="4"
+                            strokeWidth="3"
                             strokeLinecap="round"
                             className="transition-all duration-500 ease-out drop-shadow-sm"
                             style={{
@@ -693,13 +693,13 @@ export default function BreathPage() {
                         </svg>
                       </div>
                       
-                      {/* Enhanced phase indicators */}
+                      {/* Enhanced phase indicators - Mobile optimized */}
                       {isActive && (
-                        <div className="absolute -bottom-12 left-1/2 transform -translate-x-1/2 flex gap-3">
+                        <div className="absolute -bottom-8 sm:-bottom-12 left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-3">
                           {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => (
-                            <div key={phase} className="flex flex-col items-center gap-1">
+                            <div key={phase} className="flex flex-col items-center gap-0.5 sm:gap-1">
                               <div
-                                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
                                   currentPhase === phase 
                                     ? 'bg-blue-500 scale-125 shadow-lg' 
                                     : selectedPattern.pattern[phase as keyof typeof selectedPattern.pattern] > 0 
@@ -707,7 +707,7 @@ export default function BreathPage() {
                                       : 'bg-transparent'
                                 }`}
                               />
-                              <span className={`text-xs font-medium transition-all duration-300 ${
+                              <span className={`text-xs font-medium transition-all duration-300 hidden sm:block ${
                                 currentPhase === phase ? 'text-blue-600' : 'text-gray-400'
                               }`}>
                                 {phase === 'hold2' ? 'Hold' : phase.charAt(0).toUpperCase() + phase.slice(1)}

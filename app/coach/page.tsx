@@ -51,6 +51,7 @@ export default function CoachPage() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [microphoneAvailable, setMicrophoneAvailable] = useState(false);
   const [showTextInput, setShowTextInput] = useState(true); // Always show text input as fallback
+  const [microphoneInitialized, setMicrophoneInitialized] = useState(false);
   const [textInput, setTextInput] = useState('');
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
@@ -142,6 +143,7 @@ export default function CoachPage() {
 
         setMediaRecorder(recorder);
         setMicrophoneAvailable(true);
+        setMicrophoneInitialized(true);
         setIsInitializing(false);
         console.log('✅ MediaRecorder initialized successfully');
       } catch (error: any) {
@@ -160,6 +162,7 @@ export default function CoachPage() {
         
         setError(errorMessage);
         setMicrophoneAvailable(false);
+        setMicrophoneInitialized(true);
         setIsInitializing(false);
       }
     };
@@ -387,24 +390,24 @@ export default function CoachPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-3 mb-4">
-              <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
-                <Brain className="h-8 w-8 text-white" />
+          <div className="text-center mb-8 sm:mb-12">
+            <div className="inline-flex items-center gap-3 mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
+                <Brain className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
               </div>
             </div>
-            <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Aion Coach
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               Your Aristotle-inspired life coach for wisdom, virtue, and the good life
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-8">
             {/* Chat Interface */}
             <div className="lg:col-span-2">
-              <Card className="glass-effect border-0 shadow-2xl bg-white/80 backdrop-blur-xl h-[600px] flex flex-col">
+              <Card className="glass-effect border-0 shadow-2xl bg-white/80 backdrop-blur-xl h-[500px] sm:h-[600px] flex flex-col">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="h-5 w-5 text-primary" />
@@ -443,13 +446,13 @@ export default function CoachPage() {
                         className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                       >
                         <div
-                          className={`max-w-[80%] rounded-lg p-4 ${
+                          className={`max-w-[85%] sm:max-w-[80%] rounded-lg p-3 sm:p-4 ${
                             message.type === 'user'
                               ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white'
                               : 'bg-gradient-to-r from-gray-50 to-blue-50 border border-gray-200'
                           }`}
                         >
-                          <p className="text-sm mb-2">{message.content}</p>
+                          <p className="text-sm mb-2 leading-relaxed">{message.content}</p>
                           <div className="flex items-center justify-between">
                             <span className="text-xs opacity-70">
                               {formatTime(message.timestamp)}
@@ -460,10 +463,10 @@ export default function CoachPage() {
                                 size="sm"
                                 onClick={() => handlePlayAudio(message.audioUrl!)}
                                 disabled={isPlayingAudio}
-                                className="ml-2 h-6 px-2"
+                                className="ml-2 h-6 px-2 text-xs"
                               >
                                 <Volume2 className="h-3 w-3 mr-1" />
-                                {isPlayingAudio ? 'Playing...' : 'Play'}
+                                <span className="hidden sm:inline">{isPlayingAudio ? 'Playing...' : 'Play'}</span>
                               </Button>
                             )}
                           </div>
@@ -552,7 +555,7 @@ export default function CoachPage() {
                     ) : (
                       <div className="text-center">
                         <div className="flex justify-center gap-4 mb-4">
-                          {microphoneAvailable ? (
+                          {microphoneInitialized && microphoneAvailable ? (
                             <div className="relative">
                               <Button
                                 onClick={handleVoiceRecord}
@@ -576,7 +579,7 @@ export default function CoachPage() {
                                 <div className="absolute -top-2 -right-2 w-4 h-4 bg-red-500 rounded-full animate-ping" />
                               )}
                             </div>
-                          ) : (
+                          ) : microphoneInitialized && !microphoneAvailable ? (
                             <Button
                               onClick={() => {
                                 // Try to reinitialize microphone
@@ -588,6 +591,15 @@ export default function CoachPage() {
                               disabled={isProcessing}
                             >
                               <Mic className="h-6 w-6 text-orange-600" />
+                            </Button>
+                          ) : (
+                            <Button
+                              size="lg"
+                              variant="outline"
+                              className="w-16 h-16 rounded-full border-2 border-gray-300"
+                              disabled={true}
+                            >
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600" />
                             </Button>
                           )}
                           
@@ -604,7 +616,7 @@ export default function CoachPage() {
                         <p className="text-sm text-muted-foreground">
                           {isRecording ? 'Recording... Speak now' : 
                            isProcessing ? 'Processing...' :
-                           isInitializing ? 'Initializing microphone...' :
+                           !microphoneInitialized ? 'Initializing microphone...' :
                            !microphoneAvailable ? 'Microphone not available - tap to retry or type your message' :
                            'Tap to record or type your message'}
                         </p>
