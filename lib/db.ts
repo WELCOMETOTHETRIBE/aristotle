@@ -1,35 +1,10 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from "@prisma/client";
 
-declare global {
-  var __prisma: PrismaClient | undefined;
-}
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-// Create Prisma client with error handling for missing DATABASE_URL
-let prisma: PrismaClient;
+export const prisma = globalForPrisma.prisma ?? new PrismaClient();
 
-try {
-  prisma = globalThis.__prisma || new PrismaClient();
-} catch (error) {
-  console.warn('Failed to initialize Prisma client:', error);
-  // Create a mock Prisma client for development/deployment without database
-  prisma = {
-    user: { findFirst: async () => null, create: async () => ({ id: 'demo-user', name: 'Demo User' }) },
-    goal: { findMany: async () => [], create: async () => ({}) },
-    habit: { findMany: async () => [], create: async () => ({}) },
-    task: { findMany: async () => [], create: async () => ({}) },
-    fastingSession: { findMany: async () => [], create: async () => ({}) },
-    fastingBenefit: { findMany: async () => [], create: async () => ({}) },
-    session: { create: async () => ({}) },
-    conversationSummary: { findUnique: async () => null, upsert: async () => ({}) },
-    userFact: { findMany: async () => [], createMany: async () => ({}) },
-  } as any;
-}
-
-export { prisma };
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.__prisma = prisma;
-}
+if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /**
  * Get or create a user (for demo purposes)

@@ -1,264 +1,215 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
+// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// Using strings instead of enums for SQLite compatibility
+
+model Module {
+  id             String         @id
+  name           String
+  domain         String
+  defaultVirtue  String
+  description    String?
+  philosophy     String?
+  scienceNotes   String?
+  contraindications String?
+  commonMistakes String?
+  coachingPrompts String?
+  measurement    String?
+  meta           String?        @default("{}")
+
+  levels         ModuleLevel[]
+  practices      Practice[]
+  virtueMaps     ModuleVirtueMap[]
+  frameworkModuleMaps FrameworkModuleMap[]
+  sessions       Session[]
+  streaks        Streak[]
+  challenges     Challenge[]
+}
+
+model ModuleLevel {
+  id           Int       @id @default(autoincrement())
+  module       Module    @relation(fields: [moduleId], references: [id])
+  moduleId     String
+  level        String
+  durationHint String?
+
+  practices    Practice[]
+
+  @@unique([moduleId, level])
+}
+
+model Practice {
+  id            Int          @id @default(autoincrement())
+  module        Module?      @relation(fields: [moduleId], references: [id])
+  moduleId      String?
+  level         ModuleLevel? @relation(fields: [levelId], references: [id])
+  levelId       Int?
+  name          String
+  instructions  String
+  rationale     String?
+  metrics       String?
+  safetyNotes   String?
+  coachPrompts  String?
+  meta          String?      @default("{}")
+
+  frameworkPracticeMaps FrameworkPracticeMap[]
+  sessions      Session[]
+}
+
+model ModuleVirtueMap {
+  module     Module     @relation(fields: [moduleId], references: [id])
+  moduleId   String
+  virtue     String
+  weight     Int        @default(10)
+
+  @@id([moduleId, virtue])
+}
+
+model Resource {
+  id            String         @id
+  title         String
+  thinker       String?
+  era           String?
+  type          String
+  estMinutes    Int?
+  keyIdeas      String?        @default("[]")
+  microPractices String?       @default("[]")
+  reflections   String?        @default("[]")
+  level         String?
+  audioUrl      String?
+  meta          String?        @default("{}")
+}
+
+model Framework {
+  id              String   @id
+  name            String
+  culture         String?
+  overview        String?
+  coreValues      String?  @default("[]")
+  dailyRituals    String?  @default("[]")
+  weeklyChallenges String? @default("[]")
+  sayings         String?  @default("[]")
+  moduleEmphasis  String?  @default("[]")
+  starterProtocol String?  @default("[]")
+  meta            String?  @default("{}")
+
+  moduleMaps      FrameworkModuleMap[]
+  practiceMaps    FrameworkPracticeMap[]
+  sessions        Session[]
+  challenges      Challenge[]
+}
+
+model FrameworkModuleMap {
+  framework   Framework @relation(fields: [frameworkId], references: [id])
+  frameworkId String
+  module      Module    @relation(fields: [moduleId], references: [id])
+  moduleId    String
+  emphasis    String?   @default("{}")
+
+  @@id([frameworkId, moduleId])
+}
+
+model FrameworkPracticeMap {
+  framework   Framework @relation(fields: [frameworkId], references: [id])
+  frameworkId String
+  practice    Practice  @relation(fields: [practiceId], references: [id])
+  practiceId  Int
+  adaptationNote String?
+
+  @@id([frameworkId, practiceId])
 }
 
 model User {
-  id             String   @id @default(cuid())
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  name           String
-  email          String?
-  voicePreference String  @default("alloy")
-  coachTone      String   @default("gentle") // "gentle" | "direct" | "sage"
-  timezone       String   @default("UTC")
-  privacyPrefs   String   @default("{}") // JSON stored as string
+  id          Int      @id @default(autoincrement())
+  email       String?  @unique
+  displayName String?
+  tz          String?  @default("America/Los_Angeles")
 
-  // Relations
-  userFacts      UserFact[]
-  goals          Goal[]
-  habits         Habit[]
-  tasks          Task[]
-  sessions       Session[]
-  breathworkPlans BreathworkPlan[]
-  challenges     Challenge[]
-  conversationSummary ConversationSummary?
-  automations    Automation[]
-  skillRunLogs   SkillRunLog[]
-  journals       Journal[]
-  fastingSessions FastingSession[]
-  fastingBenefits FastingBenefit[]
-
-  @@map("users")
-}
-
-model UserFact {
-  id        String   @id @default(cuid())
-  userId    String
-  kind      String   // "bio" | "value" | "constraint" | "preference" | "insight"
-  content   String
-  embedding String   // Vector for semantic search (JSON string)
-  createdAt DateTime @default(now())
-
-  // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("user_facts")
-}
-
-model Goal {
-  id           String   @id @default(cuid())
-  userId       String
-  title        String
-  description  String?
-  category     String   // "spiritual" | "fitness" | "career" | "relationships" | "learning" | "finance" | "misc"
-  cadence      String   // "daily" | "weekly" | "ad-hoc"
-  targetMetric String?  // Store goal metrics as JSON string
-  status       String   @default("active") // "active" | "paused" | "completed"
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  // Relations
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("goals")
-}
-
-model Habit {
-  id            String    @id @default(cuid())
-  userId        String
-  name          String
-  description   String?
-  frequency     String    // "daily" | "x_per_week" | "custom"
-  streakCount   Int       @default(0)
-  lastCheckInAt DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-
-  // Relations
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("habits")
-}
-
-model Task {
-  id          String    @id @default(cuid())
-  userId      String
-  sessionId   String?
-  title       String
-  description String?
-  dueAt       DateTime?
-  completedAt DateTime?
-  tag         String?   // "breathwork" | "reflection" | "practice" | "log" | "misc"
-  priority    String    @default("M") // "L" | "M" | "H"
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  session     Session?  @relation(fields: [sessionId], references: [id])
-
-  @@index([userId])
-  @@index([sessionId])
-  @@map("tasks")
+  sessions    Session[]
+  streaks     Streak[]
+  virtueScores VirtueScore[]
+  feeds       Feed[]
 }
 
 model Session {
-  id            String   @id @default(cuid())
-  userId        String
-  startedAt     DateTime @default(now())
-  endedAt       DateTime?
-  inputMode     String   // "voice" | "text"
-  transcript    String
-  coachReply    String
-  coachJSON     String   // Store CoachPlan JSON as string
-  audioReplyUrl String?
-
-  // Relations
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  tasks         Task[]
-
-  @@index([userId])
-  @@map("sessions")
+  id          Int        @id @default(autoincrement())
+  user        User       @relation(fields: [userId], references: [id])
+  userId      Int
+  module      Module?    @relation(fields: [moduleId], references: [id])
+  moduleId    String?
+  practice    Practice?  @relation(fields: [practiceId], references: [id])
+  practiceId  Int?
+  framework   Framework? @relation(fields: [frameworkId], references: [id])
+  frameworkId String?
+  startedAt   DateTime   @default(now())
+  endedAt     DateTime?
+  metrics     String?    @default("{}")
+  moodPre     Int?
+  moodPost    Int?
+  notes       String?
 }
 
-model BreathworkPlan {
-  id         String   @id @default(cuid())
-  userId     String
-  name       String
-  pattern    String   // Store breath pattern as JSON string
-  durationSec Int
-  notes      String?
+model Streak {
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  module      Module   @relation(fields: [moduleId], references: [id])
+  moduleId    String
+  count       Int      @default(0)
+  lastDate    DateTime
 
-  // Relations
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@id([userId, moduleId])
+}
 
-  @@index([userId])
-  @@map("breathwork_plans")
+model VirtueScore {
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  date        DateTime
+  wisdom      Int      @default(0)
+  courage     Int      @default(0)
+  temperance  Int      @default(0)
+  justice     Int      @default(0)
+
+  @@id([userId, date])
 }
 
 model Challenge {
-  id          String   @id @default(cuid())
-  userId      String
-  name        String
-  description String?
-  startDate   DateTime
-  endDate     DateTime
-  category    String
-  progressJson String  @default("{}") // JSON stored as string
-
-  // Relations
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("challenges")
+  id            Int        @id @default(autoincrement())
+  title         String
+  module        Module?    @relation(fields: [moduleId], references: [id])
+  moduleId      String?
+  framework     Framework? @relation(fields: [frameworkId], references: [id])
+  frameworkId   String?
+  durationDays  Int
+  rules         String?     @default("{}")
+  rewardBadge   String?
 }
 
-model ConversationSummary {
-  id      String   @id @default(cuid())
-  userId  String   @unique
-  rolling String   // Rolling summary text (≤ 1k tokens)
-  updatedAt DateTime @updatedAt
+model Feed {
+  user        User     @relation(fields: [userId], references: [id])
+  userId      Int
+  date        DateTime
+  items       String
 
-  // Relations
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("conversation_summaries")
+  @@id([userId, date])
 }
 
-model Automation {
-  id        String    @id @default(cuid())
-  userId    String
-  name      String
-  type      String    // "reminder" | "review" | "sync" | "custom"
-  config    String    // Store automation config as JSON string
-  isActive  Boolean   @default(true)
-  lastRunAt DateTime?
+model GeneratedContent {
+  id             Int        @id @default(autoincrement())
+  scope          String
+  keyFingerprint String
+  moduleId       String?
+  frameworkId    String?
+  level          String?
+  locale         String      @default("en")
+  style          String?
+  payload        String
+  createdAt      DateTime    @default(now())
 
-  // Relations
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("automations")
-}
-
-model SkillRunLog {
-  id        String   @id @default(cuid())
-  userId    String
-  skillKey  String
-  inputJson String  // JSON stored as string
-  outputJson String // JSON stored as string
-  createdAt DateTime @default(now())
-  status    String   @default("success") // "success" | "error" | "pending"
-
-  // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([skillKey])
-  @@map("skill_run_logs")
-}
-
-model Journal {
-  id        String   @id @default(cuid())
-  userId    String
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@map("journals")
-}
-
-model FastingSession {
-  id          String    @id @default(cuid())
-  userId      String
-  startTime   DateTime
-  endTime     DateTime?
-  duration    Int?      // Duration in minutes
-  type        String    // "16:8", "18:6", "20:4", "24h", "36h", "48h", "72h", "custom"
-  status      String    @default("active") // "active", "completed", "broken"
-  notes       String?
-  benefits    String?   // JSON string of tracked benefits
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relations
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fastingBenefits FastingBenefit[]
-
-  @@index([userId])
-  @@index([startTime])
-  @@map("fasting_sessions")
-}
-
-model FastingBenefit {
-  id              String   @id @default(cuid())
-  userId          String
-  fastingSessionId String
-  benefitType     String   // "energy", "clarity", "weight_loss", "inflammation", "autophagy", "insulin_sensitivity"
-  intensity       Int      // 1-10 scale
-  notes           String?
-  recordedAt      DateTime @default(now())
-
-  // Relations
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fastingSession  FastingSession @relation(fields: [fastingSessionId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([fastingSessionId])
-  @@map("fasting_benefits")
+  @@unique([scope, keyFingerprint])
 } 
