@@ -86,7 +86,7 @@ export default function WisdomPage() {
       <AuroraBackground />
       
       {/* Header */}
-      <header className="mb-8 pt-20">
+      <header className="mb-8">
         <Link href="/academy" className="inline-flex items-center gap-2 text-muted hover:text-white transition-colors mb-4">
           <ArrowLeft size={16} />
           Back to Academy

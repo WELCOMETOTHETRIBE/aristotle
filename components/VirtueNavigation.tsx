@@ -43,7 +43,7 @@ export function VirtueNavigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/40 backdrop-blur-md border-b border-white/20">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-black/30 backdrop-blur-sm border-b border-white/10">
       <div className="container-academy">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -106,7 +106,7 @@ export function VirtueNavigation() {
 
       {/* Mobile Virtue Dock */}
       <div className="md:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="bg-black/60 backdrop-blur-md rounded-2xl p-2 border border-white/20 shadow-2xl">
+        <div className="bg-black/40 backdrop-blur-sm rounded-2xl p-2 border border-white/10 shadow-xl">
           <div className="flex items-center gap-1">
             {virtues.map((virtue) => {
               const IconComponent = virtue.icon;

@@ -14,10 +14,10 @@
     --accent-2: #a78bfa;
     --accent-muted: rgba(100, 210, 255, 0.3);
     --glow: 0 0 40px color-mix(in oklab, var(--accent), white 10%);
-    --text: #f8fafc;
-    --text-secondary: #cbd5e1;
-    --muted: #64748b;
-    --muted-dark: #475569;
+    --text: #ffffff;
+    --text-secondary: #e2e8f0;
+    --muted: #94a3b8;
+    --muted-dark: #64748b;
     --success: #10b981;
     --warning: #f59e0b;
     --error: #ef4444;
@@ -110,12 +110,12 @@
 @layer components {
   /* Enhanced glass effect */
   .glass {
-    background: var(--surface);
+    background: rgba(255,255,255,0.12);
     backdrop-filter: blur(20px);
-    border: 1px solid color-mix(in oklab, var(--surface), white 20%);
+    border: 1px solid rgba(255,255,255,0.25);
     box-shadow: 
-      0 8px 32px rgba(0,0,0,0.4), 
-      inset 0 1px 0 rgba(255,255,255,0.08);
+      0 8px 32px rgba(0,0,0,0.5), 
+      inset 0 1px 0 rgba(255,255,255,0.12);
   }
   
   .glass-hover {
@@ -123,12 +123,12 @@
   }
   
   .glass-hover:hover {
-    background: var(--surface-hover);
-    border-color: color-mix(in oklab, var(--surface), white 30%);
+    background: rgba(255,255,255,0.18);
+    border-color: rgba(255,255,255,0.35);
     transform: translateY(-3px);
     box-shadow: 
-      0 12px 40px rgba(0,0,0,0.5), 
-      inset 0 1px 0 rgba(255,255,255,0.12);
+      0 12px 40px rgba(0,0,0,0.6), 
+      inset 0 1px 0 rgba(255,255,255,0.18);
   }
   
   .glow {
@@ -188,12 +188,26 @@
   /* Improved contrast for better readability */
   .text-white {
     color: #ffffff;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-weight: 500;
   }
   
   .text-accent {
     color: var(--accent);
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    font-weight: 600;
+  }
+  
+  .text-secondary {
+    color: var(--text-secondary);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 400;
+  }
+  
+  .text-muted {
+    color: var(--muted);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    font-weight: 400;
   }
   
   /* Status indicators */
@@ -322,17 +336,20 @@
   /* Enhanced responsive container */
   .container-academy {
     @apply mx-auto w-full max-w-7xl px-6 py-12;
+    padding-top: 6rem; /* Account for fixed navigation */
   }
   
   @media (min-width: 768px) {
     .container-academy {
       @apply px-8 py-16;
+      padding-top: 7rem;
     }
   }
   
   @media (min-width: 1024px) {
     .container-academy {
       @apply px-10 py-20;
+      padding-top: 8rem;
     }
   }
   

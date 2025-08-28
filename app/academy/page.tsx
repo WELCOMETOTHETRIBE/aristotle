@@ -75,7 +75,7 @@ export default function AcademyPage() {
       <AuroraBackground />
       
       {/* Header */}
-      <header className="mb-12 text-center pt-20">
+      <header className="mb-12 text-center">
         <h1 className="text-4xl font-semibold text-white mb-4">
           Ancient Wisdom Academy
         </h1>

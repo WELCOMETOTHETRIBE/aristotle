@@ -36,7 +36,7 @@ export default function DashboardPage() {
       <AuroraBackground />
       
       {/* Enhanced Header with better hierarchy */}
-      <header className="mb-12 pt-20">
+      <header className="mb-12">
         <div className="flex items-baseline justify-between mb-4">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
