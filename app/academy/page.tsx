@@ -75,10 +75,11 @@ export default function AcademyPage() {
       <AuroraBackground />
       
       {/* Header */}
-      <header className="mb-12 text-center">
+      <header className="mb-12 text-center pt-20">
         <h1 className="text-4xl font-semibold text-white mb-4">
           Ancient Wisdom Academy
         </h1>
+        <h2 className="text-xl text-accent font-medium mb-4">Overview</h2>
         <p className="text-xl text-muted max-w-2xl mx-auto">
           A comprehensive system for cultivating the four cardinal virtues through 
           ancient practices and modern science.

@@ -86,7 +86,7 @@ export default function CouragePage() {
       <AuroraBackground />
       
       {/* Header */}
-      <header className="mb-8">
+      <header className="mb-8 pt-20">
         <Link href="/academy" className="inline-flex items-center gap-2 text-muted hover:text-white transition-colors mb-4">
           <ArrowLeft size={16} />
           Back to Academy
@@ -98,6 +98,7 @@ export default function CouragePage() {
           </div>
           <div>
             <h1 className="text-4xl font-semibold text-white mb-2">Courage</h1>
+            <h2 className="text-xl text-accent font-medium">The Virtue of Strength & Determination</h2>
             <p className="text-muted">
               The virtue of facing challenges with strength and determination
             </p>

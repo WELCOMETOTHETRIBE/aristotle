@@ -36,11 +36,14 @@ export default function DashboardPage() {
       <AuroraBackground />
       
       {/* Enhanced Header with better hierarchy */}
-      <header className="mb-12">
+      <header className="mb-12 pt-20">
         <div className="flex items-baseline justify-between mb-4">
-          <h1 className="text-4xl md:text-5xl font-bold text-white">
-            {getGreeting()}, {mockUserProfile.name}
-          </h1>
+          <div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2">
+              {getGreeting()}, {mockUserProfile.name}
+            </h1>
+            <h2 className="text-xl text-accent font-medium">Dashboard</h2>
+          </div>
           <div className="hidden md:flex items-center gap-3 text-sm text-muted">
             <span className="flex items-center gap-1">
               <TrendingUp size={16} />
