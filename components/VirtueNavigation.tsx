@@ -59,8 +59,8 @@ export function VirtueNavigation() {
                     whileTap={{ scale: 0.95 }}
                     className={`relative p-4 rounded-xl transition-all duration-200 interactive ${
                       isActive 
-                        ? 'bg-white/12 border border-white/25 shadow-lg' 
-                        : 'hover:bg-white/8 hover:border-white/15'
+                        ? 'bg-white/10 border border-white/20 shadow-lg' 
+                        : 'hover:bg-white/5 hover:border-white/10'
                     }`}
                   >
                     <div className={`w-10 h-10 bg-gradient-to-r ${virtue.color} rounded-xl flex items-center justify-center shadow-md`}>
@@ -110,8 +110,8 @@ export function VirtueNavigation() {
                     whileTap={{ scale: 0.9 }}
                     className={`relative p-3 rounded-xl transition-all duration-200 interactive ${
                       isActive 
-                        ? 'bg-white/12 border border-white/25' 
-                        : 'hover:bg-white/8'
+                        ? 'bg-white/10 border border-white/20' 
+                        : 'hover:bg-white/5'
                     }`}
                   >
                     <div className={`w-8 h-8 bg-gradient-to-r ${virtue.color} rounded-xl flex items-center justify-center shadow-md`}>
