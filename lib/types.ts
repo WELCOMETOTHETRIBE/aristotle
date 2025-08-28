@@ -235,12 +235,10 @@ export interface FastingSession {
 
 export interface BreathworkSession {
   id: string;
-  type: 'box' | 'wim-hof' | 'pranayama' | 'custom';
+  userId: string;
+  type: 'box' | 'wim-hof' | 'pranayama' | 'triangle' | 'circle' | 'custom';
   duration: number;
-  phases: {
-    name: string;
-    duration: number;
-  }[];
+  phases: BreathPhase[];
   completedAt: Date;
   notes?: string;
 }
@@ -315,4 +313,96 @@ export interface Resource {
   tags: string[];
   virtue?: 'wisdom' | 'courage' | 'justice' | 'temperance';
   isSaved: boolean;
+} 
+
+export interface LearningResource {
+  id: string;
+  title: string;
+  author: string;
+  category: 'philosophy' | 'wisdom' | 'courage' | 'justice' | 'temperance';
+  description: string;
+  coverImage?: string;
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  estimatedTime: number; // in minutes
+  lessons: Lesson[];
+  badges: Badge[];
+  tags: string[];
+  isCompleted?: boolean;
+  progress?: number; // 0-100
+}
+
+export interface Lesson {
+  id: string;
+  title: string;
+  content: string;
+  type: 'reading' | 'reflection' | 'practice' | 'meditation' | 'exercise';
+  duration: number; // in minutes
+  isCompleted: boolean;
+  questions?: ReflectionQuestion[];
+  practices?: Practice[];
+}
+
+export interface ReflectionQuestion {
+  id: string;
+  question: string;
+  type: 'text' | 'multiple-choice' | 'rating';
+  options?: string[];
+  userAnswer?: string;
+}
+
+export interface Practice {
+  id: string;
+  title: string;
+  description: string;
+  duration: number;
+  instructions: string[];
+  isCompleted: boolean;
+}
+
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: string;
+  isEarned: boolean;
+  earnedAt?: Date;
+  requirements: string[];
+}
+
+export interface UserProgress {
+  userId: string;
+  completedResources: string[];
+  earnedBadges: string[];
+  totalStudyTime: number;
+  currentStreak: number;
+  lastStudyDate?: Date;
+  learningGoals: LearningGoal[];
+}
+
+export interface LearningGoal {
+  id: string;
+  title: string;
+  targetDate: Date;
+  isCompleted: boolean;
+  progress: number;
+}
+
+
+
+export interface BreathPhase {
+  name: string;
+  duration: number;
+  color: string;
+}
+
+export interface TimerSession {
+  id: string;
+  userId: string;
+  type: 'focus' | 'meditation' | 'exercise' | 'custom';
+  duration: number;
+  isActive: boolean;
+  startTime: Date;
+  endTime?: Date;
+  notes?: string;
 } 

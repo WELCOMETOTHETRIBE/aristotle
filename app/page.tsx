@@ -6,6 +6,8 @@ import VirtueRadar from "@/components/VirtueRadar";
 import RadialMeter from "@/components/RadialMeter";
 import BreathTimer from "@/components/BreathTimer";
 import SunPath from "@/components/SunPath";
+import { ResourceSpotlight } from "@/components/ResourceSpotlight";
+import FocusTimer from "@/components/FocusTimer";
 import { MoreHorizontal, Target, Flame, Droplets, Clock, Heart, Sun, BookOpen, Settings, TrendingUp, Zap } from "lucide-react";
 import { getVirtueRadarData, getCurrentHydration, getFastingTimeRemaining, getCurrentMood, mockUserProfile } from "@/lib/demo-state";
 
@@ -248,51 +250,17 @@ export default function DashboardPage() {
             </button>
           }
         >
-          <div className="space-y-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">25:00</div>
-              <div className="text-sm text-muted">Focus time remaining</div>
-            </div>
-            <div className="flex gap-3">
-              <button className="btn-primary flex-1">Start</button>
-              <button className="btn-secondary flex-1">Pause</button>
-            </div>
-            <div className="flex items-center justify-center gap-3 bg-white/5 rounded-lg p-3">
-              <input type="checkbox" className="rounded accent-accent" />
-              <span className="text-sm text-muted">Zen particles</span>
-            </div>
-          </div>
+          <FocusTimer 
+            defaultDuration={25}
+            onComplete={() => {
+              // Could trigger notification or update stats
+              console.log('Focus session completed!');
+            }}
+          />
         </GlassCard>
 
         {/* Resource Spotlight - Enhanced with better layout */}
-        <GlassCard 
-          title="Resource Spotlight" 
-          subtitle="Today's wisdom"
-          action={
-            <BookOpen size={18} className="text-accent" />
-          }
-          className="col-span-full"
-        >
-          <div className="flex items-start gap-6">
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center shadow-lg">
-              <BookOpen size={28} className="text-black" />
-            </div>
-            <div className="flex-1 space-y-4">
-              <div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  "Meditations" by Marcus Aurelius
-                </h3>
-                <p className="text-secondary leading-relaxed">
-                  Ancient wisdom for modern living. Learn how to cultivate inner peace and resilience through Stoic philosophy.
-                </p>
-              </div>
-              <div className="flex gap-3">
-                <button className="btn-primary">Add to Library</button>
-                <button className="btn-secondary">Learn More</button>
-              </div>
-            </div>
-          </div>
-        </GlassCard>
+        <ResourceSpotlight className="col-span-full" />
       </section>
     </main>
   );
