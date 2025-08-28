@@ -1,15 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'standalone',
   experimental: {
     serverComponentsExternalPackages: ['@prisma/client'],
   },
-  webpack: (config) => {
-    config.externals.push({
-      'utf-8-validate': 'commonjs utf-8-validate',
-      'bufferutil': 'commonjs bufferutil',
-    })
-    return config
+  // Allow build to succeed even without environment variables
+  env: {
+    DATABASE_URL: process.env.DATABASE_URL || '',
+    OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
   },
 }
 

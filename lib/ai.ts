@@ -3,13 +3,19 @@ import CryptoJS from "crypto-js";
 import { z } from "zod";
 import OpenAI from "openai";
 
-// Check if we have a valid API key (not the placeholder)
-const apiKey = process.env.OPENAI_API_KEY;
-if (!apiKey || apiKey === "your_openai_api_key_here" || apiKey.includes("your_")) {
-  throw new Error("OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.");
-}
+// Initialize OpenAI client lazily to avoid build-time errors
+let client: OpenAI | null = null;
 
-const client = new OpenAI({ apiKey });
+function getOpenAIClient(): OpenAI {
+  if (!client) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey === "your_openai_api_key_here" || apiKey.includes("your_")) {
+      throw new Error("OpenAI API key not configured. Please set OPENAI_API_KEY environment variable.");
+    }
+    client = new OpenAI({ apiKey });
+  }
+  return client;
+}
 
 export const PracticeDetailSchema = z.object({
   title: z.string(),
@@ -54,7 +60,7 @@ export async function generateWithCache<T>(
     if (existing) return schema.parse(JSON.parse(existing.payload));
   }
 
-  const completion = await client.chat.completions.create({
+  const completion = await getOpenAIClient().chat.completions.create({
     model: "gpt-4o-mini",
     temperature: 0.7,
     messages: [
@@ -69,7 +75,7 @@ export async function generateWithCache<T>(
     parsed = schema.parse(JSON.parse(text));
   } catch (e) {
     // simple repair attempt
-    const repair = await client.chat.completions.create({
+    const repair = await getOpenAIClient().chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.2,
       messages: [
