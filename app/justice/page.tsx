@@ -86,7 +86,7 @@ export default function JusticePage() {
               Justice
             </h1>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          <p className="text-xl text-medium-contrast max-w-2xl mx-auto">
             The virtue of fairness and right relationships. Build meaningful connections, serve others, and create harmony in your community.
           </p>
         </div>
@@ -125,10 +125,10 @@ export default function JusticePage() {
                               <IconComponent className="w-5 h-5 text-white" />
                             </div>
                             <div className="flex-1">
-                              <h3 className="font-semibold text-gray-900 mb-1">{practice.title}</h3>
-                              <p className="text-sm text-gray-600 mb-2">{practice.description}</p>
+                              <h3 className="font-semibold text-high-contrast mb-1">{practice.title}</h3>
+                              <p className="text-sm text-medium-contrast mb-2">{practice.description}</p>
                               <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4 text-xs text-gray-500">
+                                <div className="flex items-center gap-4 text-xs text-low-contrast">
                                   <span>{practice.duration}</span>
                                   <span>•</span>
                                   <span>{practice.difficulty}</span>
@@ -144,7 +144,7 @@ export default function JusticePage() {
                 </div>
                 
                 <div className="mt-6">
-                  <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                  <Button className="w-full btn-primary-light bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
                     <Play className="w-4 h-4 mr-2" />
                     Practice {selectedPractice.title}
                   </Button>
@@ -166,12 +166,12 @@ export default function JusticePage() {
               <CardContent>
                 <div className="space-y-4">
                   {relationshipAreas.map((area) => (
-                    <div key={area.title} className="p-4 border border-gray-200 rounded-lg">
+                    <div key={area.title} className="p-4 border border-gray-200 rounded-lg bg-white/50">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900">{area.title}</h3>
-                        <span className="text-sm text-gray-500">{area.actions} actions needed</span>
+                        <h3 className="font-semibold text-high-contrast">{area.title}</h3>
+                        <span className="text-sm text-low-contrast">{area.actions} actions needed</span>
                       </div>
-                      <p className="text-sm text-gray-600 mb-3">{area.description}</p>
+                      <p className="text-sm text-medium-contrast mb-3">{area.description}</p>
                       <div className="flex items-center gap-3">
                         <div className="flex-1 bg-gray-200 rounded-full h-2">
                           <div 
@@ -179,9 +179,9 @@ export default function JusticePage() {
                             style={{ width: `${area.quality}%` }}
                           />
                         </div>
-                        <span className="text-sm font-medium text-gray-700">{area.quality}%</span>
+                        <span className="text-sm font-medium text-high-contrast">{area.quality}%</span>
                       </div>
-                      <div className="mt-2 text-xs text-gray-500">
+                      <div className="mt-2 text-xs text-low-contrast">
                         {area.quality >= 80 ? '🌟 Excellent' : area.quality >= 60 ? '👍 Good' : '⚠️ Needs attention'}
                       </div>
                     </div>
@@ -203,19 +203,19 @@ export default function JusticePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Link href="/community">
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start btn-secondary-light">
                     <Users className="w-4 h-4 mr-2" />
                     Join Community
                   </Button>
                 </Link>
                 <Link href="/coach">
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start btn-secondary-light">
                     <Scale className="w-4 h-4 mr-2" />
                     Get Relationship Advice
                   </Button>
                 </Link>
                 <Link href="/progress">
-                  <Button variant="outline" className="w-full justify-start">
+                  <Button variant="outline" className="w-full justify-start btn-secondary-light">
                     <Target className="w-4 h-4 mr-2" />
                     View Impact
                   </Button>
@@ -236,29 +236,29 @@ export default function JusticePage() {
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-medium text-sm">Stronger Relationships</h4>
-                      <p className="text-xs text-gray-600">Build trust and connection</p>
+                      <h4 className="font-medium text-sm text-high-contrast">Stronger Relationships</h4>
+                      <p className="text-xs text-medium-contrast">Build trust and connection</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-medium text-sm">Community Impact</h4>
-                      <p className="text-xs text-gray-600">Contribute to collective good</p>
+                      <h4 className="font-medium text-sm text-high-contrast">Community Impact</h4>
+                      <p className="text-xs text-medium-contrast">Contribute to collective good</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-medium text-sm">Inner Peace</h4>
-                      <p className="text-xs text-gray-600">Find harmony through fairness</p>
+                      <h4 className="font-medium text-sm text-high-contrast">Inner Peace</h4>
+                      <p className="text-xs text-medium-contrast">Find harmony through fairness</p>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
                     <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                     <div>
-                      <h4 className="font-medium text-sm">Leadership</h4>
-                      <p className="text-xs text-gray-600">Inspire others through example</p>
+                      <h4 className="font-medium text-sm text-high-contrast">Leadership</h4>
+                      <p className="text-xs text-medium-contrast">Inspire others through example</p>
                     </div>
                   </div>
                 </div>

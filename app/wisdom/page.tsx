@@ -92,18 +92,18 @@ export default function WisdomPage() {
           Back to Academy
         </Link>
         
-        <div className="flex items-center gap-4 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-r from-accent-primary to-blue-500 rounded-2xl flex items-center justify-center">
-            <Brain size={32} className="text-white" />
+                  <div className="flex items-center gap-4 mb-6">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg">
+              <Brain size={32} className="text-white drop-shadow-sm" />
+            </div>
+            <div>
+              <h1 className="text-4xl font-semibold text-white mb-2 drop-shadow-sm">Wisdom</h1>
+              <h2 className="text-xl text-blue-300 font-medium drop-shadow-sm">The Virtue of Knowledge & Understanding</h2>
+              <p className="text-white/80 drop-shadow-sm">
+                The virtue of knowledge, understanding, and sound judgment
+              </p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-4xl font-semibold text-white mb-2">Wisdom</h1>
-            <h2 className="text-xl text-accent font-medium">The Virtue of Knowledge & Understanding</h2>
-            <p className="text-muted">
-              The virtue of knowledge, understanding, and sound judgment
-            </p>
-          </div>
-        </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="glass rounded-xl p-4 text-center">
@@ -124,11 +124,11 @@ export default function WisdomPage() {
       {/* Practices Grid */}
       <section className="mb-12">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-2xl font-semibold text-white">Wisdom Practices</h2>
+          <h2 className="text-2xl font-semibold text-white drop-shadow-sm">Wisdom Practices</h2>
           <div className="flex gap-2">
-            <button className="btn-secondary text-sm">All</button>
-            <button className="btn-secondary text-sm">Beginner</button>
-            <button className="btn-secondary text-sm">Advanced</button>
+            <button className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 border border-white/20 hover:border-white/30 text-sm">All</button>
+            <button className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 border border-white/20 hover:border-white/30 text-sm">Beginner</button>
+            <button className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 border border-white/20 hover:border-white/30 text-sm">Advanced</button>
           </div>
         </div>
 
@@ -140,12 +140,12 @@ export default function WisdomPage() {
               subtitle={practice.description}
               action={
                 <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-muted" />
-                  <span className="text-xs text-muted">{practice.duration}m</span>
-                  <div className={`px-2 py-1 rounded-full text-xs ${
-                    practice.difficulty === 'beginner' ? 'bg-green-500/20 text-green-400' :
-                    practice.difficulty === 'intermediate' ? 'bg-yellow-500/20 text-yellow-400' :
-                    'bg-red-500/20 text-red-400'
+                  <Clock size={14} className="text-white/70" />
+                  <span className="text-xs text-white/70">{practice.duration}m</span>
+                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
+                    practice.difficulty === 'beginner' ? 'bg-green-500/30 text-green-300 border border-green-400/30' :
+                    practice.difficulty === 'intermediate' ? 'bg-yellow-500/30 text-yellow-300 border border-yellow-400/30' :
+                    'bg-red-500/30 text-red-300 border border-red-400/30'
                   }`}>
                     {practice.difficulty}
                   </div>
@@ -156,12 +156,12 @@ export default function WisdomPage() {
               <div className="space-y-4">
                 {/* Benefits */}
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-2">Benefits</h4>
+                  <h4 className="text-sm font-medium text-white mb-2 drop-shadow-sm">Benefits</h4>
                   <div className="flex flex-wrap gap-2">
                     {practice.benefits.map((benefit) => (
                       <span
                         key={benefit}
-                        className="px-2 py-1 bg-accent-primary/20 text-accent-primary text-xs rounded-full"
+                        className="px-2 py-1 bg-blue-500/30 text-blue-300 text-xs rounded-full border border-blue-400/30 font-medium"
                       >
                         {benefit}
                       </span>
@@ -171,19 +171,19 @@ export default function WisdomPage() {
 
                 {/* Cultural Context */}
                 <div>
-                  <h4 className="text-sm font-medium text-white mb-2">Cultural Context</h4>
-                  <p className="text-xs text-muted line-clamp-2">
+                  <h4 className="text-sm font-medium text-white mb-2 drop-shadow-sm">Cultural Context</h4>
+                  <p className="text-xs text-white/80 line-clamp-2 drop-shadow-sm">
                     {practice.culturalContext}
                   </p>
                 </div>
 
                 {/* Action */}
                 <div className="flex items-center justify-between pt-2">
-                  <button className="btn-primary text-sm">
+                  <button className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors duration-200 shadow-md hover:shadow-lg text-sm">
                     <Play size={14} className="mr-1" />
                     Start Practice
                   </button>
-                  <button className="text-muted hover:text-white transition-colors">
+                  <button className="text-white/70 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10">
                     <BookOpen size={14} />
                   </button>
                 </div>
@@ -200,22 +200,22 @@ export default function WisdomPage() {
           subtitle="Ancient wisdom for modern reflection"
         >
           <div className="text-center space-y-4">
-            <blockquote className="text-xl text-white italic">
-              "The only true wisdom is in knowing you know nothing."
-            </blockquote>
-            <cite className="text-accent-primary">— Socrates</cite>
-            <p className="text-sm text-muted max-w-2xl mx-auto">
-              This famous quote from Socrates embodies the essence of wisdom: 
-              intellectual humility and the recognition that true knowledge begins 
-              with acknowledging our limitations and being open to learning.
-            </p>
+                      <blockquote className="text-xl text-white italic drop-shadow-sm">
+            "The only true wisdom is in knowing you know nothing."
+          </blockquote>
+          <cite className="text-blue-300 font-medium drop-shadow-sm">— Socrates</cite>
+          <p className="text-sm text-white/80 max-w-2xl mx-auto drop-shadow-sm">
+            This famous quote from Socrates embodies the essence of wisdom: 
+            intellectual humility and the recognition that true knowledge begins 
+            with acknowledging our limitations and being open to learning.
+          </p>
           </div>
         </GlassCard>
       </section>
 
       {/* Related Resources */}
       <section>
-        <h2 className="text-2xl font-semibold text-white mb-6">Related Resources</h2>
+        <h2 className="text-2xl font-semibold text-white mb-6 drop-shadow-sm">Related Resources</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <GlassCard
             title="Books"
@@ -223,16 +223,16 @@ export default function WisdomPage() {
           >
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-accent-primary" />
-                <span className="text-white">"Meditations" by Marcus Aurelius</span>
+                <BookOpen size={14} className="text-blue-300" />
+                <span className="text-white drop-shadow-sm">"Meditations" by Marcus Aurelius</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-accent-primary" />
-                <span className="text-white">"The Republic" by Plato</span>
+                <BookOpen size={14} className="text-blue-300" />
+                <span className="text-white drop-shadow-sm">"The Republic" by Plato</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-accent-primary" />
-                <span className="text-white">"Nicomachean Ethics" by Aristotle</span>
+                <BookOpen size={14} className="text-blue-300" />
+                <span className="text-white drop-shadow-sm">"Nicomachean Ethics" by Aristotle</span>
               </div>
             </div>
           </GlassCard>
@@ -243,16 +243,16 @@ export default function WisdomPage() {
           >
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-accent-primary" />
-                <span className="text-white">Socrates</span>
+                <Users size={14} className="text-blue-300" />
+                <span className="text-white drop-shadow-sm">Socrates</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-accent-primary" />
-                <span className="text-white">Plato</span>
+                <Users size={14} className="text-blue-300" />
+                <span className="text-white drop-shadow-sm">Plato</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-accent-primary" />
-                <span className="text-white">Aristotle</span>
+                <Users size={14} className="text-blue-300" />
+                <span className="text-white drop-shadow-sm">Aristotle</span>
               </div>
             </div>
           </GlassCard>
@@ -263,8 +263,8 @@ export default function WisdomPage() {
           >
             <div className="space-y-4">
               <div className="text-center">
-                <div className="text-2xl font-semibold text-white">72%</div>
-                <div className="text-sm text-muted">Overall Progress</div>
+                <div className="text-2xl font-semibold text-white drop-shadow-sm">72%</div>
+                <div className="text-sm text-white/80 drop-shadow-sm">Overall Progress</div>
               </div>
               <div className="flex items-center justify-center gap-2">
                 {[1, 2, 3, 4, 5].map((star) => (

@@ -169,6 +169,75 @@
     @apply glass-hover;
   }
   
+  /* Unified glass effect for light theme */
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1), 
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  
+  .glass-effect:hover {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 
+      0 12px 40px rgba(0, 0, 0, 0.15), 
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+  
+  /* High contrast text utilities */
+  .text-high-contrast {
+    color: #1f2937;
+    font-weight: 600;
+  }
+  
+  .text-medium-contrast {
+    color: #374151;
+    font-weight: 500;
+  }
+  
+  .text-low-contrast {
+    color: #6b7280;
+    font-weight: 400;
+  }
+  
+  /* Improved button styles for better contrast */
+  .btn-primary-light {
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    border: none;
+  }
+  
+  .btn-primary-light:hover {
+    background: linear-gradient(135deg, #2563eb, #1e40af);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+  }
+  
+  .btn-secondary-light {
+    background: #f3f4f6;
+    color: #374151;
+    font-weight: 500;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    border: 1px solid #d1d5db;
+  }
+  
+  .btn-secondary-light:hover {
+    background: #e5e7eb;
+    color: #1f2937;
+    border-color: #9ca3af;
+  }
+  
   /* Enhanced text utilities */
   .text-gradient {
     background: linear-gradient(135deg, var(--accent), var(--accent-2));
