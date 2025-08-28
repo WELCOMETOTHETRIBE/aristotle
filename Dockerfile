@@ -65,5 +65,5 @@ ENV PORT 8080
 ENV HOSTNAME "0.0.0.0"
 ENV NODE_ENV production
 
-# Use simple test server
-CMD ["node", "-e", "const http = require('http'); const server = http.createServer((req, res) => { res.writeHead(200, {'Content-Type': 'text/plain'}); res.end('Hello World!'); }); server.listen(8080, '0.0.0.0', () => console.log('Simple test server running on port 8080'));"] 
+# Use Next.js with proper port binding
+CMD ["sh", "-c", "node scripts/init-database.js && PORT=8080 HOSTNAME=0.0.0.0 npm start"] 
