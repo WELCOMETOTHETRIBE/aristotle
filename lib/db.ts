@@ -8,7 +8,12 @@ const createPrismaClient = () => {
     console.warn('DATABASE_URL not found, skipping PrismaClient creation');
     return null;
   }
-  return new PrismaClient();
+  try {
+    return new PrismaClient();
+  } catch (error) {
+    console.warn('Failed to create PrismaClient:', error);
+    return null;
+  }
 };
 
 export const prisma = globalForPrisma.prisma ?? createPrismaClient();

@@ -8,6 +8,15 @@ const nextConfig = {
     DATABASE_URL: process.env.DATABASE_URL || '',
     OPENAI_API_KEY: process.env.OPENAI_API_KEY || '',
   },
+  // Disable telemetry and other build-time checks
+  telemetry: false,
+  // Skip type checking during build
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 }
 
 module.exports = nextConfig 

@@ -4,13 +4,23 @@ import { Button } from "@/components/ui/button";
 import { MatrixClient } from "./matrix-client";
 
 async function getModules() {
-  const modules = await prisma.module.findMany({
-    orderBy: { name: "asc" },
-    include: {
-      levels: { orderBy: { level: "asc" } }
-    }
-  });
-  return modules;
+  if (!prisma) {
+    console.warn('Database not available, returning empty modules list');
+    return [];
+  }
+  
+  try {
+    const modules = await prisma.module.findMany({
+      orderBy: { name: "asc" },
+      include: {
+        levels: { orderBy: { level: "asc" } }
+      }
+    });
+    return modules;
+  } catch (error) {
+    console.warn('Failed to fetch modules:', error);
+    return [];
+  }
 }
 
 const domainColors = {

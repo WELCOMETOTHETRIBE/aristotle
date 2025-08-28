@@ -4,66 +4,105 @@ import VirtueRadar from "@/components/VirtueRadar";
 import { TodayClient, WisdomClient } from "./today-client";
 
 async function getVirtueScores() {
-  const userId = 1; // placeholder user
-  const since = new Date(Date.now() - 14 * 24 * 3600 * 1000);
-  
-  const recent = await prisma.session.findMany({
-    where: { 
-      userId, 
-      startedAt: { gte: since }, 
-      moduleId: { not: null } 
-    },
-    select: { moduleId: true }
-  });
-  
-  const weights = await prisma.moduleVirtueMap.findMany();
-  const map = new Map<string, { virtue: string; weight: number }[]>();
-  
-  for (const w of weights) {
-    const arr = map.get(w.moduleId) || [];
-    arr.push({ virtue: w.virtue, weight: w.weight });
-    map.set(w.moduleId, arr);
+  if (!prisma) {
+    console.warn('Database not available, returning default virtue scores');
+    return [
+      { virtue: "Wisdom", score: 0 },
+      { virtue: "Courage", score: 0 },
+      { virtue: "Temperance", score: 0 },
+      { virtue: "Justice", score: 0 }
+    ];
   }
   
-  const scores: Record<string, number> = { 
-    Wisdom: 0, 
-    Courage: 0, 
-    Temperance: 0, 
-    Justice: 0 
-  };
-  
-  for (const r of recent) {
-    const vs = map.get(r.moduleId!);
-    if (!vs) continue;
-    for (const v of vs) scores[v.virtue] = Math.min(100, scores[v.virtue] + v.weight);
+  try {
+    const userId = 1; // placeholder user
+    const since = new Date(Date.now() - 14 * 24 * 3600 * 1000);
+    
+    const recent = await prisma.session.findMany({
+      where: { 
+        userId, 
+        startedAt: { gte: since }, 
+        moduleId: { not: null } 
+      },
+      select: { moduleId: true }
+    });
+    
+    const weights = await prisma.moduleVirtueMap.findMany();
+    const map = new Map<string, { virtue: string; weight: number }[]>();
+    
+    for (const w of weights) {
+      const arr = map.get(w.moduleId) || [];
+      arr.push({ virtue: w.virtue, weight: w.weight });
+      map.set(w.moduleId, arr);
+    }
+    
+    const scores: Record<string, number> = { 
+      Wisdom: 0, 
+      Courage: 0, 
+      Temperance: 0, 
+      Justice: 0 
+    };
+    
+    for (const r of recent) {
+      const vs = map.get(r.moduleId!);
+      if (!vs) continue;
+      for (const v of vs) scores[v.virtue] = Math.min(100, scores[v.virtue] + v.weight);
+    }
+    
+    // Convert to VirtueData format
+    return Object.entries(scores).map(([virtue, score]) => ({
+      virtue,
+      score
+    }));
+  } catch (error) {
+    console.warn('Failed to fetch virtue scores:', error);
+    return [
+      { virtue: "Wisdom", score: 0 },
+      { virtue: "Courage", score: 0 },
+      { virtue: "Temperance", score: 0 },
+      { virtue: "Justice", score: 0 }
+    ];
   }
-  
-  // Convert to VirtueData format
-  return Object.entries(scores).map(([virtue, score]) => ({
-    virtue,
-    score
-  }));
+}
 }
 
 async function getRandomModules() {
-  const modules = await prisma.module.findMany({
-    orderBy: { name: "asc" }
-  });
-  
-  // Pick 3 modules from different domains
-  const domains = ["Mind", "Body", "Spirit", "Community", "Knowledge"];
-  const selectedModules = [];
-  
-  for (const domain of domains) {
-    const domainModules = modules.filter((m: any) => m.domain === domain);
-    if (domainModules.length > 0) {
-      const randomModule = domainModules[Math.floor(Math.random() * domainModules.length)];
-      selectedModules.push(randomModule);
-      if (selectedModules.length >= 3) break;
-    }
+  if (!prisma) {
+    console.warn('Database not available, returning default modules');
+    return [
+      { id: "breathwork", name: "Breathwork", domain: "Mind", description: "Train breath to modulate state (calm, focus, energy)." },
+      { id: "movement_posture", name: "Movement & Posture", domain: "Body", description: "Mobility, gait, posture as confidence & function." },
+      { id: "philosophy_capsules", name: "Philosophy Capsules", domain: "Spirit", description: "Actionable micro-lessons from classic works." }
+    ];
   }
   
-  return selectedModules;
+  try {
+    const modules = await prisma.module.findMany({
+      orderBy: { name: "asc" }
+    });
+    
+    // Pick 3 modules from different domains
+    const domains = ["Mind", "Body", "Spirit", "Community", "Knowledge"];
+    const selectedModules = [];
+    
+    for (const domain of domains) {
+      const domainModules = modules.filter((m: any) => m.domain === domain);
+      if (domainModules.length > 0) {
+        const randomModule = domainModules[Math.floor(Math.random() * domainModules.length)];
+        selectedModules.push(randomModule);
+        if (selectedModules.length >= 3) break;
+      }
+    }
+    
+    return selectedModules;
+  } catch (error) {
+    console.warn('Failed to fetch modules:', error);
+    return [
+      { id: "breathwork", name: "Breathwork", domain: "Mind", description: "Train breath to modulate state (calm, focus, energy)." },
+      { id: "movement_posture", name: "Movement & Posture", domain: "Body", description: "Mobility, gait, posture as confidence & function." },
+      { id: "philosophy_capsules", name: "Philosophy Capsules", domain: "Spirit", description: "Actionable micro-lessons from classic works." }
+    ];
+  }
 }
 
 export default async function TodayPage() {
