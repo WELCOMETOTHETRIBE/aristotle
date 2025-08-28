@@ -64,7 +64,6 @@ async function getVirtueScores() {
     ];
   }
 }
-}
 
 async function getRandomModules() {
   if (!prisma) {

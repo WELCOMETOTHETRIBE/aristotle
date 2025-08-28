@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   if (!prisma) {
     return new Response("Database not available", { status: 503 });

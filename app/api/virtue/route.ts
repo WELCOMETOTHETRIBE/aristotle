@@ -1,5 +1,8 @@
 import { prisma } from "@/lib/db";
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const userId = 1; // placeholder user
   const since = new Date(Date.now() - 14 * 24 * 3600 * 1000);
