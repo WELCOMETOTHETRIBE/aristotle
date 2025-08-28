@@ -45,10 +45,14 @@ export async function generateWithCache<T>(
   prompt: string
 ): Promise<T> {
   const keyFingerprint = fingerprint({ scope, ...params });
-  const existing = await prisma.generatedContent.findUnique({
-    where: { scope_keyFingerprint: { scope, keyFingerprint } }
-  });
-  if (existing) return schema.parse(JSON.parse(existing.payload));
+  
+  // Check if we have a database connection for caching
+  if (prisma) {
+    const existing = await prisma.generatedContent.findUnique({
+      where: { scope_keyFingerprint: { scope, keyFingerprint } }
+    });
+    if (existing) return schema.parse(JSON.parse(existing.payload));
+  }
 
   const completion = await client.chat.completions.create({
     model: "gpt-4o-mini",
@@ -76,18 +80,21 @@ export async function generateWithCache<T>(
     parsed = schema.parse(JSON.parse(repair.choices[0].message?.content ?? "{}"));
   }
 
-  await prisma.generatedContent.create({
-    data: {
-      scope,
-      keyFingerprint,
-      moduleId: params.moduleId,
-      frameworkId: params.frameworkId,
-      level: params.level,
-      locale: params.locale ?? "en",
-      style: params.style,
-      payload: JSON.stringify(parsed)
-    }
-  });
+  // Cache the result if we have a database connection
+  if (prisma) {
+    await prisma.generatedContent.create({
+      data: {
+        scope,
+        keyFingerprint,
+        moduleId: params.moduleId,
+        frameworkId: params.frameworkId,
+        level: params.level,
+        locale: params.locale ?? "en",
+        style: params.style,
+        payload: JSON.stringify(parsed)
+      }
+    });
+  }
 
   return parsed;
 } 

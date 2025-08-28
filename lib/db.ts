@@ -2,7 +2,16 @@ import { PrismaClient } from "@prisma/client";
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-export const prisma = globalForPrisma.prisma ?? new PrismaClient();
+// Only create PrismaClient if DATABASE_URL is available
+const createPrismaClient = () => {
+  if (!process.env.DATABASE_URL) {
+    console.warn('DATABASE_URL not found, skipping PrismaClient creation');
+    return null;
+  }
+  return new PrismaClient();
+};
+
+export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
