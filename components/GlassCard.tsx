@@ -21,13 +21,13 @@ export function GlassCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      whileHover={{ y: -2, scale: 1.01 }}
+      whileHover={{ y: -3, scale: 1.02 }}
       className={`glass rounded-2xl border bg-transparent transition-all duration-300 ${className}`}
     >
-      <CardHeader className="flex flex-row items-center justify-between pb-4">
+      <CardHeader className="flex flex-row items-center justify-between pb-6">
         <div>
-          <CardTitle className="text-base font-semibold text-white">{title}</CardTitle>
-          {subtitle && <p className="text-xs text-muted mt-1">{subtitle}</p>}
+          <CardTitle className="text-lg font-semibold text-white mb-1">{title}</CardTitle>
+          {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>
         {action && <div className="flex items-center gap-2">{action}</div>}
       </CardHeader>

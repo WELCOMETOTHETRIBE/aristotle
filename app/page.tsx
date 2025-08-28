@@ -6,7 +6,7 @@ import VirtueRadar from "@/components/VirtueRadar";
 import RadialMeter from "@/components/RadialMeter";
 import BreathTimer from "@/components/BreathTimer";
 import SunPath from "@/components/SunPath";
-import { MoreHorizontal, Target, Flame, Droplets, Clock, Heart, Sun, BookOpen, Settings } from "lucide-react";
+import { MoreHorizontal, Target, Flame, Droplets, Clock, Heart, Sun, BookOpen, Settings, TrendingUp, Zap } from "lucide-react";
 import { getVirtueRadarData, getCurrentHydration, getFastingTimeRemaining, getCurrentMood, mockUserProfile } from "@/lib/demo-state";
 
 export default function DashboardPage() {
@@ -33,136 +33,164 @@ export default function DashboardPage() {
     <main className="container-academy">
       <AuroraBackground />
       
-      {/* Header */}
-      <header className="mb-8">
-        <h1 className="text-3xl font-semibold text-white mb-2">
-          {getGreeting()}, {mockUserProfile.name}
-        </h1>
-        <p className="text-muted">
-          Your day at the Academy begins with presence and practice.
+      {/* Enhanced Header with better hierarchy */}
+      <header className="mb-12">
+        <div className="flex items-baseline justify-between mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white">
+            {getGreeting()}, {mockUserProfile.name}
+          </h1>
+          <div className="hidden md:flex items-center gap-3 text-sm text-muted">
+            <span className="flex items-center gap-1">
+              <TrendingUp size={16} />
+              Day {mockUserProfile.streaks.morningRoutine}
+            </span>
+            <span className="w-1 h-1 bg-muted rounded-full"></span>
+            <span className="flex items-center gap-1">
+              <Zap size={16} />
+              {mockUserProfile.streaks.morningRoutine} day streak
+            </span>
+          </div>
+        </div>
+        <p className="text-lg text-secondary max-w-2xl">
+          Your day at the Academy begins with presence and practice. 
+          <span className="text-accent font-medium"> Focus on one virtue at a time.</span>
         </p>
       </header>
 
-      {/* Widget Grid */}
+      {/* Enhanced Widget Grid with better proportions */}
       <section className="widget-grid">
-        {/* Virtue Radar */}
+        {/* Virtue Radar - Larger, more prominent */}
         <GlassCard 
           title="Virtue Balance" 
           subtitle="Weekly radar"
+          className="col-span-full lg:col-span-2"
           action={
-            <button className="text-muted hover:text-white transition-colors">
-              <MoreHorizontal size={16} />
+            <button className="text-muted hover:text-white transition-colors interactive">
+              <MoreHorizontal size={18} />
             </button>
           }
         >
-          <VirtueRadar data={virtueData} />
+          <div className="h-80">
+            <VirtueRadar data={virtueData} />
+          </div>
         </GlassCard>
 
-        {/* Morning Ritual */}
+        {/* Morning Ritual - Enhanced with better visual hierarchy */}
         <GlassCard 
           title="Morning Ritual" 
           subtitle={`${mockUserProfile.streaks.morningRoutine} day streak`}
           action={
             <div className="flex items-center gap-2">
-              <Target size={16} className="text-accent-primary" />
-              <span className="text-xs text-muted">7/7</span>
+              <Target size={18} className="text-accent" />
+              <span className="text-sm font-medium text-white">7/7</span>
             </div>
           }
         >
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-white">Breathwork (10m)</span>
-              <div className="w-4 h-4 rounded-full bg-accent-primary"></div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-success animate-pulse-soft"></div>
+                <span className="font-medium text-white">Breathwork</span>
+              </div>
+              <span className="text-sm text-muted">10m</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-white">Movement (20m)</span>
-              <div className="w-4 h-4 rounded-full bg-accent-primary"></div>
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-success animate-pulse-soft"></div>
+                <span className="font-medium text-white">Movement</span>
+              </div>
+              <span className="text-sm text-muted">20m</span>
             </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-white">Gratitude (3m)</span>
-              <div className="w-4 h-4 rounded-full bg-white/20"></div>
+            <div className="flex items-center justify-between p-3 rounded-xl bg-white/5 border border-white/10">
+              <div className="flex items-center gap-3">
+                <div className="w-3 h-3 rounded-full bg-muted"></div>
+                <span className="font-medium text-secondary">Gratitude</span>
+              </div>
+              <span className="text-sm text-muted">3m</span>
             </div>
           </div>
         </GlassCard>
 
-        {/* Breathwork Timer */}
+        {/* Breathwork Timer - Enhanced sizing */}
         <GlassCard 
           title="Breathwork" 
           subtitle="Box 4-4-4-4"
           action={
-            <button className="text-muted hover:text-white transition-colors">
-              <Settings size={16} />
+            <button className="text-muted hover:text-white transition-colors interactive">
+              <Settings size={18} />
             </button>
           }
         >
-          <BreathTimer />
+          <div className="flex justify-center py-4">
+            <BreathTimer />
+          </div>
         </GlassCard>
 
-        {/* Cold Exposure */}
+        {/* Cold Exposure - Enhanced with better contrast */}
         <GlassCard 
           title="Cold Exposure" 
           subtitle="Weekly: 45 minutes"
           action={
-            <Flame size={16} className="text-accent-primary" />
+            <Flame size={18} className="text-accent" />
           }
         >
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="text-center">
-              <div className="text-2xl font-semibold text-white">3</div>
+              <div className="text-3xl font-bold text-white mb-1">3</div>
               <div className="text-sm text-muted">Day streak</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button className="btn-primary flex-1">Start Timer</button>
-              <button className="btn-secondary">Log Session</button>
+              <button className="btn-secondary flex-1">Log Session</button>
             </div>
-            <div className="text-xs text-muted text-center">
+            <div className="text-xs text-muted text-center bg-white/5 rounded-lg p-3">
               Start with 30 seconds cold shower
             </div>
           </div>
         </GlassCard>
 
-        {/* Fasting Tracker */}
+        {/* Fasting Tracker - Enhanced typography */}
         <GlassCard 
           title="Fasting" 
           subtitle="16:8 Protocol"
           action={
-            <Clock size={16} className="text-accent-primary" />
+            <Clock size={18} className="text-accent" />
           }
         >
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="text-center">
-              <div className="text-2xl font-semibold text-white">
+              <div className="text-3xl font-bold text-white mb-1">
                 {formatTime(fastingTimeRemaining)}
               </div>
               <div className="text-sm text-muted">Remaining</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button className="btn-primary flex-1">Start</button>
-              <button className="btn-secondary">Stop</button>
+              <button className="btn-secondary flex-1">Stop</button>
             </div>
-            <div className="text-xs text-muted text-center">
+            <div className="text-xs text-muted text-center bg-white/5 rounded-lg p-3">
               {mockUserProfile.streaks.fasting} day streak
             </div>
           </div>
         </GlassCard>
 
-        {/* Mood & Reflection */}
+        {/* Mood & Reflection - Enhanced interaction */}
         <GlassCard 
           title="Mood & Reflection" 
           subtitle="How are you feeling?"
           action={
-            <Heart size={16} className="text-accent-primary" />
+            <Heart size={18} className="text-accent" />
           }
         >
-          <div className="space-y-4">
-            <div className="flex justify-center gap-2">
+          <div className="space-y-6">
+            <div className="flex justify-center gap-3">
               {[1, 2, 3, 4, 5].map((mood) => (
                 <button
                   key={mood}
-                  className={`w-8 h-8 rounded-full text-sm font-medium transition-all ${
+                  className={`w-10 h-10 rounded-full text-sm font-semibold transition-all interactive ${
                     currentMood?.mood === mood 
-                      ? 'bg-accent-primary text-black' 
-                      : 'bg-white/10 text-white hover:bg-white/20'
+                      ? 'bg-accent text-black shadow-lg' 
+                      : 'bg-white/10 text-white hover:bg-white/20 hover:scale-110'
                   }`}
                 >
                   {mood}
@@ -175,86 +203,92 @@ export default function DashboardPage() {
           </div>
         </GlassCard>
 
-        {/* Sun Path */}
+        {/* Sun Path - Enhanced sizing */}
         <GlassCard 
           title="Circadian Rhythm" 
           subtitle="Sleep cycle"
           action={
-            <Sun size={16} className="text-accent-primary" />
+            <Sun size={18} className="text-accent" />
           }
         >
-          <SunPath />
+          <div className="flex justify-center py-4">
+            <SunPath />
+          </div>
         </GlassCard>
 
-        {/* Hydration Ring */}
+        {/* Hydration Ring - Enhanced with better proportions */}
         <GlassCard 
           title="Hydration" 
           subtitle="Daily target"
           action={
-            <Droplets size={16} className="text-accent-primary" />
+            <Droplets size={18} className="text-accent" />
           }
         >
-          <div className="space-y-4">
-            <RadialMeter 
-              value={hydrationProgress} 
-              label={`${currentHydration} / ${mockUserProfile.goals.dailyHydration} ml`}
-            />
-            <div className="flex gap-2">
+          <div className="space-y-6">
+            <div className="flex justify-center">
+              <RadialMeter 
+                value={hydrationProgress} 
+                label={`${currentHydration} / ${mockUserProfile.goals.dailyHydration} ml`}
+              />
+            </div>
+            <div className="flex gap-3">
               <button className="btn-secondary flex-1">+250ml</button>
               <button className="btn-secondary flex-1">+500ml</button>
             </div>
           </div>
         </GlassCard>
 
-        {/* Focus / Flow Block */}
+        {/* Focus / Flow Block - Enhanced with better hierarchy */}
         <GlassCard 
           title="Focus Block" 
           subtitle="50/10 Deep Work"
           action={
-            <button className="text-muted hover:text-white transition-colors">
-              <Settings size={16} />
+            <button className="text-muted hover:text-white transition-colors interactive">
+              <Settings size={18} />
             </button>
           }
         >
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div className="text-center">
-              <div className="text-2xl font-semibold text-white">25:00</div>
+              <div className="text-3xl font-bold text-white mb-1">25:00</div>
               <div className="text-sm text-muted">Focus time remaining</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button className="btn-primary flex-1">Start</button>
-              <button className="btn-secondary">Pause</button>
+              <button className="btn-secondary flex-1">Pause</button>
             </div>
-            <div className="flex items-center justify-center gap-2">
-              <input type="checkbox" className="rounded" />
-              <span className="text-xs text-muted">Zen particles</span>
+            <div className="flex items-center justify-center gap-3 bg-white/5 rounded-lg p-3">
+              <input type="checkbox" className="rounded accent-accent" />
+              <span className="text-sm text-muted">Zen particles</span>
             </div>
           </div>
         </GlassCard>
 
-        {/* Resource Spotlight */}
+        {/* Resource Spotlight - Enhanced with better layout */}
         <GlassCard 
           title="Resource Spotlight" 
           subtitle="Today's wisdom"
           action={
-            <BookOpen size={16} className="text-accent-primary" />
+            <BookOpen size={18} className="text-accent" />
           }
           className="col-span-full"
         >
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-accent-primary to-accent-secondary flex items-center justify-center">
-              <BookOpen size={24} className="text-black" />
+          <div className="flex items-start gap-6">
+            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center shadow-lg">
+              <BookOpen size={28} className="text-black" />
             </div>
-            <div className="flex-1">
-              <h3 className="font-semibold text-white mb-1">
-                "Meditations" by Marcus Aurelius
-              </h3>
-              <p className="text-sm text-muted line-clamp-2">
-                Ancient wisdom for modern living. Learn how to cultivate inner peace and resilience through Stoic philosophy.
-              </p>
-              <div className="flex gap-2 mt-2">
-                <button className="btn-primary text-xs">Add to Library</button>
-                <button className="btn-secondary text-xs">Learn More</button>
+            <div className="flex-1 space-y-4">
+              <div>
+                <h3 className="text-xl font-semibold text-white mb-2">
+                  "Meditations" by Marcus Aurelius
+                </h3>
+                <p className="text-secondary leading-relaxed">
+                  Ancient wisdom for modern living. Learn how to cultivate inner peace and resilience through Stoic philosophy.
+                </p>
+              </div>
+              <div className="flex gap-3">
+                <button className="btn-primary">Add to Library</button>
+                <button className="btn-secondary">Learn More</button>
               </div>
             </div>
           </div>

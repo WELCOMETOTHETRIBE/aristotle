@@ -9,7 +9,7 @@ const virtues = [
     name: "Wisdom",
     path: "/wisdom",
     icon: Brain,
-    color: "from-accent-primary to-blue-500",
+    color: "from-accent to-blue-500",
   },
   {
     name: "Courage",
@@ -27,7 +27,7 @@ const virtues = [
     name: "Temperance",
     path: "/temperance",
     icon: Leaf,
-    color: "from-accent-secondary to-purple-500",
+    color: "from-accent-2 to-purple-500",
   },
 ];
 
@@ -37,17 +37,17 @@ export function VirtueNavigation() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10">
       <div className="container-academy">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-accent-primary to-accent-secondary rounded-lg flex items-center justify-center">
-              <Brain size={20} className="text-white" />
+          <Link href="/" className="flex items-center gap-3 interactive">
+            <div className="w-10 h-10 bg-gradient-to-r from-accent to-accent-2 rounded-xl flex items-center justify-center shadow-lg">
+              <Brain size={22} className="text-black" />
             </div>
-            <span className="font-semibold text-white text-lg">Academy</span>
+            <span className="font-bold text-white text-xl">Academy</span>
           </Link>
 
           {/* Virtue Dock */}
-          <div className="hidden md:flex items-center gap-2">
+          <div className="hidden md:flex items-center gap-3">
             {virtues.map((virtue) => {
               const IconComponent = virtue.icon;
               const isActive = pathname === virtue.path;
@@ -55,21 +55,21 @@ export function VirtueNavigation() {
               return (
                 <Link key={virtue.path} href={virtue.path}>
                   <motion.div
-                    whileHover={{ scale: 1.05 }}
+                    whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.95 }}
-                    className={`relative p-3 rounded-xl transition-all duration-200 ${
+                    className={`relative p-4 rounded-xl transition-all duration-200 interactive ${
                       isActive 
-                        ? 'bg-white/10 border border-white/20' 
-                        : 'hover:bg-white/5'
+                        ? 'bg-white/12 border border-white/25 shadow-lg' 
+                        : 'hover:bg-white/8 hover:border-white/15'
                     }`}
                   >
-                    <div className={`w-8 h-8 bg-gradient-to-r ${virtue.color} rounded-lg flex items-center justify-center`}>
-                      <IconComponent size={16} className="text-white" />
+                    <div className={`w-10 h-10 bg-gradient-to-r ${virtue.color} rounded-xl flex items-center justify-center shadow-md`}>
+                      <IconComponent size={18} className="text-white" />
                     </div>
                     {isActive && (
                       <motion.div
                         layoutId="activeVirtue"
-                        className="absolute -bottom-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-accent-primary rounded-full"
+                        className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-accent rounded-full shadow-lg"
                         initial={false}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                       />
@@ -81,24 +81,24 @@ export function VirtueNavigation() {
           </div>
 
           {/* Actions */}
-          <div className="flex items-center gap-2">
-            <button className="p-2 text-muted hover:text-white transition-colors">
-              <Search size={18} />
+          <div className="flex items-center gap-3">
+            <button className="p-3 text-muted hover:text-white transition-colors interactive rounded-xl hover:bg-white/5">
+              <Search size={20} />
             </button>
-            <button className="p-2 text-muted hover:text-white transition-colors">
-              <Settings size={18} />
+            <button className="p-3 text-muted hover:text-white transition-colors interactive rounded-xl hover:bg-white/5">
+              <Settings size={20} />
             </button>
-            <button className="p-2 text-muted hover:text-white transition-colors">
-              <User size={18} />
+            <button className="p-3 text-muted hover:text-white transition-colors interactive rounded-xl hover:bg-white/5">
+              <User size={20} />
             </button>
           </div>
         </div>
       </div>
 
       {/* Mobile Virtue Dock */}
-      <div className="md:hidden fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50">
-        <div className="glass rounded-2xl p-2 border border-white/10">
-          <div className="flex items-center gap-1">
+      <div className="md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+        <div className="glass rounded-2xl p-3 border border-white/10 shadow-2xl">
+          <div className="flex items-center gap-2">
             {virtues.map((virtue) => {
               const IconComponent = virtue.icon;
               const isActive = pathname === virtue.path;
@@ -106,21 +106,21 @@ export function VirtueNavigation() {
               return (
                 <Link key={virtue.path} href={virtue.path}>
                   <motion.div
-                    whileHover={{ scale: 1.1 }}
+                    whileHover={{ scale: 1.1, y: -2 }}
                     whileTap={{ scale: 0.9 }}
-                    className={`relative p-2 rounded-xl transition-all duration-200 ${
+                    className={`relative p-3 rounded-xl transition-all duration-200 interactive ${
                       isActive 
-                        ? 'bg-white/10' 
-                        : 'hover:bg-white/5'
+                        ? 'bg-white/12 border border-white/25' 
+                        : 'hover:bg-white/8'
                     }`}
                   >
-                    <div className={`w-6 h-6 bg-gradient-to-r ${virtue.color} rounded-lg flex items-center justify-center`}>
-                      <IconComponent size={12} className="text-white" />
+                    <div className={`w-8 h-8 bg-gradient-to-r ${virtue.color} rounded-xl flex items-center justify-center shadow-md`}>
+                      <IconComponent size={14} className="text-white" />
                     </div>
                     {isActive && (
                       <motion.div
                         layoutId="activeVirtueMobile"
-                        className="absolute -top-1 left-1/2 transform -translate-x-1/2 w-1 h-1 bg-accent-primary rounded-full"
+                        className="absolute -top-2 left-1/2 transform -translate-x-1/2 w-2 h-2 bg-accent rounded-full shadow-lg"
                         initial={false}
                         transition={{ type: "spring", stiffness: 500, damping: 30 }}
                       />
