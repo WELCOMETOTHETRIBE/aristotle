@@ -336,20 +336,23 @@
   /* Enhanced responsive container */
   .container-academy {
     @apply mx-auto w-full max-w-7xl px-6 py-12;
-    padding-top: 6rem; /* Account for fixed navigation */
+    padding-top: 4rem; /* Account for minimal top header */
+    padding-bottom: 6rem; /* Account for bottom navigation */
   }
   
   @media (min-width: 768px) {
     .container-academy {
       @apply px-8 py-16;
-      padding-top: 7rem;
+      padding-top: 4.5rem;
+      padding-bottom: 7rem;
     }
   }
   
   @media (min-width: 1024px) {
     .container-academy {
       @apply px-10 py-20;
-      padding-top: 8rem;
+      padding-top: 5rem;
+      padding-bottom: 8rem;
     }
   }
   
