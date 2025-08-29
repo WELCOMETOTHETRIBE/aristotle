@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getToneGradient, getToneTextColor, getToneAccentColor } from '../../../lib/tone';
 import Link from 'next/link';
-import BreathOfThePath from '../../../components/BreathOfThePath';
+import FrameworkBreathWidget from '../../../components/FrameworkBreathWidget';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
 import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import ModuleWidget from '../../../components/ModuleWidgets';
@@ -163,10 +163,8 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           <SectionDescription>
             A breathing technique inspired by the {framework.name} tradition
           </SectionDescription>
-          <BreathOfThePath 
-            frameworkId={framework.id}
-            frameworkName={framework.name}
-            frameworkTone={framework.nav.tone}
+          <FrameworkBreathWidget 
+            frameworkId={framework.id as keyof typeof import('../../../data/frameworkBreath').FRAMEWORK_BREATH_MAP}
           />
         </PageSection>
 
