@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import BreathOfThePath from '@/components/BreathOfThePath';
 import FrameworkResourceSpotlight from '@/components/FrameworkResourceSpotlight';
+import FrameworkChat from '@/components/FrameworkChat';
 
 interface FrameworkDetailPageProps {
   params: { id: string };
@@ -33,7 +34,75 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
     return virtueMap[frameworkId] || ['Wisdom'];
   };
 
+  // Define leader information for each framework
+  const getLeaderInfo = (frameworkId: string) => {
+    const leaders: Record<string, any> = {
+      'spartan': {
+        name: 'King Leonidas',
+        title: 'Spartan King & Warrior',
+        description: 'Embodying discipline, courage, and the warrior ethos of Sparta.',
+        avatar: '🛡️'
+      },
+      'bushido': {
+        name: 'Miyamoto Musashi',
+        title: 'Legendary Samurai',
+        description: 'Master of the sword and author of "The Book of Five Rings."',
+        avatar: '🗡️'
+      },
+      'stoic': {
+        name: 'Marcus Aurelius',
+        title: 'Philosopher-Emperor',
+        description: 'Roman emperor and author of "Meditations," embodying Stoic wisdom.',
+        avatar: '🧱'
+      },
+      'monastic': {
+        name: 'Saint Benedict',
+        title: 'Founder of Western Monasticism',
+        description: 'Author of "The Rule of Saint Benedict," teaching stability and humility.',
+        avatar: '⛪'
+      },
+      'yogic': {
+        name: 'Patanjali',
+        title: 'Sage & Yoga Master',
+        description: 'Compiler of the Yoga Sutras, guiding the path to self-realization.',
+        avatar: '🧘'
+      },
+      'indigenous': {
+        name: 'Wise Elder',
+        title: 'Indigenous Wisdom Keeper',
+        description: 'Guardian of traditional knowledge and connection to the earth.',
+        avatar: '🌿'
+      },
+      'martial': {
+        name: 'Bruce Lee',
+        title: 'Martial Artist & Philosopher',
+        description: 'Transcended traditional boundaries, teaching adaptability and self-expression.',
+        avatar: '🥋'
+      },
+      'sufi': {
+        name: 'Rumi',
+        title: 'Sufi Poet & Mystic',
+        description: 'Great poet of love and devotion, guiding spiritual awakening.',
+        avatar: '🕊️'
+      },
+      'ubuntu': {
+        name: 'Desmond Tutu',
+        title: 'Archbishop & Peacemaker',
+        description: 'Embodying Ubuntu philosophy: "I am because we are."',
+        avatar: '🤝'
+      },
+      'highperf': {
+        name: 'Cal Newport',
+        title: 'Author & Professor',
+        description: 'Expert in deep work and systematic approaches to excellence.',
+        avatar: '🚀'
+      }
+    };
+    return leaders[frameworkId] || leaders['stoic'];
+  };
+
   const virtueEmphasis = getVirtueEmphasis(framework.id);
+  const leaderInfo = getLeaderInfo(framework.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -178,6 +247,16 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           </Link>
         </div>
       </div>
+
+      {/* Framework Chat */}
+      <FrameworkChat
+        frameworkId={framework.id}
+        frameworkName={framework.name}
+        leaderName={leaderInfo.name}
+        leaderTitle={leaderInfo.title}
+        leaderDescription={leaderInfo.description}
+        leaderAvatar={leaderInfo.avatar}
+      />
     </div>
   );
 } 
