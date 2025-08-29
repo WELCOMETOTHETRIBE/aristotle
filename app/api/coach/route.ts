@@ -22,6 +22,12 @@ export async function POST(req: Request) {
     
     // Check if OpenAI API key is available
     const apiKey = process.env.OPENAI_API_KEY;
+    console.log('API Key check:', {
+      hasKey: !!apiKey,
+      keyLength: apiKey ? apiKey.length : 0,
+      keyPrefix: apiKey ? apiKey.substring(0, 10) + '...' : 'none'
+    });
+    
     if (!apiKey || apiKey === "your_openai_api_key_here" || apiKey.includes("your_")) {
       console.error('OpenAI API key not configured');
       return Response.json({ 
