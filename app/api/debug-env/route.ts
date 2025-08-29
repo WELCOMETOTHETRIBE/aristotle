@@ -1,37 +1,28 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET() {
+export const dynamic = 'force-dynamic';
+
+export async function GET(request: NextRequest) {
   try {
-    const envVars = {
-      OPENAI_API_KEY: {
-        exists: !!process.env.OPENAI_API_KEY,
-        length: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.length : 0,
-        prefix: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY.substring(0, 10) + '...' : 'none',
-        value: process.env.OPENAI_API_KEY || 'NOT_SET'
-      },
+    return NextResponse.json({
       DATABASE_URL: {
         exists: !!process.env.DATABASE_URL,
-        value: process.env.DATABASE_URL || 'NOT_SET'
+        value: process.env.DATABASE_URL || 'NOT_SET',
+        length: process.env.DATABASE_URL?.length || 0,
+        startsWithPostgres: process.env.DATABASE_URL?.startsWith('postgresql://') || false
       },
       NODE_ENV: process.env.NODE_ENV,
-      RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT,
-      RAILWAY_PROJECT_NAME: process.env.RAILWAY_PROJECT_NAME
-    };
-
-    return NextResponse.json({
-      timestamp: new Date().toISOString(),
-      environment: envVars,
-      allEnvKeys: Object.keys(process.env).filter(key => 
-        key.includes('OPENAI') || 
-        key.includes('RAILWAY') || 
-        key.includes('DATABASE') ||
-        key.includes('NODE')
-      )
+      JWT_SECRET: {
+        exists: !!process.env.JWT_SECRET,
+        value: process.env.JWT_SECRET ? 'SET' : 'NOT_SET'
+      },
+      allEnvVars: Object.keys(process.env).filter(key => key.includes('DATABASE') || key.includes('JWT') || key.includes('NODE'))
     });
   } catch (error) {
-    return NextResponse.json({
-      error: error instanceof Error ? error.message : 'Unknown error',
-      timestamp: new Date().toISOString()
-    }, { status: 500 });
+    console.error('Debug env error:', error);
+    return NextResponse.json(
+      { error: 'Debug error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { status: 500 }
+    );
   }
 } 
