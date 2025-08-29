@@ -3,7 +3,6 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { VirtueNavigation } from "@/components/VirtueNavigation";
-import { ModuleNavigation } from "@/components/ModuleNavigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +22,6 @@ export default function RootLayout({
         <QueryProvider>
           <div className="min-h-screen bg-bg">
             <VirtueNavigation />
-            <ModuleNavigation />
             {children}
           </div>
         </QueryProvider>
