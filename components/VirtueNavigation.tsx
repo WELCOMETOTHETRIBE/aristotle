@@ -71,9 +71,18 @@ export function VirtueNavigation() {
     try {
       const response = await fetch('/api/auth/signout', {
         method: 'POST',
+        credentials: 'include', // Ensure cookies are included
       });
+      
       if (response.ok) {
+        // Close the profile menu
+        setShowProfileMenu(false);
+        
+        // Force a hard reload to clear all client-side state
         window.location.href = '/auth';
+        window.location.reload();
+      } else {
+        console.error('Sign out failed:', response.status);
       }
     } catch (error) {
       console.error('Sign out error:', error);
