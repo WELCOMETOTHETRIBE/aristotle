@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getFrameworksByModule } from '@/lib/frameworkMap';
+import { getFrameworksByModule } from '../lib/frameworkMap';
 import { getToneGradient, getToneTextColor } from '@/lib/tone';
 
 interface FrameworkChipsProps {

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getFrameworksByPractice } from '@/lib/frameworkMap';
+import { getFrameworksByPractice } from '../../../../../lib/frameworkMap';
 
 export async function GET(
   request: NextRequest,

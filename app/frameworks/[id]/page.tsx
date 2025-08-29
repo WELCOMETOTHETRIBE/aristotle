@@ -1,11 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getToneGradient, getToneTextColor, getToneAccentColor } from '@/lib/tone';
+import { getToneGradient, getToneTextColor, getToneAccentColor } from '../../../lib/tone';
 import Link from 'next/link';
-import BreathOfThePath from '@/components/BreathOfThePath';
-import FrameworkResourceSpotlight from '@/components/FrameworkResourceSpotlight';
-import FrameworkPersonaChat from '@/components/FrameworkPersonaChat';
+import BreathOfThePath from '../../../components/BreathOfThePath';
+import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
+import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import PageLayout, { 
   PageTitle, 
   PageSubtitle, 
@@ -15,7 +15,7 @@ import PageLayout, {
   CardDescription, 
   PageSection, 
   PageGrid 
-} from '@/components/PageLayout';
+} from '../../../components/PageLayout';
 
 interface Framework {
   id: string;

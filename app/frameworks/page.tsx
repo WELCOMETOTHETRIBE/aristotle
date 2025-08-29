@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getToneGradient, getToneTextColor } from '@/lib/tone';
+import { getToneGradient, getToneTextColor } from '../../lib/tone';
 import Link from 'next/link';
 import PageLayout, { 
   PageTitle, 
@@ -9,7 +9,7 @@ import PageLayout, {
   CardTitle, 
   PageSection, 
   PageGrid 
-} from '@/components/PageLayout';
+} from '../../components/PageLayout';
 
 interface Framework {
   id: string;

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getAllFrameworks } from '@/lib/frameworkMap';
+import { getAllFrameworks } from '../../../lib/frameworkMap';
 
 export async function GET() {
   try {
