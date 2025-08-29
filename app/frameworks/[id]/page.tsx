@@ -2,6 +2,7 @@ import { getFrameworkById } from '@/lib/frameworkMap';
 import { getToneGradient, getToneTextColor, getToneAccentColor } from '@/lib/tone';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import BreathOfThePath from '@/components/BreathOfThePath';
 
 interface FrameworkDetailPageProps {
   params: { id: string };
@@ -13,6 +14,25 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
   if (!framework) {
     notFound();
   }
+
+  // Define virtue emphasis for each framework
+  const getVirtueEmphasis = (frameworkId: string) => {
+    const virtueMap: Record<string, string[]> = {
+      'spartan': ['Courage', 'Temperance'],
+      'samurai': ['Honor', 'Courage'],
+      'stoic': ['Wisdom', 'Temperance'],
+      'confucian': ['Justice', 'Wisdom'],
+      'yogic': ['Temperance', 'Wisdom'],
+      'benedictine': ['Temperance', 'Devotion'],
+      'zen': ['Wisdom', 'Temperance'],
+      'taoist': ['Wisdom', 'Temperance'],
+      'indigenous': ['Stewardship', 'Community'],
+      'modern': ['Wisdom', 'Justice']
+    };
+    return virtueMap[frameworkId] || ['Wisdom'];
+  };
+
+  const virtueEmphasis = getVirtueEmphasis(framework.id);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
@@ -29,11 +49,33 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                 {framework.nav.badge}
               </span>
             </div>
+            
+            {/* Virtue Bar */}
+            <div className="mt-6 flex justify-center gap-2">
+              {virtueEmphasis.map((virtue) => (
+                <span
+                  key={virtue}
+                  className="px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm text-sm font-medium"
+                >
+                  <span className={getToneTextColor(framework.nav.tone)}>{virtue}</span>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
       </div>
 
       <div className="container mx-auto px-4 py-8">
+        {/* Breath of the Path */}
+        <section className="mb-12">
+          <h2 className="text-3xl font-bold text-white mb-6">Breath of the Path</h2>
+          <BreathOfThePath 
+            frameworkId={framework.id}
+            frameworkName={framework.name}
+            frameworkTone={framework.nav.tone}
+          />
+        </section>
+
         {/* Core Modules */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-white mb-6">Core Modules</h2>

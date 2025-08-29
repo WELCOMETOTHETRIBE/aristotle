@@ -7,6 +7,10 @@ import { VIRTUE_PRACTICES } from "./virtue-practices";
 
 const prisma = new PrismaClient();
 
+function slugify(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
 async function main() {
   console.log("Starting seed...");
 
@@ -86,10 +90,22 @@ async function main() {
 
   // Seed virtue practices
   for (const p of VIRTUE_PRACTICES) {
+    const practiceData = {
+      ...p,
+      slug: p.slug ?? slugify(p.title),
+      virtue: 'Wisdom', // Default virtue
+      shortDesc: p.description,
+      targetModuleId: null,
+      tags: JSON.stringify([]),
+      safety: p.safetyNotes,
+      measurement: p.metrics,
+      meta: JSON.stringify({})
+    };
+    
     await prisma.virtuePractice.upsert({
-      where: { slug: p.slug },
-      update: p,
-      create: p,
+      where: { slug: practiceData.slug },
+      update: practiceData,
+      create: practiceData,
     });
   }
 
@@ -101,6 +117,18 @@ async function main() {
       id: 1,
       email: "demo@aristotle.com",
       displayName: "Demo User"
+    },
+  });
+
+  // Create default user preferences
+  await prisma.userPreference.upsert({
+    where: { userId: 1 },
+    update: {},
+    create: {
+      userId: 1,
+      framework: null,
+      style: null,
+      locale: 'en'
     },
   });
 

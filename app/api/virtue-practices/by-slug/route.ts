@@ -3,8 +3,8 @@ import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    const url = new URL(request.url);
-    const slug = url.searchParams.get('slug');
+    const { searchParams } = request.nextUrl;
+    const slug = searchParams.get('slug');
 
     if (!slug) {
       return NextResponse.json(

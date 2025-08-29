@@ -37,7 +37,7 @@ export const ReflectionSchema = z.object({
   next_step: z.string()
 });
 
-type Scope = "practice_detail" | "hidden_wisdom" | "reflection";
+type Scope = "practice_detail" | "virtue_practice_detail" | "hidden_wisdom";
 
 function fingerprint(input: Record<string, any>) {
   const raw = JSON.stringify(input);

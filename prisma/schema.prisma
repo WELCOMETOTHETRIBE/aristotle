@@ -135,6 +135,7 @@ model User {
   streaks     Streak[]
   virtueScores VirtueScore[]
   feeds       Feed[]
+  preferences UserPreference?
 }
 
 model Session {
@@ -204,6 +205,7 @@ model GeneratedContent {
   scope          String
   keyFingerprint String
   moduleId       String?
+  virtuePracticeId Int?
   frameworkId    String?
   level          String?
   locale         String      @default("en")
@@ -215,16 +217,31 @@ model GeneratedContent {
 }
 
 model VirtuePractice {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  instructions String?
-  rationale   String?
-  metrics     String?
-  safetyNotes String?
-  coachPrompts String?
-  slug        String?  @unique
-  meta        String?  @default("{}")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id            Int       @id @default(autoincrement())
+  slug          String?   @unique
+  title         String
+  virtue        String
+  shortDesc     String?
+  targetModuleId String?
+  tags          String?   @default("[]")
+  safety        String?
+  measurement   String?
+  description   String?
+  instructions  String?
+  rationale     String?
+  metrics       String?
+  safetyNotes   String?
+  coachPrompts  String?
+  meta          String?   @default("{}")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model UserPreference {
+  userId    Int     @id
+  user      User    @relation(fields: [userId], references: [id])
+  framework String?
+  style     String?
+  locale    String? @default("en")
+  updatedAt DateTime @default(now())
 } 

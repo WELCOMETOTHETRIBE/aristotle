@@ -1,38 +1,53 @@
-export function practiceDetailPrompt(args: {
-  moduleName: string; level: string; style: string; locale: string;
+export function practiceDetailPrompt(a: {
+  moduleName: string; 
+  level: string; 
+  style: string; 
+  locale: string; 
   baseFacts: { safety?: string[]; measurement?: string[] }
 }) {
-  const { moduleName, level, style, locale, baseFacts } = args;
+  const { moduleName, level, style, locale, baseFacts } = a;
   return `
-You are a wise, practical coach. Tone style: ${style}. Locale: ${locale}.
-Generate a PRACTICE DETAIL for module "${moduleName}" at level "${level}".
-Use grounded, non-medical language.
+You are a practical coach. Style:${style}. Locale:${locale}.
+Generate a PRACTICE DETAIL for "${moduleName}" at level "${level}".
+Honor facts; non-medical; conservative.
 
-Base facts to honor (do not contradict):
-- Safety: ${(baseFacts.safety||[]).join("; ") || "None"}
-- Measurement: ${(baseFacts.measurement||[]).join("; ") || "minutes, mood delta"}
+Facts:
+- Safety: ${(baseFacts.safety || ["—"]).join("; ")}
+- Measurement: ${(baseFacts.measurement || ["minutes; mood (1–5)"]).join("; ")}
 
-Output STRICT JSON:
-{
-  "title": "string",
-  "body": "string",
-  "bullets": ["string", "string"],
-  "coach_prompts": ["string"],
-  "safety_reminders": ["string"],
-  "est_time_min": 5
-}
+JSON ONLY:
+{ "title":"","body":"","bullets":[],"coach_prompts":[],"safety_reminders":[],"est_time_min":5 }
 `.trim();
 }
 
-export function hiddenWisdomPrompt(args: { dateBucket: string; style: string; locale: string }) {
-  const { dateBucket, style, locale } = args;
+export function virtuePracticePrompt(a: {
+  title: string; 
+  virtue: string; 
+  shortDesc?: string; 
+  safety?: string; 
+  measurement?: string; 
+  style: string; 
+  locale: string;
+}) {
+  const { title, virtue, shortDesc, safety, measurement, style, locale } = a;
   return `
-You produce ONE practical micro-lesson from cross-cultural wisdom.
-Locale: ${locale}. Style: ${style}. Date bucket: ${dateBucket}.
-
-Output STRICT JSON:
-{ "insight": "", "micro_experiment": "", "reflection": "" }
+Style:${style}. Locale:${locale}.
+Generate detailed card for virtue "${virtue}" titled "${title}".
+Facts:
+- Short:${shortDesc || "—"}; Safety:${safety || "—"}; Measurement:${measurement || "minutes; mood 1–5"}
+JSON ONLY:
+{ "title":"","body":"","bullets":[],"coach_prompts":[],"safety_reminders":[],"est_time_min":5 }
 `.trim();
+}
+
+export function hiddenWisdomPrompt(a: {
+  dateBucket: string; 
+  style: string; 
+  locale: string
+}) {
+  const { dateBucket, style, locale } = a;
+  return `One practical micro-lesson. Date:${dateBucket}. Style:${style}. Locale:${locale}.
+JSON ONLY:{ "insight":"","micro_experiment":"","reflection":"" }`.trim();
 }
 
 export function reflectionPrompt(args: { moduleName: string; minutes: number; pre: number; post: number }) {

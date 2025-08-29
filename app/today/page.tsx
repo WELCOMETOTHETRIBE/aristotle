@@ -1,175 +1,235 @@
-import { prisma } from "@/lib/db";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import VirtueRadar from "@/components/VirtueRadar";
-import { TodayClient, WisdomClient } from "./today-client";
+"use client";
+import { useEffect, useState } from "react";
+import Link from "next/link";
 
-async function getVirtueScores() {
-  if (!prisma) {
-    console.warn('Database not available, returning default virtue scores');
-    return [
-      { virtue: "Wisdom", score: 0 },
-      { virtue: "Courage", score: 0 },
-      { virtue: "Temperance", score: 0 },
-      { virtue: "Justice", score: 0 }
-    ];
-  }
-  
-  try {
-    const userId = 1; // placeholder user
-    const since = new Date(Date.now() - 14 * 24 * 3600 * 1000);
-    
-    const recent = await prisma.session.findMany({
-      where: { 
-        userId, 
-        startedAt: { gte: since }, 
-        moduleId: { not: null } 
-      },
-      select: { moduleId: true }
-    });
-    
-    const weights = await prisma.moduleVirtueMap.findMany();
-    const map = new Map<string, { virtue: string; weight: number }[]>();
-    
-    for (const w of weights) {
-      const arr = map.get(w.moduleId) || [];
-      arr.push({ virtue: w.virtue, weight: w.weight });
-      map.set(w.moduleId, arr);
-    }
-    
-    const scores: Record<string, number> = { 
-      Wisdom: 0, 
-      Courage: 0, 
-      Temperance: 0, 
-      Justice: 0 
-    };
-    
-    for (const r of recent) {
-      const vs = map.get(r.moduleId!);
-      if (!vs) continue;
-      for (const v of vs) scores[v.virtue] = Math.min(100, scores[v.virtue] + v.weight);
-    }
-    
-    // Convert to VirtueData format
-    return Object.entries(scores).map(([virtue, score]) => ({
-      virtue,
-      score
-    }));
-  } catch (error) {
-    console.warn('Failed to fetch virtue scores:', error);
-    return [
-      { virtue: "Wisdom", score: 0 },
-      { virtue: "Courage", score: 0 },
-      { virtue: "Temperance", score: 0 },
-      { virtue: "Justice", score: 0 }
-    ];
-  }
+interface UserPrefs {
+  framework: string | null;
+  style: string | null;
+  locale: string;
 }
 
-async function getRandomModules() {
-  if (!prisma) {
-    console.warn('Database not available, returning default modules');
-    return [
-      { id: "breathwork", name: "Breathwork", domain: "Mind", description: "Train breath to modulate state (calm, focus, energy)." },
-      { id: "movement_posture", name: "Movement & Posture", domain: "Body", description: "Mobility, gait, posture as confidence & function." },
-      { id: "philosophy_capsules", name: "Philosophy Capsules", domain: "Spirit", description: "Actionable micro-lessons from classic works." }
-    ];
-  }
-  
-  try {
-    const modules = await prisma.module.findMany({
-      orderBy: { name: "asc" }
-    });
-    
-    // Pick 3 modules from different domains
-    const domains = ["Mind", "Body", "Spirit", "Community", "Knowledge"];
-    const selectedModules = [];
-    
-    for (const domain of domains) {
-      const domainModules = modules.filter((m: any) => m.domain === domain);
-      if (domainModules.length > 0) {
-        const randomModule = domainModules[Math.floor(Math.random() * domainModules.length)];
-        selectedModules.push(randomModule);
-        if (selectedModules.length >= 3) break;
-      }
-    }
-    
-    return selectedModules;
-  } catch (error) {
-    console.warn('Failed to fetch modules:', error);
-    return [
-      { id: "breathwork", name: "Breathwork", domain: "Mind", description: "Train breath to modulate state (calm, focus, energy)." },
-      { id: "movement_posture", name: "Movement & Posture", domain: "Body", description: "Mobility, gait, posture as confidence & function." },
-      { id: "philosophy_capsules", name: "Philosophy Capsules", domain: "Spirit", description: "Actionable micro-lessons from classic works." }
-    ];
-  }
+interface HiddenWisdom {
+  insight: string;
+  micro_experiment: string;
+  reflection: string;
 }
 
-export default async function TodayPage() {
-  const [virtueScores, modules] = await Promise.all([
-    getVirtueScores(),
-    getRandomModules()
-  ]);
+interface PracticeDetail {
+  title: string;
+  body: string;
+  bullets: string[];
+  coach_prompts: string[];
+  safety_reminders: string[];
+  est_time_min: number;
+}
 
-  return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-8">Today's Practice</h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Virtue Radar */}
-        <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle>Virtue Balance</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <VirtueRadar data={virtueScores} />
-            </CardContent>
-          </Card>
-        </div>
+interface Framework {
+  id: string;
+  name: string;
+  nav: {
+    tone: string;
+    badge: string;
+    emoji: string;
+  };
+  coreModules: string[];
+  supportModules: string[];
+}
+
+export default function TodayPage() {
+  const [userPrefs, setUserPrefs] = useState<UserPrefs | null>(null);
+  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
+  const [practices, setPractices] = useState<PracticeDetail[]>([]);
+  const [framework, setFramework] = useState<Framework | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadTodayContent = async () => {
+      try {
+        setLoading(true);
         
-        {/* Hidden Wisdom */}
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Daily Hidden Wisdom</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <WisdomClient />
-            </CardContent>
-          </Card>
+        // Load user preferences
+        const prefsResponse = await fetch('/api/prefs');
+        const prefs = await prefsResponse.json();
+        setUserPrefs(prefs);
+        
+        // Load hidden wisdom
+        const dateBucket = new Date().toISOString().split('T')[0];
+        const wisdomResponse = await fetch(
+          `/api/generate/hidden-wisdom?dateBucket=${dateBucket}&style=${prefs.style || 'aristotle'}&locale=${prefs.locale || 'en'}`
+        );
+        const wisdom = await wisdomResponse.json();
+        setHiddenWisdom(wisdom);
+        
+        // If user has a framework preference, load framework and practices
+        if (prefs.framework) {
+          const frameworkResponse = await fetch(`/api/frameworks/${prefs.framework}`);
+          const frameworkData = await frameworkResponse.json();
+          setFramework(frameworkData);
+          
+          // Load 2 core + 1 support module practices
+          const moduleIds = [
+            ...frameworkData.coreModules.slice(0, 2),
+            ...frameworkData.supportModules.slice(0, 1)
+          ];
+          
+          const practicePromises = moduleIds.map(moduleId =>
+            fetch(`/api/generate/practice?moduleId=${moduleId}&level=Beginner&style=${prefs.framework}&locale=${prefs.locale || 'en'}`)
+              .then(r => r.json())
+          );
+          
+          const practiceResults = await Promise.all(practicePromises);
+          setPractices(practiceResults);
+        }
+      } catch (error) {
+        console.error('Error loading today content:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadTodayContent();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        <div className="container mx-auto px-4 py-8">
+          <div className="animate-pulse">
+            <div className="h-8 bg-white/20 rounded mb-8"></div>
+            <div className="space-y-6">
+              <div className="h-64 bg-white/10 rounded-lg"></div>
+              <div className="h-48 bg-white/10 rounded-lg"></div>
+              <div className="h-48 bg-white/10 rounded-lg"></div>
+            </div>
+          </div>
         </div>
       </div>
-      
-      {/* Practice Cards */}
-      <div className="mt-8">
-        <h2 className="text-2xl font-semibold mb-4">Today's Practices</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {modules.map((module: any) => (
-            <Card key={module.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <CardTitle className="text-lg">{module.name}</CardTitle>
-                <p className="text-sm text-gray-600">{module.description}</p>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                      module.domain === 'Mind' ? 'bg-blue-100 text-blue-800' :
-                      module.domain === 'Body' ? 'bg-green-100 text-green-800' :
-                      module.domain === 'Spirit' ? 'bg-purple-100 text-purple-800' :
-                      module.domain === 'Community' ? 'bg-orange-100 text-orange-800' :
-                      'bg-indigo-100 text-indigo-800'
-                    }`}>
-                      {module.domain}
-                    </span>
-                  </div>
-                  
-                                     <TodayClient module={module} />
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold text-white mb-2">Today's Wisdom</h1>
+          <p className="text-gray-300">
+            {new Date().toLocaleDateString('en-US', { 
+              weekday: 'long', 
+              year: 'numeric', 
+              month: 'long', 
+              day: 'numeric' 
+            })}
+          </p>
         </div>
+
+        {/* Hidden Wisdom */}
+        {hiddenWisdom && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6">✨ Hidden Wisdom</h2>
+            <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20">
+              <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
+              <div className="space-y-4">
+                <div>
+                  <h4 className="text-sm font-medium text-blue-300 mb-2">Micro Experiment</h4>
+                  <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium text-purple-300 mb-2">Reflection</h4>
+                  <p className="text-gray-300">{hiddenWisdom.reflection}</p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Personalized Practices */}
+        {framework && practices.length > 0 && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              🎯 {framework.name} Practices
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {practices.map((practice, index) => (
+                <div
+                  key={index}
+                  className="p-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors"
+                >
+                  <h3 className="text-xl font-semibold text-white mb-3">{practice.title}</h3>
+                  <p className="text-gray-300 mb-4 line-clamp-3">{practice.body}</p>
+                  
+                  {practice.bullets.length > 0 && (
+                    <div className="mb-4">
+                      <ul className="space-y-1">
+                        {practice.bullets.slice(0, 2).map((bullet, bulletIndex) => (
+                          <li key={bulletIndex} className="text-sm text-gray-300 flex items-start gap-2">
+                            <span className="text-blue-400 mt-1">•</span>
+                            {bullet}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  <div className="flex items-center justify-between text-sm text-gray-400">
+                    <span>⏱️ {practice.est_time_min} min</span>
+                    <span className="text-blue-300">{framework.nav.badge}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* No Framework Selected */}
+        {!framework && (
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-white mb-6">🎯 Choose Your Path</h2>
+            <div className="p-8 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-center">
+              <p className="text-gray-300 mb-4">
+                Select a framework to get personalized practices and wisdom.
+              </p>
+              <Link
+                href="/frameworks"
+                className="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+              >
+                Explore Frameworks
+              </Link>
+            </div>
+          </section>
+        )}
+
+        {/* Quick Actions */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">⚡ Quick Actions</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Link
+              href="/breath"
+              className="p-4 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors text-center"
+            >
+              <div className="text-2xl mb-2">🫁</div>
+              <h3 className="text-white font-medium">Breathwork</h3>
+              <p className="text-sm text-gray-400">Find your center</p>
+            </Link>
+            
+            <Link
+              href="/coach"
+              className="p-4 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors text-center"
+            >
+              <div className="text-2xl mb-2">🧠</div>
+              <h3 className="text-white font-medium">AI Coach</h3>
+              <p className="text-sm text-gray-400">Get guidance</p>
+            </Link>
+            
+            <Link
+              href="/progress"
+              className="p-4 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors text-center"
+            >
+              <div className="text-2xl mb-2">📊</div>
+              <h3 className="text-white font-medium">Progress</h3>
+              <p className="text-sm text-gray-400">Track growth</p>
+            </Link>
+          </div>
+        </section>
       </div>
     </div>
   );

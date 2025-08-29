@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { Brain, Target, Heart, Home, Clock, X, BookOpen } from 'lucide-react';
 import { useState } from 'react';
+import FrameworkDropdown from './FrameworkDropdown';
 
 const navigationItems = [
   { href: '/', icon: Home, label: 'Home' },
@@ -45,6 +46,7 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+            <FrameworkDropdown />
           </div>
 
           {/* Mobile menu button */}
@@ -89,6 +91,9 @@ export function Navigation() {
                   {item.label}
                 </Link>
               ))}
+              <div className="px-3 py-3">
+                <FrameworkDropdown />
+              </div>
             </div>
           </div>
         </>

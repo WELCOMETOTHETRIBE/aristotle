@@ -1,31 +1,33 @@
-export interface FrameworkNav {
-  tone: string;
-  badge: string;
+export type FrameworkNav = {
+  tone: "gritty" | "honor" | "calm" | "order" | "embodied" | "stewardship" | "disciplined" | "devotional" | "communal" | "crisp";
+  badge: string; 
   emoji: string;
-}
+};
 
-export interface Framework {
-  id: string;
-  name: string;
+export type FrameworkRecord = {
+  id: string; 
+  name: string; 
   nav: FrameworkNav;
-  coreModules: string[];
+  coreModules: string[]; 
   supportModules: string[];
   featuredPractices: string[];
-}
+};
 
-export interface FrameworkMap {
-  $schema: string;
-  version: string;
-  frameworks: Framework[];
-  catalog: {
-    modules: string[];
-    practices: string[];
-  };
-}
+export type FrameworkCatalog = { 
+  modules: string[]; 
+  practices: string[] 
+};
 
+export type FrameworkMap = { 
+  version: string; 
+  frameworks: FrameworkRecord[]; 
+  catalog: FrameworkCatalog 
+};
+
+// Legacy interfaces for backward compatibility
 export interface FrameworkByModule {
-  core: Framework[];
-  support: Framework[];
+  core: FrameworkRecord[];
+  support: FrameworkRecord[];
 }
 
 export interface FrameworkByPractice {
@@ -33,7 +35,7 @@ export interface FrameworkByPractice {
 }
 
 export interface FrameworkIndex {
-  byFramework: Record<string, Framework>;
+  byFramework: Record<string, FrameworkRecord>;
   byModule: Record<string, FrameworkByModule>;
   byPractice: Record<string, string[]>;
 } 
