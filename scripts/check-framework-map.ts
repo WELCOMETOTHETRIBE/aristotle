@@ -16,28 +16,28 @@ async function checkFrameworkMap() {
     // Check if database is available
     if (!prisma) {
       console.log('⚠️  Database not available, skipping DB checks');
-      return;
-    }
-    
-    // Check featured practices exist in database
-    console.log('\n📋 Checking featured practices...');
-    for (const framework of frameworkMap.frameworks) {
-      for (const practiceSlug of framework.featuredPractices) {
-        const practice = await prisma.virtuePractice.findFirst({
-          where: {
-            OR: [
-              { slug: practiceSlug },
-              { slug: practiceSlug.replace(/_/g, '-') },
-              { slug: practiceSlug.replace(/-/g, '_') }
-            ]
+      // Continue with non-DB checks
+    } else {
+      // Check featured practices exist in database
+      console.log('\n📋 Checking featured practices...');
+      for (const framework of frameworkMap.frameworks) {
+        for (const practiceSlug of framework.featuredPractices) {
+          const practice = await prisma.virtuePractice.findFirst({
+            where: {
+              OR: [
+                { slug: practiceSlug },
+                { slug: practiceSlug.replace(/_/g, '-') },
+                { slug: practiceSlug.replace(/-/g, '_') }
+              ]
+            }
+          });
+          
+          if (!practice) {
+            console.error(`❌ Framework "${framework.name}": Practice "${practiceSlug}" not found in database`);
+            hasErrors = true;
+          } else {
+            console.log(`✅ Framework "${framework.name}": Practice "${practiceSlug}" ✓`);
           }
-        });
-        
-        if (!practice) {
-          console.error(`❌ Framework "${framework.name}": Practice "${practiceSlug}" not found in database`);
-          hasErrors = true;
-        } else {
-          console.log(`✅ Framework "${framework.name}": Practice "${practiceSlug}" ✓`);
         }
       }
     }
@@ -61,7 +61,7 @@ async function checkFrameworkMap() {
     
     // Check for duplicate framework IDs
     console.log('\n🆔 Checking for duplicate framework IDs...');
-    const frameworkIds = frameworkMap.frameworks.map(f => f.id);
+    const frameworkIds = frameworkMap.frameworks.map((f: any) => f.id);
     const uniqueIds = new Set(frameworkIds);
     
     if (frameworkIds.length !== uniqueIds.size) {
@@ -73,7 +73,7 @@ async function checkFrameworkMap() {
     
     // Check for duplicate practice slugs
     console.log('\n🏷️  Checking for duplicate practice slugs...');
-    const allPracticeSlugs = frameworkMap.frameworks.flatMap(f => f.featuredPractices);
+    const allPracticeSlugs = frameworkMap.frameworks.flatMap((f: any) => f.featuredPractices);
     const uniqueSlugs = new Set(allPracticeSlugs);
     
     if (allPracticeSlugs.length !== uniqueSlugs.size) {

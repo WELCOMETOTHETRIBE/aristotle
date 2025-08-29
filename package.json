@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "npm run doctor && next build",
+    "build:docker": "tsx scripts/strip-placeholders.ts && next build",
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",

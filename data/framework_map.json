@@ -32,7 +32,7 @@
           "boundary_setting",
           "public_speaking",
           "moral_courage",
-          "teaching_others"
+          "spartan_mentorship"
         ]
       },
       {
@@ -56,9 +56,9 @@
         ],
         "featuredPractices": [
           "samurai_bushido",
-          "active_listening",
-          "conflict_resolution",
-          "fair_decision_making",
+          "bushido_attentiveness",
+          "bushido_mediation",
+          "bushido_justice",
           "contemplative_reading",
           "public_speaking",
           "leadership_development",
@@ -170,16 +170,15 @@
           "hydration",
           "movement_posture",
           "resource_library",
-          "community",
           "virtue_cultivation",
           "sleep_circadian"
         ],
         "featuredPractices": [
-          "community_service",
-          "active_listening",
-          "conflict_resolution",
-          "teaching_others",
-          "fair_decision_making",
+          "indigenous_wisdom_sharing",
+          "indigenous_attentiveness",
+          "indigenous_mediation",
+          "indigenous_mentorship",
+          "indigenous_justice",
           "lifelong_learning"
         ]
       },
@@ -209,7 +208,7 @@
           "coherent_breathing_balance",
           "public_speaking",
           "leadership_development",
-          "teaching_others"
+          "martial_instruction"
         ]
       },
       {
@@ -234,8 +233,8 @@
           "mindful_observation",
           "wisdom_journaling",
           "evening_reflection",
-          "teaching_others",
-          "community_service",
+          "sufi_guidance",
+          "sufi_remembrance",
           "ocean_breath_harmony",
           "triangle_breathing_simplicity"
         ]
@@ -260,12 +259,12 @@
           "creative_spark"
         ],
         "featuredPractices": [
-          "active_listening",
-          "conflict_resolution",
-          "community_service",
-          "fair_decision_making",
+          "ubuntu_attentiveness",
+          "ubuntu_mediation",
+          "ubuntu_compassion",
+          "ubuntu_justice",
           "leadership_development",
-          "teaching_others",
+          "ubuntu_mentorship",
           "lifelong_learning"
         ]
       },
