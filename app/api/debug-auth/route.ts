@@ -7,11 +7,12 @@ export async function GET(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
     
+    const verified = token ? !!(await verifyToken(token)) : false;
     return NextResponse.json({
       hasToken: !!token,
       tokenLength: token?.length || 0,
       tokenPreview: token ? `${token.substring(0, 20)}...` : null,
-      verified: token ? !!verifyToken(token) : false,
+      verified,
       headers: Object.fromEntries(request.headers.entries()),
       cookies: Object.fromEntries(request.cookies.getAll().map(c => [c.name, c.value]))
     });

@@ -60,6 +60,7 @@
     "date-fns": "^4.1.0",
     "framer-motion": "^12.23.12",
     "hono": "^3.12.8",
+    "jose": "^6.1.0",
     "jsonwebtoken": "^9.0.2",
     "lodash-es": "^4.17.21",
     "lucide-react": "^0.303.0",

@@ -1,26 +1,27 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import jwt from 'jsonwebtoken';
+import * as jose from 'jose';
 
 const JWT_SECRET = 'default-jwt-secret-for-development-only';
 
-function verifyTokenInMiddleware(token: string) {
+async function verifyTokenInMiddleware(token: string) {
   console.log('🔐 Attempting to verify token with secret:', JWT_SECRET ? 'SECRET_SET' : 'SECRET_NOT_SET');
   console.log('🔐 JWT_SECRET value:', JWT_SECRET);
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const { payload } = await jose.jwtVerify(token, secret);
     console.log('🔐 Middleware token verification success:', { 
-      userId: decoded?.userId, 
-      username: decoded?.username 
+      userId: payload.userId, 
+      username: payload.username 
     });
-    return decoded;
+    return payload;
   } catch (error) {
     console.log('🔐 Middleware token verification failed:', error);
     return null;
   }
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   console.log('🚨 MIDDLEWARE CALLED for path:', request.nextUrl.pathname);
   
   const { pathname } = request.nextUrl;
@@ -46,7 +47,7 @@ export function middleware(request: NextRequest) {
   // Check if user is authenticated
   let isAuthenticated = false;
   if (token) {
-    const decoded = verifyTokenInMiddleware(token);
+    const decoded = await verifyTokenInMiddleware(token);
     isAuthenticated = !!decoded;
     console.log('🔐 Token verification result:', { decoded, isAuthenticated });
   }

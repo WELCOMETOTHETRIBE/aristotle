@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     const user = await createUser(username, password, email, displayName);
 
-    const token = generateToken({
+    const token = await generateToken({
       userId: user.id,
       username: user.username
     });

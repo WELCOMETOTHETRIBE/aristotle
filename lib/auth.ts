@@ -1,5 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import * as jose from 'jose';
 import { prisma } from './db';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'default-jwt-secret-for-development-only';
@@ -7,6 +7,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'default-jwt-secret-for-development
 export interface JWTPayload {
   userId: number;
   username: string;
+  [key: string]: any;
 }
 
 export async function hashPassword(password: string): Promise<string> {
@@ -18,13 +19,19 @@ export async function comparePassword(password: string, hashedPassword: string):
   return bcrypt.compare(password, hashedPassword);
 }
 
-export function generateToken(payload: JWTPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+export async function generateToken(payload: JWTPayload): Promise<string> {
+  const secret = new TextEncoder().encode(JWT_SECRET);
+  return await new jose.SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('7d')
+    .sign(secret);
 }
 
-export function verifyToken(token: string): JWTPayload | null {
+export async function verifyToken(token: string): Promise<JWTPayload | null> {
   try {
-    return jwt.verify(token, JWT_SECRET) as JWTPayload;
+    const secret = new TextEncoder().encode(JWT_SECRET);
+    const { payload } = await jose.jwtVerify(token, secret);
+    return payload as JWTPayload;
   } catch (error) {
     return null;
   }

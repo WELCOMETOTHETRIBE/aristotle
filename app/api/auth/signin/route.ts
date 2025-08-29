@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('✅ User authenticated, generating token');
-    const token = generateToken({
+    const token = await generateToken({
       userId: user.id,
       username: user.username
     });
