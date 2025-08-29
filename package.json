@@ -14,7 +14,7 @@
     "db:migrate": "prisma migrate dev",
     "db:seed": "prisma db seed",
     "railway:build": "prisma generate && next build",
-    "build": "node scripts/build.js",
+    "build:custom": "node scripts/build.js",
     "railway:start": "node scripts/init-database.js && next start",
     "test": "vitest",
     "test:ui": "vitest --ui",
