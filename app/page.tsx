@@ -145,8 +145,8 @@ export default function DashboardPage() {
               <div className="text-sm text-muted">Day streak</div>
             </div>
             <div className="flex gap-3">
-              <button className="btn-primary flex-1">Start Timer</button>
-              <button className="btn-secondary flex-1">Log Session</button>
+              <button className="btn-primary-light flex-1">Start Timer</button>
+              <button className="btn-high-contrast flex-1">Log Session</button>
             </div>
             <div className="text-xs text-muted text-center bg-white/5 rounded-lg p-3">
               Start with 30 seconds cold shower
@@ -170,8 +170,8 @@ export default function DashboardPage() {
               <div className="text-sm text-muted">Remaining</div>
             </div>
             <div className="flex gap-3">
-              <button className="btn-primary flex-1">Start</button>
-              <button className="btn-secondary flex-1">Stop</button>
+              <button className="btn-success flex-1">Start</button>
+              <button className="btn-high-contrast flex-1">Stop</button>
             </div>
             <div className="text-xs text-muted text-center bg-white/5 rounded-lg p-3">
               {mockUserProfile.streaks.fasting} day streak
@@ -202,7 +202,7 @@ export default function DashboardPage() {
                 </button>
               ))}
             </div>
-            <button className="btn-secondary w-full">
+            <button className="btn-high-contrast w-full">
               1-minute reflection
             </button>
           </div>
@@ -237,8 +237,8 @@ export default function DashboardPage() {
               />
             </div>
             <div className="flex gap-3">
-              <button className="btn-secondary flex-1">+250ml</button>
-              <button className="btn-secondary flex-1">+500ml</button>
+              <button className="btn-high-contrast flex-1">+250ml</button>
+              <button className="btn-high-contrast flex-1">+500ml</button>
             </div>
           </div>
         </GlassCard>

@@ -207,7 +207,7 @@
   /* Improved button styles for better contrast */
   .btn-primary-light {
     background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    color: white;
+    color: white !important;
     font-weight: 600;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
@@ -220,11 +220,12 @@
     background: linear-gradient(135deg, #2563eb, #1e40af);
     transform: translateY(-1px);
     box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    color: white !important;
   }
   
   .btn-secondary-light {
     background: #f3f4f6;
-    color: #374151;
+    color: #374151 !important;
     font-weight: 500;
     padding: 0.75rem 1.5rem;
     border-radius: 0.75rem;
@@ -234,8 +235,51 @@
   
   .btn-secondary-light:hover {
     background: #e5e7eb;
-    color: #1f2937;
+    color: #1f2937 !important;
     border-color: #9ca3af;
+  }
+  
+  /* Universal button improvements */
+  button {
+    color: inherit;
+  }
+  
+  /* High contrast button variants */
+  .btn-high-contrast {
+    background: #1f2937;
+    color: white !important;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    border: 2px solid #374151;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
+  .btn-high-contrast:hover {
+    background: #111827;
+    color: white !important;
+    border-color: #4b5563;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  }
+  
+  .btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white !important;
+    font-weight: 600;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.75rem;
+    transition: all 0.2s ease;
+    border: none;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  }
+  
+  .btn-success:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
   }
   
   /* Enhanced text utilities */

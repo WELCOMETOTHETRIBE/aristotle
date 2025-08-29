@@ -247,12 +247,12 @@ export default function AcademyPage() {
             
             <div className="grid grid-cols-2 gap-4">
               <Link href="/temperance">
-                <button className="btn-primary w-full">
+                <button className="btn-primary-light w-full">
                   Start with Temperance
                 </button>
               </Link>
               <Link href="/wisdom">
-                <button className="btn-secondary w-full">
+                <button className="btn-high-contrast w-full">
                   Begin with Wisdom
                 </button>
               </Link>

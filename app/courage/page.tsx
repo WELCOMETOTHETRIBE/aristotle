@@ -126,9 +126,9 @@ export default function CouragePage() {
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-2xl font-semibold text-white">Courage Practices</h2>
           <div className="flex gap-2">
-            <button className="btn-secondary text-sm">All</button>
-            <button className="btn-secondary text-sm">Beginner</button>
-            <button className="btn-secondary text-sm">Advanced</button>
+            <button className="bg-white/25 hover:bg-white/35 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 border border-white/30 hover:border-white/40 text-sm shadow-md hover:shadow-lg">All</button>
+            <button className="bg-white/25 hover:bg-white/35 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 border border-white/30 hover:border-white/40 text-sm shadow-md hover:shadow-lg">Beginner</button>
+            <button className="bg-white/25 hover:bg-white/35 text-white font-semibold px-4 py-2 rounded-lg transition-all duration-200 border border-white/30 hover:border-white/40 text-sm shadow-md hover:shadow-lg">Advanced</button>
           </div>
         </div>
 
@@ -179,7 +179,7 @@ export default function CouragePage() {
 
                 {/* Action */}
                 <div className="flex items-center justify-between pt-2">
-                  <button className="btn-primary text-sm">
+                  <button className="btn-primary-light text-sm">
                     <Play size={14} className="mr-1" />
                     Start Practice
                   </button>

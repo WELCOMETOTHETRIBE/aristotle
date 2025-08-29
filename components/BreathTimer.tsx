@@ -157,7 +157,7 @@ export default function BreathTimer({
       <div className="flex justify-center gap-3">
         <button
           onClick={toggleTimer}
-          className="btn-primary flex items-center gap-2"
+                        className="btn-primary-light flex items-center gap-2"
           aria-label={isActive ? "Pause breathwork" : "Start breathwork"}
         >
           {isActive ? <Pause size={16} /> : <Play size={16} />}
@@ -165,7 +165,7 @@ export default function BreathTimer({
         </button>
         <button
           onClick={resetTimer}
-          className="btn-secondary flex items-center gap-2"
+                        className="btn-high-contrast flex items-center gap-2"
           aria-label="Reset breathwork timer"
         >
           <RotateCcw size={16} />

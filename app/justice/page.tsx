@@ -144,7 +144,7 @@ export default function JusticePage() {
                 </div>
                 
                 <div className="mt-6">
-                  <Button className="w-full btn-primary-light bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
+                  <Button className="w-full btn-success">
                     <Play className="w-4 h-4 mr-2" />
                     Practice {selectedPractice.title}
                   </Button>
@@ -203,19 +203,19 @@ export default function JusticePage() {
               </CardHeader>
               <CardContent className="space-y-3">
                 <Link href="/community">
-                  <Button variant="outline" className="w-full justify-start btn-secondary-light">
+                  <Button variant="outline" className="w-full justify-start btn-high-contrast">
                     <Users className="w-4 h-4 mr-2" />
                     Join Community
                   </Button>
                 </Link>
                 <Link href="/coach">
-                  <Button variant="outline" className="w-full justify-start btn-secondary-light">
+                  <Button variant="outline" className="w-full justify-start btn-high-contrast">
                     <Scale className="w-4 h-4 mr-2" />
                     Get Relationship Advice
                   </Button>
                 </Link>
                 <Link href="/progress">
-                  <Button variant="outline" className="w-full justify-start btn-secondary-light">
+                  <Button variant="outline" className="w-full justify-start btn-high-contrast">
                     <Target className="w-4 h-4 mr-2" />
                     View Impact
                   </Button>

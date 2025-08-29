@@ -171,7 +171,7 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
             <button
               onClick={handlePreviousLesson}
               disabled={currentLessonIndex === 0}
-              className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-high-contrast disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
@@ -185,7 +185,7 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
               )}
               <button
                 onClick={handleCompleteLesson}
-                className="btn-primary"
+                className="btn-primary-light"
               >
                 {currentLesson.isCompleted ? 'Continue' : 'Complete Lesson'}
               </button>
@@ -194,7 +194,7 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
             <button
               onClick={handleNextLesson}
               disabled={currentLessonIndex === selectedResource.lessons.length - 1}
-              className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-high-contrast disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -241,12 +241,12 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
             <div className="flex gap-3">
               <button 
                 onClick={() => handleStartLearning(featuredResource)}
-                className="btn-primary flex items-center gap-2"
+                className="btn-primary-light flex items-center gap-2"
               >
                 <Play size={16} />
                 Start Learning
               </button>
-              <button className="btn-secondary">Learn More</button>
+              <button className="btn-high-contrast">Learn More</button>
             </div>
           </div>
         </div>

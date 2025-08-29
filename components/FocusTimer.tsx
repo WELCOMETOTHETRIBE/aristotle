@@ -119,7 +119,7 @@ export default function FocusTimer({
       <div className="flex gap-3">
         <button
           onClick={toggleTimer}
-          className="btn-primary flex-1 flex items-center justify-center gap-2"
+                        className="btn-primary-light flex-1 flex items-center justify-center gap-2"
           aria-label={isActive ? "Pause focus session" : isCompleted ? "Start new session" : "Start focus session"}
         >
           {isActive ? <Pause size={16} /> : <Play size={16} />}
@@ -127,7 +127,7 @@ export default function FocusTimer({
         </button>
         <button
           onClick={resetTimer}
-          className="btn-secondary flex items-center justify-center gap-2"
+                        className="btn-high-contrast flex items-center justify-center gap-2"
           aria-label="Reset focus timer"
         >
           <RotateCcw size={16} />

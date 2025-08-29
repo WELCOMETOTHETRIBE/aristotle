@@ -88,47 +88,56 @@ export function ModuleNavigation() {
         {/* Toggle Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-12 h-12 bg-black/60 backdrop-blur-md border border-white/10 rounded-xl flex items-center justify-center text-white hover:bg-black/80 transition-all duration-200 shadow-lg"
+          className="w-14 h-14 bg-gradient-to-r from-blue-600 to-purple-600 backdrop-blur-md border border-white/20 rounded-xl flex items-center justify-center text-white hover:from-blue-700 hover:to-purple-700 transition-all duration-200 shadow-xl hover:shadow-2xl hover:scale-105"
+          title="Quick Navigation"
         >
-          {isExpanded ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+          {isExpanded ? <ChevronUp size={22} /> : <ChevronDown size={22} />}
         </button>
 
         {/* Expanded Navigation */}
         {isExpanded && (
-          <div className="absolute top-14 left-0 w-64 bg-black/80 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl p-4 space-y-2">
-            <div className="text-xs text-white/60 font-medium mb-3 px-2">Quick Navigation</div>
+          <div className="absolute top-14 left-0 w-72 bg-black/90 backdrop-blur-xl border border-white/20 rounded-xl shadow-2xl">
+            <div className="p-4 border-b border-white/10">
+              <div className="text-sm text-white font-semibold">Quick Navigation</div>
+              <div className="text-xs text-white/60 mt-1">All modules at your fingertips</div>
+            </div>
             
-            {modules.map((module) => {
-              const IconComponent = module.icon;
-              const isActive = pathname === module.path;
-              
-              return (
-                <Link key={module.path} href={module.path}>
-                  <div
-                    className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer group ${
-                      isActive 
-                        ? 'bg-white/20 border border-white/20' 
-                        : 'hover:bg-white/10 border border-transparent'
-                    }`}
-                    onClick={() => setIsExpanded(false)}
-                  >
-                    <div className={`w-8 h-8 bg-gradient-to-r ${module.color} rounded-lg flex items-center justify-center shadow-md`}>
-                      <IconComponent size={16} className="text-white" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className={`text-sm font-medium ${
-                        isActive ? 'text-white' : 'text-white/80 group-hover:text-white'
-                      }`}>
-                        {module.name}
+            <div className="max-h-96 overflow-y-auto p-2 space-y-1">
+              {modules.map((module) => {
+                const IconComponent = module.icon;
+                const isActive = pathname === module.path;
+                
+                return (
+                  <Link key={module.path} href={module.path}>
+                    <div
+                      className={`flex items-center gap-3 p-3 rounded-lg transition-all duration-200 cursor-pointer group ${
+                        isActive 
+                          ? 'bg-white/25 border border-white/30 shadow-lg' 
+                          : 'hover:bg-white/15 border border-transparent hover:border-white/20'
+                      }`}
+                      onClick={() => setIsExpanded(false)}
+                    >
+                      <div className={`w-10 h-10 bg-gradient-to-r ${module.color} rounded-lg flex items-center justify-center shadow-md flex-shrink-0`}>
+                        <IconComponent size={18} className="text-white" />
                       </div>
-                      <div className="text-xs text-white/60 truncate">
-                        {module.description}
+                      <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-semibold ${
+                          isActive ? 'text-white' : 'text-white/90 group-hover:text-white'
+                        }`}>
+                          {module.name}
+                        </div>
+                        <div className="text-xs text-white/70 truncate">
+                          {module.description}
+                        </div>
                       </div>
+                      {isActive && (
+                        <div className="w-2 h-2 bg-white rounded-full flex-shrink-0"></div>
+                      )}
                     </div>
-                  </div>
-                </Link>
-              );
-            })}
+                  </Link>
+                );
+              })}
+            </div>
           </div>
         )}
       </div>
