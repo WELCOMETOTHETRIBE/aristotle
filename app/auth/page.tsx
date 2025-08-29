@@ -30,7 +30,6 @@ export default function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    setSuccess('');
 
     try {
       const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
@@ -40,6 +39,7 @@ export default function AuthPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(formData),
+        credentials: 'include', // Ensure cookies are sent
       });
 
       const data = await response.json();
@@ -50,10 +50,26 @@ export default function AuthPage() {
 
       setSuccess(isSignUp ? 'Account created successfully!' : 'Welcome back!');
       
-      // Redirect after a brief success message
-      setTimeout(() => {
-        router.push('/');
-      }, 1500);
+      // Check authentication status before redirecting
+      setTimeout(async () => {
+        try {
+          const authCheck = await fetch('/api/debug-auth', {
+            credentials: 'include'
+          });
+          const authData = await authCheck.json();
+          
+          if (authData.hasToken && authData.verified) {
+            console.log('✅ Authentication verified, redirecting...');
+            router.push('/');
+          } else {
+            console.log('❌ Authentication not verified:', authData);
+            setError('Authentication failed - please try again');
+          }
+        } catch (error) {
+          console.error('Auth check failed:', error);
+          setError('Authentication verification failed');
+        }
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -202,7 +218,17 @@ export default function AuthPage() {
                     exit={{ opacity: 0, y: -10 }}
                   >
                     <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                    <span className="text-green-300 text-sm font-medium">{success}</span>
+                    <div className="flex-1">
+                      <span className="text-green-300 text-sm font-medium">{success}</span>
+                      <div className="mt-2">
+                        <button
+                          onClick={() => router.push('/')}
+                          className="text-green-300 text-xs underline hover:text-green-200"
+                        >
+                          Click here if you're not redirected automatically
+                        </button>
+                      </div>
+                    </div>
                   </motion.div>
                 )}
               </AnimatePresence>
