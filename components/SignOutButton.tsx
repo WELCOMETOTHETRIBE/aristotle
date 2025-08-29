@@ -2,25 +2,19 @@
 
 import { useState } from 'react';
 import { LogOut, Loader2 } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 export default function SignOutButton() {
   const [isLoading, setIsLoading] = useState(false);
+  const { signOut } = useAuth();
 
   const handleSignOut = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/auth/signout', {
-        method: 'POST',
-        credentials: 'include', // Ensure cookies are included
-      });
-
-      if (response.ok) {
-        // Force a hard reload to clear all client-side state
-        window.location.href = '/auth';
-        window.location.reload();
-      } else {
-        console.error('Sign out failed:', response.status);
-      }
+      await signOut();
+      // Force a hard reload to clear all client-side state
+      window.location.href = '/auth';
+      window.location.reload();
     } catch (error) {
       console.error('Sign out error:', error);
     } finally {

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, Sparkles, Shield, Users, ArrowRight, CheckCircle, AlertCircle, Loader2, Sun, Moon } from 'lucide-react';
+import { useAuth } from '@/lib/auth-context';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -19,6 +20,7 @@ export default function AuthPage() {
   });
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
+  const { signIn, signUp, user } = useAuth();
 
   // Auto-detect dark mode preference
   useEffect(() => {
@@ -26,50 +28,36 @@ export default function AuthPage() {
     setIsDark(isDarkMode);
   }, []);
 
+  // Redirect if already authenticated
+  useEffect(() => {
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
     try {
-      const endpoint = isSignUp ? '/api/auth/signup' : '/api/auth/signin';
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-        credentials: 'include', // Ensure cookies are sent
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Authentication failed');
-      }
-
-      setSuccess(isSignUp ? 'Account created successfully!' : 'Welcome back!');
-      
-      // Check authentication status before redirecting
-      setTimeout(async () => {
-        try {
-          const authCheck = await fetch('/api/debug-auth', {
-            credentials: 'include'
-          });
-          const authData = await authCheck.json();
-          
-          if (authData.hasToken && authData.verified) {
-            console.log('✅ Authentication verified, redirecting...');
-            router.push('/');
-          } else {
-            console.log('❌ Authentication not verified:', authData);
-            setError('Authentication failed - please try again');
-          }
-        } catch (error) {
-          console.error('Auth check failed:', error);
-          setError('Authentication verification failed');
+      if (isSignUp) {
+        const result = await signUp(formData.username, formData.password, formData.email, formData.displayName);
+        if (result.success) {
+          setSuccess('Account created successfully!');
+          setTimeout(() => router.push('/'), 1000);
+        } else {
+          setError(result.error || 'Sign up failed');
         }
-      }, 1000);
+      } else {
+        const result = await signIn(formData.username, formData.password);
+        if (result.success) {
+          setSuccess('Welcome back!');
+          setTimeout(() => router.push('/'), 1000);
+        } else {
+          setError(result.error || 'Sign in failed');
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {

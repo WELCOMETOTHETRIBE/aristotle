@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { VirtueNavigation } from "@/components/VirtueNavigation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { AuthProvider } from "@/lib/auth-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,10 +23,12 @@ export default function RootLayout({
       <body className={inter.className}>
         <ErrorBoundary>
           <QueryProvider>
-            <div className="min-h-screen bg-bg">
-              <VirtueNavigation />
-              {children}
-            </div>
+            <AuthProvider>
+              <div className="min-h-screen bg-bg">
+                <VirtueNavigation />
+                {children}
+              </div>
+            </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>
       </body>

@@ -1,192 +1,234 @@
-# Authentication Setup Guide
+# Authentication System
 
-This guide will help you set up authentication for the Aristotle application using PostgreSQL.
+The Aristotle app uses a JWT-based authentication system with HTTP-only cookies for security.
 
-## Prerequisites
+## Features
 
-- Node.js 18+ installed
-- PostgreSQL database (local or cloud)
-- Git
-
-## Setup Steps
-
-### 1. Database Setup
-
-#### Option A: Local PostgreSQL
-```bash
-# Install PostgreSQL (macOS)
-brew install postgresql
-brew services start postgresql
-
-# Create database
-createdb aristotle
-
-# Or using psql
-psql postgres
-CREATE DATABASE aristotle;
-\q
-```
-
-#### Option B: Cloud PostgreSQL (Recommended for Production)
-- **Railway**: Create a new PostgreSQL service
-- **Supabase**: Create a new project with PostgreSQL
-- **Neon**: Create a new database
-- **AWS RDS**: Create a PostgreSQL instance
-
-### 2. Environment Configuration
-
-Copy the environment template:
-```bash
-cp env.local.example .env.local
-```
-
-Update `.env.local` with your database credentials:
-```bash
-# For local PostgreSQL
-DATABASE_URL="postgresql://username:password@localhost:5432/aristotle"
-
-# For Railway
-DATABASE_URL="postgresql://username:password@host:port/database"
-
-# Generate a secure JWT secret
-JWT_SECRET="your-super-secure-jwt-secret-key"
-```
-
-### 3. Database Migration
-
-Run the database migrations:
-```bash
-# Generate Prisma client
-npm run db:generate
-
-# Run migrations
-npm run db:migrate
-
-# Seed the database
-npm run db:seed
-```
-
-### 4. Start the Application
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-npm run dev
-```
-
-## Authentication Features
-
-### User Registration
-- Username and password required
-- Email and display name optional
-- Password minimum 6 characters
-- Username must be unique
-
-### User Login
-- Username/password authentication
-- JWT tokens stored in HTTP-only cookies
-- 7-day token expiration
-- Automatic redirect to dashboard after login
-
-### Protected Routes
-All main application routes require authentication:
-- `/` (Dashboard)
-- `/frameworks`
-- `/wisdom`, `/courage`, `/justice`, `/temperance`
-- `/coach`, `/breath`, `/fasting`
-- `/progress`, `/today`, `/community`
-
-### Sign Out
-- Clears authentication cookies
-- Redirects to login page
-
-## Default User
-
-The seed script creates a default user:
-- **Username**: `demo`
-- **Password**: `password123`
-- **Email**: `demo@aristotle.com`
+- **JWT Tokens**: Secure token-based authentication
+- **HTTP-only Cookies**: Prevents XSS attacks
+- **Password Hashing**: Uses bcrypt for secure password storage
+- **Middleware Protection**: Automatic route protection
+- **React Context**: Easy-to-use authentication state management
 
 ## API Endpoints
 
-### Authentication
-- `POST /api/auth/signup` - User registration
-- `POST /api/auth/signin` - User login
-- `POST /api/auth/signout` - User logout
-- `GET /api/auth/me` - Get current user
+### POST /api/auth/signup
+Create a new user account.
 
-### Protected APIs
-All existing APIs now require authentication and will return user-specific data.
+**Request Body:**
+```json
+{
+  "username": "string",
+  "password": "string",
+  "email": "string (optional)",
+  "displayName": "string (optional)"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "User created successfully",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "displayName": "Test User"
+  }
+}
+```
+
+### POST /api/auth/signin
+Sign in with existing credentials.
+
+**Request Body:**
+```json
+{
+  "username": "string",
+  "password": "string"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Authentication successful",
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "displayName": "Test User"
+  }
+}
+```
+
+### GET /api/auth/me
+Get current user information.
+
+**Response:**
+```json
+{
+  "user": {
+    "id": 1,
+    "username": "testuser",
+    "email": "test@example.com",
+    "displayName": "Test User",
+    "tz": "America/Los_Angeles",
+    "createdAt": "2025-08-29T15:28:04.669Z"
+  }
+}
+```
+
+### POST /api/auth/signout
+Sign out and clear authentication.
+
+**Response:**
+```json
+{
+  "message": "Signed out successfully"
+}
+```
+
+## React Components
+
+### AuthProvider
+Wraps your app to provide authentication context.
+
+```tsx
+import { AuthProvider } from '@/lib/auth-context';
+
+function App() {
+  return (
+    <AuthProvider>
+      <YourApp />
+    </AuthProvider>
+  );
+}
+```
+
+### useAuth Hook
+Access authentication state and methods in components.
+
+```tsx
+import { useAuth } from '@/lib/auth-context';
+
+function MyComponent() {
+  const { user, loading, signIn, signUp, signOut } = useAuth();
+
+  if (loading) return <div>Loading...</div>;
+  if (!user) return <div>Please sign in</div>;
+
+  return (
+    <div>
+      <h1>Welcome, {user.displayName}!</h1>
+      <button onClick={signOut}>Sign Out</button>
+    </div>
+  );
+}
+```
+
+### AuthGuard
+Protect routes that require authentication.
+
+```tsx
+import AuthGuard from '@/components/AuthGuard';
+
+function ProtectedPage() {
+  return (
+    <AuthGuard>
+      <div>This content is only visible to authenticated users</div>
+    </AuthGuard>
+  );
+}
+```
+
+## Middleware
+
+The app uses Next.js middleware to automatically protect routes:
+
+- **Protected Routes**: All routes except `/auth` and API routes
+- **Authentication Check**: Verifies JWT token in cookies
+- **Automatic Redirects**: Redirects unauthenticated users to `/auth`
+
+## Environment Variables
+
+Required environment variables:
+
+```env
+# JWT Secret (generate a secure random string)
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+
+# Database URL
+DATABASE_URL="postgresql://username:password@localhost:5432/aristotle"
+```
 
 ## Security Features
 
-- **Password Hashing**: bcrypt with 12 salt rounds
-- **JWT Tokens**: Secure token-based authentication
-- **HTTP-Only Cookies**: Prevents XSS attacks
-- **Middleware Protection**: Automatic route protection
-- **Input Validation**: Server-side validation for all inputs
+1. **HTTP-only Cookies**: Prevents JavaScript access to auth tokens
+2. **Secure Flag**: Cookies are secure in production
+3. **SameSite Protection**: Prevents CSRF attacks
+4. **Password Hashing**: Uses bcrypt with 12 salt rounds
+5. **JWT Expiration**: Tokens expire after 7 days
+6. **Input Validation**: Server-side validation of all inputs
 
-## Deployment
+## Testing
 
-### Railway (Recommended)
-1. Connect your GitHub repository to Railway
-2. Add PostgreSQL service
-3. Set environment variables:
-   - `DATABASE_URL` (auto-set by Railway)
-   - `JWT_SECRET` (generate secure random string)
-   - `NODE_ENV=production`
-4. Deploy
+Test the authentication system:
 
-### Other Platforms
-- **Vercel**: Add PostgreSQL add-on
-- **Netlify**: Use external PostgreSQL service
-- **AWS**: Use RDS for PostgreSQL
+```bash
+# Start the development server
+npm run dev
+
+# Test signup
+curl -X POST http://localhost:3000/api/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"testpass123","email":"test@example.com"}'
+
+# Test signin
+curl -X POST http://localhost:3000/api/auth/signin \
+  -H "Content-Type: application/json" \
+  -d '{"username":"testuser","password":"testpass123"}' \
+  -c cookies.txt
+
+# Test protected endpoint
+curl -X GET http://localhost:3000/api/auth/me -b cookies.txt
+
+# Test signout
+curl -X POST http://localhost:3000/api/auth/signout -b cookies.txt
+```
+
+## Database Schema
+
+The User model includes:
+
+```prisma
+model User {
+  id          Int      @id @default(autoincrement())
+  username    String   @unique
+  email       String?  @unique
+  password    String   // Hashed password
+  displayName String?
+  tz          String?  @default("America/Los_Angeles")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+```
 
 ## Troubleshooting
 
-### Database Connection Issues
-```bash
-# Test database connection
-npx prisma db pull
+### Common Issues
 
-# Reset database
-npx prisma migrate reset
+1. **"Not authenticated" error**: Check if JWT_SECRET is set correctly
+2. **Database connection issues**: Verify DATABASE_URL is correct
+3. **Cookie not set**: Ensure credentials: 'include' is used in fetch requests
+4. **Middleware redirects**: Check if the route is properly configured
+
+### Debug Endpoints
+
+Use `/api/debug-auth` to check authentication status:
+
+```bash
+curl -X GET http://localhost:3000/api/debug-auth -b cookies.txt
 ```
 
-### Authentication Issues
-- Check JWT_SECRET is set
-- Verify database migrations ran successfully
-- Check browser console for errors
-- Ensure cookies are enabled
-
-### Build Issues
-```bash
-# Clear Next.js cache
-rm -rf .next
-
-# Reinstall dependencies
-rm -rf node_modules package-lock.json
-npm install
-```
-
-## Development
-
-### Adding New Protected Routes
-Update `middleware.ts` to include new routes in the `protectedRoutes` array.
-
-### Customizing Authentication
-- Modify `lib/auth.ts` for custom authentication logic
-- Update `app/auth/page.tsx` for custom UI
-- Extend user model in `prisma/schema.prisma` for additional fields
-
-## Production Checklist
-
-- [ ] Secure JWT_SECRET generated
-- [ ] HTTPS enabled
-- [ ] Database backups configured
-- [ ] Environment variables set
-- [ ] Error logging configured
-- [ ] Rate limiting implemented
-- [ ] Security headers configured 
+This will return detailed information about the current authentication state. 
