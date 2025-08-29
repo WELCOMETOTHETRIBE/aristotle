@@ -5,6 +5,16 @@ import Link from 'next/link';
 import BreathOfThePath from '@/components/BreathOfThePath';
 import FrameworkResourceSpotlight from '@/components/FrameworkResourceSpotlight';
 import FrameworkPersonaChat from '@/components/FrameworkPersonaChat';
+import PageLayout, { 
+  PageTitle, 
+  PageSubtitle, 
+  SectionTitle, 
+  SectionDescription, 
+  CardTitle, 
+  CardDescription, 
+  PageSection, 
+  PageGrid 
+} from '@/components/PageLayout';
 
 interface FrameworkDetailPageProps {
   params: { id: string };
@@ -15,6 +25,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
     const framework = getFrameworkById(params.id);
 
     if (!framework) {
+      console.error(`Framework not found: ${params.id}`);
       notFound();
     }
 
@@ -38,23 +49,23 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
     const virtueEmphasis = getVirtueEmphasis(framework.id);
 
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-8">
+      <PageLayout background="default">
         {/* Hero Section */}
-        <div className={`bg-gradient-to-br ${getToneGradient(framework.nav.tone)} py-16`}>
+        <div className={`bg-gradient-to-br ${getToneGradient(framework.nav.tone)} py-16 -mt-12`}>
           <div className="container mx-auto px-4">
             <div className="text-center">
               <div className="text-6xl mb-4">{framework.nav.emoji}</div>
-              <h1 className={`text-5xl font-bold mb-4 ${getToneTextColor(framework.nav.tone)}`}>
+              <PageTitle size="large" className={getToneTextColor(framework.nav.tone)}>
                 {framework.name}
-              </h1>
-              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm">
+              </PageTitle>
+              <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mt-4">
                 <span className={`text-lg font-medium ${getToneTextColor(framework.nav.tone)}`}>
                   {framework.nav.badge}
                 </span>
               </div>
               
               {/* Virtue Bar */}
-              <div className="mt-6 flex justify-center gap-2">
+              <div className="mt-6 flex justify-center gap-2 flex-wrap">
                 {virtueEmphasis.map((virtue) => (
                   <span
                     key={virtue}
@@ -70,33 +81,36 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
         <div className="container mx-auto px-4 py-8">
           {/* Breath of the Path */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Breath of the Path</h2>
+          <PageSection>
+            <SectionTitle>Breath of the Path</SectionTitle>
+            <SectionDescription>
+              A breathing technique inspired by the {framework.name} tradition
+            </SectionDescription>
             <BreathOfThePath 
               frameworkId={framework.id}
               frameworkName={framework.name}
               frameworkTone={framework.nav.tone}
             />
-          </section>
+          </PageSection>
 
           {/* Core Modules */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Core Modules</h2>
-            <p className="text-gray-300 mb-6">
+          <PageSection>
+            <SectionTitle>Core Modules</SectionTitle>
+            <SectionDescription>
               Essential foundations that define the {framework.name} tradition
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            </SectionDescription>
+            <PageGrid cols={3}>
               {framework.coreModules.map((moduleId) => (
                 <div
                   key={moduleId}
-                  className={`p-6 rounded-lg border-2 ${getToneAccentColor(framework.nav.tone)} bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-colors`}
+                  className={`p-6 rounded-xl border-2 ${getToneAccentColor(framework.nav.tone)} bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:scale-105`}
                 >
-                  <h3 className="text-lg font-semibold text-white capitalize mb-2">
+                  <CardTitle className="capitalize mb-2">
                     {moduleId.replace(/_/g, ' ')}
-                  </h3>
-                  <p className="text-sm text-gray-300">
+                  </CardTitle>
+                  <CardDescription>
                     Essential foundation of this framework
-                  </p>
+                  </CardDescription>
                   <div className="mt-3">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">
                       Core Module
@@ -104,27 +118,27 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                   </div>
                 </div>
               ))}
-            </div>
-          </section>
+            </PageGrid>
+          </PageSection>
 
           {/* Support Modules */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Support Modules</h2>
-            <p className="text-gray-300 mb-6">
+          <PageSection>
+            <SectionTitle>Support Modules</SectionTitle>
+            <SectionDescription>
               Complementary practices that enhance the {framework.name} path
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            </SectionDescription>
+            <PageGrid cols={3}>
               {framework.supportModules.map((moduleId) => (
                 <div
                   key={moduleId}
-                  className="p-6 rounded-lg border border-gray-600 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
+                  className="p-6 rounded-xl border border-gray-600 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:scale-105"
                 >
-                  <h3 className="text-lg font-semibold text-white capitalize mb-2">
+                  <CardTitle className="capitalize mb-2">
                     {moduleId.replace(/_/g, ' ')}
-                  </h3>
-                  <p className="text-sm text-gray-400">
+                  </CardTitle>
+                  <CardDescription>
                     Complementary practices
-                  </p>
+                  </CardDescription>
                   <div className="mt-3">
                     <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300">
                       Support Module
@@ -132,86 +146,88 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                   </div>
                 </div>
               ))}
-            </div>
-          </section>
+            </PageGrid>
+          </PageSection>
 
           {/* Resource Spotlight */}
-          <section className="mb-12">
+          <PageSection>
             <FrameworkResourceSpotlight 
               frameworkId={framework.id}
               frameworkName={framework.name}
               frameworkTone={framework.nav.tone}
             />
-          </section>
+          </PageSection>
 
           {/* Chat with Influential Leader */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Chat with {framework.name} Guide</h2>
-            <p className="text-gray-300 mb-6">
+          <PageSection>
+            <SectionTitle>Chat with {framework.name} Guide</SectionTitle>
+            <SectionDescription>
               Get personalized guidance from the {framework.name} tradition
-            </p>
+            </SectionDescription>
             <FrameworkPersonaChat frameworkId={framework.id} title={framework.name} />
-          </section>
+          </PageSection>
 
           {/* Featured Practices */}
-          <section className="mb-12">
-            <h2 className="text-3xl font-bold text-white mb-6">Featured Practices</h2>
-            <p className="text-gray-300 mb-6">
+          <PageSection>
+            <SectionTitle>Featured Practices</SectionTitle>
+            <SectionDescription>
               Key practices that embody the {framework.name} tradition
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            </SectionDescription>
+            <PageGrid cols={3}>
               {framework.featuredPractices.map((practiceSlug) => (
                 <div
                   key={practiceSlug}
-                  className="p-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors"
+                  className="p-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-all duration-300 hover:scale-105"
                 >
-                  <h3 className="text-xl font-semibold text-white mb-3 capitalize">
+                  <CardTitle className="capitalize mb-3">
                     {practiceSlug.replace(/_/g, ' ')}
-                  </h3>
-                  <p className="text-gray-300 mb-4">
+                  </CardTitle>
+                  <CardDescription className="mb-4">
                     A key practice from the {framework.name} tradition
-                  </p>
+                  </CardDescription>
                   <div className="text-sm text-gray-400">
                     Coming soon...
                   </div>
                 </div>
               ))}
-            </div>
-          </section>
+            </PageGrid>
+          </PageSection>
 
           {/* Back to Frameworks */}
-          <div className="text-center">
+          <div className="text-center mt-12">
             <Link
               href="/frameworks"
-              className="inline-flex items-center px-6 py-3 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
+              className="btn-secondary inline-flex items-center"
             >
               ← Back to All Frameworks
             </Link>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   } catch (error) {
     console.error('Error rendering framework page:', error);
     
     // Return a fallback page instead of crashing
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 pt-8">
+      <PageLayout background="default">
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-white mb-4">Framework Not Found</h1>
-            <p className="text-gray-300 mb-8">
+            <PageTitle size="large">Framework Not Found</PageTitle>
+            <PageSubtitle className="mt-4">
               The framework you're looking for could not be loaded.
-            </p>
-            <Link
-              href="/frameworks"
-              className="inline-flex items-center px-6 py-3 rounded-lg bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 transition-colors"
-            >
-              ← Back to All Frameworks
-            </Link>
+            </PageSubtitle>
+            <div className="mt-8">
+              <Link
+                href="/frameworks"
+                className="btn-secondary inline-flex items-center"
+              >
+                ← Back to All Frameworks
+              </Link>
+            </div>
           </div>
         </div>
-      </div>
+      </PageLayout>
     );
   }
 } 

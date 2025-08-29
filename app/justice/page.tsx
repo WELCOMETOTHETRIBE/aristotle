@@ -1,10 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Scale, Heart, Users, Target, Sparkles, ArrowRight, Play, Calendar, Award } from 'lucide-react';
+import { Scale, Heart, Users, Target, Sparkles, ArrowRight, Play, Calendar, Award, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import PageLayout, { 
+  PageTitle, 
+  PageSubtitle, 
+  SectionTitle, 
+  CardTitle, 
+  CardDescription, 
+  PageSection, 
+  PageGrid 
+} from '@/components/PageLayout';
 
 const justicePractices = [
   {
@@ -76,207 +83,192 @@ export default function JusticePage() {
   const [selectedPractice, setSelectedPractice] = useState(justicePractices[0]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Scale className="w-8 h-8 text-green-600 mr-3" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
-              Justice
-            </h1>
+    <PageLayout background="default">
+      {/* Header */}
+      <PageSection spacing="large">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
+          <ArrowLeft size={16} />
+          Back to Home
+        </Link>
+        
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-20 h-20 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg">
+              <Scale className="w-10 h-10 text-white" />
+            </div>
+            <div>
+              <PageTitle size="large" className="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+                Justice
+              </PageTitle>
+              <PageSubtitle className="mt-2">
+                The Virtue of Fairness & Right Relationships
+              </PageSubtitle>
+            </div>
           </div>
-          <p className="text-xl text-medium-contrast max-w-2xl mx-auto">
-            The virtue of fairness and right relationships. Build meaningful connections, serve others, and create harmony in your community.
-          </p>
+          <CardDescription className="max-w-2xl mx-auto">
+            Build meaningful connections, serve others, and create harmony in your community.
+          </CardDescription>
+        </div>
+      </PageSection>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Main Content */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Daily Practice */}
+          <PageSection>
+            <div className="glass rounded-2xl border border-white/10 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Target className="w-6 h-6 text-green-400" />
+                <CardTitle>Daily Practice</CardTitle>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {justicePractices.map((practice) => {
+                  const IconComponent = practice.icon;
+                  return (
+                    <div
+                      key={practice.title}
+                      className={`p-6 rounded-xl border transition-all duration-300 cursor-pointer ${
+                        selectedPractice.title === practice.title
+                          ? 'bg-gradient-to-r ' + practice.color + ' text-white border-transparent'
+                          : 'bg-white/5 text-white hover:bg-white/10 border-white/20'
+                      }`}
+                      onClick={() => setSelectedPractice(practice)}
+                    >
+                      <div className="flex items-center gap-3 mb-3">
+                        <IconComponent className="w-6 h-6" />
+                        <CardTitle className="text-lg">{practice.title}</CardTitle>
+                      </div>
+                      <CardDescription className="mb-4">
+                        {practice.description}
+                      </CardDescription>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="opacity-70">{practice.duration}</span>
+                        <span className="px-2 py-1 rounded-full bg-white/20 text-xs">
+                          {practice.difficulty}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              
+              <div className="mt-6 text-center">
+                <button className="btn-primary">
+                  <Play className="w-4 h-4 mr-2" />
+                  Start Practice
+                </button>
+              </div>
+            </div>
+          </PageSection>
+
+          {/* Relationship Areas */}
+          <PageSection>
+            <div className="glass rounded-2xl border border-white/10 p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Users className="w-6 h-6 text-green-400" />
+                <CardTitle>Relationship Areas</CardTitle>
+              </div>
+              
+              <PageGrid cols={2}>
+                {relationshipAreas.map((area) => (
+                  <div key={area.title} className="p-6 rounded-xl bg-white/5 border border-white/20">
+                    <div className="flex items-center justify-between mb-3">
+                      <CardTitle className="text-lg">{area.title}</CardTitle>
+                      <div className="text-2xl font-bold text-green-400">{area.quality}%</div>
+                    </div>
+                    <CardDescription className="mb-4">
+                      {area.description}
+                    </CardDescription>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-400">{area.actions} actions</span>
+                      <button className="btn-secondary btn-small">
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </PageGrid>
+            </div>
+          </PageSection>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Daily Practice */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Calendar className="w-5 h-5 text-green-600" />
-                  Today's Justice Practice
-                </CardTitle>
-                <CardDescription>
-                  Choose a practice to cultivate justice and fairness today
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {justicePractices.map((practice) => {
-                    const IconComponent = practice.icon;
-                    return (
-                      <Card
-                        key={practice.title}
-                        className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
-                          selectedPractice.title === practice.title
-                            ? 'ring-2 ring-green-500 bg-green-50'
-                            : 'hover:bg-gray-50'
-                        }`}
-                        onClick={() => setSelectedPractice(practice)}
-                      >
-                        <CardContent className="p-4">
-                          <div className="flex items-start space-x-3">
-                            <div className={`w-10 h-10 bg-gradient-to-r ${practice.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                              <IconComponent className="w-5 h-5 text-white" />
-                            </div>
-                            <div className="flex-1">
-                              <h3 className="font-semibold text-high-contrast mb-1">{practice.title}</h3>
-                              <p className="text-sm text-medium-contrast mb-2">{practice.description}</p>
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4 text-xs text-low-contrast">
-                                  <span>{practice.duration}</span>
-                                  <span>•</span>
-                                  <span>{practice.difficulty}</span>
-                                </div>
-                                <span className="text-xs font-medium text-green-600">{practice.impact}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    );
-                  })}
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Selected Practice Details */}
+          <div className="glass rounded-2xl border border-white/10 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Sparkles className="w-5 h-5 text-green-400" />
+              <CardTitle>Practice Details</CardTitle>
+            </div>
+            
+            <div className="space-y-4">
+              <div>
+                <CardTitle className="text-lg mb-2">{selectedPractice.title}</CardTitle>
+                <CardDescription>{selectedPractice.description}</CardDescription>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Duration:</span>
+                  <span className="text-white">{selectedPractice.duration}</span>
                 </div>
-                
-                <div className="mt-6">
-                  <Button className="w-full btn-success">
-                    <Play className="w-4 h-4 mr-2" />
-                    Practice {selectedPractice.title}
-                  </Button>
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Difficulty:</span>
+                  <span className="text-white">{selectedPractice.difficulty}</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Relationship Health */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Heart className="w-5 h-5 text-green-600" />
-                  Relationship Health
-                </CardTitle>
-                <CardDescription>
-                  Assess and improve your relationships across different areas of life
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {relationshipAreas.map((area) => (
-                    <div key={area.title} className="p-4 border border-gray-200 rounded-lg bg-white/50">
-                      <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-semibold text-high-contrast">{area.title}</h3>
-                        <span className="text-sm text-low-contrast">{area.actions} actions needed</span>
-                      </div>
-                      <p className="text-sm text-medium-contrast mb-3">{area.description}</p>
-                      <div className="flex items-center gap-3">
-                        <div className="flex-1 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className="bg-gradient-to-r from-green-500 to-emerald-600 h-2 rounded-full transition-all duration-300"
-                            style={{ width: `${area.quality}%` }}
-                          />
-                        </div>
-                        <span className="text-sm font-medium text-high-contrast">{area.quality}%</span>
-                      </div>
-                      <div className="mt-2 text-xs text-low-contrast">
-                        {area.quality >= 80 ? '🌟 Excellent' : area.quality >= 60 ? '👍 Good' : '⚠️ Needs attention'}
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-between">
+                  <span className="text-gray-400">Impact:</span>
+                  <span className="text-white">{selectedPractice.impact}</span>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              
+              <button className="btn-primary w-full">
+                <Play className="w-4 h-4 mr-2" />
+                Start Practice
+              </button>
+            </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Quick Actions */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Sparkles className="w-5 h-5 text-green-600" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Link href="/community">
-                  <Button variant="outline" className="w-full justify-start btn-high-contrast">
-                    <Users className="w-4 h-4 mr-2" />
-                    Join Community
-                  </Button>
-                </Link>
-                <Link href="/coach">
-                  <Button variant="outline" className="w-full justify-start btn-high-contrast">
-                    <Scale className="w-4 h-4 mr-2" />
-                    Get Relationship Advice
-                  </Button>
-                </Link>
-                <Link href="/progress">
-                  <Button variant="outline" className="w-full justify-start btn-high-contrast">
-                    <Target className="w-4 h-4 mr-2" />
-                    View Impact
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          {/* Justice Quote */}
+          <div className="glass rounded-2xl border border-white/10 p-6 bg-gradient-to-r from-green-500/20 to-emerald-600/20">
+            <blockquote className="text-lg italic text-white mb-4 leading-relaxed">
+              "Justice is the constant and perpetual will to allot to every man his due."
+            </blockquote>
+            <cite className="text-sm text-green-300">— Justinian I</cite>
+          </div>
 
-            {/* Justice Benefits */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-green-600" />
-                  Justice Benefits
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm text-high-contrast">Stronger Relationships</h4>
-                      <p className="text-xs text-medium-contrast">Build trust and connection</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm text-high-contrast">Community Impact</h4>
-                      <p className="text-xs text-medium-contrast">Contribute to collective good</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm text-high-contrast">Inner Peace</h4>
-                      <p className="text-xs text-medium-contrast">Find harmony through fairness</p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div>
-                      <h4 className="font-medium text-sm text-high-contrast">Leadership</h4>
-                      <p className="text-xs text-medium-contrast">Inspire others through example</p>
-                    </div>
-                  </div>
+          {/* Progress Stats */}
+          <div className="glass rounded-2xl border border-white/10 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Award className="w-5 h-5 text-green-400" />
+              <CardTitle>Your Progress</CardTitle>
+            </div>
+            
+            <div className="space-y-4">
+              <div className="text-center">
+                <div className="text-3xl font-bold text-white">75%</div>
+                <div className="text-sm text-gray-400">Overall Justice Score</div>
+              </div>
+              
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Practices Completed</span>
+                  <span className="text-white">12/16</span>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Quote */}
-            <Card className="glass-effect border-0 shadow-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-              <CardContent className="p-6">
-                <blockquote className="text-lg italic mb-4">
-                  "Justice is the bond of men in states, for the administration of justice, which is the determination of what is just, is the principle of order in political society."
-                </blockquote>
-                <cite className="text-sm opacity-90">— Aristotle</cite>
-              </CardContent>
-            </Card>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Streak</span>
+                  <span className="text-white">8 days</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Community Impact</span>
+                  <span className="text-white">High</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 } 

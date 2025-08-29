@@ -1,10 +1,17 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Sparkles, Mic, Send, Brain, Shield, Scale, Leaf, BookOpen, Target, Users, MessageCircle, Volume2, VolumeX, RotateCcw, Lightbulb, Heart, Zap } from 'lucide-react';
+import { Sparkles, Mic, Send, Brain, Shield, Scale, Leaf, MessageCircle, Volume2, VolumeX, RotateCcw, Lightbulb, Heart, Zap, ArrowLeft } from 'lucide-react';
+import Link from 'next/link';
+import PageLayout, { 
+  PageTitle, 
+  PageSubtitle, 
+  SectionTitle, 
+  CardTitle, 
+  CardDescription, 
+  PageSection, 
+  PageGrid 
+} from '@/components/PageLayout';
 
 interface Message {
   id: string;
@@ -187,189 +194,199 @@ export default function CoachPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-red-50">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center mb-4">
-            <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mr-4">
-              <Sparkles className="w-8 h-8 text-white" />
+    <PageLayout background="default">
+      {/* Header */}
+      <PageSection spacing="large">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
+          <ArrowLeft size={16} />
+          Back to Home
+        </Link>
+        
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg">
+              <Sparkles className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-amber-600 to-orange-600 bg-clip-text text-transparent">
-              Aristotle AI
-            </h1>
+            <div>
+              <PageTitle size="large" className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+                Aristotle AI
+              </PageTitle>
+              <PageSubtitle className="mt-2">
+                Your philosophical guide for cultivating wisdom, courage, justice, and temperance
+              </PageSubtitle>
+            </div>
           </div>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Your philosophical guide for cultivating wisdom, courage, justice, and temperance in modern life.
-          </p>
         </div>
+      </PageSection>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Chat Area */}
-          <div className="lg:col-span-3">
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl h-[600px] flex flex-col">
-              <CardHeader className="border-b border-gray-200">
-                <CardTitle className="flex items-center gap-2">
-                  <MessageCircle className="w-5 h-5 text-amber-600" />
-                  Philosophical Dialogue
-                </CardTitle>
-                <CardDescription>
-                  Engage in Socratic dialogue with Aristotle to explore virtue and wisdom
-                </CardDescription>
-              </CardHeader>
-              
-              <CardContent className="flex-1 flex flex-col p-0">
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-4 py-3 ${
-                          message.sender === 'user'
-                            ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        }`}
-                      >
-                        <div className="flex items-start gap-2">
-                          {message.sender === 'aristotle' && (
-                            <div className="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
-                              <Sparkles className="w-3 h-3 text-white" />
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <p className="text-sm">{message.content}</p>
-                            <p className="text-xs opacity-70 mt-1">
-                              {message.timestamp.toLocaleTimeString()}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  
-                  {isProcessing && (
-                    <div className="flex justify-start">
-                      <div className="bg-gray-100 rounded-2xl px-4 py-3">
-                        <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
-                            <Sparkles className="w-3 h-3 text-white" />
-                          </div>
-                          <div className="flex space-x-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div ref={messagesEndRef} />
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* Main Chat Area */}
+        <div className="lg:col-span-3">
+          <div className="glass rounded-2xl border border-white/10 shadow-xl h-[600px] flex flex-col">
+            {/* Chat Header */}
+            <div className="border-b border-white/10 p-6">
+              <div className="flex items-center gap-3">
+                <MessageCircle className="w-6 h-6 text-amber-400" />
+                <div>
+                  <CardTitle>Philosophical Dialogue</CardTitle>
+                  <CardDescription>
+                    Engage in Socratic dialogue with Aristotle to explore virtue and wisdom
+                  </CardDescription>
                 </div>
-
-                {/* Input Area */}
-                <div className="border-t border-gray-200 p-4">
-                  <div className="flex items-center gap-2">
-                    <Input
-                      ref={inputRef}
-                      value={inputValue}
-                                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
-                       onKeyPress={(e: React.KeyboardEvent<HTMLInputElement>) => e.key === 'Enter' && handleSendMessage()}
-                      placeholder="Ask Aristotle about virtue, wisdom, or life..."
-                      className="flex-1"
-                      disabled={isProcessing}
-                    />
-                    <Button
-                      onClick={startRecording}
-                      variant="outline"
-                      size="sm"
-                      disabled={isRecording || isProcessing}
-                      className={isRecording ? 'bg-red-100 border-red-300' : ''}
-                    >
-                      <Mic className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      onClick={handleSendMessage}
-                      disabled={!inputValue.trim() || isProcessing}
-                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700"
-                    >
-                      <Send className="w-4 h-4" />
-                    </Button>
+              </div>
+            </div>
+            
+            {/* Messages */}
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {messages.map((message) => (
+                <div
+                  key={message.id}
+                  className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                >
+                  <div
+                    className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                      message.sender === 'user'
+                        ? 'bg-gradient-to-r from-amber-500 to-orange-600 text-white'
+                        : 'bg-white/10 backdrop-blur-sm text-white border border-white/20'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      {message.sender === 'aristotle' && (
+                        <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center flex-shrink-0">
+                          <Sparkles className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                      <div className="flex-1">
+                        <p className="text-sm leading-relaxed">{message.content}</p>
+                        <p className="text-xs opacity-70 mt-2">
+                          {message.timestamp.toLocaleTimeString()}
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
+              ))}
+              
+              {isProcessing && (
+                <div className="flex justify-start">
+                  <div className="bg-white/10 backdrop-blur-sm rounded-2xl px-4 py-3 border border-white/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+                        <Sparkles className="w-4 h-4 text-white" />
+                      </div>
+                      <div className="flex space-x-1">
+                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce"></div>
+                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                        <div className="w-2 h-2 bg-amber-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <div ref={messagesEndRef} />
+            </div>
+
+            {/* Input Area */}
+            <div className="border-t border-white/10 p-6">
+              <div className="flex items-center gap-3">
+                <input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
+                  placeholder="Ask Aristotle about virtue, wisdom, or life..."
+                  className="input-primary flex-1"
+                  disabled={isProcessing}
+                />
+                <button
+                  onClick={startRecording}
+                  disabled={isRecording || isProcessing}
+                  className={`p-3 rounded-xl transition-all duration-200 ${
+                    isRecording 
+                      ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
+                      : 'bg-white/10 text-gray-400 hover:text-white hover:bg-white/20 border border-white/20'
+                  }`}
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isProcessing}
+                  className="btn-primary p-3"
+                >
+                  <Send className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Virtue Selection */}
+          <div className="glass rounded-2xl border border-white/10 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Shield className="w-5 h-5 text-amber-400" />
+              <CardTitle>Explore Virtues</CardTitle>
+            </div>
+            <CardDescription className="mb-4">
+              Choose a virtue to focus our discussion
+            </CardDescription>
+            <div className="space-y-3">
+              {virtues.map((virtue) => {
+                const IconComponent = virtue.icon;
+                return (
+                  <button
+                    key={virtue.name}
+                    className={`w-full text-left p-3 rounded-xl transition-all duration-200 border ${
+                      selectedVirtue === virtue.name 
+                        ? `bg-gradient-to-r ${virtue.color} text-white border-transparent` 
+                        : 'bg-white/5 text-white hover:bg-white/10 border-white/20'
+                    }`}
+                    onClick={() => handleVirtueSelect(virtue.name)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <IconComponent className="w-4 h-4" />
+                      <div>
+                        <div className="font-medium">{virtue.name}</div>
+                        <div className="text-xs opacity-70">{virtue.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Virtue Selection */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="w-5 h-5 text-amber-600" />
-                  Explore Virtues
-                </CardTitle>
-                <CardDescription>
-                  Choose a virtue to focus our discussion
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {virtues.map((virtue) => {
-                  const IconComponent = virtue.icon;
-                  return (
-                    <Button
-                      key={virtue.name}
-                      variant="outline"
-                      className={`w-full justify-start ${
-                        selectedVirtue === virtue.name ? 'bg-gradient-to-r ' + virtue.color + ' text-white border-0' : ''
-                      }`}
-                      onClick={() => handleVirtueSelect(virtue.name)}
-                    >
-                      <IconComponent className="w-4 h-4 mr-2" />
-                      {virtue.name}
-                    </Button>
-                  );
-                })}
-              </CardContent>
-            </Card>
+          {/* Quick Prompts */}
+          <div className="glass rounded-2xl border border-white/10 p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <Lightbulb className="w-5 h-5 text-amber-400" />
+              <CardTitle>Conversation Starters</CardTitle>
+            </div>
+            <div className="space-y-2">
+              {philosophicalPrompts.map((prompt, index) => (
+                <button
+                  key={index}
+                  onClick={() => handlePromptSelect(prompt)}
+                  className="text-left text-sm text-gray-300 hover:text-white p-3 rounded-lg hover:bg-white/5 transition-colors w-full border border-transparent hover:border-white/10"
+                >
+                  {prompt}
+                </button>
+              ))}
+            </div>
+          </div>
 
-            {/* Quick Prompts */}
-            <Card className="glass-effect border-0 shadow-xl bg-white/80 backdrop-blur-xl">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Lightbulb className="w-5 h-5 text-amber-600" />
-                  Conversation Starters
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-2">
-                {philosophicalPrompts.map((prompt, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handlePromptSelect(prompt)}
-                    className="text-left text-sm text-gray-600 hover:text-gray-900 p-2 rounded-lg hover:bg-gray-50 transition-colors w-full"
-                  >
-                    {prompt}
-                  </button>
-                ))}
-              </CardContent>
-            </Card>
-
-            {/* Aristotle's Wisdom */}
-            <Card className="glass-effect border-0 shadow-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white">
-              <CardContent className="p-6">
-                <blockquote className="text-lg italic mb-4">
-                  "The more you know, the more you realize you don't know."
-                </blockquote>
-                <cite className="text-sm opacity-90">— Aristotle</cite>
-              </CardContent>
-            </Card>
+          {/* Aristotle's Wisdom */}
+          <div className="glass rounded-2xl border border-white/10 p-6 bg-gradient-to-r from-amber-500/20 to-orange-600/20">
+            <blockquote className="text-lg italic text-white mb-4 leading-relaxed">
+              "The more you know, the more you realize you don't know."
+            </blockquote>
+            <cite className="text-sm text-amber-300">— Aristotle</cite>
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 } 
