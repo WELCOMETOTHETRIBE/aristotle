@@ -99,49 +99,63 @@ export default function DashboardPage() {
 
   const getGreeting = () => {
     const hour = new Date().getHours();
-    if (hour < 12) return "Good morning";
-    if (hour < 18) return "Good afternoon";
-    return "Good evening";
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
   };
 
-  // Safe render function to prevent crashes
+  if (loading) {
+    return (
+      <PageLayout title="Dashboard" description="Your wellness command center">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <p className="text-white">Loading your dashboard...</p>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout title="Dashboard" description="Your wellness command center">
+        <div className="text-center py-12">
+          <p className="body-text text-red-400">{error}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-primary mt-4"
+          >
+            Retry
+          </button>
+        </div>
+      </PageLayout>
+    );
+  }
+
+  if (!data) {
+    return (
+      <PageLayout title="Dashboard" description="Your wellness command center">
+        <div className="text-center py-12">
+          <p className="body-text">No data available</p>
+        </div>
+      </PageLayout>
+    );
+  }
+
   const renderDashboard = () => {
     try {
-      if (loading) {
-        return (
-          <div className="page-grid page-grid-cols-3">
-            {Array.from({ length: 9 }).map((_, i) => (
-              <div key={i} className="card-base">
-                <div className="loading-pulse h-32 rounded-lg"></div>
-              </div>
-            ))}
-          </div>
-        );
-      }
-
-      if (!data) {
-        return (
-          <div className="text-center py-12">
-            <p className="body-text">Unable to load dashboard data. Please try refreshing the page.</p>
-            {error && (
-              <p className="text-red-400 mt-2">{error}</p>
-            )}
-          </div>
-        );
-      }
-
       return (
         <>
-          {/* Welcome Section */}
+          {/* Header */}
           <div className="mb-8">
-            <h2 className="subheadline mb-2">{getGreeting()}, seeker</h2>
-            <p className="body-text">Your daily practice awaits. Choose your path to flourishing.</p>
+            <h1 className="text-3xl font-bold text-white mb-2">{getGreeting()}, {data.virtueScores ? 'Warrior' : 'Friend'}!</h1>
+            <p className="text-gray-300">Your wellness journey continues...</p>
           </div>
 
-          {/* Main Dashboard Grid */}
-          <div className="page-grid page-grid-cols-3">
-            {/* Virtue Balance Radar */}
-            <GlassCard title="Virtue Balance" subtitle="Weekly virtue alignment" className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {/* Virtue Radar */}
+            <GlassCard title="Virtue Progress" subtitle="This week's growth" className="p-6">
               <VirtueRadar data={[
                 { virtue: 'Wisdom', score: data.virtueScores.wisdom },
                 { virtue: 'Courage', score: data.virtueScores.courage },
@@ -150,8 +164,8 @@ export default function DashboardPage() {
               ]} />
             </GlassCard>
 
-            {/* Morning Ritual Tracker */}
-            <GlassCard title="Morning Ritual" subtitle="Daily practice checklist" className="p-6">
+            {/* Habits Tracker */}
+            <GlassCard title="Daily Habits" subtitle="Track your progress" className="p-6">
               <div className="space-y-3">
                 {data.habits.total.map((habit) => (
                   <div key={habit} className="flex items-center justify-between">
@@ -164,11 +178,6 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-            </GlassCard>
-
-            {/* Breathwork Timer */}
-            <GlassCard title="Breath of the Path" subtitle="Guided breathing practice" className="p-6">
-              <BreathTimer />
             </GlassCard>
 
             {/* Hydration Ring */}
@@ -220,9 +229,9 @@ export default function DashboardPage() {
               </div>
             </GlassCard>
 
-            {/* Focus Timer */}
-            <GlassCard title="Focus Session" subtitle="Deep work timer" className="p-6">
-              <FocusTimer />
+            {/* Breathwork Timer */}
+            <GlassCard title="Breath of the Path" subtitle="Guided breathing practice" className="p-6">
+              <BreathTimer />
             </GlassCard>
 
             {/* Sun Path */}
@@ -234,6 +243,11 @@ export default function DashboardPage() {
             <GlassCard title="Wisdom Spotlight" subtitle="Featured resource" className="p-6">
               <ResourceSpotlight />
             </GlassCard>
+
+            {/* Focus Timer */}
+            <GlassCard title="Focus Session" subtitle="Deep work timer" className="p-6">
+              <FocusTimer />
+            </GlassCard>
           </div>
         </>
       );
@@ -242,7 +256,13 @@ export default function DashboardPage() {
       return (
         <div className="text-center py-12">
           <p className="body-text">Something went wrong while rendering the dashboard.</p>
-          <p className="text-red-400 mt-2">Please try refreshing the page.</p>
+          <p className="text-red-400 mt-2">Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            className="btn-primary mt-4"
+          >
+            Refresh Page
+          </button>
         </div>
       );
     }
