@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getToneGradient, getToneTextColor } from '../../lib/tone';
 import Link from 'next/link';
+import ModuleWidget from '../../components/ModuleWidgets';
 import PageLayout, { 
   PageTitle, 
   PageSubtitle, 
@@ -12,7 +13,6 @@ import PageLayout, {
   SectionTitle,
   SectionDescription
 } from '../../components/PageLayout';
-// import ModuleWidget from '../../components/ModuleWidgets';
 
 interface Framework {
   id: string;
@@ -168,7 +168,7 @@ export default function FrameworksPage() {
       </PageSection>
 
       {/* Interactive Widgets Preview */}
-      {/* <PageSection>
+      <PageSection>
         <div className="text-center mb-8">
           <SectionTitle>Interactive Practice Widgets</SectionTitle>
           <SectionDescription>
@@ -180,7 +180,7 @@ export default function FrameworksPage() {
           <ModuleWidget moduleId="focus_deepwork" moduleName="Focus Timer" />
           <ModuleWidget moduleId="gratitude_awe" moduleName="Gratitude Journal" />
         </PageGrid>
-      </PageSection> */}
+      </PageSection>
     </PageLayout>
   );
 } 
