@@ -1,5 +1,6 @@
 const { execSync } = require('child_process');
 const path = require('path');
+const fs = require('fs');
 
 console.log('🗄️ Initializing database schema...');
 
@@ -13,6 +14,13 @@ if (!process.env.DATABASE_URL) {
 }
 
 console.log(`📊 Using database: ${process.env.DATABASE_URL}`);
+
+// Ensure the prisma directory exists
+const prismaDir = path.dirname(process.env.DATABASE_URL.replace('file:', ''));
+if (!fs.existsSync(prismaDir)) {
+  console.log(`📁 Creating prisma directory: ${prismaDir}`);
+  fs.mkdirSync(prismaDir, { recursive: true });
+}
 
 try {
   // Push schema to database
