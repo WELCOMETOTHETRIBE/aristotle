@@ -8,18 +8,19 @@ console.log('🗄️ Initializing database schema...');
 if (!process.env.DATABASE_URL) {
   console.log('⚠️ DATABASE_URL not set, using default SQLite database');
   process.env.DATABASE_URL = 'file:./prisma/dev.db';
-} else if (!process.env.DATABASE_URL.startsWith('file:')) {
-  console.log('⚠️ DATABASE_URL does not start with file:, adding file: prefix');
-  process.env.DATABASE_URL = `file:${process.env.DATABASE_URL}`;
 }
 
 console.log(`📊 Using database: ${process.env.DATABASE_URL}`);
 
-// Ensure the prisma directory exists
-const prismaDir = path.dirname(process.env.DATABASE_URL.replace('file:', ''));
-if (!fs.existsSync(prismaDir)) {
-  console.log(`📁 Creating prisma directory: ${prismaDir}`);
-  fs.mkdirSync(prismaDir, { recursive: true });
+// Only create directories for SQLite databases
+if (process.env.DATABASE_URL.startsWith('file:')) {
+  const prismaDir = path.dirname(process.env.DATABASE_URL.replace('file:', ''));
+  if (!fs.existsSync(prismaDir)) {
+    console.log(`📁 Creating prisma directory: ${prismaDir}`);
+    fs.mkdirSync(prismaDir, { recursive: true });
+  }
+} else {
+  console.log('📊 Using PostgreSQL database - no local directory needed');
 }
 
 try {
