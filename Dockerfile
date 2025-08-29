@@ -12,8 +12,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma
 
-# Install dependencies
-RUN npm ci
+# Install dependencies (using npm install instead of npm ci for better compatibility)
+RUN npm install --production=false
 
 # Rebuild the source code only when needed
 FROM base AS builder
