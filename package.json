@@ -27,7 +27,8 @@
     "lint:fix": "next lint --fix",
     "e2e": "playwright test",
     "verify": "npm run typecheck && npm run test && npm run e2e",
-    "test:integrity": "node scripts/run-widget-integrity-test.js"
+    "test:integrity": "node scripts/run-widget-integrity-test.js",
+    "feedback:export": "node scripts/export-developer-feedback.js"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.3.2",

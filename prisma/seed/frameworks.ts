@@ -1,33 +1,38 @@
 import { PrismaClient } from '@prisma/client';
-import { FRAMEWORKS } from './frameworks-data';
+import { getAllFrameworks } from '../../lib/frameworks.config';
 
 export async function seedFrameworks(prisma: PrismaClient) {
-  for (const f of FRAMEWORKS) {
-    const { moduleEmphasis = [], ...rest } = f as any;
-    const frameworkData = {
-      ...rest,
-      coreValues: JSON.stringify(rest.coreValues || []),
-      dailyRituals: JSON.stringify(rest.dailyRituals || []),
-      weeklyChallenges: JSON.stringify(rest.weeklyChallenges || []),
-      sayings: JSON.stringify(rest.sayings || []),
-      moduleEmphasis: JSON.stringify(moduleEmphasis || []),
-      starterProtocol: JSON.stringify(rest.starterProtocol || []),
-      meta: JSON.stringify(rest.meta || {})
-    };
-    
+  const frameworks = getAllFrameworks();
+  
+  for (const framework of frameworks) {
+    // Create framework with all data in config
     await prisma.framework.upsert({
-      where: { id: f.id },
-      update: frameworkData,
-      create: frameworkData,
+      where: { slug: framework.slug },
+      update: {
+        name: framework.name,
+        tone: framework.tone,
+        virtuePrimary: framework.virtuePrimary,
+        virtueSecondary: framework.virtueSecondary,
+        config: {
+          widgets: framework.widgets,
+          quests: framework.quests,
+          capstone: framework.capstone,
+          teachingChip: framework.teachingChip
+        }
+      },
+      create: {
+        slug: framework.slug,
+        name: framework.name,
+        tone: framework.tone,
+        virtuePrimary: framework.virtuePrimary,
+        virtueSecondary: framework.virtueSecondary,
+        config: {
+          widgets: framework.widgets,
+          quests: framework.quests,
+          capstone: framework.capstone,
+          teachingChip: framework.teachingChip
+        }
+      },
     });
-    
-    // Create framework-module mappings
-    for (const em of moduleEmphasis) {
-      await prisma.frameworkModuleMap.upsert({
-        where: { frameworkId_moduleId: { frameworkId: f.id, moduleId: em.module_id } },
-        update: { emphasis: JSON.stringify(em) },
-        create: { frameworkId: f.id, moduleId: em.module_id, emphasis: JSON.stringify(em) },
-      });
-    }
   }
 } 

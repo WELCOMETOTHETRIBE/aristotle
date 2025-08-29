@@ -1,15 +1,17 @@
 'use client';
 
 import { useState } from 'react';
-import { Settings, Activity, BarChart3, TestTube, Bug } from 'lucide-react';
+import { Settings, Activity, BarChart3, TestTube, Bug, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ConformanceMatrix from './ConformanceMatrix';
 import IntegrityDashboard from './IntegrityDashboard';
+import DeveloperFeedbackDashboard from './DeveloperFeedbackDashboard';
 
 export default function DeveloperToolbar() {
   const [showConformanceMatrix, setShowConformanceMatrix] = useState(false);
   const [showIntegrityDashboard, setShowIntegrityDashboard] = useState(false);
+  const [showFeedbackDashboard, setShowFeedbackDashboard] = useState(false);
 
   // Only show in development
   if (process.env.NODE_ENV !== 'development') {
@@ -48,6 +50,16 @@ export default function DeveloperToolbar() {
             <Button
               variant="outline"
               size="sm"
+              onClick={() => setShowFeedbackDashboard(true)}
+              className="flex items-center gap-1"
+            >
+              <MessageSquare className="h-3 w-3" />
+              Feedback
+            </Button>
+            
+            <Button
+              variant="outline"
+              size="sm"
               onClick={() => {
                 // Run quick self-test
                 fetch('/api/debug/widget-integrity?format=pretty')
@@ -77,6 +89,11 @@ export default function DeveloperToolbar() {
       <IntegrityDashboard
         isVisible={showIntegrityDashboard}
         onClose={() => setShowIntegrityDashboard(false)}
+      />
+
+      <DeveloperFeedbackDashboard
+        isVisible={showFeedbackDashboard}
+        onClose={() => setShowFeedbackDashboard(false)}
       />
     </>
   );
