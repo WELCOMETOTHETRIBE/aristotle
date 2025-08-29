@@ -7,8 +7,121 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Using strings instead of enums for PostgreSQL compatibility
+enum Virtue { 
+  WISDOM 
+  JUSTICE 
+  COURAGE 
+  TEMPERANCE 
+}
 
+enum WidgetKind { 
+  TIMER 
+  COUNTER 
+  DRAG_BOARD 
+  CHECKLIST 
+  JOURNAL 
+  AUDIO_NOTE 
+  PHOTO 
+  BREATH 
+  BALANCE_GYRO 
+  WHEEL 
+  SLIDERS 
+}
+
+// New Framework System Models
+model Framework {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  name          String
+  tone          String
+  virtuePrimary Virtue
+  virtueSecondary Virtue?
+  config        Json     // widgets, breath, quests, copy, KPIs
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  widgets       Widget[]
+  quests        Quest[]
+  capstones     Capstone[]
+  
+  // Legacy relations
+  moduleMaps      FrameworkModuleMap[]
+  practiceMaps    FrameworkPracticeMap[]
+  sessions        Session[]
+  challenges      Challenge[]
+}
+
+model Widget {
+  id           String    @id @default(cuid())
+  frameworkId  String
+  framework    Framework @relation(fields: [frameworkId], references: [id])
+  kind         WidgetKind
+  title        String
+  config       Json      // per-widget UI & logic params
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  kpis         KPIReading[]
+}
+
+model Quest {
+  id           String    @id @default(cuid())
+  frameworkId  String
+  framework    Framework @relation(fields: [frameworkId], references: [id])
+  title        String
+  description  String
+  widgetIds    String[]  // 1..N
+  minutes      Int       // 2..6
+  virtueGrants Json      // { wisdom?:number, justice?:number, courage?:number, temperance?:number }
+  active       Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Checkin {
+  id            String   @id @default(cuid())
+  userId        String
+  questId       String?
+  widgetId      String
+  frameworkSlug String
+  payload       Json     // raw completion data (duration, reps, files, choices)
+  virtues       Json     // XP granted at time of checkin
+  createdAt     DateTime @default(now())
+}
+
+model KPIReading {
+  id        String   @id @default(cuid())
+  widgetId  String
+  userId    String
+  metric    String   // e.g., "duration_sec", "reps", "rpe", "balance_sec"
+  value     Float
+  unit      String?  // "sec", "count", "score"
+  createdAt DateTime @default(now())
+  
+  widget    Widget   @relation(fields: [widgetId], references: [id])
+}
+
+model Capstone {
+  id           String   @id @default(cuid())
+  frameworkId  String
+  framework    Framework @relation(fields: [frameworkId], references: [id])
+  title        String
+  requirements Json      // checklist array
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model VirtueTotals {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  wisdom    Int      @default(0)
+  justice   Int      @default(0)
+  courage   Int      @default(0)
+  temperance Int     @default(0)
+  updatedAt DateTime @updatedAt
+}
+
+// Legacy models (keeping for backward compatibility)
 model Module {
   id             String         @id
   name           String
@@ -84,25 +197,6 @@ model Resource {
   level         String?
   audioUrl      String?
   meta          String?        @default("{}")
-}
-
-model Framework {
-  id              String   @id
-  name            String
-  culture         String?
-  overview        String?
-  coreValues      String?  @default("[]")
-  dailyRituals    String?  @default("[]")
-  weeklyChallenges String? @default("[]")
-  sayings         String?  @default("[]")
-  moduleEmphasis  String?  @default("[]")
-  starterProtocol String?  @default("[]")
-  meta            String?  @default("{}")
-
-  moduleMaps      FrameworkModuleMap[]
-  practiceMaps    FrameworkPracticeMap[]
-  sessions        Session[]
-  challenges      Challenge[]
 }
 
 model FrameworkModuleMap {
@@ -335,7 +429,7 @@ model HydrationLog {
   date      DateTime @default(now())
   ml        Int
   source    String?  // water, tea, etc.
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model MoodLog {
@@ -344,7 +438,7 @@ model MoodLog {
   date      DateTime @default(now())
   mood      Int      // 1..5
   note      String?
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 }
 
 model TimerSession {
@@ -355,5 +449,5 @@ model TimerSession {
   startedAt DateTime @default(now())
   endedAt   DateTime?
   meta      Json?
-  user      User     @relation(fields: [userId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 } 
