@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'default-jwt-secret-for-development-only';
+const JWT_SECRET = 'default-jwt-secret-for-development-only';
 
 function verifyTokenInMiddleware(token: string) {
+  console.log('🔐 Attempting to verify token with secret:', JWT_SECRET ? 'SECRET_SET' : 'SECRET_NOT_SET');
+  console.log('🔐 JWT_SECRET value:', JWT_SECRET);
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as any;
     console.log('🔐 Middleware token verification success:', { 
@@ -19,6 +21,8 @@ function verifyTokenInMiddleware(token: string) {
 }
 
 export function middleware(request: NextRequest) {
+  console.log('🚨 MIDDLEWARE CALLED for path:', request.nextUrl.pathname);
+  
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('auth-token')?.value;
   
@@ -37,11 +41,14 @@ export function middleware(request: NextRequest) {
   
   const isAuthRoute = pathname === '/auth';
 
+  console.log('🔍 Route types:', { isProtectedRoute, isAuthRoute });
+
   // Check if user is authenticated
   let isAuthenticated = false;
   if (token) {
     const decoded = verifyTokenInMiddleware(token);
     isAuthenticated = !!decoded;
+    console.log('🔐 Token verification result:', { decoded, isAuthenticated });
   }
 
   console.log('🔐 Authentication result:', { 
@@ -67,14 +74,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - api (API routes)
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     */
-    '/((?!api|_next/static|_next/image|favicon.ico).*)',
-  ],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 }; 

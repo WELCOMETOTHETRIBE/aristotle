@@ -20,7 +20,7 @@ export default function AuthPage() {
   });
   const [isDark, setIsDark] = useState(false);
   const router = useRouter();
-  const { signIn, signUp, user } = useAuth();
+  const { signIn, signUp, user, loading } = useAuth();
 
   // Auto-detect dark mode preference
   useEffect(() => {
@@ -30,10 +30,10 @@ export default function AuthPage() {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (user) {
-      router.push('/');
+    if (user && !loading) {
+      router.replace('/');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,6 +104,24 @@ export default function AuthPage() {
       x: 0
     }
   };
+
+  // Show loading state while checking authentication
+  if (loading) {
+    return (
+      <div className={`min-h-screen transition-colors duration-500 ${
+        isDark 
+          ? 'bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900' 
+          : 'bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'
+      }`}>
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="flex items-center gap-3">
+            <Loader2 className="w-8 h-8 animate-spin text-white" />
+            <span className="text-xl text-white">Loading...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`min-h-screen transition-colors duration-500 ${
