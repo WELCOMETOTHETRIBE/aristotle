@@ -17,6 +17,8 @@ import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpo
 import BreathTimerCircle from '../../../components/BreathTimerCircle';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
 import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
+import WidgetGuard from '../../../components/WidgetGuard';
+import DeveloperToolbar from '../../../components/DeveloperToolbar';
 
 interface FrameworkDetailPageProps {
   params: { slug: string };
@@ -107,49 +109,59 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
   };
 
   const renderWidget = (widget: any) => {
-    const commonProps = {
-      title: widget.title,
-      config: widget.config,
-      onComplete: (payload: any) => handleWidgetComplete(widget.id, payload),
-      virtueGrantPerCompletion: widget.virtueGrantPerCompletion
-    };
+    return (
+      <WidgetGuard
+        widget={widget}
+        framework={framework}
+        onComplete={(payload) => handleWidgetComplete(widget.id, payload)}
+      >
+        {(normalizedWidget: any, onComplete: any) => {
+          const commonProps = {
+            title: normalizedWidget.title,
+            config: normalizedWidget.config,
+            onComplete,
+            virtueGrantPerCompletion: normalizedWidget.virtueGrantPerCompletion
+          };
 
-    const widgetComponent = (() => {
-      switch (widget.kind) {
-        case 'TIMER':
-          return <TimerCard {...commonProps} />;
-        case 'COUNTER':
-          return <CounterCard {...commonProps} />;
-        case 'BREATH':
-          return <BreathPacer {...commonProps} />;
-        default:
+          const widgetComponent = (() => {
+            switch (normalizedWidget.kind) {
+              case 'TIMER':
+                return <TimerCard {...commonProps} />;
+              case 'COUNTER':
+                return <CounterCard {...commonProps} />;
+              case 'BREATH':
+                return <BreathPacer {...commonProps} />;
+              default:
+                return (
+                  <div className="p-6 bg-gray-800 rounded-lg">
+                    <h3 className="text-lg font-semibold text-white mb-2">{normalizedWidget.title}</h3>
+                    <p className="text-gray-400">Widget type {normalizedWidget.kind} not implemented yet</p>
+                  </div>
+                );
+            }
+          })();
+
           return (
-            <div className="p-6 bg-gray-800 rounded-lg">
-              <h3 className="text-lg font-semibold text-white mb-2">{widget.title}</h3>
-              <p className="text-gray-400">Widget type {widget.kind} not implemented yet</p>
+            <div className="relative">
+              <div className="absolute top-2 right-2 z-10">
+                <button
+                  onClick={() => setShowWidgetInfo(showWidgetInfo === widget.id ? null : widget.id)}
+                  className="p-1 text-muted-foreground hover:text-white transition-colors bg-black/20 rounded-full"
+                >
+                  <Info className="h-3 w-3" />
+                </button>
+              </div>
+              {showWidgetInfo === widget.id && (
+                <div className="absolute top-8 right-2 z-20 w-64 p-3 bg-black/90 backdrop-blur border border-white/20 rounded-lg text-xs">
+                  <p className="text-white mb-2">{normalizedWidget.config.teaching}</p>
+                  <p className="text-gray-300">Virtue gains: {Object.entries(normalizedWidget.virtueGrantPerCompletion).map(([virtue, amount]) => `${virtue} +${amount}`).join(', ')}</p>
+                </div>
+              )}
+              {widgetComponent}
             </div>
           );
-      }
-    })();
-
-    return (
-      <div className="relative">
-        <div className="absolute top-2 right-2 z-10">
-          <button
-            onClick={() => setShowWidgetInfo(showWidgetInfo === widget.id ? null : widget.id)}
-            className="p-1 text-muted-foreground hover:text-white transition-colors bg-black/20 rounded-full"
-          >
-            <Info className="h-3 w-3" />
-          </button>
-        </div>
-        {showWidgetInfo === widget.id && (
-          <div className="absolute top-8 right-2 z-20 w-64 p-3 bg-black/90 backdrop-blur border border-white/20 rounded-lg text-xs">
-            <p className="text-white mb-2">{widget.config.teaching}</p>
-            <p className="text-gray-300">Virtue gains: {Object.entries(widget.virtueGrantPerCompletion).map(([virtue, amount]) => `${virtue} +${amount}`).join(', ')}</p>
-          </div>
-        )}
-        {widgetComponent}
-      </div>
+        }}
+      </WidgetGuard>
     );
   };
 
@@ -396,6 +408,9 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           ← Back to All Frameworks
         </Link>
       </div>
+
+      {/* Developer Toolbar */}
+      <DeveloperToolbar />
     </PageLayout>
   );
 } 
