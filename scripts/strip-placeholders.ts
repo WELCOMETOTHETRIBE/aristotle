@@ -14,7 +14,10 @@ const PLACEHOLDER_PATTERNS = [
   /FIXME.*implement/i,
   /for demo purposes/i,
   /for now, return/i,
-  /placeholder user/i
+  /placeholder user/i,
+  /your-secret-key/i,
+  /your-openai-api-key/i,
+  /your-railway-token/i
 ];
 
 const EXCLUDE_PATTERNS = [
@@ -46,7 +49,9 @@ const EXCLUDE_PATTERNS = [
   /\.test\./,
   /\.spec\./,
   /\.e2e\./,
-  /\.smoke\./
+  /\.smoke\./,
+  /prisma\/seed\//, // Don't check seed files
+  /env\.local\.example$/ // Don't check example env files
 ];
 
 const INCLUDE_EXTENSIONS = [

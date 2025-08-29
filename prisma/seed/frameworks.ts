@@ -1,83 +1,33 @@
-// prisma/seed/frameworks.ts
-export const FRAMEWORKS = [
-  { id:"spartan",  name:"Spartan Agōgē", culture:"Greek",
-    overview:"Discipline in service of the whole; embrace chosen hardship.",
-    coreValues:["discipline","endurance","service","courage","simplicity"],
-    dailyRituals:["Short cold/heat dose","Strength circuit","Temperance act"],
-    weeklyChallenges:["3 group trainings","1 service action","Comfort fast"],
-    sayings:["Sweat more in training, bleed less in war."],
-    moduleEmphasis:[{module_id:"cold_heat"},{module_id:"strength"},{module_id:"fasting"},{module_id:"focus_deepwork"}],
-  },
-  { id:"bushido", name:"Samurai Bushidō", culture:"Japanese",
-    overview:"Honor, rectitude, respect, self-control in every act.",
-    coreValues:["honor","rectitude","respect","loyalty","self-control"],
-    dailyRituals:["Morning code reflection","Etiquette drill","Precision ritual"],
-    weeklyChallenges:["Resolve an obligation","Teach a younger person"],
-    sayings:["The way is in daily life."],
-    moduleEmphasis:[{module_id:"etiquette_presence"},{module_id:"meditation"},{module_id:"movement_posture"},{module_id:"conflict_debate"}],
-  },
-  { id:"stoic", name:"Stoicism", culture:"Hellenistic",
-    overview:"Control/accept; practice virtue and clear perception.",
-    coreValues:["rationality","acceptance","temperance","courage","justice"],
-    dailyRituals:["Negative visualization","Evening reflection"],
-    weeklyChallenges:["Voluntary discomfort","Repair one relationship"],
-    sayings:["Amor fati."],
-    moduleEmphasis:[{module_id:"memento_mori"},{module_id:"mood_regulation"},{module_id:"virtue_cultivation"},{module_id:"focus_deepwork"}],
-  },
-  { id:"monastic", name:"Monastic Rule", culture:"Various",
-    overview:"Order, humility, rhythm: stillness, work, rest, service.",
-    coreValues:["order","humility","contemplation","service","stability"],
-    dailyRituals:["Fixed morning/evening sit","Silence window","Tidy a shared space"],
-    weeklyChallenges:["Cook/clean for others","Digital sabbath"],
-    sayings:["Ora et labora."],
-    moduleEmphasis:[{module_id:"meditation"},{module_id:"service_contribution"},{module_id:"focus_deepwork"},{module_id:"gratitude_awe"}],
-  },
-  { id:"yogic", name:"Yogic Path", culture:"Indian",
-    overview:"Union of body, breath, mind; asana, pranayama, mantra.",
-    coreValues:["balance","presence","discipline","compassion","non-harm"],
-    dailyRituals:["Short asana","Breath control","Mantra 3–5m"],
-    weeklyChallenges:["Attend/teach a class","Vegetable-forward day"],
-    sayings:["Practice and all is coming."],
-    moduleEmphasis:[{module_id:"flexibility"},{module_id:"breathwork"},{module_id:"meditation"},{module_id:"service_contribution"}],
-  },
-  { id:"indigenous", name:"Indigenous Wisdom", culture:"Global",
-    overview:"Live with land and cycles; gratitude and stewardship.",
-    coreValues:["stewardship","gratitude","cycles","community","respect"],
-    dailyRituals:["Awe/nature walk","Gratitude offering","Share food or story"],
-    weeklyChallenges:["Community tending","Learn from an elder"],
-    sayings:["We borrow the earth from our children."],
-    moduleEmphasis:[{module_id:"gratitude_awe"},{module_id:"service_contribution"},{module_id:"longevity"},{module_id:"tribal_challenges"}],
-  },
-  { id:"martial", name:"Martial Arts Code", culture:"Global",
-    overview:"Discipline, etiquette, calm under pressure.",
-    coreValues:["discipline","respect","focus","humility","flow"],
-    dailyRituals:["Kata/shadow 5–10m","Bow in/out","Breath reset"],
-    weeklyChallenges:["Deliberate hard task","Teach one movement"],
-    sayings:["Train hard; fight easy."],
-    moduleEmphasis:[{module_id:"movement_posture"},{module_id:"breathwork"},{module_id:"conflict_debate"},{module_id:"focus_deepwork"}],
-  },
-  { id:"sufi", name:"Sufi Practice", culture:"Middle Eastern",
-    overview:"Remembrance, love, and joy; polish the heart.",
-    coreValues:["love","remembrance","joy","humility","unity"],
-    dailyRituals:["Dhikr","Gentle movement","Compassion break"],
-    weeklyChallenges:["Share food or poem","Repair a small rift"],
-    sayings:["Be the soul of the place you stand."],
-    moduleEmphasis:[{module_id:"mood_regulation"},{module_id:"meditation"},{module_id:"gratitude_awe"},{module_id:"service_contribution"}],
-  },
-  { id:"ubuntu", name:"Ubuntu", culture:"African",
-    overview:"I am because we are; shared humanity as strength.",
-    coreValues:["community","generosity","dignity","interdependence","repair"],
-    dailyRituals:["Greet neighbors by name","Offer help","Share a resource/story"],
-    weeklyChallenges:["Host a small circle","Community project"],
-    sayings:["A person is a person through other persons."],
-    moduleEmphasis:[{module_id:"service_contribution"},{module_id:"active_listening"},{module_id:"tribal_challenges"},{module_id:"mentorship_teaching"}],
-  },
-  { id:"highperf", name:"Modern High-Performance", culture:"Global",
-    overview:"Science-backed clarity, energy, output.",
-    coreValues:["clarity","consistency","systems","feedback","renewal"],
-    dailyRituals:["Top-1 plan","Focus block + hydrate","Evening score"],
-    weeklyChallenges:["Ship one deliverable","Restoration day"],
-    sayings:["You fall to the level of your systems."],
-    moduleEmphasis:[{module_id:"focus_deepwork"},{module_id:"sleep_circadian"},{module_id:"hydration"},{module_id:"skill_builder"}],
-  },
-]; 
+import { PrismaClient } from '@prisma/client';
+import { FRAMEWORKS } from './frameworks-data';
+
+export async function seedFrameworks(prisma: PrismaClient) {
+  for (const f of FRAMEWORKS) {
+    const { moduleEmphasis = [], ...rest } = f as any;
+    const frameworkData = {
+      ...rest,
+      coreValues: JSON.stringify(rest.coreValues || []),
+      dailyRituals: JSON.stringify(rest.dailyRituals || []),
+      weeklyChallenges: JSON.stringify(rest.weeklyChallenges || []),
+      sayings: JSON.stringify(rest.sayings || []),
+      moduleEmphasis: JSON.stringify(moduleEmphasis || []),
+      starterProtocol: JSON.stringify(rest.starterProtocol || []),
+      meta: JSON.stringify(rest.meta || {})
+    };
+    
+    await prisma.framework.upsert({
+      where: { id: f.id },
+      update: frameworkData,
+      create: frameworkData,
+    });
+    
+    // Create framework-module mappings
+    for (const em of moduleEmphasis) {
+      await prisma.frameworkModuleMap.upsert({
+        where: { frameworkId_moduleId: { frameworkId: f.id, moduleId: em.module_id } },
+        update: { emphasis: JSON.stringify(em) },
+        create: { frameworkId: f.id, moduleId: em.module_id, emphasis: JSON.stringify(em) },
+      });
+    }
+  }
+} 
