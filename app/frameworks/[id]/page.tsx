@@ -6,7 +6,7 @@ import Link from 'next/link';
 import BreathOfThePath from '../../../components/BreathOfThePath';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
 import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
-import ModuleWidget from '../../../components/ModuleWidgets';
+// import ModuleWidget from '../../../components/ModuleWidgets';
 import PageLayout, { 
   PageTitle, 
   PageSubtitle, 
@@ -170,38 +170,58 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           />
         </PageSection>
 
-        {/* Core Modules - Interactive Widgets */}
+        {/* Core Modules */}
         <PageSection>
           <SectionTitle>Core Modules</SectionTitle>
           <SectionDescription>
-            Essential interactive practices that define the {framework.name} tradition
+            Essential practices that define the {framework.name} tradition
           </SectionDescription>
-          <PageGrid cols={2}>
+          <PageGrid cols={3}>
             {framework.coreModules.map((moduleId) => (
-              <ModuleWidget
+              <div
                 key={moduleId}
-                moduleId={moduleId}
-                moduleName={moduleId.replace(/_/g, ' ')}
-                frameworkTone={framework.nav.tone}
-              />
+                className={`p-6 rounded-xl border-2 ${getToneAccentColor(framework.nav.tone)} bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-all duration-300 hover:scale-105`}
+              >
+                <CardTitle className="capitalize mb-2">
+                  {moduleId.replace(/_/g, ' ')}
+                </CardTitle>
+                <CardDescription>
+                  Essential foundation of this framework
+                </CardDescription>
+                <div className="mt-3">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">
+                    Core Module
+                  </span>
+                </div>
+              </div>
             ))}
           </PageGrid>
         </PageSection>
 
-        {/* Support Modules - Interactive Widgets */}
+        {/* Support Modules */}
         <PageSection>
           <SectionTitle>Support Modules</SectionTitle>
           <SectionDescription>
-            Complementary interactive practices that enhance the {framework.name} path
+            Complementary practices that enhance the {framework.name} path
           </SectionDescription>
-          <PageGrid cols={2}>
+          <PageGrid cols={3}>
             {framework.supportModules.map((moduleId) => (
-              <ModuleWidget
+              <div
                 key={moduleId}
-                moduleId={moduleId}
-                moduleName={moduleId.replace(/_/g, ' ')}
-                frameworkTone={framework.nav.tone}
-              />
+                className="p-6 rounded-xl border border-gray-600 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-all duration-300 hover:scale-105"
+              >
+                <CardTitle className="capitalize mb-2">
+                  {moduleId.replace(/_/g, ' ')}
+                </CardTitle>
+                <CardDescription>
+                  Complementary practices
+                </CardDescription>
+                <div className="mt-3">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300">
+                    Support Module
+                  </span>
+                </div>
+              </div>
             ))}
           </PageGrid>
         </PageSection>
