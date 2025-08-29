@@ -5,6 +5,7 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { VirtueNavigation } from "@/components/VirtueNavigation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
+import DeveloperToolbar from "@/components/DeveloperToolbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,6 +28,7 @@ export default function RootLayout({
               <div className="min-h-screen bg-bg">
                 <VirtueNavigation />
                 {children}
+                <DeveloperToolbar />
               </div>
             </AuthProvider>
           </QueryProvider>

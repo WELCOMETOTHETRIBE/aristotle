@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale } from 'lucide-react';
+import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale, MessageSquare } from 'lucide-react';
 import BreathTimerCircle from '@/components/BreathTimerCircle';
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
+import DeveloperFeedbackButton from '@/components/DeveloperFeedbackButton';
 
 interface VirtueScores {
   wisdom: number;
@@ -437,6 +438,17 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* General Page Feedback */}
+      <DeveloperFeedbackButton
+        targetId="dashboard_page"
+        type="general"
+        className="fixed top-4 right-4 z-50"
+      >
+        <div className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-colors">
+          <MessageSquare className="h-4 w-4" />
+        </div>
+      </DeveloperFeedbackButton>
+      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -451,22 +463,27 @@ export default function DashboardPage() {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Wisdom Spotlight - Special Widget */}
-              <Card className="glass-effect bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <BookOpen className="h-5 w-5 text-purple-400" />
-                    Wisdom Spotlight
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'wisdom_spotlight' ? null : 'wisdom_spotlight')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </CardTitle>
-                  <CardDescription>
-                    Daily wisdom from ancient traditions
-                  </CardDescription>
-                </CardHeader>
+              <DeveloperFeedbackButton
+                targetId="wisdom_spotlight"
+                type="section"
+                className="relative"
+              >
+                <Card className="glass-effect bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <BookOpen className="h-5 w-5 text-purple-400" />
+                      Wisdom Spotlight
+                      <button
+                        onClick={() => setShowWidgetInfo(showWidgetInfo === 'wisdom_spotlight' ? null : 'wisdom_spotlight')}
+                        className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                      >
+                        <Info className="h-4 w-4" />
+                      </button>
+                    </CardTitle>
+                    <CardDescription>
+                      Daily wisdom from ancient traditions
+                    </CardDescription>
+                  </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'wisdom_spotlight' && (
                     <div className="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
@@ -496,9 +513,15 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
+              </DeveloperFeedbackButton>
 
               {/* Virtue Progress */}
-              <Card className="glass-effect">
+              <DeveloperFeedbackButton
+                targetId="virtue_progress"
+                type="section"
+                className="relative"
+              >
+                <Card className="glass-effect">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-primary" />
@@ -554,6 +577,7 @@ export default function DashboardPage() {
                   </div>
                 </CardContent>
               </Card>
+              </DeveloperFeedbackButton>
 
               {/* Today's Tasks */}
               <Card className="glass-effect">

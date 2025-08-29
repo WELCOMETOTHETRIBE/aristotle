@@ -65,7 +65,7 @@ export default function DeveloperFeedbackButton({
       {/* Feedback Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="absolute top-2 right-2 z-50 p-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all duration-200 opacity-0 hover:opacity-100 group-hover:opacity-100"
+        className="absolute top-2 right-2 z-50 p-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-all duration-200 opacity-100"
         title="Add developer feedback"
       >
         <MessageSquare className="h-3 w-3" />
