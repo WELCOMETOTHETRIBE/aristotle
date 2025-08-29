@@ -8,8 +8,11 @@ import PageLayout, {
   PageSubtitle, 
   CardTitle, 
   PageSection, 
-  PageGrid 
+  PageGrid,
+  SectionTitle,
+  SectionDescription
 } from '../../components/PageLayout';
+import ModuleWidget from '../../components/ModuleWidgets';
 
 interface Framework {
   id: string;
@@ -161,6 +164,21 @@ export default function FrameworksPage() {
               </div>
             </Link>
           ))}
+        </PageGrid>
+      </PageSection>
+
+      {/* Interactive Widgets Preview */}
+      <PageSection>
+        <div className="text-center mb-8">
+          <SectionTitle>Interactive Practice Widgets</SectionTitle>
+          <SectionDescription>
+            Each framework includes interactive widgets for hands-on practice
+          </SectionDescription>
+        </div>
+        <PageGrid cols={3}>
+          <ModuleWidget moduleId="breathwork" moduleName="Breathwork" />
+          <ModuleWidget moduleId="focus_deepwork" moduleName="Focus Timer" />
+          <ModuleWidget moduleId="gratitude_awe" moduleName="Gratitude Journal" />
         </PageGrid>
       </PageSection>
     </PageLayout>
