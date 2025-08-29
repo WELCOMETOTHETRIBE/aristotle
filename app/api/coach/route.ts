@@ -19,7 +19,17 @@ const systemFor = (persona: string) => {
 export async function POST(req: Request) {
   try {
     const { persona = "stoic", userMessage = "" } = await req.json();
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY! });
+    
+    // Check if OpenAI API key is available
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey === "your_openai_api_key_here" || apiKey.includes("your_")) {
+      console.error('OpenAI API key not configured');
+      return Response.json({ 
+        reply: "I'm currently offline for maintenance. Please try again later." 
+      }, { status: 503 });
+    }
+
+    const openai = new OpenAI({ apiKey });
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       temperature: 0.6,
@@ -32,6 +42,8 @@ export async function POST(req: Request) {
     return Response.json({ reply });
   } catch (error) {
     console.error('Coach API error:', error);
-    return Response.json({ reply: "I'm having trouble responding right now. Please try again." }, { status: 500 });
+    return Response.json({ 
+      reply: "I'm having trouble responding right now. Please try again." 
+    }, { status: 500 });
   }
 } 
