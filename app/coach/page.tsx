@@ -104,21 +104,39 @@ export default function CoachPage() {
   }, [messages]);
 
   const generateAristotleResponse = async (userMessage: string): Promise<string> => {
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 2000));
-    
-    const responses = [
-      "Ah, an excellent question that touches upon the very nature of human excellence. Let me share with you what I have observed about this matter...",
-      "This brings to mind a fundamental principle I discovered in my studies: that virtue lies not in the extremes, but in the golden mean between excess and deficiency.",
-      "Consider this: every action we take is either moving us toward eudaimonia or away from it. Your situation presents an opportunity for growth.",
-      "In my Nicomachean Ethics, I wrote that 'we are what we repeatedly do. Excellence, then, is not an act, but a habit.' How does this apply to your circumstance?",
-      "The wise person seeks not just to know what is right, but to do what is right. Your question reveals a thoughtful mind seeking practical wisdom.",
-      "Let us examine this through the lens of the four cardinal virtues. Which virtue - wisdom, courage, justice, or temperance - is most relevant here?",
-      "Remember, my friend, that the goal of life is not happiness as a fleeting emotion, but eudaimonia - a life of flourishing and excellence.",
-      "This challenge you face is not an obstacle, but a teacher. What is it trying to teach you about yourself and your character?"
-    ];
-    
-    return responses[Math.floor(Math.random() * responses.length)];
+    try {
+      const response = await fetch('/api/coach', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          persona: 'aristotle',
+          userMessage: userMessage
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      return data.reply || "I apologize, but I'm having trouble responding right now. Please try again.";
+    } catch (error) {
+      console.error('Error calling AI API:', error);
+      // Fallback responses if API fails
+      const fallbackResponses = [
+        "Ah, an excellent question that touches upon the very nature of human excellence. Let me share with you what I have observed about this matter...",
+        "This brings to mind a fundamental principle I discovered in my studies: that virtue lies not in the extremes, but in the golden mean between excess and deficiency.",
+        "Consider this: every action we take is either moving us toward eudaimonia or away from it. Your situation presents an opportunity for growth.",
+        "In my Nicomachean Ethics, I wrote that 'we are what we repeatedly do. Excellence, then, is not an act, but a habit.' How does this apply to your circumstance?",
+        "The wise person seeks not just to know what is right, but to do what is right. Your question reveals a thoughtful mind seeking practical wisdom.",
+        "Let us examine this through the lens of the four cardinal virtues. Which virtue - wisdom, courage, justice, or temperance - is most relevant here?",
+        "Remember, my friend, that the goal of life is not happiness as a fleeting emotion, but eudaimonia - a life of flourishing and excellence.",
+        "This challenge you face is not an obstacle, but a teacher. What is it trying to teach you about yourself and your character?"
+      ];
+      return fallbackResponses[Math.floor(Math.random() * fallbackResponses.length)];
+    }
   };
 
   const handleSendMessage = async () => {
