@@ -3,7 +3,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brain, Shield, Scale, Leaf, Search, Settings, User, Home } from "lucide-react";
 import { motion } from "framer-motion";
-import FrameworksDropdown from "./FrameworksDropdown";
 
 const virtues = [
   {
@@ -70,7 +69,6 @@ export function VirtueNavigation() {
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Search">
                 <Search size={12} />
               </button>
-              <FrameworksDropdown />
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Settings">
                 <Settings size={12} />
               </button>
