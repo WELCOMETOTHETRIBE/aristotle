@@ -31,27 +31,64 @@ export const toneGradients: Record<string, string> = {
 };
 
 export function getToneGradient(tone: string): string {
-  return toneGradients[tone] || 'from-gray-700 via-gray-600 to-gray-700';
+  try {
+    const gradients: Record<string, string> = {
+      'gritty': 'from-red-900 via-red-800 to-red-900',
+      'honor': 'from-gray-900 via-gray-800 to-gray-900',
+      'calm': 'from-slate-700 via-slate-600 to-slate-700',
+      'order': 'from-blue-900 via-blue-800 to-blue-900',
+      'embodied': 'from-green-900 via-green-800 to-green-900',
+      'stewardship': 'from-emerald-900 via-emerald-800 to-emerald-900',
+      'disciplined': 'from-purple-900 via-purple-800 to-purple-900',
+      'devotional': 'from-indigo-900 via-indigo-800 to-indigo-900',
+      'communal': 'from-orange-900 via-orange-800 to-orange-900',
+      'crisp': 'from-cyan-900 via-cyan-800 to-cyan-900'
+    };
+    return gradients[tone] || gradients['calm'];
+  } catch (error) {
+    console.error('Error getting tone gradient:', error);
+    return 'from-slate-700 via-slate-600 to-slate-700';
+  }
 }
 
 export function getToneTextColor(tone: string): string {
-  const lightTones = ['crisp', 'calm'];
-  return lightTones.includes(tone) ? 'text-gray-100' : 'text-white';
+  try {
+    const colors: Record<string, string> = {
+      'gritty': 'text-red-100',
+      'honor': 'text-gray-100',
+      'calm': 'text-gray-100',
+      'order': 'text-blue-100',
+      'embodied': 'text-green-100',
+      'stewardship': 'text-emerald-100',
+      'disciplined': 'text-purple-100',
+      'devotional': 'text-indigo-100',
+      'communal': 'text-orange-100',
+      'crisp': 'text-cyan-100'
+    };
+    return colors[tone] || colors['calm'];
+  } catch (error) {
+    console.error('Error getting tone text color:', error);
+    return 'text-gray-100';
+  }
 }
 
 export function getToneAccentColor(tone: string): string {
-  const accentColors: Record<string, string> = {
-    gritty: 'border-gray-600',
-    honor: 'border-red-600',
-    calm: 'border-slate-500',
-    order: 'border-amber-600',
-    embodied: 'border-emerald-500',
-    stewardship: 'border-green-600',
-    disciplined: 'border-orange-600',
-    devotional: 'border-purple-600',
-    communal: 'border-blue-500',
-    crisp: 'border-indigo-500'
-  };
-  
-  return accentColors[tone] || 'border-gray-500';
+  try {
+    const colors: Record<string, string> = {
+      'gritty': 'border-red-500',
+      'honor': 'border-gray-500',
+      'calm': 'border-slate-500',
+      'order': 'border-blue-500',
+      'embodied': 'border-green-500',
+      'stewardship': 'border-emerald-500',
+      'disciplined': 'border-purple-500',
+      'devotional': 'border-indigo-500',
+      'communal': 'border-orange-500',
+      'crisp': 'border-cyan-500'
+    };
+    return colors[tone] || colors['calm'];
+  } catch (error) {
+    console.error('Error getting tone accent color:', error);
+    return 'border-slate-500';
+  }
 } 

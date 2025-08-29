@@ -17,7 +17,7 @@ export async function GET(
 
     return NextResponse.json(framework);
   } catch (error) {
-    console.error('Error loading framework:', error);
+    console.error('Error in framework API:', error);
     return NextResponse.json(
       { error: 'Failed to load framework' },
       { status: 500 }

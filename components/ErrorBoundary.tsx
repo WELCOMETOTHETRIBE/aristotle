@@ -1,129 +1,54 @@
-'use client';
+"use client";
+import { Component, ReactNode } from 'react';
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
+interface Props {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
 
-interface ErrorBoundaryState {
+interface State {
   hasError: boolean;
   error?: Error;
 }
 
-interface ErrorBoundaryProps {
-  children: React.ReactNode;
-  fallback?: React.ComponentType<{ error: Error; resetError: () => void }>;
-}
-
-export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
-  constructor(props: ErrorBoundaryProps) {
+export class ErrorBoundary extends Component<Props, State> {
+  constructor(props: Props) {
     super(props);
     this.state = { hasError: false };
   }
 
-  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+  static getDerivedStateFromError(error: Error): State {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  componentDidCatch(error: Error, errorInfo: any) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
-    
-    // Log to global error buffer for doctor
-    if (typeof window !== 'undefined') {
-      if (!window.__doctorErrors) {
-        window.__doctorErrors = [];
-      }
-      window.__doctorErrors.push({
-        timestamp: new Date().toISOString(),
-        type: 'react-error',
-        error: error.message,
-        stack: error.stack,
-        componentStack: errorInfo.componentStack || undefined
-      });
-    }
   }
-
-  resetError = () => {
-    this.setState({ hasError: false, error: undefined });
-  };
-
-  copyDiagnostic = () => {
-    if (this.state.error) {
-      const diagnostic = {
-        error: this.state.error.message,
-        stack: this.state.error.stack,
-        timestamp: new Date().toISOString(),
-        url: window.location.href
-      };
-      
-      navigator.clipboard.writeText(JSON.stringify(diagnostic, null, 2));
-      alert('Diagnostic copied to clipboard!');
-    }
-  };
 
   render() {
     if (this.state.hasError) {
       if (this.props.fallback) {
-        return <this.props.fallback error={this.state.error!} resetError={this.resetError} />;
+        return this.props.fallback;
       }
 
       return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50">
-          <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Something went wrong
-              </h2>
-              <p className="text-gray-600 mb-6">
-                {this.state.error?.message || 'An unexpected error occurred'}
-              </p>
-              <div className="space-y-3">
-                <Button onClick={this.resetError} className="w-full">
-                  Try again
-                </Button>
-                <Button 
-                  onClick={this.copyDiagnostic} 
-                  variant="outline" 
-                  className="w-full"
-                >
-                  Copy Diagnostic
-                </Button>
-              </div>
-            </div>
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-white mb-4">Something went wrong</h1>
+            <p className="text-gray-300 mb-6">
+              We encountered an unexpected error. Please try refreshing the page.
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              Refresh Page
+            </button>
           </div>
         </div>
       );
     }
 
     return this.props.children;
-  }
-}
-
-// Global error handler for unhandled promise rejections
-if (typeof window !== 'undefined') {
-  window.addEventListener('unhandledrejection', (event) => {
-    console.error('Unhandled promise rejection:', event.reason);
-    
-    if (!window.__doctorErrors) {
-      window.__doctorErrors = [];
-    }
-    
-    window.__doctorErrors.push({
-      timestamp: new Date().toISOString(),
-      type: 'unhandled-rejection',
-      error: event.reason?.message || String(event.reason),
-      stack: event.reason?.stack
-    });
-  });
-}
-
-declare global {
-  interface Window {
-    __doctorErrors?: Array<{
-      timestamp: string;
-      type: string;
-      error: string;
-      stack?: string;
-      componentStack?: string;
-      metadata?: Record<string, any>;
-    }>;
   }
 }

@@ -6,7 +6,7 @@ export async function GET() {
     const frameworks = getAllFrameworks();
     return NextResponse.json(frameworks);
   } catch (error) {
-    console.error('Error loading frameworks:', error);
+    console.error('Error in frameworks API:', error);
     return NextResponse.json(
       { error: 'Failed to load frameworks' },
       { status: 500 }
