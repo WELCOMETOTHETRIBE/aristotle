@@ -1,4 +1,6 @@
-import { getAllFrameworks } from '@/lib/frameworkMap';
+'use client';
+
+import { useEffect, useState } from 'react';
 import { getToneGradient, getToneTextColor } from '@/lib/tone';
 import Link from 'next/link';
 import PageLayout, { 
@@ -9,8 +11,112 @@ import PageLayout, {
   PageGrid 
 } from '@/components/PageLayout';
 
+interface Framework {
+  id: string;
+  name: string;
+  nav: {
+    tone: string;
+    badge: string;
+    emoji: string;
+  };
+  coreModules: string[];
+  featuredPractices: string[];
+}
+
 export default function FrameworksPage() {
-  const frameworks = getAllFrameworks();
+  const [frameworks, setFrameworks] = useState<Framework[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadFrameworks = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await fetch('/api/frameworks');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        setFrameworks(data);
+      } catch (err) {
+        console.error('Error loading frameworks:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load frameworks');
+        // Set fallback frameworks
+        setFrameworks([
+          {
+            id: 'spartan',
+            name: 'Spartan Agōgē',
+            nav: { tone: 'gritty', badge: 'Discipline', emoji: '🛡️' },
+            coreModules: ['strength', 'discipline', 'courage'],
+            featuredPractices: ['cold_exposure', 'adversity_training']
+          },
+          {
+            id: 'stoic',
+            name: 'Stoicism',
+            nav: { tone: 'calm', badge: 'Clarity', emoji: '🧱' },
+            coreModules: ['wisdom', 'temperance', 'reflection'],
+            featuredPractices: ['evening_reflection', 'memento_mori']
+          }
+        ]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadFrameworks();
+  }, []);
+
+  if (loading) {
+    return (
+      <PageLayout background="default">
+        <PageSection spacing="large">
+          <div className="text-center">
+            <PageTitle>Ancient Wisdom Frameworks</PageTitle>
+            <PageSubtitle className="mt-4 max-w-2xl mx-auto">
+              Loading frameworks...
+            </PageSubtitle>
+          </div>
+        </PageSection>
+        
+        <PageSection>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-48 bg-white/10 rounded-xl"></div>
+              </div>
+            ))}
+          </div>
+        </PageSection>
+      </PageLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <PageLayout background="default">
+        <PageSection spacing="large">
+          <div className="text-center">
+            <PageTitle>Ancient Wisdom Frameworks</PageTitle>
+            <PageSubtitle className="mt-4 max-w-2xl mx-auto">
+              Unable to load frameworks
+            </PageSubtitle>
+            <p className="text-gray-400 mt-4">
+              {error}
+            </p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="btn-primary mt-6"
+            >
+              Try Again
+            </button>
+          </div>
+        </PageSection>
+      </PageLayout>
+    );
+  }
 
   return (
     <PageLayout background="default">
