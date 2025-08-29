@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Clock, Star, ChevronRight, Play, CheckCircle, Award } from "lucide-react";
-import { GlassCard } from "./GlassCard";
 import { learningResources, getResourceById } from "@/lib/learning-resources";
 import { LearningResource } from "@/lib/types";
 
@@ -205,91 +204,82 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
   }
 
   return (
-    <GlassCard 
-      title="Resource Spotlight" 
-      subtitle="Today's wisdom"
-      action={
-        <BookOpen size={18} className="text-accent" />
-      }
-      className={`col-span-full ${className}`}
-    >
-      <div className="space-y-6">
-        {/* Featured Resource */}
-        <div className="flex items-start gap-6">
-          <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center shadow-lg">
-            <BookOpen size={28} className="text-black" />
-          </div>
-          <div className="flex-1 space-y-4">
-            <div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                {featuredResource.title}
-              </h3>
-              <p className="text-secondary leading-relaxed mb-3">
-                {featuredResource.description}
-              </p>
-              <div className="flex items-center gap-4 text-sm text-muted">
-                <span>by {featuredResource.author}</span>
-                <span className={`${getDifficultyColor(featuredResource.difficulty)}`}>
-                  {featuredResource.difficulty}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock size={14} />
-                  {featuredResource.estimatedTime} min
-                </span>
-              </div>
-            </div>
-            <div className="flex gap-3">
-              <button 
-                onClick={() => handleStartLearning(featuredResource)}
-                className="btn-primary-light flex items-center gap-2"
-              >
-                <Play size={16} />
-                Start Learning
-              </button>
-              <button className="btn-high-contrast">Learn More</button>
-            </div>
-          </div>
+    <div className={`space-y-6 ${className}`}>
+      {/* Featured Resource */}
+      <div className="flex items-start gap-6">
+        <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-accent to-accent-2 flex items-center justify-center shadow-lg">
+          <BookOpen size={28} className="text-black" />
         </div>
-
-        {/* All Resources Grid */}
-        <div>
-          <h4 className="text-lg font-semibold text-white mb-4">All Resources</h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {learningResources.map((resource) => (
-              <motion.div
-                key={resource.id}
-                whileHover={{ scale: 1.02 }}
-                className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
-                onClick={() => handleStartLearning(resource)}
-              >
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h5 className="font-semibold text-white">{resource.title}</h5>
-                    <p className="text-sm text-muted">by {resource.author}</p>
-                  </div>
-                  <ChevronRight size={16} className="text-muted" />
-                </div>
-                <p className="text-sm text-secondary mb-3 line-clamp-2">
-                  {resource.description}
-                </p>
-                <div className="flex items-center gap-3 text-xs text-muted">
-                  <span className={`${getDifficultyColor(resource.difficulty)}`}>
-                    {resource.difficulty}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock size={12} />
-                    {resource.estimatedTime} min
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Star size={12} />
-                    {resource.lessons.length} lessons
-                  </span>
-                </div>
-              </motion.div>
-            ))}
+        <div className="flex-1 space-y-4">
+          <div>
+            <h3 className="text-xl font-semibold text-white mb-2">
+              {featuredResource.title}
+            </h3>
+            <p className="text-secondary leading-relaxed mb-3">
+              {featuredResource.description}
+            </p>
+            <div className="flex items-center gap-4 text-sm text-muted">
+              <span>by {featuredResource.author}</span>
+              <span className={`${getDifficultyColor(featuredResource.difficulty)}`}>
+                {featuredResource.difficulty}
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock size={14} />
+                {featuredResource.estimatedTime} min
+              </span>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <button 
+              onClick={() => handleStartLearning(featuredResource)}
+              className="btn-primary-light flex items-center gap-2"
+            >
+              <Play size={16} />
+              Start Learning
+            </button>
+            <button className="btn-high-contrast">Learn More</button>
           </div>
         </div>
       </div>
-    </GlassCard>
+
+      {/* All Resources Grid */}
+      <div>
+        <h4 className="text-lg font-semibold text-white mb-4">All Resources</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {learningResources.map((resource) => (
+            <motion.div
+              key={resource.id}
+              whileHover={{ scale: 1.02 }}
+              className="bg-white/5 rounded-xl p-4 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+              onClick={() => handleStartLearning(resource)}
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div>
+                  <h5 className="font-semibold text-white">{resource.title}</h5>
+                  <p className="text-sm text-muted">by {resource.author}</p>
+                </div>
+                <ChevronRight size={16} className="text-muted" />
+              </div>
+              <p className="text-sm text-secondary mb-3 line-clamp-2">
+                {resource.description}
+              </p>
+              <div className="flex items-center gap-3 text-xs text-muted">
+                <span className={`${getDifficultyColor(resource.difficulty)}`}>
+                  {resource.difficulty}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Clock size={12} />
+                  {resource.estimatedTime} min
+                </span>
+                <span className="flex items-center gap-1">
+                  <Star size={12} />
+                  {resource.lessons.length} lessons
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </div>
   );
 } 
