@@ -1316,12 +1316,12 @@ export default function ModuleWidget({ moduleId, moduleName, frameworkTone }: {
             </div>
             <div>
               <h3 className="font-bold text-white text-lg capitalize">{moduleName}</h3>
-              <p className="text-sm text-gray-400">Interactive widget coming soon!</p>
+              <p className="text-sm text-gray-400">Interactive widget in development</p>
             </div>
           </div>
           <div className="text-center py-8 text-gray-400">
             <Sparkles className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Enhanced interactive features are being developed for this module.</p>
+            <p>Interactive features are being developed for this module.</p>
           </div>
         </motion.div>
       );

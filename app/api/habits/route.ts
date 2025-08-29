@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     
     const habits = await prisma.habit.findMany({
       where: { userId: user.id },
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const habitData = HabitSchema.parse(body);
     
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     
     const habit = await prisma.habit.create({
       data: {

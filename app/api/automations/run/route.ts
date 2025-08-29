@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user owns the automation
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     if (automation.userId !== user.id) {
       return NextResponse.json(
         { error: 'Unauthorized' },

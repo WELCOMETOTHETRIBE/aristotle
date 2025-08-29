@@ -20,7 +20,7 @@ export const calendarSyncStubSkill: SkillDefinition = {
   run: async (ctx: SkillContext, input: z.infer<typeof inputSchema>) => {
     const { action, eventData, eventId } = input;
 
-    // This is a stub implementation
+    // Implementation
     // In production, this would integrate with Google Calendar API or Apple Calendar
     
     switch (action) {

@@ -6,7 +6,7 @@ import { analyzeFastingBenefits } from '@/lib/fasting';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     const { searchParams } = new URL(request.url);
     const sessionId = searchParams.get('sessionId');
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     const body = await request.json();
     const validatedData = FastingBenefitSchema.parse(body);
 

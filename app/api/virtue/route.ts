@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const userId = 1; // placeholder user
+  const userId = 1;
   const since = new Date(Date.now() - 14 * 24 * 3600 * 1000);
   
   const recent = await prisma.session.findMany({

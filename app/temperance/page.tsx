@@ -3,15 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Play, Pause, RotateCcw, Heart, Timer, Target, Sparkles, ChevronDown, ChevronUp, Volume2, VolumeX, Leaf, Brain, Shield, Scale, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import PageLayout, { 
-  PageTitle, 
-  PageSubtitle, 
-  SectionTitle, 
-  CardTitle, 
-  CardDescription, 
-  PageSection, 
-  PageGrid 
-} from '@/components/PageLayout';
+import PageLayout from '@/components/PageLayout';
 
 interface VirtueBreathPattern {
   name: string;
@@ -244,9 +236,9 @@ export default function TemperancePage() {
   };
 
   return (
-    <PageLayout background="default">
+    <PageLayout title="Temperance" description="The Virtue of Moderation & Self-Control">
       {/* Header */}
-      <PageSection spacing="large">
+      <section className="page-section">
         <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft size={16} />
           Back to Home
@@ -258,29 +250,29 @@ export default function TemperancePage() {
               <Leaf className="w-10 h-10 text-white" />
             </div>
             <div>
-              <PageTitle size="large" className="bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
+              <h1 className="headline bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
                 Temperance
-              </PageTitle>
-              <PageSubtitle className="mt-2">
+              </h1>
+              <p className="subheadline mt-2">
                 The Virtue of Moderation & Self-Control
-              </PageSubtitle>
+              </p>
             </div>
           </div>
-          <CardDescription className="max-w-2xl mx-auto">
+          <p className="body-text max-w-2xl mx-auto">
             Cultivate balance, self-control, and inner harmony through mindful breathing practices.
-          </CardDescription>
+          </p>
         </div>
-      </PageSection>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Breath Timer */}
-          <PageSection>
-            <div className="glass rounded-2xl border border-white/10 p-8 text-center">
+          <section className="page-section">
+            <div className="glass-card p-8 text-center">
               <div className="flex items-center justify-center gap-3 mb-6">
                 <Timer className="w-6 h-6 text-purple-400" />
-                <CardTitle>Breath Timer</CardTitle>
+                <h2 className="section-title">Breath Timer</h2>
               </div>
               
               {/* Visual Breath Indicator */}
@@ -342,14 +334,14 @@ export default function TemperancePage() {
                 </div>
               </div>
             </div>
-          </PageSection>
+          </section>
 
           {/* Breath Patterns */}
-          <PageSection>
-            <div className="glass rounded-2xl border border-white/10 p-6">
+          <section className="page-section">
+            <div className="glass-card">
               <div className="flex items-center gap-3 mb-6">
                 <Target className="w-6 h-6 text-purple-400" />
-                <CardTitle>Breath Patterns</CardTitle>
+                <h2 className="section-title">Breath Patterns</h2>
               </div>
               
               <div className="space-y-4">
@@ -371,7 +363,7 @@ export default function TemperancePage() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
                           <IconComponent className="w-6 h-6" />
-                          <CardTitle className="text-lg">{pattern.name}</CardTitle>
+                          <h3 className="text-lg font-semibold">{pattern.name}</h3>
                         </div>
                         <button
                           onClick={(e) => {
@@ -384,19 +376,19 @@ export default function TemperancePage() {
                         </button>
                       </div>
                       
-                      <CardDescription className="mb-4">
+                      <p className="body-text mb-4">
                         {pattern.description}
-                      </CardDescription>
+                      </p>
                       
                       {isExpanded && (
                         <div className="mt-4 space-y-4">
                           <div>
-                            <CardTitle className="text-sm mb-2">Philosophical Context</CardTitle>
-                            <CardDescription>{pattern.philosophicalContext}</CardDescription>
+                            <h4 className="text-sm font-semibold mb-2">Philosophical Context</h4>
+                            <p className="body-text">{pattern.philosophicalContext}</p>
                           </div>
                           
                           <div>
-                            <CardTitle className="text-sm mb-2">Benefits</CardTitle>
+                            <h4 className="text-sm font-semibold mb-2">Benefits</h4>
                             <div className="flex flex-wrap gap-2">
                               {pattern.benefits.map((benefit) => (
                                 <span
@@ -410,7 +402,7 @@ export default function TemperancePage() {
                           </div>
                           
                           <div>
-                            <CardTitle className="text-sm mb-2">Pattern</CardTitle>
+                            <h4 className="text-sm font-semibold mb-2">Pattern</h4>
                             <div className="grid grid-cols-4 gap-2 text-sm">
                               <div className="text-center">
                                 <div className="font-bold">{pattern.pattern.inhale}s</div>
@@ -437,22 +429,22 @@ export default function TemperancePage() {
                 })}
               </div>
             </div>
-          </PageSection>
+          </section>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Current Pattern Info */}
-          <div className="glass rounded-2xl border border-white/10 p-6">
+          <div className="glass-card">
             <div className="flex items-center gap-3 mb-4">
               <Sparkles className="w-5 h-5 text-purple-400" />
-              <CardTitle>Current Pattern</CardTitle>
+              <h2 className="section-title">Current Pattern</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <CardTitle className="text-lg mb-2">{selectedPattern.name}</CardTitle>
-                <CardDescription>{selectedPattern.description}</CardDescription>
+                <h3 className="text-lg font-semibold mb-2">{selectedPattern.name}</h3>
+                <p className="body-text">{selectedPattern.description}</p>
               </div>
               
               <div className="space-y-2">
@@ -475,7 +467,7 @@ export default function TemperancePage() {
           </div>
 
           {/* Temperance Quote */}
-          <div className="glass rounded-2xl border border-white/10 p-6 bg-gradient-to-r from-purple-500/20 to-pink-600/20">
+          <div className="glass-card bg-gradient-to-r from-purple-500/20 to-pink-600/20">
             <blockquote className="text-lg italic text-white mb-4 leading-relaxed">
               "Temperance is the virtue that moderates the attraction of pleasures and provides balance in the use of created goods."
             </blockquote>
@@ -483,10 +475,10 @@ export default function TemperancePage() {
           </div>
 
           {/* Progress Stats */}
-          <div className="glass rounded-2xl border border-white/10 p-6">
+          <div className="glass-card">
             <div className="flex items-center gap-3 mb-4">
               <Heart className="w-5 h-5 text-purple-400" />
-              <CardTitle>Your Progress</CardTitle>
+              <h2 className="section-title">Your Progress</h2>
             </div>
             
             <div className="space-y-4">

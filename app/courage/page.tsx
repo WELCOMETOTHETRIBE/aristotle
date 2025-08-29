@@ -4,15 +4,7 @@ import AuroraBackground from "@/components/AuroraBackground";
 import { GlassCard } from "@/components/GlassCard";
 import { Shield, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, Flame, Zap, Mountain } from "lucide-react";
 import Link from "next/link";
-import PageLayout, { 
-  PageTitle, 
-  PageSubtitle, 
-  SectionTitle, 
-  CardTitle, 
-  CardDescription, 
-  PageSection, 
-  PageGrid 
-} from '@/components/PageLayout';
+import PageLayout from '@/components/PageLayout';
 
 const practices = [
   {
@@ -91,11 +83,11 @@ const practices = [
 
 export default function CouragePage() {
   return (
-    <PageLayout background="default">
+    <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
       <AuroraBackground />
       
       {/* Header */}
-      <PageSection spacing="large">
+      <section className="page-section">
         <Link href="/academy" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft size={16} />
           Back to Academy
@@ -106,10 +98,10 @@ export default function CouragePage() {
             <Shield size={32} className="text-white" />
           </div>
           <div>
-            <PageTitle size="default">Courage</PageTitle>
-            <PageSubtitle className="mt-2">
+            <h1 className="headline">Courage</h1>
+            <p className="subheadline mt-2">
               The Virtue of Bravery & Strength
-            </PageSubtitle>
+            </p>
             <p className="text-gray-300 mt-2">
               The virtue of facing challenges with bravery and inner strength
             </p>
@@ -117,25 +109,25 @@ export default function CouragePage() {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="glass-card p-4 text-center">
             <div className="text-2xl font-semibold text-white">4</div>
             <div className="text-sm text-gray-400">Practices</div>
           </div>
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="glass-card p-4 text-center">
             <div className="text-2xl font-semibold text-white">68%</div>
             <div className="text-sm text-gray-400">Progress</div>
           </div>
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="glass-card p-4 text-center">
             <div className="text-2xl font-semibold text-white">12</div>
             <div className="text-sm text-gray-400">Day Streak</div>
           </div>
         </div>
-      </PageSection>
+      </section>
 
       {/* Practices Grid */}
-      <PageSection>
+      <section className="page-section">
         <div className="flex items-center justify-between mb-8">
-          <SectionTitle>Courage Practices</SectionTitle>
+          <h2 className="section-title">Courage Practices</h2>
           <div className="flex gap-2">
             <button className="btn-secondary btn-small">All</button>
             <button className="btn-secondary btn-small">Beginner</button>
@@ -143,7 +135,7 @@ export default function CouragePage() {
           </div>
         </div>
 
-        <PageGrid cols={2}>
+        <div className="page-grid">
           {practices.map((practice) => (
             <GlassCard
               key={practice.id}
@@ -167,7 +159,7 @@ export default function CouragePage() {
               <div className="space-y-4">
                 {/* Benefits */}
                 <div>
-                  <CardTitle className="mb-2">Benefits</CardTitle>
+                  <h3 className="text-sm font-semibold mb-2">Benefits</h3>
                   <div className="flex flex-wrap gap-2">
                     {practice.benefits.map((benefit) => (
                       <span
@@ -182,10 +174,10 @@ export default function CouragePage() {
 
                 {/* Cultural Context */}
                 <div>
-                  <CardTitle className="mb-2">Cultural Context</CardTitle>
-                  <CardDescription className="line-clamp-2">
+                  <h3 className="text-sm font-semibold mb-2">Cultural Context</h3>
+                  <p className="body-text line-clamp-2">
                     {practice.culturalContext}
-                  </CardDescription>
+                  </p>
                 </div>
 
                 {/* Action */}
@@ -201,11 +193,11 @@ export default function CouragePage() {
               </div>
             </GlassCard>
           ))}
-        </PageGrid>
-      </PageSection>
+        </div>
+      </section>
 
       {/* Courage Quote */}
-      <PageSection>
+      <section className="page-section">
         <GlassCard
           title="Courage Quote"
           subtitle="Ancient wisdom for modern bravery"
@@ -215,19 +207,19 @@ export default function CouragePage() {
               "Courage is not the absence of fear, but the triumph over it."
             </blockquote>
             <cite className="text-red-300 font-medium">— Nelson Mandela</cite>
-            <CardDescription className="max-w-2xl mx-auto">
+            <p className="body-text max-w-2xl mx-auto">
               True courage is not about being fearless, but about acting with 
               integrity and strength even when we are afraid. It's the choice 
               to move forward despite uncertainty and discomfort.
-            </CardDescription>
+            </p>
           </div>
         </GlassCard>
-      </PageSection>
+      </section>
 
       {/* Related Resources */}
-      <PageSection>
-        <SectionTitle>Related Resources</SectionTitle>
-        <PageGrid cols={3}>
+      <section className="page-section">
+        <h2 className="section-title">Related Resources</h2>
+        <div className="page-grid">
           <GlassCard
             title="Books"
             subtitle="Essential readings"
@@ -288,8 +280,8 @@ export default function CouragePage() {
               </div>
             </div>
           </GlassCard>
-        </PageGrid>
-      </PageSection>
+        </div>
+      </section>
     </PageLayout>
   );
 } 

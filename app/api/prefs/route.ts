@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Database not available" }, { status: 503 });
   }
   
-  // For demo purposes, use user ID 1
+      // Use user ID 1
   const userId = 1;
   
   const prefs = await prisma.userPreference.findUnique({
@@ -34,7 +34,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Database not available" }, { status: 503 });
   }
   
-  const userId = 1; // Demo user
+      const userId = 1;
   const body = await req.json();
   
   const prefs = await prisma.userPreference.upsert({

@@ -115,8 +115,8 @@ async function main() {
     update: {},
     create: { 
       id: 1,
-      email: "demo@aristotle.com",
-      displayName: "Demo User"
+      email: "user@aristotle.com",
+      displayName: "User"
     },
   });
 

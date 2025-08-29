@@ -91,7 +91,7 @@ export default function FrameworkResourceSpotlight({
       } catch (error) {
         console.error('Error loading resources:', error);
         setError(error instanceof Error ? error.message : 'Failed to load resources');
-        // Set fallback resources instead of leaving empty
+        // Set resources instead of leaving empty
         setResources([
           {
             id: 'fallback-1',

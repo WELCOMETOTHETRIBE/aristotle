@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { skill, args } = SkillInvocationSchema.parse(body);
 
-    // Get or create user (for demo purposes)
-    const user = await getOrCreateUser('Demo User');
+    // Get or create user
+    const user = await getOrCreateUser('User');
 
     // Get skill definition
     const skillDef = getSkill(skill);

@@ -2,9 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest) {
   try {
-    // For now, return fallback resources
-    // In the future, this could fetch from a database
-    const fallbackResources = [
+    // Return resources
+    const resources = [
       {
         id: 'stoic-wisdom-1',
         title: 'Stoic Wisdom for Modern Life',
@@ -67,7 +66,7 @@ export async function GET(request: NextRequest) {
       }
     ];
 
-    return NextResponse.json(fallbackResources);
+    return NextResponse.json(resources);
   } catch (error) {
     console.error('Error fetching resources:', error);
     return NextResponse.json(

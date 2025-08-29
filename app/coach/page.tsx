@@ -3,15 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Mic, Send, Brain, Shield, Scale, Leaf, MessageCircle, Volume2, VolumeX, RotateCcw, Lightbulb, Heart, Zap, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import PageLayout, { 
-  PageTitle, 
-  PageSubtitle, 
-  SectionTitle, 
-  CardTitle, 
-  CardDescription, 
-  PageSection, 
-  PageGrid 
-} from '@/components/PageLayout';
+import PageLayout from '@/components/PageLayout';
 
 interface Message {
   id: string;
@@ -169,7 +161,7 @@ export default function CoachPage() {
       const question = virtueData.questions[Math.floor(Math.random() * virtueData.questions.length)];
       const message: Message = {
         id: Date.now().toString(),
-        content: `Let us explore ${virtue.toLowerCase}. ${question}`,
+        content: `Let us explore ${virtue.toLowerCase()}. ${question}`,
         sender: 'aristotle',
         timestamp: new Date(),
         type: 'question',
@@ -194,9 +186,9 @@ export default function CoachPage() {
   };
 
   return (
-    <PageLayout background="default">
+    <PageLayout title="Aristotle AI" description="Your philosophical guide for cultivating wisdom, courage, justice, and temperance">
       {/* Header */}
-      <PageSection spacing="large">
+      <section className="page-section">
         <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft size={16} />
           Back to Home
@@ -208,30 +200,30 @@ export default function CoachPage() {
               <Sparkles className="w-10 h-10 text-white" />
             </div>
             <div>
-              <PageTitle size="large" className="bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
+              <h1 className="headline bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
                 Aristotle AI
-              </PageTitle>
-              <PageSubtitle className="mt-2">
+              </h1>
+              <p className="subheadline mt-2">
                 Your philosophical guide for cultivating wisdom, courage, justice, and temperance
-              </PageSubtitle>
+              </p>
             </div>
           </div>
         </div>
-      </PageSection>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Chat Area */}
         <div className="lg:col-span-3">
-          <div className="glass rounded-2xl border border-white/10 shadow-xl h-[600px] flex flex-col">
+          <div className="glass-card shadow-xl h-[600px] flex flex-col">
             {/* Chat Header */}
             <div className="border-b border-white/10 p-6">
               <div className="flex items-center gap-3">
                 <MessageCircle className="w-6 h-6 text-amber-400" />
                 <div>
-                  <CardTitle>Philosophical Dialogue</CardTitle>
-                  <CardDescription>
+                  <h2 className="section-title">Philosophical Dialogue</h2>
+                  <p className="body-text">
                     Engage in Socratic dialogue with Aristotle to explore virtue and wisdom
-                  </CardDescription>
+                  </p>
                 </div>
               </div>
             </div>
@@ -325,14 +317,14 @@ export default function CoachPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Virtue Selection */}
-          <div className="glass rounded-2xl border border-white/10 p-6">
+          <div className="glass-card">
             <div className="flex items-center gap-3 mb-4">
               <Shield className="w-5 h-5 text-amber-400" />
-              <CardTitle>Explore Virtues</CardTitle>
+              <h2 className="section-title">Explore Virtues</h2>
             </div>
-            <CardDescription className="mb-4">
+            <p className="body-text mb-4">
               Choose a virtue to focus our discussion
-            </CardDescription>
+            </p>
             <div className="space-y-3">
               {virtues.map((virtue) => {
                 const IconComponent = virtue.icon;
@@ -360,10 +352,10 @@ export default function CoachPage() {
           </div>
 
           {/* Quick Prompts */}
-          <div className="glass rounded-2xl border border-white/10 p-6">
+          <div className="glass-card">
             <div className="flex items-center gap-3 mb-4">
               <Lightbulb className="w-5 h-5 text-amber-400" />
-              <CardTitle>Conversation Starters</CardTitle>
+              <h2 className="section-title">Conversation Starters</h2>
             </div>
             <div className="space-y-2">
               {philosophicalPrompts.map((prompt, index) => (
@@ -379,7 +371,7 @@ export default function CoachPage() {
           </div>
 
           {/* Aristotle's Wisdom */}
-          <div className="glass rounded-2xl border border-white/10 p-6 bg-gradient-to-r from-amber-500/20 to-orange-600/20">
+          <div className="glass-card bg-gradient-to-r from-amber-500/20 to-orange-600/20">
             <blockquote className="text-lg italic text-white mb-4 leading-relaxed">
               "The more you know, the more you realize you don't know."
             </blockquote>

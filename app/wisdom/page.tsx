@@ -1,18 +1,8 @@
 'use client';
 
-import AuroraBackground from "@/components/AuroraBackground";
-import { GlassCard } from "@/components/GlassCard";
 import { Brain, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star } from "lucide-react";
 import Link from "next/link";
-import PageLayout, { 
-  PageTitle, 
-  PageSubtitle, 
-  SectionTitle, 
-  CardTitle, 
-  CardDescription, 
-  PageSection, 
-  PageGrid 
-} from '@/components/PageLayout';
+import PageLayout from '@/components/PageLayout';
 
 const practices = [
   {
@@ -91,11 +81,9 @@ const practices = [
 
 export default function WisdomPage() {
   return (
-    <PageLayout background="default">
-      <AuroraBackground />
-      
+    <PageLayout title="Wisdom" description="The Virtue of Knowledge & Understanding">
       {/* Header */}
-      <PageSection spacing="large">
+      <div className="page-section">
         <Link href="/academy" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft size={16} />
           Back to Academy
@@ -106,50 +94,51 @@ export default function WisdomPage() {
             <Brain size={32} className="text-white drop-shadow-sm" />
           </div>
           <div>
-            <PageTitle size="default">Wisdom</PageTitle>
-            <PageSubtitle className="mt-2">
+            <h1 className="headline">Wisdom</h1>
+            <p className="subheadline mt-2">
               The Virtue of Knowledge & Understanding
-            </PageSubtitle>
-            <p className="text-gray-300 mt-2">
+            </p>
+            <p className="body-text mt-2">
               The virtue of knowledge, understanding, and sound judgment
             </p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="card-base text-center">
             <div className="text-2xl font-semibold text-white">4</div>
             <div className="text-sm text-gray-400">Practices</div>
           </div>
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="card-base text-center">
             <div className="text-2xl font-semibold text-white">72%</div>
             <div className="text-sm text-gray-400">Progress</div>
           </div>
-          <div className="glass rounded-xl p-4 text-center">
+          <div className="card-base text-center">
             <div className="text-2xl font-semibold text-white">15</div>
             <div className="text-sm text-gray-400">Day Streak</div>
           </div>
         </div>
-      </PageSection>
+      </div>
 
       {/* Practices Grid */}
-      <PageSection>
+      <div className="page-section">
         <div className="flex items-center justify-between mb-8">
-          <SectionTitle>Wisdom Practices</SectionTitle>
+          <h2 className="section-title">Wisdom Practices</h2>
           <div className="flex gap-2">
-            <button className="btn-secondary btn-small">All</button>
-            <button className="btn-secondary btn-small">Beginner</button>
-            <button className="btn-secondary btn-small">Advanced</button>
+            <button className="btn-secondary text-sm px-3 py-1">All</button>
+            <button className="btn-secondary text-sm px-3 py-1">Beginner</button>
+            <button className="btn-secondary text-sm px-3 py-1">Advanced</button>
           </div>
         </div>
 
-        <PageGrid cols={2}>
+        <div className="page-grid page-grid-cols-2">
           {practices.map((practice) => (
-            <GlassCard
+            <div
               key={practice.id}
-              title={practice.title}
-              subtitle={practice.description}
-              action={
+              className="card-base hover-lift cursor-pointer"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-white text-lg">{practice.title}</h3>
                 <div className="flex items-center gap-2">
                   <Clock size={14} className="text-gray-400" />
                   <span className="text-xs text-gray-400">{practice.duration}m</span>
@@ -161,13 +150,14 @@ export default function WisdomPage() {
                     {practice.difficulty}
                   </div>
                 </div>
-              }
-              className="group hover:scale-105 transition-transform duration-300 cursor-pointer"
-            >
+              </div>
+              
+              <p className="body-text mb-4">{practice.description}</p>
+              
               <div className="space-y-4">
                 {/* Benefits */}
                 <div>
-                  <CardTitle className="mb-2">Benefits</CardTitle>
+                  <h4 className="font-semibold text-white mb-2">Benefits</h4>
                   <div className="flex flex-wrap gap-2">
                     {practice.benefits.map((benefit) => (
                       <span
@@ -182,15 +172,15 @@ export default function WisdomPage() {
 
                 {/* Cultural Context */}
                 <div>
-                  <CardTitle className="mb-2">Cultural Context</CardTitle>
-                  <CardDescription className="line-clamp-2">
+                  <h4 className="font-semibold text-white mb-2">Cultural Context</h4>
+                  <p className="body-text line-clamp-2">
                     {practice.culturalContext}
-                  </CardDescription>
+                  </p>
                 </div>
 
                 {/* Action */}
                 <div className="flex items-center justify-between pt-2">
-                  <button className="btn-primary btn-small">
+                  <button className="btn-primary text-sm px-3 py-1">
                     <Play size={14} className="mr-1" />
                     Start Practice
                   </button>
@@ -199,39 +189,38 @@ export default function WisdomPage() {
                   </button>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           ))}
-        </PageGrid>
-      </PageSection>
+        </div>
+      </div>
 
       {/* Wisdom Quote */}
-      <PageSection>
-        <GlassCard
-          title="Wisdom Quote"
-          subtitle="Ancient wisdom for modern reflection"
-        >
+      <div className="page-section">
+        <div className="card-base">
+          <h3 className="font-bold text-white text-lg mb-2">Wisdom Quote</h3>
+          <p className="body-text mb-4">Ancient wisdom for modern reflection</p>
+          
           <div className="text-center space-y-4">
             <blockquote className="text-xl text-white italic">
               "The only true wisdom is in knowing you know nothing."
             </blockquote>
             <cite className="text-blue-300 font-medium">— Socrates</cite>
-            <CardDescription className="max-w-2xl mx-auto">
+            <p className="body-text max-w-2xl mx-auto">
               This famous quote from Socrates embodies the essence of wisdom: 
               intellectual humility and the recognition that true knowledge begins 
               with acknowledging our limitations and being open to learning.
-            </CardDescription>
+            </p>
           </div>
-        </GlassCard>
-      </PageSection>
+        </div>
+      </div>
 
       {/* Related Resources */}
-      <PageSection>
-        <SectionTitle>Related Resources</SectionTitle>
-        <PageGrid cols={3}>
-          <GlassCard
-            title="Books"
-            subtitle="Essential readings"
-          >
+      <div className="page-section">
+        <h2 className="section-title">Related Resources</h2>
+        <div className="page-grid page-grid-cols-3">
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Books</h3>
+            <p className="body-text mb-4">Essential readings</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <BookOpen size={14} className="text-blue-300" />
@@ -246,12 +235,11 @@ export default function WisdomPage() {
                 <span className="text-white">"Nicomachean Ethics" by Aristotle</span>
               </div>
             </div>
-          </GlassCard>
+          </div>
 
-          <GlassCard
-            title="Teachers"
-            subtitle="Wisdom guides"
-          >
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Teachers</h3>
+            <p className="body-text mb-4">Wisdom guides</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-blue-300" />
@@ -266,12 +254,11 @@ export default function WisdomPage() {
                 <span className="text-white">Aristotle</span>
               </div>
             </div>
-          </GlassCard>
+          </div>
 
-          <GlassCard
-            title="Progress"
-            subtitle="Your wisdom journey"
-          >
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Progress</h3>
+            <p className="body-text mb-4">Your wisdom journey</p>
             <div className="space-y-4">
               <div className="text-center">
                 <div className="text-2xl font-semibold text-white">72%</div>
@@ -287,9 +274,9 @@ export default function WisdomPage() {
                 ))}
               </div>
             </div>
-          </GlassCard>
-        </PageGrid>
-      </PageSection>
+          </div>
+        </div>
+      </div>
     </PageLayout>
   );
 } 

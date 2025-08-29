@@ -6,7 +6,7 @@ import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     
     const goals = await prisma.goal.findMany({
       where: { userId: user.id },
@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const goalData = GoalSchema.parse(body);
     
-    const user = await getOrCreateUser('Demo User');
+    const user = await getOrCreateUser('User');
     
     const goal = await prisma.goal.create({
       data: {

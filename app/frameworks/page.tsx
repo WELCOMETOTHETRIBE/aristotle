@@ -4,15 +4,7 @@ import { useEffect, useState } from 'react';
 import { getToneGradient, getToneTextColor } from '../../lib/tone';
 import Link from 'next/link';
 import ModuleWidget from '../../components/ModuleWidgets';
-import PageLayout, { 
-  PageTitle, 
-  PageSubtitle, 
-  CardTitle, 
-  PageSection, 
-  PageGrid,
-  SectionTitle,
-  SectionDescription
-} from '../../components/PageLayout';
+import PageLayout from '../../components/PageLayout';
 
 interface Framework {
   id: string;
@@ -74,17 +66,17 @@ export default function FrameworksPage() {
 
   if (loading) {
     return (
-      <PageLayout background="default">
-        <PageSection spacing="large">
+      <PageLayout title="Ancient Wisdom Frameworks" description="Loading frameworks...">
+        <section className="page-section">
           <div className="text-center">
-            <PageTitle>Ancient Wisdom Frameworks</PageTitle>
-            <PageSubtitle className="mt-4 max-w-2xl mx-auto">
+            <h1 className="headline">Ancient Wisdom Frameworks</h1>
+            <p className="subheadline mt-4 max-w-2xl mx-auto">
               Loading frameworks...
-            </PageSubtitle>
+            </p>
           </div>
-        </PageSection>
+        </section>
         
-        <PageSection>
+        <section className="page-section">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
               <div key={i} className="animate-pulse">
@@ -92,20 +84,20 @@ export default function FrameworksPage() {
               </div>
             ))}
           </div>
-        </PageSection>
+        </section>
       </PageLayout>
     );
   }
 
   if (error) {
     return (
-      <PageLayout background="default">
-        <PageSection spacing="large">
+      <PageLayout title="Ancient Wisdom Frameworks" description="Unable to load frameworks">
+        <section className="page-section">
           <div className="text-center">
-            <PageTitle>Ancient Wisdom Frameworks</PageTitle>
-            <PageSubtitle className="mt-4 max-w-2xl mx-auto">
+            <h1 className="headline">Ancient Wisdom Frameworks</h1>
+            <p className="subheadline mt-4 max-w-2xl mx-auto">
               Unable to load frameworks
-            </PageSubtitle>
+            </p>
             <p className="text-gray-400 mt-4">
               {error}
             </p>
@@ -116,24 +108,24 @@ export default function FrameworksPage() {
               Try Again
             </button>
           </div>
-        </PageSection>
+        </section>
       </PageLayout>
     );
   }
 
   return (
-    <PageLayout background="default">
-      <PageSection spacing="large">
+    <PageLayout title="Ancient Wisdom Frameworks" description="Explore timeless traditions and their practical applications for modern life">
+      <section className="page-section">
         <div className="text-center">
-          <PageTitle>Ancient Wisdom Frameworks</PageTitle>
-          <PageSubtitle className="mt-4 max-w-2xl mx-auto">
+          <h1 className="headline">Ancient Wisdom Frameworks</h1>
+          <p className="subheadline mt-4 max-w-2xl mx-auto">
             Explore timeless traditions and their practical applications for modern life
-          </PageSubtitle>
+          </p>
         </div>
-      </PageSection>
+      </section>
 
-      <PageSection>
-        <PageGrid cols="auto">
+      <section className="page-section">
+        <div className="page-grid">
           {frameworks.map((framework) => (
             <Link
               key={framework.id}
@@ -143,9 +135,9 @@ export default function FrameworksPage() {
               <div className={`relative overflow-hidden rounded-xl bg-gradient-to-br ${getToneGradient(framework.nav.tone)} p-6 transition-all duration-300 group-hover:scale-105 group-hover:shadow-2xl h-full`}>
                 <div className="text-center">
                   <div className="text-4xl mb-3">{framework.nav.emoji}</div>
-                  <CardTitle className={`mb-2 ${getToneTextColor(framework.nav.tone)}`}>
+                  <h2 className={`text-xl font-semibold mb-2 ${getToneTextColor(framework.nav.tone)}`}>
                     {framework.name}
-                  </CardTitle>
+                  </h2>
                   <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm">
                     <span className={`text-sm font-medium ${getToneTextColor(framework.nav.tone)}`}>
                       {framework.nav.badge}
@@ -164,23 +156,23 @@ export default function FrameworksPage() {
               </div>
             </Link>
           ))}
-        </PageGrid>
-      </PageSection>
+        </div>
+      </section>
 
       {/* Interactive Widgets Preview */}
-      <PageSection>
+      <section className="page-section">
         <div className="text-center mb-8">
-          <SectionTitle>Interactive Practice Widgets</SectionTitle>
-          <SectionDescription>
+          <h2 className="section-title">Interactive Practice Widgets</h2>
+          <p className="section-description">
             Each framework includes interactive widgets for hands-on practice
-          </SectionDescription>
+          </p>
         </div>
-        <PageGrid cols={3}>
+        <div className="page-grid">
           <ModuleWidget moduleId="breathwork" moduleName="Breathwork" />
           <ModuleWidget moduleId="focus_deepwork" moduleName="Focus Timer" />
           <ModuleWidget moduleId="gratitude_awe" moduleName="Gratitude Journal" />
-        </PageGrid>
-      </PageSection>
+        </div>
+      </section>
     </PageLayout>
   );
 } 

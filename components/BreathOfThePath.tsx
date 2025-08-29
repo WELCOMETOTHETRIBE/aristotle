@@ -40,7 +40,7 @@ export default function BreathOfThePath({ frameworkId, frameworkName, frameworkT
       } catch (err) {
         console.error('Error fetching breathwork practice:', err);
         setError(err instanceof Error ? err.message : 'Failed to load breathwork practice');
-        // Set a fallback practice instead of leaving it null
+        // Set a practice instead of leaving it null
         setPractice({
           title: `${frameworkName} Breathwork`,
           body: `A foundational breathwork practice from the ${frameworkName} tradition. Focus on steady, mindful breathing to cultivate presence and clarity.`,

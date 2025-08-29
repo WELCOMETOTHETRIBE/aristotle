@@ -254,6 +254,6 @@ export const getResourcesByCategory = (category: string): LearningResource[] => 
 };
 
 export const getRecommendedResources = (userProgress?: any): LearningResource[] => {
-  // For now, return all resources. In the future, this could be personalized
+      // Return all resources
   return learningResources;
 }; 

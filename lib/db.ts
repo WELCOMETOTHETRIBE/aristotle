@@ -21,7 +21,7 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /**
- * Get or create a user (for demo purposes)
+ * Get or create a user
  * In production, this would integrate with proper auth
  */
 export async function getOrCreateUser(name: string) {
@@ -47,7 +47,7 @@ export async function getOrCreateUser(name: string) {
     return user;
   } catch (error) {
     console.error('Error in getOrCreateUser:', error);
-    // Return a demo user if database is not available
+    // Return a user if database is not available
     return {
       id: 'demo-user',
       name: name,

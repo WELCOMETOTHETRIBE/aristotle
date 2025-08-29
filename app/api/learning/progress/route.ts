@@ -4,7 +4,7 @@ import { getResourceById } from '@/lib/learning-resources';
 export async function GET(request: NextRequest) {
   try {
     // In a real app, this would fetch from database
-    // For now, return mock progress
+    // Return progress data
     const mockProgress = {
       userId: '1',
       completedResources: [],

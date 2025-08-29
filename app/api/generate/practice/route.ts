@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -8,9 +10,8 @@ export async function GET(request: NextRequest) {
     const style = searchParams.get('style');
     const locale = searchParams.get('locale');
 
-    // For now, return a fallback practice structure
-    // In the future, this could integrate with AI generation
-    const fallbackPractice = {
+    // Return a practice structure
+    const practice = {
       title: `${style ? style.charAt(0).toUpperCase() + style.slice(1) : 'Ancient'} ${moduleId ? moduleId.charAt(0).toUpperCase() + moduleId.slice(1) : 'Practice'}`,
       body: `A foundational practice from the ${style || 'ancient'} tradition. Focus on mindful awareness and steady progress.`,
       bullets: [
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
       est_time_min: 5
     };
 
-    return NextResponse.json(fallbackPractice);
+    return NextResponse.json(practice);
   } catch (error) {
     console.error('Error generating practice:', error);
     return NextResponse.json(

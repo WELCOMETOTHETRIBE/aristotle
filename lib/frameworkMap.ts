@@ -2,23 +2,16 @@ import fs from "node:fs";
 import path from "node:path";
 import { FrameworkMap, FrameworkRecord, FrameworkIndex, FrameworkByModule } from './types/framework';
 
-// Handle cache function availability
-let simpleCache: any;
-try {
-  const react = require('react');
-  simpleCache = react.cache;
-} catch {
-  // Fallback for Node.js environments
-  simpleCache = (fn: any) => {
-    let cached: any = null;
-    return (...args: any[]) => {
-      if (!cached) {
-        cached = fn(...args);
-      }
-      return cached;
-    };
+// Simple cache implementation
+const simpleCache = (fn: any) => {
+  let cached: any = null;
+  return (...args: any[]) => {
+    if (!cached) {
+      cached = fn(...args);
+    }
+    return cached;
   };
-}
+};
 
 export const loadFrameworkMap = simpleCache((): FrameworkMap => {
   try {

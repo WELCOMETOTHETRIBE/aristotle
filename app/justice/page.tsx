@@ -3,15 +3,7 @@
 import { useState } from 'react';
 import { Scale, Heart, Users, Target, Sparkles, ArrowRight, Play, Calendar, Award, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
-import PageLayout, { 
-  PageTitle, 
-  PageSubtitle, 
-  SectionTitle, 
-  CardTitle, 
-  CardDescription, 
-  PageSection, 
-  PageGrid 
-} from '@/components/PageLayout';
+import PageLayout from '@/components/PageLayout';
 
 const justicePractices = [
   {
@@ -83,9 +75,9 @@ export default function JusticePage() {
   const [selectedPractice, setSelectedPractice] = useState(justicePractices[0]);
 
   return (
-    <PageLayout background="default">
+    <PageLayout title="Justice" description="The Virtue of Fairness & Right Relationships">
       {/* Header */}
-      <PageSection spacing="large">
+      <section className="page-section">
         <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft size={16} />
           Back to Home
@@ -97,29 +89,29 @@ export default function JusticePage() {
               <Scale className="w-10 h-10 text-white" />
             </div>
             <div>
-              <PageTitle size="large" className="bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
+              <h1 className="headline bg-gradient-to-r from-green-400 to-emerald-500 bg-clip-text text-transparent">
                 Justice
-              </PageTitle>
-              <PageSubtitle className="mt-2">
+              </h1>
+              <p className="subheadline mt-2">
                 The Virtue of Fairness & Right Relationships
-              </PageSubtitle>
+              </p>
             </div>
           </div>
-          <CardDescription className="max-w-2xl mx-auto">
+          <p className="body-text max-w-2xl mx-auto">
             Build meaningful connections, serve others, and create harmony in your community.
-          </CardDescription>
+          </p>
         </div>
-      </PageSection>
+      </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-8">
           {/* Daily Practice */}
-          <PageSection>
-            <div className="glass rounded-2xl border border-white/10 p-6">
+          <section className="page-section">
+            <div className="glass-card">
               <div className="flex items-center gap-3 mb-6">
                 <Target className="w-6 h-6 text-green-400" />
-                <CardTitle>Daily Practice</CardTitle>
+                <h2 className="section-title">Daily Practice</h2>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -137,11 +129,11 @@ export default function JusticePage() {
                     >
                       <div className="flex items-center gap-3 mb-3">
                         <IconComponent className="w-6 h-6" />
-                        <CardTitle className="text-lg">{practice.title}</CardTitle>
+                        <h3 className="text-lg font-semibold">{practice.title}</h3>
                       </div>
-                      <CardDescription className="mb-4">
+                      <p className="body-text mb-4">
                         {practice.description}
-                      </CardDescription>
+                      </p>
                       <div className="flex items-center justify-between text-sm">
                         <span className="opacity-70">{practice.duration}</span>
                         <span className="px-2 py-1 rounded-full bg-white/20 text-xs">
@@ -160,26 +152,26 @@ export default function JusticePage() {
                 </button>
               </div>
             </div>
-          </PageSection>
+          </section>
 
           {/* Relationship Areas */}
-          <PageSection>
-            <div className="glass rounded-2xl border border-white/10 p-6">
+          <section className="page-section">
+            <div className="glass-card">
               <div className="flex items-center gap-3 mb-6">
                 <Users className="w-6 h-6 text-green-400" />
-                <CardTitle>Relationship Areas</CardTitle>
+                <h2 className="section-title">Relationship Areas</h2>
               </div>
               
-              <PageGrid cols={2}>
+              <div className="page-grid">
                 {relationshipAreas.map((area) => (
                   <div key={area.title} className="p-6 rounded-xl bg-white/5 border border-white/20">
                     <div className="flex items-center justify-between mb-3">
-                      <CardTitle className="text-lg">{area.title}</CardTitle>
+                      <h3 className="text-lg font-semibold">{area.title}</h3>
                       <div className="text-2xl font-bold text-green-400">{area.quality}%</div>
                     </div>
-                    <CardDescription className="mb-4">
+                    <p className="body-text mb-4">
                       {area.description}
-                    </CardDescription>
+                    </p>
                     <div className="flex items-center justify-between">
                       <span className="text-sm text-gray-400">{area.actions} actions</span>
                       <button className="btn-secondary btn-small">
@@ -188,24 +180,24 @@ export default function JusticePage() {
                     </div>
                   </div>
                 ))}
-              </PageGrid>
+              </div>
             </div>
-          </PageSection>
+          </section>
         </div>
 
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Selected Practice Details */}
-          <div className="glass rounded-2xl border border-white/10 p-6">
+          <div className="glass-card">
             <div className="flex items-center gap-3 mb-4">
               <Sparkles className="w-5 h-5 text-green-400" />
-              <CardTitle>Practice Details</CardTitle>
+              <h2 className="section-title">Practice Details</h2>
             </div>
             
             <div className="space-y-4">
               <div>
-                <CardTitle className="text-lg mb-2">{selectedPractice.title}</CardTitle>
-                <CardDescription>{selectedPractice.description}</CardDescription>
+                <h3 className="text-lg font-semibold mb-2">{selectedPractice.title}</h3>
+                <p className="body-text">{selectedPractice.description}</p>
               </div>
               
               <div className="space-y-3">
@@ -231,7 +223,7 @@ export default function JusticePage() {
           </div>
 
           {/* Justice Quote */}
-          <div className="glass rounded-2xl border border-white/10 p-6 bg-gradient-to-r from-green-500/20 to-emerald-600/20">
+          <div className="glass-card bg-gradient-to-r from-green-500/20 to-emerald-600/20">
             <blockquote className="text-lg italic text-white mb-4 leading-relaxed">
               "Justice is the constant and perpetual will to allot to every man his due."
             </blockquote>
@@ -239,10 +231,10 @@ export default function JusticePage() {
           </div>
 
           {/* Progress Stats */}
-          <div className="glass rounded-2xl border border-white/10 p-6">
+          <div className="glass-card">
             <div className="flex items-center gap-3 mb-4">
               <Award className="w-5 h-5 text-green-400" />
-              <CardTitle>Your Progress</CardTitle>
+              <h2 className="section-title">Your Progress</h2>
             </div>
             
             <div className="space-y-4">
