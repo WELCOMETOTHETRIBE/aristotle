@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Brain, Shield, Scale, Leaf, Search, Settings, User, Home, Bell, LogOut } from "lucide-react";
+import { Brain, Shield, Scale, Leaf, Search, Settings, User, Home, Bell, LogOut, Target, TrendingUp } from "lucide-react";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import FrameworksDropdown from "./FrameworksDropdown";
@@ -53,6 +53,11 @@ export function VirtueNavigation() {
   const pathname = usePathname();
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  // Hide navigation on auth page
+  if (pathname === '/auth') {
+    return null;
+  }
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -109,6 +114,15 @@ export function VirtueNavigation() {
                 <Search size={12} />
               </button>
               <FrameworksDropdown />
+              <Link href="/today" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Today's Plan">
+                <Target size={12} />
+              </Link>
+              <Link href="/progress" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Progress">
+                <TrendingUp size={12} />
+              </Link>
+              <Link href="/coach" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="AI Coach">
+                <Brain size={12} />
+              </Link>
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Notifications">
                 <Bell size={12} />
               </button>
