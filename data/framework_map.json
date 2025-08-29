@@ -1,0 +1,368 @@
+{
+    "$schema": "https://example.com/awws/framework-map.schema.json",
+    "version": "1.0.0",
+    "frameworks": [
+      {
+        "id": "spartan",
+        "name": "Spartan Agōgē",
+        "nav": { "tone": "gritty", "badge": "Discipline", "emoji": "🛡️" },
+        "coreModules": [
+          "cold_heat",
+          "strength",
+          "fasting",
+          "focus_deepwork",
+          "movement_posture",
+          "virtue_cultivation"
+        ],
+        "supportModules": [
+          "sleep_circadian",
+          "hydration",
+          "mood_regulation",
+          "tribal_challenges",
+          "longevity",
+          "meditation"
+        ],
+        "featuredPractices": [
+          "spartan_discipline",
+          "cold_exposure_training",
+          "adversity_training",
+          "failure_resilience",
+          "leadership_development",
+          "risk_assessment",
+          "boundary_setting",
+          "public_speaking",
+          "moral_courage",
+          "teaching_others"
+        ]
+      },
+      {
+        "id": "bushido",
+        "name": "Samurai Bushidō",
+        "nav": { "tone": "honor", "badge": "Rectitude", "emoji": "🗡️" },
+        "coreModules": [
+          "etiquette_presence",
+          "meditation",
+          "movement_posture",
+          "conflict_debate",
+          "focus_deepwork"
+        ],
+        "supportModules": [
+          "gratitude_awe",
+          "mentorship_teaching",
+          "virtue_cultivation",
+          "sleep_circadian",
+          "strength",
+          "breathwork"
+        ],
+        "featuredPractices": [
+          "samurai_bushido",
+          "active_listening",
+          "conflict_resolution",
+          "fair_decision_making",
+          "contemplative_reading",
+          "public_speaking",
+          "leadership_development",
+          "box_breathing_temperance",
+          "triangle_breathing_simplicity"
+        ]
+      },
+      {
+        "id": "stoic",
+        "name": "Stoicism",
+        "nav": { "tone": "calm", "badge": "Clarity", "emoji": "🧱" },
+        "coreModules": [
+          "memento_mori",
+          "mood_regulation",
+          "virtue_cultivation",
+          "focus_deepwork",
+          "philosophy_capsules"
+        ],
+        "supportModules": [
+          "meditation",
+          "service_contribution",
+          "sleep_circadian",
+          "fasting",
+          "resource_library",
+          "gratitude_awe"
+        ],
+        "featuredPractices": [
+          "evening_reflection",
+          "critical_analysis",
+          "intellectual_humility",
+          "socratic_dialogue",
+          "moral_courage",
+          "failure_resilience",
+          "coherent_breathing_balance",
+          "box_breathing_temperance",
+          "wisdom_journaling"
+        ]
+      },
+      {
+        "id": "monastic",
+        "name": "Monastic Rule",
+        "nav": { "tone": "order", "badge": "Stability", "emoji": "⛪" },
+        "coreModules": [
+          "meditation",
+          "service_contribution",
+          "focus_deepwork",
+          "gratitude_awe",
+          "sleep_circadian"
+        ],
+        "supportModules": [
+          "fasting",
+          "etiquette_presence",
+          "resource_library",
+          "philosophy_capsules",
+          "mood_regulation",
+          "longevity"
+        ],
+        "featuredPractices": [
+          "contemplative_reading",
+          "evening_reflection",
+          "community_service",
+          "ocean_breath_harmony",
+          "mindful_observation",
+          "wisdom_journaling",
+          "lifelong_learning"
+        ]
+      },
+      {
+        "id": "yogic",
+        "name": "Yogic Path",
+        "nav": { "tone": "embodied", "badge": "Union", "emoji": "🧘" },
+        "coreModules": [
+          "flexibility",
+          "breathwork",
+          "meditation",
+          "movement_posture",
+          "mood_regulation"
+        ],
+        "supportModules": [
+          "hydration",
+          "sleep_circadian",
+          "gratitude_awe",
+          "creative_spark",
+          "longevity",
+          "virtue_cultivation"
+        ],
+        "featuredPractices": [
+          "coherent_breathing_balance",
+          "ocean_breath_harmony",
+          "triangle_breathing_simplicity",
+          "box_breathing_temperance",
+          "mindful_observation",
+          "wisdom_journaling",
+          "lifelong_learning"
+        ]
+      },
+      {
+        "id": "indigenous",
+        "name": "Indigenous Wisdom",
+        "nav": { "tone": "stewardship", "badge": "Cycles", "emoji": "🌿" },
+        "coreModules": [
+          "gratitude_awe",
+          "service_contribution",
+          "longevity",
+          "tribal_challenges",
+          "etiquette_presence"
+        ],
+        "supportModules": [
+          "hydration",
+          "movement_posture",
+          "resource_library",
+          "community",
+          "virtue_cultivation",
+          "sleep_circadian"
+        ],
+        "featuredPractices": [
+          "community_service",
+          "active_listening",
+          "conflict_resolution",
+          "teaching_others",
+          "fair_decision_making",
+          "lifelong_learning"
+        ]
+      },
+      {
+        "id": "martial",
+        "name": "Martial Arts Code",
+        "nav": { "tone": "disciplined", "badge": "Etiquette", "emoji": "🥋" },
+        "coreModules": [
+          "movement_posture",
+          "breathwork",
+          "conflict_debate",
+          "focus_deepwork",
+          "strength"
+        ],
+        "supportModules": [
+          "meditation",
+          "mood_regulation",
+          "hydration",
+          "sleep_circadian",
+          "flexibility",
+          "virtue_cultivation"
+        ],
+        "featuredPractices": [
+          "adversity_training",
+          "boundary_setting",
+          "box_breathing_temperance",
+          "coherent_breathing_balance",
+          "public_speaking",
+          "leadership_development",
+          "teaching_others"
+        ]
+      },
+      {
+        "id": "sufi",
+        "name": "Sufi Practice",
+        "nav": { "tone": "devotional", "badge": "Remembrance", "emoji": "🕊️" },
+        "coreModules": [
+          "mood_regulation",
+          "meditation",
+          "gratitude_awe",
+          "service_contribution",
+          "philosophy_capsules"
+        ],
+        "supportModules": [
+          "breathwork",
+          "creative_spark",
+          "sleep_circadian",
+          "virtue_cultivation",
+          "resource_library"
+        ],
+        "featuredPractices": [
+          "mindful_observation",
+          "wisdom_journaling",
+          "evening_reflection",
+          "teaching_others",
+          "community_service",
+          "ocean_breath_harmony",
+          "triangle_breathing_simplicity"
+        ]
+      },
+      {
+        "id": "ubuntu",
+        "name": "Ubuntu",
+        "nav": { "tone": "communal", "badge": "Humanity", "emoji": "🤝" },
+        "coreModules": [
+          "service_contribution",
+          "active_listening",
+          "tribal_challenges",
+          "mentorship_teaching",
+          "etiquette_presence"
+        ],
+        "supportModules": [
+          "gratitude_awe",
+          "conflict_debate",
+          "resource_library",
+          "virtue_cultivation",
+          "language_memory",
+          "creative_spark"
+        ],
+        "featuredPractices": [
+          "active_listening",
+          "conflict_resolution",
+          "community_service",
+          "fair_decision_making",
+          "leadership_development",
+          "teaching_others",
+          "lifelong_learning"
+        ]
+      },
+      {
+        "id": "highperf",
+        "name": "Modern High-Performance",
+        "nav": { "tone": "crisp", "badge": "Systems", "emoji": "🚀" },
+        "coreModules": [
+          "focus_deepwork",
+          "sleep_circadian",
+          "hydration",
+          "skill_builder",
+          "resource_library"
+        ],
+        "supportModules": [
+          "breathwork",
+          "mood_regulation",
+          "movement_posture",
+          "fasting",
+          "language_memory",
+          "creative_spark"
+        ],
+        "featuredPractices": [
+          "risk_assessment",
+          "leadership_development",
+          "boundary_setting",
+          "public_speaking",
+          "lifelong_learning",
+          "critical_analysis",
+          "cross_disciplinary_learning",
+          "coherent_breathing_balance"
+        ]
+      }
+    ],
+    "catalog": {
+      "modules": [
+        "breathwork",
+        "meditation",
+        "visualization",
+        "memory_training",
+        "focus_deepwork",
+        "mood_regulation",
+        "fasting",
+        "hydration",
+        "cold_heat",
+        "movement_posture",
+        "strength",
+        "flexibility",
+        "sleep_circadian",
+        "skin_care",
+        "longevity",
+        "virtue_cultivation",
+        "philosophy_capsules",
+        "gratitude_awe",
+        "service_contribution",
+        "memento_mori",
+        "etiquette_presence",
+        "active_listening",
+        "conflict_debate",
+        "mentorship_teaching",
+        "tribal_challenges",
+        "resource_library",
+        "hidden_wisdom",
+        "skill_builder",
+        "language_memory",
+        "creative_spark"
+      ],
+      "practices": [
+        "socratic_dialogue",
+        "contemplative_reading",
+        "evening_reflection",
+        "critical_analysis",
+        "mindful_observation",
+        "intellectual_humility",
+        "cross_disciplinary_learning",
+        "wisdom_journaling",
+        "teaching_others",
+        "lifelong_learning",
+        "spartan_discipline",
+        "samurai_bushido",
+        "cold_exposure_training",
+        "public_speaking",
+        "risk_assessment",
+        "boundary_setting",
+        "failure_resilience",
+        "adversity_training",
+        "moral_courage",
+        "leadership_development",
+        "active_listening",
+        "fair_decision_making",
+        "community_service",
+        "conflict_resolution",
+        "box_breathing_temperance",
+        "ocean_breath_harmony",
+        "coherent_breathing_balance",
+        "triangle_breathing_simplicity"
+      ]
+    }
+  }
+  

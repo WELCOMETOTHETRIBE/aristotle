@@ -3,7 +3,7 @@ generator client {
   provider = "prisma-client-js"
 }
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
@@ -212,4 +212,19 @@ model GeneratedContent {
   createdAt      DateTime    @default(now())
 
   @@unique([scope, keyFingerprint])
+}
+
+model VirtuePractice {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  instructions String?
+  rationale   String?
+  metrics     String?
+  safetyNotes String?
+  coachPrompts String?
+  slug        String?  @unique
+  meta        String?  @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 } 

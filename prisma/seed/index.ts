@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { MODULES } from "./modules";
 import { FRAMEWORKS } from "./frameworks";
 import { RESOURCES } from "./resources";
+import { VIRTUE_PRACTICES } from "./virtue-practices";
 
 const prisma = new PrismaClient();
 
@@ -80,6 +81,15 @@ async function main() {
       where: { id: r.id },
       update: resourceData,
       create: resourceData,
+    });
+  }
+
+  // Seed virtue practices
+  for (const p of VIRTUE_PRACTICES) {
+    await prisma.virtuePractice.upsert({
+      where: { slug: p.slug },
+      update: p,
+      create: p,
     });
   }
 

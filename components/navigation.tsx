@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Brain, Target, Heart, Home, Clock, X } from 'lucide-react';
+import { Brain, Target, Heart, Home, Clock, X, BookOpen } from 'lucide-react';
 import { useState } from 'react';
 
 const navigationItems = [
@@ -10,6 +10,7 @@ const navigationItems = [
   { href: '/coach', icon: Brain, label: 'Coach' },
   { href: '/breath', icon: Heart, label: 'Breathwork' },
   { href: '/fasting', icon: Clock, label: 'Fasting' },
+  { href: '/frameworks', icon: BookOpen, label: 'Frameworks' },
 ];
 
 export function Navigation() {

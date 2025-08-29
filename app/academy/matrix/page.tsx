@@ -2,6 +2,8 @@ import { prisma } from "@/lib/db";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { MatrixClient } from "./matrix-client";
+import { FrameworkChips } from "@/components/FrameworkChips";
+import { FrameworkFilter } from "@/components/FrameworkFilter";
 
 async function getModules() {
   if (!prisma) {
@@ -45,6 +47,11 @@ export default async function MatrixPage() {
     <div className="container mx-auto p-6">
       <h1 className="text-3xl font-bold mb-8">Academy Matrix</h1>
       
+      <FrameworkFilter onFrameworkChange={(frameworkId) => {
+        // This will be handled by client-side filtering
+        console.log('Framework filter changed:', frameworkId);
+      }} />
+      
       {Object.entries(groupedModules).map(([domain, domainModules]) => (
         <div key={domain} className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 flex items-center gap-2">
@@ -77,6 +84,11 @@ export default async function MatrixPage() {
                     <div>
                       <h4 className="font-medium text-sm mb-2">Preview Styles:</h4>
                       <MatrixClient module={module} />
+                    </div>
+                    
+                    <div>
+                      <h4 className="font-medium text-sm mb-2">Frameworks:</h4>
+                      <FrameworkChips moduleId={module.id} />
                     </div>
                   </div>
                 </CardContent>

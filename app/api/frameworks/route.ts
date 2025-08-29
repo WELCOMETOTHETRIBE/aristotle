@@ -1,18 +1,15 @@
-import { prisma } from "@/lib/db";
-
-// Force dynamic rendering
-export const dynamic = 'force-dynamic';
+import { NextResponse } from 'next/server';
+import { getAllFrameworks } from '@/lib/frameworkMap';
 
 export async function GET() {
-  const rows = await prisma.framework.findMany({ 
-    orderBy: { name: "asc" },
-    include: {
-      moduleMaps: {
-        include: {
-          module: true
-        }
-      }
-    }
-  });
-  return Response.json(rows);
+  try {
+    const frameworks = getAllFrameworks();
+    return NextResponse.json(frameworks);
+  } catch (error) {
+    console.error('Error loading frameworks:', error);
+    return NextResponse.json(
+      { error: 'Failed to load frameworks' },
+      { status: 500 }
+    );
+  }
 } 
