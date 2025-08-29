@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Brain, Shield, Scale, Leaf, Search, Settings, User, Home, Bell, LogOut, Target, TrendingUp } from "lucide-react";
+import GraduationCapIcon from "./GraduationCapIcon";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import FrameworksDropdown from "./FrameworksDropdown";
@@ -103,7 +104,7 @@ export function VirtueNavigation() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 interactive">
               <div className="w-5 h-5 bg-gradient-to-r from-accent to-accent-2 rounded-md flex items-center justify-center shadow-lg">
-                <Brain size={10} className="text-black" />
+                <GraduationCapIcon size={10} className="text-black" />
               </div>
               <span className="font-semibold text-white text-xs">Academy</span>
             </Link>
