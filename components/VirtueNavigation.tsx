@@ -1,8 +1,10 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Brain, Shield, Scale, Leaf, Search, Settings, User, Home } from "lucide-react";
+import { Brain, Shield, Scale, Leaf, Search, Settings, User, Home, Bell, LogOut } from "lucide-react";
 import { motion } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
+import FrameworksDropdown from "./FrameworksDropdown";
 
 const virtues = [
   {
@@ -49,6 +51,34 @@ const virtues = [
 
 export function VirtueNavigation() {
   const pathname = usePathname();
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const profileMenuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+        setShowProfileMenu(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const response = await fetch('/api/auth/signout', {
+        method: 'POST',
+      });
+      if (response.ok) {
+        window.location.href = '/auth';
+      }
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
 
   return (
     <>
@@ -69,12 +99,38 @@ export function VirtueNavigation() {
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Search">
                 <Search size={12} />
               </button>
+              <FrameworksDropdown />
+              <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Notifications">
+                <Bell size={12} />
+              </button>
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Settings">
                 <Settings size={12} />
               </button>
-              <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Profile">
-                <User size={12} />
-              </button>
+              
+              {/* Profile Menu */}
+              <div className="relative" ref={profileMenuRef}>
+                <button 
+                  className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" 
+                  title="Profile"
+                  onClick={() => setShowProfileMenu(!showProfileMenu)}
+                >
+                  <User size={12} />
+                </button>
+                
+                {showProfileMenu && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur border border-gray-200 rounded-lg shadow-xl z-50">
+                    <div className="py-1">
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <LogOut size={14} />
+                        Sign Out
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

@@ -105,6 +105,9 @@
   /* Container Academy */
   .container-academy {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8;
+    padding-top: calc(2rem + 2rem); /* Account for top navigation (h-8 = 2rem) */
+    padding-bottom: calc(2rem + 4rem); /* Account for bottom navigation */
+    min-height: calc(100vh - 6rem); /* Full height minus navigation bars */
   }
 
   /* Page Layout */
