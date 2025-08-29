@@ -3,6 +3,7 @@ import { getToneGradient, getToneTextColor, getToneAccentColor } from '@/lib/ton
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import BreathOfThePath from '@/components/BreathOfThePath';
+import FrameworkResourceSpotlight from '@/components/FrameworkResourceSpotlight';
 
 interface FrameworkDetailPageProps {
   params: { id: string };
@@ -19,15 +20,15 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
   const getVirtueEmphasis = (frameworkId: string) => {
     const virtueMap: Record<string, string[]> = {
       'spartan': ['Courage', 'Temperance'],
-      'samurai': ['Honor', 'Courage'],
+      'bushido': ['Honor', 'Courage'],
       'stoic': ['Wisdom', 'Temperance'],
-      'confucian': ['Justice', 'Wisdom'],
+      'monastic': ['Temperance', 'Devotion'],
       'yogic': ['Temperance', 'Wisdom'],
-      'benedictine': ['Temperance', 'Devotion'],
-      'zen': ['Wisdom', 'Temperance'],
-      'taoist': ['Wisdom', 'Temperance'],
       'indigenous': ['Stewardship', 'Community'],
-      'modern': ['Wisdom', 'Justice']
+      'martial': ['Discipline', 'Courage'],
+      'sufi': ['Devotion', 'Wisdom'],
+      'ubuntu': ['Justice', 'Community'],
+      'highperf': ['Wisdom', 'Justice']
     };
     return virtueMap[frameworkId] || ['Wisdom'];
   };
@@ -79,18 +80,26 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         {/* Core Modules */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-white mb-6">Core Modules</h2>
+          <p className="text-gray-300 mb-6">
+            Essential foundations that define the {framework.name} tradition
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {framework.coreModules.map((moduleId) => (
               <div
                 key={moduleId}
-                className={`p-4 rounded-lg border-2 ${getToneAccentColor(framework.nav.tone)} bg-white/10 backdrop-blur-sm`}
+                className={`p-6 rounded-lg border-2 ${getToneAccentColor(framework.nav.tone)} bg-white/10 backdrop-blur-sm hover:bg-white/15 transition-colors`}
               >
-                <h3 className="text-lg font-semibold text-white capitalize">
+                <h3 className="text-lg font-semibold text-white capitalize mb-2">
                   {moduleId.replace(/_/g, ' ')}
                 </h3>
-                <p className="text-sm text-gray-300 mt-1">
+                <p className="text-sm text-gray-300">
                   Essential foundation of this framework
                 </p>
+                <div className="mt-3">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-500/20 text-blue-300">
+                    Core Module
+                  </span>
+                </div>
               </div>
             ))}
           </div>
@@ -99,26 +108,46 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         {/* Support Modules */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-white mb-6">Support Modules</h2>
+          <p className="text-gray-300 mb-6">
+            Complementary practices that enhance the {framework.name} path
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {framework.supportModules.map((moduleId) => (
               <div
                 key={moduleId}
-                className="p-4 rounded-lg border border-gray-600 bg-white/5 backdrop-blur-sm"
+                className="p-6 rounded-lg border border-gray-600 bg-white/5 backdrop-blur-sm hover:bg-white/10 transition-colors"
               >
-                <h3 className="text-lg font-semibold text-white capitalize">
+                <h3 className="text-lg font-semibold text-white capitalize mb-2">
                   {moduleId.replace(/_/g, ' ')}
                 </h3>
-                <p className="text-sm text-gray-400 mt-1">
+                <p className="text-sm text-gray-400">
                   Complementary practices
                 </p>
+                <div className="mt-3">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-500/20 text-gray-300">
+                    Support Module
+                  </span>
+                </div>
               </div>
             ))}
           </div>
         </section>
 
+        {/* Resource Spotlight */}
+        <section className="mb-12">
+          <FrameworkResourceSpotlight 
+            frameworkId={framework.id}
+            frameworkName={framework.name}
+            frameworkTone={framework.nav.tone}
+          />
+        </section>
+
         {/* Featured Practices */}
         <section className="mb-12">
           <h2 className="text-3xl font-bold text-white mb-6">Featured Practices</h2>
+          <p className="text-gray-300 mb-6">
+            Key practices that embody the {framework.name} tradition
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {framework.featuredPractices.map((practiceSlug) => (
               <div

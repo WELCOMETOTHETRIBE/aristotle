@@ -1,18 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { Brain, Target, Heart, Home, Clock, X, BookOpen } from 'lucide-react';
+import { Brain, X } from 'lucide-react';
 import { useState } from 'react';
 import FrameworkDropdown from './FrameworkDropdown';
-
-const navigationItems = [
-  { href: '/', icon: Home, label: 'Home' },
-  { href: '/dashboard', icon: Target, label: 'Dashboard' },
-  { href: '/coach', icon: Brain, label: 'Coach' },
-  { href: '/breath', icon: Heart, label: 'Breathwork' },
-  { href: '/fasting', icon: Clock, label: 'Fasting' },
-  { href: '/frameworks', icon: BookOpen, label: 'Frameworks' },
-];
 
 export function Navigation() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -34,18 +25,8 @@ export function Navigation() {
             Aion
           </Link>
           
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Frameworks Dropdown */}
           <div className="hidden md:flex items-center gap-6">
-            {navigationItems.map((item) => (
-              <Link 
-                key={item.href}
-                href={item.href} 
-                className="flex items-center gap-2 text-sm hover:text-primary transition-colors"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            ))}
             <FrameworkDropdown />
           </div>
 
@@ -80,17 +61,6 @@ export function Navigation() {
           {/* Menu */}
           <div className="md:hidden absolute top-full left-0 right-0 bg-white/95 backdrop-blur-md border-t border-gray-200 dark:bg-gray-900/95 dark:border-gray-700 shadow-lg z-50">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              {navigationItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 px-3 py-3 text-base font-medium text-gray-700 hover:text-primary hover:bg-gray-50 dark:text-gray-300 dark:hover:text-primary dark:hover:bg-gray-800 rounded-md transition-colors"
-                  onClick={closeMobileMenu}
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.label}
-                </Link>
-              ))}
               <div className="px-3 py-3">
                 <FrameworkDropdown />
               </div>
