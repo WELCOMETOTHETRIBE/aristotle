@@ -37,7 +37,7 @@ export default function FrameworksDropdown() {
 
       {open && (
         <div
-          className="absolute right-0 mt-2 w-72 max-h-[70vh] overflow-auto rounded-xl bg-black/85 backdrop-blur border border-white/10 shadow-xl z-[60]"
+          className="absolute left-0 mt-2 w-72 max-h-[70vh] overflow-auto rounded-xl bg-black/85 backdrop-blur border border-white/10 shadow-xl z-[60]"
           role="listbox"
         >
           <div className="px-3 py-2 text-xs opacity-70">10 Universal Frameworks</div>
