@@ -3,9 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy } from 'lucide-react';
+import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale } from 'lucide-react';
 import BreathTimerCircle from '@/components/BreathTimerCircle';
+import TimerCard from '@/components/widgets/TimerCard';
+import CounterCard from '@/components/widgets/CounterCard';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
+import { getAllFrameworks } from '@/lib/frameworks.config';
 
 interface VirtueScores {
   wisdom: number;
@@ -55,6 +58,143 @@ interface Goal {
   createdAt: string;
 }
 
+interface WidgetInfo {
+  id: string;
+  title: string;
+  description: string;
+  icon: any;
+  category: string;
+}
+
+const WIDGET_INFO: WidgetInfo[] = [
+  {
+    id: 'virtue_progress',
+    title: 'Virtue Progress',
+    description: 'Track your daily virtue scores and see your 7-day averages. Click on the circles to update your scores.',
+    icon: Trophy,
+    category: 'core'
+  },
+  {
+    id: 'breathwork_timer',
+    title: 'Breathwork Practice',
+    description: 'Master your breath with guided breathing patterns. Choose from Stoic, Spartan, or other framework-specific patterns.',
+    icon: Zap,
+    category: 'practice'
+  },
+  {
+    id: 'hydration_tracker',
+    title: 'Hydration Tracker',
+    description: 'Track your daily water intake. Use the quick-add buttons to log your consumption throughout the day.',
+    icon: Droplets,
+    category: 'health'
+  },
+  {
+    id: 'mood_tracker',
+    title: 'Mood Tracker',
+    description: 'Rate your daily mood on a 1-5 scale. Your mood data helps track patterns and emotional well-being.',
+    icon: Smile,
+    category: 'health'
+  },
+  {
+    id: 'habit_manager',
+    title: 'Habit Manager',
+    description: 'Track your daily habits and build streaks. Check in daily to maintain momentum and see your progress.',
+    icon: TrendingUp,
+    category: 'core'
+  },
+  {
+    id: 'task_manager',
+    title: 'Task Manager',
+    description: 'Manage your daily tasks and priorities. Mark tasks complete and track your productivity.',
+    icon: Target,
+    category: 'core'
+  },
+  {
+    id: 'goal_tracker',
+    title: 'Goal Tracker',
+    description: 'Track your long-term goals and objectives. Monitor progress and stay focused on what matters.',
+    icon: Brain,
+    category: 'core'
+  },
+  {
+    id: 'wisdom_spotlight',
+    title: 'Wisdom Spotlight',
+    description: 'Daily curated wisdom from ancient traditions. Reflect on timeless teachings and apply them to modern life.',
+    icon: BookOpen,
+    category: 'wisdom'
+  },
+  {
+    id: 'focus_timer',
+    title: 'Focus Timer',
+    description: 'Deep work sessions with customizable duration. Track your focus time and build concentration skills.',
+    icon: Timer,
+    category: 'practice'
+  },
+  {
+    id: 'gratitude_journal',
+    title: 'Gratitude Journal',
+    description: 'Write daily gratitude entries. Cultivate appreciation and positive mindset through regular practice.',
+    icon: Heart,
+    category: 'wisdom'
+  },
+  {
+    id: 'meditation_timer',
+    title: 'Meditation Timer',
+    description: 'Guided meditation sessions with customizable duration. Build mindfulness and inner peace.',
+    icon: Leaf,
+    category: 'practice'
+  },
+  {
+    id: 'strength_counter',
+    title: 'Strength Counter',
+    description: 'Track physical exercises and repetitions. Build strength and discipline through consistent training.',
+    icon: Shield,
+    category: 'practice'
+  },
+  {
+    id: 'virtue_assessment',
+    title: 'Virtue Assessment',
+    description: 'Daily self-assessment of your virtues. Use sliders to rate your wisdom, courage, justice, and temperance.',
+    icon: Sliders,
+    category: 'wisdom'
+  },
+  {
+    id: 'community_connection',
+    title: 'Community Connection',
+    description: 'Connect with others through shared practices. Build relationships and support networks.',
+    icon: Users,
+    category: 'wisdom'
+  },
+  {
+    id: 'reflection_journal',
+    title: 'Reflection Journal',
+    description: 'Daily reflection and self-examination. Process experiences and gain insights through writing.',
+    icon: FileText,
+    category: 'wisdom'
+  },
+  {
+    id: 'boundary_setter',
+    title: 'Boundary Setter',
+    description: 'Set and maintain healthy boundaries. Practice saying no and protecting your energy.',
+    icon: CheckSquare,
+    category: 'wisdom'
+  },
+  {
+    id: 'nature_connection',
+    title: 'Nature Connection',
+    description: 'Connect with the natural world. Take photos and reflect on your relationship with nature.',
+    icon: Camera,
+    category: 'wisdom'
+  },
+  {
+    id: 'voice_notes',
+    title: 'Voice Notes',
+    description: 'Record audio reflections and insights. Capture thoughts and ideas through voice.',
+    icon: Mic,
+    category: 'practice'
+  }
+];
+
 export default function DashboardPage() {
   const [virtueScores, setVirtueScores] = useState<VirtueScores>({ wisdom: 0, courage: 0, justice: 0, temperance: 0 });
   const [hydrationData, setHydrationData] = useState<HydrationData>({ current: 0, target: 2000, percentage: 0 });
@@ -64,9 +204,12 @@ export default function DashboardPage() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
   const [hedonicScore, setHedonicScore] = useState(50);
+  const [showWidgetInfo, setShowWidgetInfo] = useState<string | null>(null);
+  const [frameworks, setFrameworks] = useState<any[]>([]);
 
   useEffect(() => {
     fetchDashboardData();
+    setFrameworks(getAllFrameworks());
   }, []);
 
   const fetchDashboardData = async () => {
@@ -223,10 +366,45 @@ export default function DashboardPage() {
     return '😢';
   };
 
+  const getWidgetInfo = (widgetId: string) => {
+    return WIDGET_INFO.find(info => info.id === widgetId);
+  };
+
   const dueTasks = tasks.filter(task => !task.completedAt && task.dueAt);
   const completedTasks = tasks.filter(task => task.completedAt);
   const activeGoals = goals.filter(goal => goal.status === 'active');
   const checkedHabits = habits.filter(habit => habit.checkedToday);
+
+  // Daily wisdom quotes
+  const dailyWisdom = [
+    {
+      quote: "The unexamined life is not worth living.",
+      author: "Socrates",
+      framework: "Stoic"
+    },
+    {
+      quote: "Strength is forged through chosen hardship.",
+      author: "Spartan Agōgē",
+      framework: "Spartan"
+    },
+    {
+      quote: "Honor is clarity in action.",
+      author: "Bushidō",
+      framework: "Samurai"
+    },
+    {
+      quote: "Rhythm roots the soul.",
+      author: "Monastic Rule",
+      framework: "Monastic"
+    },
+    {
+      quote: "Align body, breath, and mind.",
+      author: "Yogic Path",
+      framework: "Yogic"
+    }
+  ];
+
+  const todayWisdom = dailyWisdom[new Date().getDate() % dailyWisdom.length];
 
   if (loading) {
     return (
@@ -264,18 +442,71 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
+              {/* Wisdom Spotlight - Special Widget */}
+              <Card className="glass-effect bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <BookOpen className="h-5 w-5 text-purple-400" />
+                    Wisdom Spotlight
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'wisdom_spotlight' ? null : 'wisdom_spotlight')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
+                  </CardTitle>
+                  <CardDescription>
+                    Daily wisdom from ancient traditions
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {showWidgetInfo === 'wisdom_spotlight' && (
+                    <div className="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <p className="text-sm text-purple-200">{getWidgetInfo('wisdom_spotlight')?.description}</p>
+                    </div>
+                  )}
+                  <div className="text-center space-y-4">
+                    <div className="text-2xl font-serif italic text-purple-200 mb-4">
+                      "{todayWisdom.quote}"
+                    </div>
+                    <div className="text-sm text-purple-300">
+                      — {todayWisdom.author}
+                    </div>
+                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs">
+                      {todayWisdom.framework} Tradition
+                    </div>
+                    <div className="pt-4">
+                      <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20">
+                        Reflect on This Wisdom
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* Virtue Progress */}
               <Card className="glass-effect">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Trophy className="h-5 w-5 text-primary" />
                     Virtue Progress
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'virtue_progress' ? null : 'virtue_progress')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     7-day average scores for your core virtues
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {showWidgetInfo === 'virtue_progress' && (
+                    <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <p className="text-sm text-blue-200">{getWidgetInfo('virtue_progress')?.description}</p>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                     {Object.entries(virtueScores).map(([virtue, score]) => (
                       <div key={virtue} className="text-center">
@@ -317,12 +548,23 @@ export default function DashboardPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Target className="h-5 w-5 text-primary" />
                     Today's Actions
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'task_manager' ? null : 'task_manager')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     {dueTasks.length} tasks due today
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {showWidgetInfo === 'task_manager' && (
+                    <div className="mb-4 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+                      <p className="text-sm text-green-200">{getWidgetInfo('task_manager')?.description}</p>
+                    </div>
+                  )}
                   {dueTasks.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">
                       No tasks due today. Great job staying on top of things!
@@ -370,12 +612,23 @@ export default function DashboardPage() {
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-primary" />
                     Habit Streaks
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'habit_manager' ? null : 'habit_manager')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     Keep building momentum with your daily habits
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {showWidgetInfo === 'habit_manager' && (
+                    <div className="mb-4 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
+                      <p className="text-sm text-orange-200">{getWidgetInfo('habit_manager')?.description}</p>
+                    </div>
+                  )}
                   {habits.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">
                       No habits set up yet. Start building positive routines!
@@ -411,12 +664,23 @@ export default function DashboardPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Brain className="h-5 w-5 text-primary" />
                     Active Goals
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'goal_tracker' ? null : 'goal_tracker')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     Your current objectives and aspirations
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {showWidgetInfo === 'goal_tracker' && (
+                    <div className="mb-4 p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+                      <p className="text-sm text-indigo-200">{getWidgetInfo('goal_tracker')?.description}</p>
+                    </div>
+                  )}
                   {activeGoals.length === 0 ? (
                     <p className="text-muted-foreground text-center py-4">
                       No active goals. Set some meaningful objectives to work toward!
@@ -442,22 +706,151 @@ export default function DashboardPage() {
                   )}
                 </CardContent>
               </Card>
-            </div>
 
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Breathwork Timer */}
+              {/* Additional Practice Widgets */}
               <Card className="glass-effect">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Zap className="h-5 w-5 text-primary" />
-                    Breathwork Practice
+                    Practice Tools
                   </CardTitle>
                   <CardDescription>
-                    Start your breathing practice
+                    Quick access to essential practice widgets
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Focus Timer */}
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Timer className="h-4 w-4 text-blue-400" />
+                        <h4 className="font-medium text-sm">Focus Timer</h4>
+                        <button
+                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'focus_timer' ? null : 'focus_timer')}
+                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                        >
+                          <Info className="h-3 w-3" />
+                        </button>
+                      </div>
+                      {showWidgetInfo === 'focus_timer' && (
+                        <div className="mb-3 p-2 bg-blue-500/10 rounded border border-blue-500/20">
+                          <p className="text-xs text-blue-200">{getWidgetInfo('focus_timer')?.description}</p>
+                        </div>
+                      )}
+                      <TimerCard 
+                        title="Deep Work Session"
+                        config={{ duration: 1500, includeRPE: false, teaching: "Focus is the new superpower" }}
+                        onComplete={() => console.log('Focus session completed')}
+                        virtueGrantPerCompletion={{ wisdom: 2 }}
+                      />
+                    </div>
+
+                    {/* Gratitude Journal */}
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Heart className="h-4 w-4 text-red-400" />
+                        <h4 className="font-medium text-sm">Gratitude Journal</h4>
+                        <button
+                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'gratitude_journal' ? null : 'gratitude_journal')}
+                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                        >
+                          <Info className="h-3 w-3" />
+                        </button>
+                      </div>
+                      {showWidgetInfo === 'gratitude_journal' && (
+                        <div className="mb-3 p-2 bg-red-500/10 rounded border border-red-500/20">
+                          <p className="text-xs text-red-200">{getWidgetInfo('gratitude_journal')?.description}</p>
+                        </div>
+                      )}
+                      <div className="space-y-3">
+                        <textarea 
+                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-sm"
+                          placeholder="What are you grateful for today?"
+                          rows={3}
+                        />
+                        <Button size="sm" className="w-full">Save Gratitude</Button>
+                      </div>
+                    </div>
+
+                    {/* Meditation Timer */}
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Leaf className="h-4 w-4 text-green-400" />
+                        <h4 className="font-medium text-sm">Meditation Timer</h4>
+                        <button
+                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'meditation_timer' ? null : 'meditation_timer')}
+                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                        >
+                          <Info className="h-3 w-3" />
+                        </button>
+                      </div>
+                      {showWidgetInfo === 'meditation_timer' && (
+                        <div className="mb-3 p-2 bg-green-500/10 rounded border border-green-500/20">
+                          <p className="text-xs text-green-200">{getWidgetInfo('meditation_timer')?.description}</p>
+                        </div>
+                      )}
+                      <TimerCard 
+                        title="Mindfulness Session"
+                        config={{ duration: 600, includeRPE: false, teaching: "Stillness reveals the warrior within" }}
+                        onComplete={() => console.log('Meditation completed')}
+                        virtueGrantPerCompletion={{ wisdom: 1, temperance: 1 }}
+                      />
+                    </div>
+
+                    {/* Strength Counter */}
+                    <div className="p-4 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-2 mb-3">
+                        <Shield className="h-4 w-4 text-orange-400" />
+                        <h4 className="font-medium text-sm">Strength Counter</h4>
+                        <button
+                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'strength_counter' ? null : 'strength_counter')}
+                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                        >
+                          <Info className="h-3 w-3" />
+                        </button>
+                      </div>
+                      {showWidgetInfo === 'strength_counter' && (
+                        <div className="mb-3 p-2 bg-orange-500/10 rounded border border-orange-500/20">
+                          <p className="text-xs text-orange-200">{getWidgetInfo('strength_counter')?.description}</p>
+                        </div>
+                      )}
+                      <CounterCard 
+                        title="Push-ups"
+                        config={{ target: 20, unit: "reps", exercises: ["push-ups", "squats", "pull-ups"], teaching: "Perfect practice makes perfect" }}
+                        onComplete={() => console.log('Strength training completed')}
+                        virtueGrantPerCompletion={{ courage: 2 }}
+                      />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Breathwork Timer - Special Widget */}
+              <Card className="glass-effect bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Zap className="h-5 w-5 text-cyan-400" />
+                    Breathwork Practice
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'breathwork_timer' ? null : 'breathwork_timer')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
+                  </CardTitle>
+                  <CardDescription>
+                    Master your breath with guided patterns
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {showWidgetInfo === 'breathwork_timer' && (
+                    <div className="mb-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+                      <p className="text-sm text-cyan-200">{getWidgetInfo('breathwork_timer')?.description}</p>
+                    </div>
+                  )}
                   <BreathTimerCircle 
                     patternId="stoic"
                     ratio="4:4:4:4"
@@ -476,12 +869,23 @@ export default function DashboardPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Droplets className="h-5 w-5 text-primary" />
                     Hydration
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'hydration_tracker' ? null : 'hydration_tracker')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     Track your daily water intake
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {showWidgetInfo === 'hydration_tracker' && (
+                    <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+                      <p className="text-sm text-blue-200">{getWidgetInfo('hydration_tracker')?.description}</p>
+                    </div>
+                  )}
                   <div className="text-center">
                     <div className="text-3xl font-bold mb-2">
                       {hydrationData.current}ml
@@ -517,12 +921,23 @@ export default function DashboardPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Smile className="h-5 w-5 text-primary" />
                     Today's Mood
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'mood_tracker' ? null : 'mood_tracker')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     How are you feeling today?
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
+                  {showWidgetInfo === 'mood_tracker' && (
+                    <div className="mb-4 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
+                      <p className="text-sm text-yellow-200">{getWidgetInfo('mood_tracker')?.description}</p>
+                    </div>
+                  )}
                   {moodData.logged ? (
                     <div className="text-center">
                       <div className="text-4xl mb-2">{getMoodEmoji(moodData.mood!)}</div>

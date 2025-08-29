@@ -16,7 +16,7 @@ import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
 import BreathTimerCircle from '../../../components/BreathTimerCircle';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
-import { Trophy, Target, TrendingUp, BookOpen, Zap } from 'lucide-react';
+import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 
 interface FrameworkDetailPageProps {
   params: { slug: string };
@@ -34,6 +34,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showWidgetInfo, setShowWidgetInfo] = useState<string | null>(null);
 
   useEffect(() => {
     const loadFrameworkData = async () => {
@@ -113,21 +114,43 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
       virtueGrantPerCompletion: widget.virtueGrantPerCompletion
     };
 
-    switch (widget.kind) {
-      case 'TIMER':
-        return <TimerCard {...commonProps} />;
-      case 'COUNTER':
-        return <CounterCard {...commonProps} />;
-      case 'BREATH':
-        return <BreathPacer {...commonProps} />;
-      default:
-        return (
-          <div className="p-6 bg-gray-800 rounded-lg">
-            <h3 className="text-lg font-semibold text-white mb-2">{widget.title}</h3>
-            <p className="text-gray-400">Widget type {widget.kind} not implemented yet</p>
+    const widgetComponent = (() => {
+      switch (widget.kind) {
+        case 'TIMER':
+          return <TimerCard {...commonProps} />;
+        case 'COUNTER':
+          return <CounterCard {...commonProps} />;
+        case 'BREATH':
+          return <BreathPacer {...commonProps} />;
+        default:
+          return (
+            <div className="p-6 bg-gray-800 rounded-lg">
+              <h3 className="text-lg font-semibold text-white mb-2">{widget.title}</h3>
+              <p className="text-gray-400">Widget type {widget.kind} not implemented yet</p>
+            </div>
+          );
+      }
+    })();
+
+    return (
+      <div className="relative">
+        <div className="absolute top-2 right-2 z-10">
+          <button
+            onClick={() => setShowWidgetInfo(showWidgetInfo === widget.id ? null : widget.id)}
+            className="p-1 text-muted-foreground hover:text-white transition-colors bg-black/20 rounded-full"
+          >
+            <Info className="h-3 w-3" />
+          </button>
+        </div>
+        {showWidgetInfo === widget.id && (
+          <div className="absolute top-8 right-2 z-20 w-64 p-3 bg-black/90 backdrop-blur border border-white/20 rounded-lg text-xs">
+            <p className="text-white mb-2">{widget.config.teaching}</p>
+            <p className="text-gray-300">Virtue gains: {Object.entries(widget.virtueGrantPerCompletion).map(([virtue, amount]) => `${virtue} +${amount}`).join(', ')}</p>
           </div>
-        );
-    }
+        )}
+        {widgetComponent}
+      </div>
+    );
   };
 
   if (loading) {
@@ -168,6 +191,13 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             </span>
           </div>
           
+          {/* Framework Intention */}
+          <div className="max-w-2xl mx-auto mb-6">
+            <p className={`text-lg ${getToneTextColor(framework.tone)} opacity-90 leading-relaxed`}>
+              {framework.teachingChip}
+            </p>
+          </div>
+          
           {/* Virtue Bars */}
           <div className="flex justify-center gap-4 flex-wrap">
             {Object.entries(virtueTotals).map(([virtue, total]) => (
@@ -201,10 +231,26 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
       {/* Breathwork Practice */}
       <div className="page-section">
-        <h2 className="section-title">Breathwork Practice</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="section-title">Breathwork Practice</h2>
+          <button
+            onClick={() => setShowWidgetInfo(showWidgetInfo === 'breathwork' ? null : 'breathwork')}
+            className="p-1 text-muted-foreground hover:text-white transition-colors"
+          >
+            <Info className="h-4 w-4" />
+          </button>
+        </div>
         <p className="section-description">
           Master your breath with {framework.name} breathing patterns
         </p>
+        {showWidgetInfo === 'breathwork' && (
+          <div className="mb-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
+            <p className="text-sm text-cyan-200">
+              Practice framework-specific breathing patterns to cultivate the core virtues of this tradition. 
+              Each pattern is designed to align with the philosophical principles and practical wisdom of {framework.name}.
+            </p>
+          </div>
+        )}
         <div className="max-w-md mx-auto">
           <BreathTimerCircle 
             patternId={params.slug}
@@ -226,10 +272,26 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
       {/* Widgets Grid */}
       <div className="page-section">
-        <h2 className="section-title">Practice Widgets</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="section-title">Practice Widgets</h2>
+          <button
+            onClick={() => setShowWidgetInfo(showWidgetInfo === 'practice_widgets' ? null : 'practice_widgets')}
+            className="p-1 text-muted-foreground hover:text-white transition-colors"
+          >
+            <Info className="h-4 w-4" />
+          </button>
+        </div>
         <p className="section-description">
           Interactive tools to embody the {framework.name} tradition
         </p>
+        {showWidgetInfo === 'practice_widgets' && (
+          <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
+            <p className="text-sm text-blue-200">
+              These interactive widgets are specifically designed to help you embody the principles and practices of {framework.name}. 
+              Each widget focuses on cultivating the core virtues of this tradition through practical, daily exercises.
+            </p>
+          </div>
+        )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {framework.widgets.map((widget: any) => (
             <div key={widget.id}>
@@ -241,10 +303,26 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
       {/* Resources Spotlight */}
       <div className="page-section">
-        <h2 className="section-title">Wisdom Resources</h2>
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="section-title">Wisdom Resources</h2>
+          <button
+            onClick={() => setShowWidgetInfo(showWidgetInfo === 'wisdom_resources' ? null : 'wisdom_resources')}
+            className="p-1 text-muted-foreground hover:text-white transition-colors"
+          >
+            <Info className="h-4 w-4" />
+          </button>
+        </div>
         <p className="section-description">
           Curated knowledge and practices from the {framework.name} tradition
         </p>
+        {showWidgetInfo === 'wisdom_resources' && (
+          <div className="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+            <p className="text-sm text-purple-200">
+              Discover curated wisdom, teachings, and practices from the {framework.name} tradition. 
+              These resources provide deeper insights into the philosophical foundations and practical applications of this ancient wisdom.
+            </p>
+          </div>
+        )}
         <FrameworkResourceSpotlight 
           frameworkId={params.slug}
           frameworkName={framework.name}
