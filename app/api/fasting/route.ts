@@ -1,104 +1,128 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { FastingSessionSchema, FastingBenefitSchema, FastingEndSessionSchema } from '@/lib/validators';
-import { getOrCreateUser } from '@/lib/db';
 import { prisma } from '@/lib/db';
-import { calculateFastingDuration, getFastingStage } from '@/lib/fasting';
+import { safeParse, zFastingSession } from '@/lib/validate';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('User');
-    const { searchParams } = new URL(request.url);
-    const activeOnly = searchParams.get('active') === 'true';
-
-    const where: any = { userId: user.id };
-    if (activeOnly) {
-      where.status = 'active';
-    }
-
-    const sessions = await prisma.fastingSession.findMany({
-      where,
-      orderBy: { startTime: 'desc' },
-      include: {
-        fastingBenefits: {
-          orderBy: { recordedAt: 'desc' }
-        }
+    // For now, use a default user ID (in production, get from auth)
+    const userId = 1;
+    
+    // Get active fasting session
+    const activeSession = await prisma.fastingSession.findFirst({
+      where: {
+        userId,
+        status: 'active'
+      },
+      orderBy: {
+        startTime: 'desc'
       }
     });
-
-    return NextResponse.json({ sessions });
-  } catch (error: any) {
-    console.error('Fasting sessions GET error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    // Get latest completed session
+    const latestSession = await prisma.fastingSession.findFirst({
+      where: {
+        userId,
+        status: 'completed'
+      },
+      orderBy: {
+        startTime: 'desc'
+      }
+    });
+    
+    return NextResponse.json({
+      active: activeSession,
+      latest: latestSession
+    });
+  } catch (error) {
+    console.error('Error fetching fasting sessions:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch fasting sessions' },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('User');
     const body = await request.json();
-    const validatedData = FastingSessionSchema.parse(body);
-
-    // Check if user already has an active session
-    const activeSession = await prisma.fastingSession.findFirst({
-      where: { userId: user.id, status: 'active' }
+    const data = safeParse(zFastingSession, body);
+    
+    // For now, use a default user ID (in production, get from auth)
+    const userId = 1;
+    
+    // Check if there's already an active session
+    const existingActive = await prisma.fastingSession.findFirst({
+      where: {
+        userId,
+        status: 'active'
+      }
     });
-
-    if (activeSession) {
+    
+    if (existingActive) {
       return NextResponse.json(
-        { error: 'You already have an active fasting session' },
+        { error: 'Already have an active fasting session' },
         { status: 400 }
       );
     }
-
+    
     const session = await prisma.fastingSession.create({
       data: {
-        userId: user.id,
-        startTime: new Date(validatedData.startTime),
-        endTime: validatedData.endTime ? new Date(validatedData.endTime) : null,
-        type: validatedData.type,
-        notes: validatedData.notes,
-        status: validatedData.endTime ? 'completed' : 'active'
+        userId,
+        protocol: data.protocol,
+        targetHours: data.targetHours,
+        notes: data.notes
       }
     });
-
-    return NextResponse.json({ session });
-  } catch (error: any) {
-    console.error('Fasting session POST error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    return NextResponse.json({
+      success: true,
+      session
+    });
+  } catch (error) {
+    console.error('Error starting fasting session:', error);
+    if (error instanceof Response) return error;
+    return NextResponse.json(
+      { error: 'Failed to start fasting session' },
+      { status: 500 }
+    );
   }
 }
 
-export async function PATCH(request: NextRequest) {
+export async function PUT(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('User');
     const body = await request.json();
-    const validatedData = FastingEndSessionSchema.parse(body);
-
-    const session = await prisma.fastingSession.findFirst({
-      where: { id: validatedData.fastingSessionId, userId: user.id }
-    });
-
-    if (!session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    const { id } = body;
+    
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Session ID is required' },
+        { status: 400 }
+      );
     }
-
-    const endTime = new Date(validatedData.endTime);
-    const duration = calculateFastingDuration(new Date(session.startTime), endTime);
-
-    const updatedSession = await prisma.fastingSession.update({
-      where: { id: validatedData.fastingSessionId },
+    
+    // For now, use a default user ID (in production, get from auth)
+    const userId = 1;
+    
+    const session = await prisma.fastingSession.update({
+      where: {
+        id: parseInt(id),
+        userId
+      },
       data: {
-        endTime,
-        duration: duration.totalMinutes,
         status: 'completed',
-        notes: validatedData.notes
+        endTime: new Date()
       }
     });
-
-    return NextResponse.json({ session: updatedSession });
-  } catch (error: any) {
-    console.error('Fasting session PATCH error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    
+    return NextResponse.json({
+      success: true,
+      session
+    });
+  } catch (error) {
+    console.error('Error stopping fasting session:', error);
+    return NextResponse.json(
+      { error: 'Failed to stop fasting session' },
+      { status: 500 }
+    );
   }
 } 

@@ -1,68 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { FastingBenefitSchema } from '@/lib/validators';
-import { getOrCreateUser } from '@/lib/db';
 import { prisma } from '@/lib/db';
-import { analyzeFastingBenefits } from '@/lib/fasting';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('User');
     const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('sessionId');
-
-    const where: any = { userId: user.id };
-    if (sessionId) {
-      where.fastingSessionId = sessionId;
-    }
-
-    const benefits = await prisma.fastingBenefit.findMany({
-      where,
-      orderBy: { recordedAt: 'desc' },
-      include: {
-        fastingSession: true
-      }
+    const protocol = searchParams.get('protocol') || '16:8';
+    
+    // Static benefits data as fallback
+    const staticBenefits = {
+      '16:8': [
+        { type: 'Autophagy', intensity: 3, description: 'Cellular cleanup and renewal' },
+        { type: 'Insulin Sensitivity', intensity: 4, description: 'Improved blood sugar regulation' },
+        { type: 'Fat Burning', intensity: 4, description: 'Enhanced fat metabolism' },
+        { type: 'Mental Clarity', intensity: 3, description: 'Improved focus and cognitive function' },
+        { type: 'Inflammation Reduction', intensity: 2, description: 'Lower systemic inflammation' }
+      ],
+      '18:6': [
+        { type: 'Autophagy', intensity: 4, description: 'Enhanced cellular cleanup' },
+        { type: 'Ketosis', intensity: 3, description: 'Fat-burning metabolic state' },
+        { type: 'Growth Hormone', intensity: 4, description: 'Increased HGH production' },
+        { type: 'Brain Function', intensity: 4, description: 'Improved cognitive performance' },
+        { type: 'Longevity', intensity: 3, description: 'Potential lifespan extension' }
+      ],
+      '20:4': [
+        { type: 'Deep Autophagy', intensity: 5, description: 'Maximum cellular renewal' },
+        { type: 'Ketosis', intensity: 5, description: 'Full fat-burning state' },
+        { type: 'Growth Hormone', intensity: 5, description: 'Peak HGH levels' },
+        { type: 'Mental Sharpness', intensity: 5, description: 'Exceptional clarity and focus' },
+        { type: 'Anti-Aging', intensity: 4, description: 'Advanced anti-aging effects' }
+      ]
+    };
+    
+    // Get benefits for the requested protocol
+    const benefits = staticBenefits[protocol as keyof typeof staticBenefits] || staticBenefits['16:8'];
+    
+    return NextResponse.json({
+      protocol,
+      benefits,
+      count: benefits.length
     });
-
-    const analysis = analyzeFastingBenefits(benefits.map((b: any) => ({
-      ...b,
-      benefitType: b.benefitType as any
-    })));
-
-    return NextResponse.json({ benefits, analysis });
-  } catch (error: any) {
-    console.error('Fasting benefits GET error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-}
-
-export async function POST(request: NextRequest) {
-  try {
-    const user = await getOrCreateUser('User');
-    const body = await request.json();
-    const validatedData = FastingBenefitSchema.parse(body);
-
-    // Verify the fasting session belongs to the user
-    const session = await prisma.fastingSession.findFirst({
-      where: { id: validatedData.fastingSessionId, userId: user.id }
-    });
-
-    if (!session) {
-      return NextResponse.json({ error: 'Fasting session not found' }, { status: 404 });
-    }
-
-    const benefit = await prisma.fastingBenefit.create({
-      data: {
-        userId: user.id,
-        fastingSessionId: validatedData.fastingSessionId,
-        benefitType: validatedData.benefitType,
-        intensity: validatedData.intensity,
-        notes: validatedData.notes
-      }
-    });
-
-    return NextResponse.json({ benefit });
-  } catch (error: any) {
-    console.error('Fasting benefit POST error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error) {
+    console.error('Error fetching fasting benefits:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch fasting benefits' },
+      { status: 500 }
+    );
   }
 } 

@@ -3,43 +3,47 @@ import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
+    // For now, use a default user ID (in production, get from auth)
+    const userId = 1;
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     
-    // Get today's completed habits
-    const completedHabits = await prisma.session.findMany({
+    // Get active habits with today's checks
+    const habits = await prisma.habit.findMany({
       where: {
-        startedAt: {
-          gte: today
-        },
-        endedAt: {
-          not: null
+        userId
+      },
+      include: {
+        checks: {
+          where: {
+            date: {
+              gte: today,
+              lt: tomorrow
+            }
+          }
         }
       },
-      select: {
-        moduleId: true
+      orderBy: {
+        createdAt: 'asc'
       }
     });
     
-    // Default morning ritual habits
-    const totalHabits = ['breathwork', 'movement', 'gratitude'];
-    const completedHabitIds = completedHabits.map((session: any) => session.moduleId).filter(Boolean);
+    // Transform to include check status
+    const habitsWithChecks = habits.map((habit: any) => ({
+      ...habit,
+      checkedToday: habit.checks.length > 0 ? habit.checks[0].done : false,
+      todayNote: habit.checks.length > 0 ? habit.checks[0].note : null
+    }));
     
     return NextResponse.json({
-      completed: completedHabitIds,
-      total: totalHabits,
-      count: completedHabitIds.length,
-      totalCount: totalHabits.length
+      habits: habitsWithChecks
     });
   } catch (error) {
-    console.error('Error fetching habits data:', error);
+    console.error('Error fetching habits:', error);
     return NextResponse.json(
-      { 
-        completed: ['breathwork'], 
-        total: ['breathwork', 'movement', 'gratitude'],
-        count: 1,
-        totalCount: 3
-      },
+      { habits: [] },
       { status: 200 }
     );
   }

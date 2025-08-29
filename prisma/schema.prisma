@@ -140,6 +140,13 @@ model User {
   virtueScores VirtueScore[]
   feeds       Feed[]
   preferences UserPreference?
+  tasks       Task[]
+  goals       Goal[]
+  habits      Habit[]
+  fastingSessions FastingSession[]
+  hydrationLogs HydrationLog[]
+  moodLogs    MoodLog[]
+  timerSessions TimerSession[]
 }
 
 model Session {
@@ -179,6 +186,7 @@ model VirtueScore {
   courage     Int      @default(0)
   temperance  Int      @default(0)
   justice     Int      @default(0)
+  note        String?
 
   @@id([userId, date])
 }
@@ -248,4 +256,104 @@ model UserPreference {
   style     String?
   locale    String? @default("en")
   updatedAt DateTime @default(now())
+}
+
+// New models for dashboard widgets
+model Task {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  completedAt DateTime?
+  dueDate     DateTime?
+  priority    String    @default("M") // L/M/H
+  tag         String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+model Goal {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  title       String
+  description String?
+  category    String
+  status      String    @default("active")
+  targetDate  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+}
+
+model Habit {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  name        String
+  frequency   String    // e.g. daily, 3x/week
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  user        User      @relation(fields: [userId], references: [id])
+  checks      HabitCheck[]
+}
+
+model HabitCheck {
+  id        Int      @id @default(autoincrement())
+  habitId   Int
+  date      DateTime
+  done      Boolean  @default(false)
+  note      String?
+  createdAt DateTime @default(now())
+  Habit     Habit    @relation(fields: [habitId], references: [id])
+}
+
+model FastingSession {
+  id          Int       @id @default(autoincrement())
+  userId      Int
+  startTime   DateTime  @default(now())
+  endTime     DateTime?
+  status      String    @default("active") // active|completed
+  protocol    String    // 16:8, 18:6, etc.
+  targetHours Int
+  notes       String?
+  user        User      @relation(fields: [userId], references: [id])
+  benefits    FastingBenefit[]
+}
+
+model FastingBenefit {
+  id               Int             @id @default(autoincrement())
+  fastingSessionId Int
+  type             String
+  intensity        Int
+  recordedAt       DateTime        @default(now())
+  session          FastingSession  @relation(fields: [fastingSessionId], references: [id])
+}
+
+model HydrationLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  date      DateTime @default(now())
+  ml        Int
+  source    String?  // water, tea, etc.
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model MoodLog {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  date      DateTime @default(now())
+  mood      Int      // 1..5
+  note      String?
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model TimerSession {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  type      String   // focus, breathwork, cold, etc.
+  label     String?
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  meta      Json?
+  user      User     @relation(fields: [userId], references: [id])
 } 

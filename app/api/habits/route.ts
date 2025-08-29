@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { HabitSchema } from '@/lib/validators';
-import { getOrCreateUser } from '@/lib/db';
 import { prisma } from '@/lib/db';
+import { safeParse, zHabitCheck } from '@/lib/validate';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('User');
+    // For now, use a default user ID (in production, get from auth)
+    const userId = 1;
     
     const habits = await prisma.habit.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' }, // Now this field exists
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json(habits);
@@ -26,32 +25,57 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const habitData = HabitSchema.parse(body);
+    const data = safeParse(zHabitCheck, body);
     
-    const user = await getOrCreateUser('User');
+    // For now, use a default user ID (in production, get from auth)
+    const userId = 1;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
     
-    const habit = await prisma.habit.create({
-      data: {
-        userId: user.id,
-        name: habitData.name,
-        description: habitData.description,
-        frequency: habitData.frequency,
-      },
+    // Check if habit exists and belongs to user
+    const habit = await prisma.habit.findFirst({
+      where: {
+        id: data.habitId,
+        userId
+      }
     });
-
-    return NextResponse.json(habit);
-  } catch (error) {
-    console.error('Habits POST error:', error);
     
-    if (error instanceof z.ZodError) {
+    if (!habit) {
       return NextResponse.json(
-        { error: 'Invalid habit data', details: error.errors },
-        { status: 400 }
+        { error: 'Habit not found' },
+        { status: 404 }
       );
     }
-
+    
+    // Upsert today's habit check
+    const habitCheck = await prisma.habitCheck.upsert({
+      where: {
+        habitId_date: {
+          habitId: data.habitId,
+          date: today
+        }
+      },
+      update: {
+        done: data.done,
+        note: data.note
+      },
+      create: {
+        habitId: data.habitId,
+        date: today,
+        done: data.done,
+        note: data.note
+      }
+    });
+    
+    return NextResponse.json({
+      success: true,
+      habitCheck
+    });
+  } catch (error) {
+    console.error('Error creating habit check:', error);
+    if (error instanceof Response) return error;
     return NextResponse.json(
-      { error: 'Failed to create habit' },
+      { error: 'Failed to create habit check' },
       { status: 500 }
     );
   }

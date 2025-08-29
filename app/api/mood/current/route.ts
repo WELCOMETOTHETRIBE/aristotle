@@ -5,55 +5,31 @@ export async function GET(request: NextRequest) {
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
     
-    // Get today's mood record
-    const moodRecord = await prisma.session.findFirst({
+    // Get today's mood log
+    const moodLog = await prisma.moodLog.findFirst({
       where: {
-        moduleId: 'mood_regulation',
-        startedAt: {
-          gte: today
+        date: {
+          gte: today,
+          lt: tomorrow
         }
       },
       orderBy: {
-        startedAt: 'desc'
+        date: 'desc'
       }
     });
-    
-    // Get mood trend for the last 7 days
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
-    
-    const moodTrend = await prisma.session.findMany({
-      where: {
-        moduleId: 'mood_regulation',
-        startedAt: {
-          gte: weekAgo
-        },
-        moodPost: {
-          not: null
-        }
-      },
-      select: {
-        moodPost: true,
-        startedAt: true
-      },
-      orderBy: {
-        startedAt: 'asc'
-      }
-    });
-    
-    const current = moodRecord?.moodPost || 4;
-    const trend = moodTrend.map((record: any) => record.moodPost || 4);
     
     return NextResponse.json({
-      current,
-      trend,
-      lastUpdated: moodRecord?.startedAt
+      mood: moodLog?.mood || null,
+      note: moodLog?.note || null,
+      logged: !!moodLog
     });
   } catch (error) {
     console.error('Error fetching mood data:', error);
     return NextResponse.json(
-      { current: 4, trend: [3, 4, 4, 5, 4, 3, 4] },
+      { mood: null, note: null, logged: false },
       { status: 200 }
     );
   }

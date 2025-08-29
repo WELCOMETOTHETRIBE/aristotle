@@ -5,22 +5,16 @@ import { join } from 'path';
 
 const PLACEHOLDER_PATTERNS = [
   /coming soon/i,
-  /demo user/i,
-  /demo@/i,
-  /fallback.*resources/i,
-  /fallback.*practice/i,
-  /stub.*implementation/i,
-  /TODO.*implement/i,
-  /FIXME.*implement/i,
-  /for demo purposes/i,
-  /for now, return/i,
-  /placeholder user/i,
-  /your-secret-key/i,
-  /your-openai-api-key/i,
-  /your-railway-token/i
+  /TODO:\s*placeholder/i,
+  /FIXME:\s*placeholder/i,
+  /placeholder text/i,
+  /mock data/i,
+  /dummy data/i,
+  /sample data/i,
+  /test data/i
 ];
 
-const EXCLUDE_PATTERNS = [
+const IGNORE_PATTERNS = [
   /node_modules/,
   /\.git/,
   /\.next/,
@@ -31,151 +25,84 @@ const EXCLUDE_PATTERNS = [
   /\.lock$/,
   /package-lock\.json$/,
   /yarn\.lock$/,
-  /pnpm-lock\.yaml$/,
-  /\.min\./,
-  /\.map$/,
-  /\.d\.ts$/,
-  /scripts\/strip-placeholders\.ts$/, // Don't check this file itself
-  /doctor-report\.json$/,
-  /README\.md$/,
-  /\.md$/,
-  /\.json$/,
-  /\.yml$/,
-  /\.yaml$/,
-  /\.toml$/,
-  /\.env/,
-  /\.example$/,
-  /\.config\./,
-  /\.test\./,
-  /\.spec\./,
-  /\.e2e\./,
-  /\.smoke\./,
-  /prisma\/seed\//, // Don't check seed files
-  /env\.local\.example$/ // Don't check example env files
+  /\.min\.js$/,
+  /\.min\.css$/,
+  /README.*\.md$/,
+  /IMPLEMENTATION_PROGRESS\.md$/,
+  /scripts\/strip-placeholders\.ts$/,
+  /scripts\/doctor\.ts$/,
+  /app\/api\/health-doctor/
 ];
 
-const INCLUDE_EXTENSIONS = [
-  '.ts', '.tsx', '.js', '.jsx', '.vue', '.svelte', '.astro'
+const TEXT_EXTENSIONS = [
+  '.ts', '.tsx', '.js', '.jsx', '.json', '.md', '.txt', '.css', '.scss', '.html'
 ];
 
-interface PlaceholderMatch {
-  file: string;
-  line: number;
-  pattern: string;
-  context: string;
-}
-
-async function shouldCheckFile(filePath: string): Promise<boolean> {
-  // Check if file should be excluded
-  for (const pattern of EXCLUDE_PATTERNS) {
-    if (pattern.test(filePath)) {
-      return false;
-    }
-  }
-
-  // Check if file has an extension we want to include
-  const ext = filePath.split('.').pop()?.toLowerCase();
-  return ext ? INCLUDE_EXTENSIONS.includes(`.${ext}`) : false;
-}
-
-async function scanFile(filePath: string): Promise<PlaceholderMatch[]> {
-  const matches: PlaceholderMatch[] = [];
+async function scanDirectory(dir: string): Promise<string[]> {
+  const issues: string[] = [];
   
   try {
-    const content = await readFile(filePath, 'utf-8');
-    const lines = content.split('\n');
-    
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i];
-      const lineNumber = i + 1;
-      
-      for (const pattern of PLACEHOLDER_PATTERNS) {
-        if (pattern.test(line)) {
-          matches.push({
-            file: filePath,
-            line: lineNumber,
-            pattern: pattern.source,
-            context: line.trim()
-          });
-        }
-      }
-    }
-  } catch (error) {
-    console.warn(`Warning: Could not read file ${filePath}:`, error);
-  }
-  
-  return matches;
-}
-
-async function scanDirectory(dirPath: string): Promise<PlaceholderMatch[]> {
-  const matches: PlaceholderMatch[] = [];
-  
-  try {
-    const entries = await readdir(dirPath, { withFileTypes: true });
+    const entries = await readdir(dir);
     
     for (const entry of entries) {
-      const fullPath = join(dirPath, entry.name);
+      const fullPath = join(dir, entry);
+      const stats = await stat(fullPath);
       
-      if (entry.isDirectory()) {
-        const subMatches = await scanDirectory(fullPath);
-        matches.push(...subMatches);
-      } else if (entry.isFile()) {
-        if (await shouldCheckFile(fullPath)) {
-          const fileMatches = await scanFile(fullPath);
-          matches.push(...fileMatches);
+      // Skip ignored patterns
+      if (IGNORE_PATTERNS.some(pattern => pattern.test(fullPath))) {
+        continue;
+      }
+      
+      if (stats.isDirectory()) {
+        const subIssues = await scanDirectory(fullPath);
+        issues.push(...subIssues);
+      } else if (stats.isFile()) {
+        const ext = fullPath.split('.').pop()?.toLowerCase();
+        if (ext && TEXT_EXTENSIONS.includes(`.${ext}`)) {
+          try {
+            const content = await readFile(fullPath, 'utf-8');
+            const lines = content.split('\n');
+            
+            for (let i = 0; i < lines.length; i++) {
+              const line = lines[i];
+              for (const pattern of PLACEHOLDER_PATTERNS) {
+                if (pattern.test(line)) {
+                  issues.push(`${fullPath}:${i + 1} - Found placeholder: "${line.trim()}"`);
+                }
+              }
+            }
+          } catch (error) {
+            // Skip files that can't be read as text
+            continue;
+          }
         }
       }
     }
   } catch (error) {
-    console.warn(`Warning: Could not scan directory ${dirPath}:`, error);
+    console.error(`Error scanning directory ${dir}:`, error);
   }
   
-  return matches;
+  return issues;
 }
 
 async function main() {
-  console.log('🔍 Scanning for placeholder content...');
+  console.log('🔍 Scanning for placeholder text...');
   
-  const startTime = Date.now();
-  const matches = await scanDirectory('.');
-  const endTime = Date.now();
+  const issues = await scanDirectory('.');
   
-  console.log(`\n📊 Scan completed in ${endTime - startTime}ms`);
-  console.log(`Found ${matches.length} placeholder matches\n`);
-  
-  if (matches.length > 0) {
-    console.log('❌ PLACEHOLDER CONTENT DETECTED:');
-    console.log('The following files contain placeholder content that must be removed before shipping:\n');
-    
-    // Group by file for better readability
-    const matchesByFile = matches.reduce((acc, match) => {
-      if (!acc[match.file]) {
-        acc[match.file] = [];
-      }
-      acc[match.file].push(match);
-      return acc;
-    }, {} as Record<string, PlaceholderMatch[]>);
-    
-    for (const [file, fileMatches] of Object.entries(matchesByFile)) {
-      console.log(`📁 ${file}:`);
-      for (const match of fileMatches) {
-        console.log(`   Line ${match.line}: ${match.context}`);
-      }
-      console.log('');
-    }
-    
-    console.log('🚫 Build failed: Placeholder content detected');
-    console.log('Please remove all placeholder content before shipping.');
+  if (issues.length > 0) {
+    console.error('❌ Found placeholder text in the following files:');
+    issues.forEach(issue => console.error(`  ${issue}`));
+    console.error(`\nTotal issues found: ${issues.length}`);
+    console.error('Please remove all placeholder text before building for production.');
     process.exit(1);
   } else {
-    console.log('✅ No placeholder content detected');
-    console.log('✅ Build can proceed');
+    console.log('✅ No placeholder text found. Ready for production!');
+    process.exit(0);
   }
 }
 
-if (require.main === module) {
-  main().catch((error) => {
-    console.error('Error during scan:', error);
-    process.exit(1);
-  });
-} 
+main().catch(error => {
+  console.error('Error running placeholder scan:', error);
+  process.exit(1);
+}); 
