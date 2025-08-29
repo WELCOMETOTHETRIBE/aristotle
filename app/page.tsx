@@ -157,21 +157,21 @@ export default function DashboardPage() {
             {/* Virtue Radar */}
             <GlassCard title="Virtue Progress" subtitle="This week's growth" className="p-6">
               <VirtueRadar data={[
-                { virtue: 'Wisdom', score: data.virtueScores.wisdom },
-                { virtue: 'Courage', score: data.virtueScores.courage },
-                { virtue: 'Justice', score: data.virtueScores.justice },
-                { virtue: 'Temperance', score: data.virtueScores.temperance }
+                { virtue: 'Wisdom', score: data.virtueScores?.wisdom || 0 },
+                { virtue: 'Courage', score: data.virtueScores?.courage || 0 },
+                { virtue: 'Justice', score: data.virtueScores?.justice || 0 },
+                { virtue: 'Temperance', score: data.virtueScores?.temperance || 0 }
               ]} />
             </GlassCard>
 
             {/* Habits Tracker */}
             <GlassCard title="Daily Habits" subtitle="Track your progress" className="p-6">
               <div className="space-y-3">
-                {data.habits.total.map((habit) => (
+                {(data.habits?.total || []).map((habit) => (
                   <div key={habit} className="flex items-center justify-between">
                     <span className="text-white capitalize">{habit}</span>
                     <div className={`w-4 h-4 rounded-full border-2 ${
-                      data.habits.completed.includes(habit) 
+                      (data.habits?.completed || []).includes(habit) 
                         ? 'bg-green-500 border-green-500' 
                         : 'border-gray-400'
                     }`} />
@@ -183,8 +183,8 @@ export default function DashboardPage() {
             {/* Hydration Ring */}
             <GlassCard title="Hydration" subtitle="Daily water intake" className="p-6">
               <RadialMeter 
-                value={data.hydration.current / data.hydration.target} 
-                label={`${data.hydration.current}/${data.hydration.target} ml`}
+                value={(data.hydration?.current || 0) / (data.hydration?.target || 1)} 
+                label={`${data.hydration?.current || 0}/${data.hydration?.target || 2000} ml`}
                 size={120}
               />
               <div className="flex gap-2 mt-4">
@@ -194,13 +194,13 @@ export default function DashboardPage() {
             </GlassCard>
 
             {/* Fasting Status */}
-            <GlassCard title="Fasting" subtitle={data.fasting.isActive ? "Active fast" : "No active fast"} className="p-6">
-              {data.fasting.isActive ? (
+            <GlassCard title="Fasting" subtitle={data.fasting?.isActive ? "Active fast" : "No active fast"} className="p-6">
+              {data.fasting?.isActive ? (
                 <div className="text-center">
                   <div className="text-2xl font-bold text-white mb-2">
-                    {formatTime(data.fasting.timeRemaining)}
+                    {formatTime(data.fasting?.timeRemaining || 0)}
                   </div>
-                  <p className="text-sm text-gray-300 mb-4">{data.fasting.protocol}</p>
+                  <p className="text-sm text-gray-300 mb-4">{data.fasting?.protocol || '16:8'}</p>
                   <button className="btn-primary btn-small w-full">End Fast</button>
                 </div>
               ) : (
@@ -214,14 +214,14 @@ export default function DashboardPage() {
             {/* Mood Tracker */}
             <GlassCard title="Mood" subtitle="How are you feeling?" className="p-6">
               <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">{data.mood.current}/5</div>
+                <div className="text-3xl font-bold text-white mb-2">{data.mood?.current || 0}/5</div>
                 <p className="text-sm text-gray-300 mb-4">Current mood</p>
                 <div className="flex justify-center gap-1">
                   {[1, 2, 3, 4, 5].map((rating) => (
                     <button
                       key={rating}
                       className={`w-8 h-8 rounded-full ${
-                        rating <= data.mood.current ? 'bg-yellow-400' : 'bg-gray-600'
+                        rating <= (data.mood?.current || 0) ? 'bg-yellow-400' : 'bg-gray-600'
                       }`}
                     />
                   ))}
