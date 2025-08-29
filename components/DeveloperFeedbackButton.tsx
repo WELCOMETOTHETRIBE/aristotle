@@ -32,10 +32,7 @@ export default function DeveloperFeedbackButton({
   const [priority, setPriority] = useState<DeveloperFeedback['priority']>('medium');
   const [category, setCategory] = useState<DeveloperFeedback['category']>('improvement');
 
-  // Only show in development
-  if (process.env.NODE_ENV !== 'development') {
-    return <>{children}</>;
-  }
+  // No environment check needed - controlled by DeveloperAuth component
 
   const handleSubmit = () => {
     if (!comment.trim()) return;

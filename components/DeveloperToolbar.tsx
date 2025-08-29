@@ -13,10 +13,7 @@ export default function DeveloperToolbar() {
   const [showIntegrityDashboard, setShowIntegrityDashboard] = useState(false);
   const [showFeedbackDashboard, setShowFeedbackDashboard] = useState(false);
 
-  // Only show in development
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
+  // No environment check needed - controlled by DeveloperAuth component
 
   return (
     <>

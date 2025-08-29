@@ -9,6 +9,7 @@ import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
+import DeveloperAuth from '@/components/DeveloperAuth';
 import DeveloperFeedbackButton from '@/components/DeveloperFeedbackButton';
 
 interface VirtueScores {
@@ -439,15 +440,17 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* General Page Feedback */}
-      <DeveloperFeedbackButton
-        targetId="dashboard_page"
-        type="general"
-        className="fixed top-4 right-4 z-50"
-      >
-        <div className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-colors">
-          <MessageSquare className="h-4 w-4" />
-        </div>
-      </DeveloperFeedbackButton>
+      <DeveloperAuth>
+        <DeveloperFeedbackButton
+          targetId="dashboard_page"
+          type="general"
+          className="fixed top-4 right-4 z-50"
+        >
+          <div className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-colors">
+            <MessageSquare className="h-4 w-4" />
+          </div>
+        </DeveloperFeedbackButton>
+      </DeveloperAuth>
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
@@ -463,11 +466,12 @@ export default function DashboardPage() {
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Wisdom Spotlight - Special Widget */}
-              <DeveloperFeedbackButton
-                targetId="wisdom_spotlight"
-                type="section"
-                className="relative"
-              >
+              <DeveloperAuth>
+                <DeveloperFeedbackButton
+                  targetId="wisdom_spotlight"
+                  type="section"
+                  className="relative"
+                >
                 <Card className="glass-effect bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
@@ -514,13 +518,15 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
               </DeveloperFeedbackButton>
+              </DeveloperAuth>
 
               {/* Virtue Progress */}
-              <DeveloperFeedbackButton
-                targetId="virtue_progress"
-                type="section"
-                className="relative"
-              >
+              <DeveloperAuth>
+                <DeveloperFeedbackButton
+                  targetId="virtue_progress"
+                  type="section"
+                  className="relative"
+                >
                 <Card className="glass-effect">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -578,6 +584,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
               </DeveloperFeedbackButton>
+              </DeveloperAuth>
 
               {/* Today's Tasks */}
               <Card className="glass-effect">
