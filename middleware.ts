@@ -1,29 +1,5 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken } from '@/lib/auth';
-
-// Routes that require authentication
-const protectedRoutes = [
-  '/',
-  '/dashboard',
-  '/frameworks',
-  '/wisdom',
-  '/courage',
-  '/justice',
-  '/temperance',
-  '/coach',
-  '/breath',
-  '/fasting',
-  '/progress',
-  '/today',
-  '/community',
-  '/academy'
-];
-
-// Routes that should redirect to dashboard if already authenticated
-const authRoutes = [
-  '/auth'
-];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -33,51 +9,11 @@ export function middleware(request: NextRequest) {
     pathname,
     hasToken: !!token,
     tokenLength: token?.length || 0,
-    tokenPreview: token ? `${token.substring(0, 20)}...` : 'none',
-    jwtSecret: process.env.JWT_SECRET ? 'SET' : 'NOT_SET',
-    nodeEnv: process.env.NODE_ENV
+    tokenPreview: token ? `${token.substring(0, 20)}...` : 'none'
   });
   
-  const isAuthenticated = token && verifyToken(token);
-  
-  console.log('🔐 Authentication result:', {
-    isAuthenticated,
-    tokenValid: !!verifyToken(token || '')
-  });
-
-  // Check if the route requires authentication
-  const isProtectedRoute = protectedRoutes.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
-  );
-
-  // Check if it's an auth route
-  const isAuthRoute = authRoutes.some(route => 
-    pathname === route || pathname.startsWith(route + '/')
-  );
-
-  console.log('🛣️ Route analysis:', {
-    isProtectedRoute,
-    isAuthRoute,
-    willRedirect: (!isAuthenticated && isProtectedRoute) || (isAuthenticated && isAuthRoute)
-  });
-
-  // If user is not authenticated and trying to access protected route
-  if (!isAuthenticated && isProtectedRoute) {
-    console.log('🚫 Redirecting to auth (not authenticated)');
-    const url = request.nextUrl.clone();
-    url.pathname = '/auth';
-    return NextResponse.redirect(url);
-  }
-
-  // If user is authenticated and trying to access auth route
-  if (isAuthenticated && isAuthRoute) {
-    console.log('✅ Redirecting to dashboard (authenticated)');
-    const url = request.nextUrl.clone();
-    url.pathname = '/';
-    return NextResponse.redirect(url);
-  }
-
-  console.log('➡️ Continuing to requested page');
+  // Temporarily allow all requests to pass through
+  console.log('➡️ Allowing request to continue');
   return NextResponse.next();
 }
 
