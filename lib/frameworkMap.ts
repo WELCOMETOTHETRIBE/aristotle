@@ -24,7 +24,13 @@ export const loadFrameworkMap = simpleCache((): FrameworkMap => {
   try {
     const p = path.join(process.cwd(), "data", "framework_map.json");
     if (!fs.existsSync(p)) {
-      console.error("data/framework_map.json not found");
+      console.error("data/framework_map.json not found at:", p);
+      console.log("Current working directory:", process.cwd());
+      try {
+        console.log("Available files in data directory:", fs.readdirSync(path.join(process.cwd(), "data")));
+      } catch (e) {
+        console.log("data directory not found");
+      }
       throw new Error("data/framework_map.json not found");
     }
     
@@ -44,13 +50,30 @@ export const loadFrameworkMap = simpleCache((): FrameworkMap => {
     return parsed;
   } catch (error) {
     console.error("Error loading framework map:", error);
-    // Return a minimal valid structure to prevent crashes
+    // Return a minimal valid structure with some basic frameworks to prevent crashes
     return {
       version: "1.0.0",
-      frameworks: [],
+      frameworks: [
+        {
+          id: "spartan",
+          name: "Spartan Agōgē",
+          nav: { tone: "gritty", badge: "Discipline", emoji: "🛡️" },
+          coreModules: ["strength", "discipline", "courage"],
+          supportModules: ["meditation", "fasting"],
+          featuredPractices: ["cold_exposure", "adversity_training"]
+        },
+        {
+          id: "stoic",
+          name: "Stoicism",
+          nav: { tone: "calm", badge: "Clarity", emoji: "🧱" },
+          coreModules: ["wisdom", "temperance", "reflection"],
+          supportModules: ["meditation", "philosophy"],
+          featuredPractices: ["evening_reflection", "memento_mori"]
+        }
+      ],
       catalog: {
-        modules: [],
-        practices: []
+        modules: ["strength", "discipline", "courage", "wisdom", "temperance", "reflection", "meditation", "fasting", "philosophy"],
+        practices: ["cold_exposure", "adversity_training", "evening_reflection", "memento_mori"]
       }
     };
   }

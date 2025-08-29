@@ -46,6 +46,7 @@ RUN adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder /app/scripts ./scripts
 COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/data ./data
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/test-server.js ./test-server.js
 
