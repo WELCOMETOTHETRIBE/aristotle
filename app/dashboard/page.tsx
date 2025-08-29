@@ -375,36 +375,44 @@ export default function DashboardPage() {
   const activeGoals = goals.filter(goal => goal.status === 'active');
   const checkedHabits = habits.filter(habit => habit.checkedToday);
 
-  // Daily wisdom quotes
-  const dailyWisdom = [
-    {
-      quote: "The unexamined life is not worth living.",
-      author: "Socrates",
-      framework: "Stoic"
-    },
-    {
-      quote: "Strength is forged through chosen hardship.",
-      author: "Spartan Agōgē",
-      framework: "Spartan"
-    },
-    {
-      quote: "Honor is clarity in action.",
-      author: "Bushidō",
-      framework: "Samurai"
-    },
-    {
-      quote: "Rhythm roots the soul.",
-      author: "Monastic Rule",
-      framework: "Monastic"
-    },
-    {
-      quote: "Align body, breath, and mind.",
-      author: "Yogic Path",
-      framework: "Yogic"
-    }
-  ];
+  // Daily wisdom quotes - will be replaced with AI-generated content
+  const [todayWisdom, setTodayWisdom] = useState({
+    quote: "The unexamined life is not worth living.",
+    author: "Socrates",
+    framework: "Stoic",
+    reflection: "What aspect of your life needs deeper examination today?"
+  });
 
-  const todayWisdom = dailyWisdom[new Date().getDate() % dailyWisdom.length];
+  // Load dynamic daily wisdom
+  useEffect(() => {
+    const loadDailyWisdom = async () => {
+      try {
+        const frameworks = ['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic'];
+        const randomFramework = frameworks[Math.floor(Math.random() * frameworks.length)];
+        
+        const response = await fetch('/api/generate/daily-wisdom', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            framework: randomFramework,
+            date: new Date().toISOString().split('T')[0]
+          }),
+        });
+
+        if (response.ok) {
+          const wisdom = await response.json();
+          setTodayWisdom(wisdom);
+        }
+      } catch (error) {
+        console.error('Error loading daily wisdom:', error);
+        // Keep the default wisdom if API fails
+      }
+    };
+
+    loadDailyWisdom();
+  }, []);
 
   if (loading) {
     return (
@@ -475,6 +483,11 @@ export default function DashboardPage() {
                     <div className="inline-flex items-center px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs">
                       {todayWisdom.framework} Tradition
                     </div>
+                    {todayWisdom.reflection && (
+                      <div className="text-sm text-purple-300 italic">
+                        {todayWisdom.reflection}
+                      </div>
+                    )}
                     <div className="pt-4">
                       <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20">
                         Reflect on This Wisdom

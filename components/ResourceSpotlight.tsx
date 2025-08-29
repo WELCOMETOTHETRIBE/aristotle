@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BookOpen, Clock, Star, ChevronRight, Play, CheckCircle, Award } from "lucide-react";
 import { learningResources, getResourceById } from "@/lib/learning-resources";
@@ -13,8 +13,58 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
   const [selectedResource, setSelectedResource] = useState<LearningResource | null>(null);
   const [isLearningMode, setIsLearningMode] = useState(false);
   const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
+  const [resources, setResources] = useState<LearningResource[]>(learningResources);
+  const [loading, setLoading] = useState(false);
 
-  const featuredResource = learningResources[0]; // Meditations by default
+  // Load AI-generated resources
+  useEffect(() => {
+    const loadAIGeneratedResources = async () => {
+      setLoading(true);
+      try {
+        const topics = ['Stoic Philosophy', 'Mindful Living', 'Personal Growth', 'Ancient Wisdom'];
+        const difficulties = ['beginner', 'intermediate'];
+        const focuses = ['practical application', 'daily practice', 'self-reflection'];
+        
+        const aiResources = await Promise.all(
+          topics.slice(0, 2).map(async (topic, index) => {
+            try {
+              const response = await fetch('/api/generate/learning-resources', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  topic,
+                  difficulty: difficulties[index % difficulties.length],
+                  focus: focuses[index % focuses.length]
+                }),
+              });
+
+              if (response.ok) {
+                return await response.json();
+              }
+            } catch (error) {
+              console.error(`Error generating resource for ${topic}:`, error);
+            }
+            return null;
+          })
+        );
+
+        const validResources = aiResources.filter(resource => resource !== null);
+        if (validResources.length > 0) {
+          setResources([...validResources, ...learningResources.slice(0, 2)]);
+        }
+      } catch (error) {
+        console.error('Error loading AI-generated resources:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadAIGeneratedResources();
+  }, []);
+
+  const featuredResource = resources[0] || learningResources[0]; // Use AI-generated or fallback to default
 
   const handleStartLearning = (resource: LearningResource) => {
     setSelectedResource(resource);
@@ -246,7 +296,7 @@ export function ResourceSpotlight({ className = "" }: ResourceSpotlightProps) {
       <div>
         <h4 className="text-lg font-semibold text-white mb-4">All Resources</h4>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {learningResources.map((resource) => (
+          {resources.map((resource) => (
             <motion.div
               key={resource.id}
               whileHover={{ scale: 1.02 }}

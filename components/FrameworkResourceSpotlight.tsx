@@ -87,7 +87,49 @@ export default function FrameworkResourceSpotlight({
           }
         });
 
-        setResources(frameworkResources.slice(0, 3)); // Show top 3
+        // If we have static resources, use them; otherwise generate AI resources
+        if (frameworkResources.length > 0) {
+          setResources(frameworkResources.slice(0, 3)); // Show top 3
+        } else {
+          // Generate AI resources for this framework
+          try {
+            const aiResponse = await fetch('/api/generate/framework-resources', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                frameworkId,
+                frameworkName,
+                frameworkTone
+              }),
+            });
+
+            if (aiResponse.ok) {
+              const aiResource = await aiResponse.json();
+              setResources([aiResource]);
+            } else {
+              throw new Error('Failed to generate AI resources');
+            }
+          } catch (aiError) {
+            console.error('Error generating AI resources:', aiError);
+            // Fallback to static resource
+            setResources([
+              {
+                id: 'fallback-1',
+                title: `${frameworkName} Wisdom`,
+                thinker: 'Ancient Sage',
+                era: 'Timeless',
+                type: 'capsule',
+                estMinutes: 5,
+                keyIdeas: ['Foundational principles', 'Practical application'],
+                microPractices: ['Daily reflection', 'Mindful practice'],
+                reflections: ['How does this wisdom apply today?'],
+                level: 'Beginner'
+              }
+            ]);
+          }
+        }
       } catch (error) {
         console.error('Error loading resources:', error);
         setError(error instanceof Error ? error.message : 'Failed to load resources');
