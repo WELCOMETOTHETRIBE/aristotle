@@ -50,6 +50,9 @@ COPY --from=builder /app/data ./data
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/test-server.js ./test-server.js
 
+# Create prisma directory and set proper permissions
+RUN mkdir -p ./prisma && chown -R nextjs:nodejs ./prisma
+
 # Set the correct permission for prerender cache
 RUN mkdir .next
 RUN chown nextjs:nodejs .next
