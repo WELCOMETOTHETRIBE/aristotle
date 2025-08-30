@@ -102,12 +102,12 @@ export function VirtueNavigation() {
         <div className="mx-auto w-full max-w-7xl px-4">
           <div className="flex items-center justify-between h-8">
             {/* Logo */}
-            <Link href="/" className="flex items-center gap-1.5 interactive">
-              <img 
-                src="/academy_logo.png" 
-                alt="Academy Logo" 
-                className="w-5 h-5 rounded-md shadow-lg"
-              />
+                                  <Link href="/" className="flex items-center gap-1.5 interactive">
+                        <img
+                          src="/academy_logo_r2.png"
+                          alt="Academy Logo"
+                          className="w-5 h-5 rounded-md shadow-lg"
+                        />
               <span className="font-semibold text-white text-xs">Academy</span>
             </Link>
 

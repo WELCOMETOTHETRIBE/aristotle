@@ -159,7 +159,7 @@ export default function AuthPage() {
               <div className="relative mb-8">
                 <div className="w-32 h-32 bg-gradient-to-br from-accent via-accent-2 to-purple-500 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden border-2 border-white/10">
                   <img 
-                    src="/academy_logo.png" 
+                    src="/academy_logo_r2.png" 
                     alt="Academy Logo" 
                     className="w-20 h-20 object-contain"
                     onError={(e) => {
