@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-mo
 import { 
   Play, Pause, RotateCcw, Timer, Target, BookOpen, Heart, Brain, Zap, 
   Users, Sun, Moon, Coffee, Droplets, Dumbbell, CheckCircle,
-  Clock, TrendingUp, Activity, Sparkles, Flame, Wind
+  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera
 } from 'lucide-react';
 import { BreathworkWidgetNew } from './BreathworkWidgetNew';
 
@@ -286,6 +286,19 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
   const [currentEntry, setCurrentEntry] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(0);
+
+  // Load saved entries from localStorage on component mount
+  useEffect(() => {
+    const savedEntries = localStorage.getItem('gratitudeJournalEntries');
+    if (savedEntries) {
+      setEntries(JSON.parse(savedEntries));
+    }
+  }, []);
+
+  // Save entries to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('gratitudeJournalEntries', JSON.stringify(entries));
+  }, [entries]);
 
   const prompts = [
     "What am I grateful for today?",
@@ -908,6 +921,344 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
   );
 }
 
+// ===== NATURE PHOTO LOG WIDGET =====
+interface NaturePhotoLogWidgetProps {
+  frameworkTone?: string;
+}
+
+interface NaturePhoto {
+  id: string;
+  url: string;
+  caption: string;
+  tags: string[];
+  location?: string;
+  timestamp: Date;
+  weather?: string;
+  mood?: string;
+}
+
+export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePhotoLogWidgetProps) {
+  const [photos, setPhotos] = useState<NaturePhoto[]>([]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [caption, setCaption] = useState('');
+  const [location, setLocation] = useState('');
+  const [weather, setWeather] = useState('');
+  const [mood, setMood] = useState('');
+  const [showGallery, setShowGallery] = useState(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<NaturePhoto | null>(null);
+
+  const availableTags = ['dawn', 'dusk', 'tree', 'water', 'earth', 'sky', 'flower', 'animal', 'mountain', 'forest', 'ocean', 'river', 'sunset', 'sunrise', 'clouds', 'rain', 'snow', 'wind'];
+
+  // Load saved photos from localStorage on component mount
+  useEffect(() => {
+    const savedPhotos = localStorage.getItem('naturePhotoLog');
+    if (savedPhotos) {
+      const parsedPhotos = JSON.parse(savedPhotos).map((photo: any) => ({
+        ...photo,
+        timestamp: new Date(photo.timestamp)
+      }));
+      setPhotos(parsedPhotos);
+    }
+  }, []);
+
+  // Save photos to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('naturePhotoLog', JSON.stringify(photos));
+  }, [photos]);
+
+  const addPhoto = () => {
+    if (selectedTags.length === 0) return;
+
+    // For demo purposes, create a placeholder image URL
+    // In a real app, this would be an actual photo upload
+    const newPhoto: NaturePhoto = {
+      id: Date.now().toString(),
+      url: `https://picsum.photos/400/300?random=${Date.now()}`, // Placeholder image
+      caption: caption.trim() || 'Nature connection',
+      tags: selectedTags,
+      location: location.trim() || undefined,
+      timestamp: new Date(),
+      weather: weather.trim() || undefined,
+      mood: mood.trim() || undefined
+    };
+
+    setPhotos(prev => [newPhoto, ...prev]);
+    
+    // Reset form
+    setSelectedTags([]);
+    setCaption('');
+    setLocation('');
+    setWeather('');
+    setMood('');
+    setIsAdding(false);
+  };
+
+  const removePhoto = (id: string) => {
+    setPhotos(prev => prev.filter(photo => photo.id !== id));
+  };
+
+  const toggleTag = (tag: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tag) 
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('en-US', { 
+      month: 'short', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  return (
+    <motion.div 
+      className="p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-blue-500/10 border border-green-500/20 backdrop-blur-sm"
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <motion.div 
+            className="p-3 rounded-xl bg-green-500/20"
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            <Camera className="w-6 h-6 text-green-400" />
+          </motion.div>
+          <div>
+            <h3 className="font-bold text-white text-lg">Nature Photo Log</h3>
+            <p className="text-sm text-gray-400">Connect with the natural world</p>
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-green-400">{photos.length}</div>
+          <div className="text-xs text-gray-400">Photos</div>
+        </div>
+      </div>
+
+      {/* Add Photo Section */}
+      {!isAdding ? (
+        <motion.button
+          onClick={() => setIsAdding(true)}
+          className="w-full p-4 border-2 border-dashed border-green-500/30 rounded-xl text-green-400 hover:border-green-500/50 hover:bg-green-500/10 transition-all mb-6"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <div className="flex items-center justify-center gap-2">
+            <Camera className="w-5 h-5" />
+            <span>Add Nature Photo</span>
+          </div>
+        </motion.button>
+      ) : (
+        <motion.div 
+          className="mb-6 p-4 bg-white/5 rounded-lg border border-green-500/20"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <div className="text-sm text-gray-400 mb-3">Select tags for your nature connection:</div>
+          
+          {/* Tag Selection */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {availableTags.map((tag) => (
+              <motion.button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
+                  selectedTags.includes(tag)
+                    ? 'bg-green-500/30 text-green-200 border border-green-500/50'
+                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {tag}
+              </motion.button>
+            ))}
+          </div>
+
+          {/* Additional Details */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+            <input
+              type="text"
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              placeholder="Caption (optional)"
+              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
+            />
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="Location (optional)"
+              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
+            />
+            <input
+              type="text"
+              value={weather}
+              onChange={(e) => setWeather(e.target.value)}
+              placeholder="Weather (optional)"
+              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
+            />
+            <input
+              type="text"
+              value={mood}
+              onChange={(e) => setMood(e.target.value)}
+              placeholder="Mood (optional)"
+              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <motion.button
+              onClick={addPhoto}
+              disabled={selectedTags.length === 0}
+              className="px-4 py-2 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Add Photo
+            </motion.button>
+            <motion.button
+              onClick={() => {
+                setIsAdding(false);
+                setSelectedTags([]);
+                setCaption('');
+                setLocation('');
+                setWeather('');
+                setMood('');
+              }}
+              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-all"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Cancel
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Gallery Toggle */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="text-sm text-gray-400">Your Nature Collection:</div>
+        <button
+          onClick={() => setShowGallery(!showGallery)}
+          className="text-sm text-green-400 hover:text-green-300 transition-colors"
+        >
+          {showGallery ? 'Hide Gallery' : 'Show Gallery'}
+        </button>
+      </div>
+
+      {/* Photo Gallery */}
+      {showGallery && (
+        <motion.div 
+          className="mb-6"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+        >
+          {photos.length === 0 ? (
+            <div className="text-center py-8 text-gray-400">
+              <Camera className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p>No photos yet. Start your nature connection journey!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              {photos.map((photo) => (
+                <motion.div
+                  key={photo.id}
+                  className="relative group cursor-pointer"
+                  whileHover={{ scale: 1.05 }}
+                  onClick={() => setSelectedPhoto(photo)}
+                >
+                  <img
+                    src={photo.url}
+                    alt={photo.caption}
+                    className="w-full h-24 object-cover rounded-lg"
+                  />
+                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
+                    <div className="text-white text-xs text-center">
+                      <div className="font-medium">{photo.caption}</div>
+                      <div className="text-gray-300">{formatDate(photo.timestamp)}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removePhoto(photo.id);
+                    }}
+                    className="absolute top-1 right-1 w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center text-xs opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    ×
+                  </button>
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Photo Detail Modal */}
+      {selectedPhoto && (
+        <motion.div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <motion.div 
+            className="bg-gray-900 rounded-xl p-6 max-w-md w-full"
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={selectedPhoto.url}
+              alt={selectedPhoto.caption}
+              className="w-full h-48 object-cover rounded-lg mb-4"
+            />
+            <h3 className="text-white font-bold mb-2">{selectedPhoto.caption}</h3>
+            <div className="space-y-2 text-sm text-gray-300">
+              <div>📅 {formatDate(selectedPhoto.timestamp)}</div>
+              {selectedPhoto.location && <div>📍 {selectedPhoto.location}</div>}
+              {selectedPhoto.weather && <div>🌤️ {selectedPhoto.weather}</div>}
+              {selectedPhoto.mood && <div>😊 {selectedPhoto.mood}</div>}
+              <div className="flex flex-wrap gap-1 mt-2">
+                {selectedPhoto.tags.map((tag) => (
+                  <span key={tag} className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <button
+              onClick={() => setSelectedPhoto(null)}
+              className="mt-4 w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+            >
+              Close
+            </button>
+          </motion.div>
+        </motion.div>
+      )}
+
+      {/* Nature Connection Tips */}
+      <div className="mt-4 p-3 bg-white/5 rounded-lg">
+        <div className="text-xs text-gray-400 mb-1">Connection Tip:</div>
+        <div className="text-sm text-white">
+          Take time to observe and photograph nature. This practice helps cultivate mindfulness and deepens your connection to the natural world.
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ===== ENHANCED SLEEP TRACKER WIDGET =====
 interface SleepTrackerWidgetProps {
   frameworkTone?: string;
@@ -1106,6 +1457,8 @@ export default function ModuleWidget({ moduleId, moduleName, frameworkTone }: {
       return <HydrationWidget frameworkTone={frameworkTone} />;
     case 'sleep_circadian':
       return <SleepTrackerWidget frameworkTone={frameworkTone} />;
+    case 'nature_photo_log':
+      return <NaturePhotoLogWidget frameworkTone={frameworkTone} />;
     default:
       return (
         <motion.div 

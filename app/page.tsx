@@ -426,43 +426,71 @@ export default function DashboardPage() {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl transform translate-x-16 -translate-y-16"></div>
                 <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-500/10 to-red-500/10 rounded-full blur-2xl transform -translate-x-12 translate-y-12"></div>
                 
-                <div className="relative p-8">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                      <div className="relative">
-                        <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25">
-                          <Sparkles className="w-8 h-8 text-white" />
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                        </div>
+                <div className="relative p-6 md:p-8">
+                  {/* Header Section */}
+                  <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
+                    <div className="relative flex-shrink-0">
+                      <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25">
+                        <Sparkles className="w-8 h-8 text-white" />
                       </div>
-                      <div className="space-y-2">
-                        <h3 className="text-xl font-bold text-white mb-2">Unlock Your Personalized Path</h3>
-                        <p className="text-gray-300 text-base leading-relaxed max-w-md">
-                          Complete a quick assessment to get matched with your ideal philosophical framework and practices tailored to your unique personality
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                            <span>3-5 minutes</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                            <span>AI-powered matching</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                            <span>100% private</span>
-                          </div>
+                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                        <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xl md:text-2xl font-bold text-white mb-3">Unlock Your Personalized Path</h3>
+                      <p className="text-gray-300 text-base leading-relaxed mb-4">
+                        Complete a quick assessment to get matched with your ideal philosophical framework and practices tailored to your unique personality
+                      </p>
+                      
+                      {/* Feature Pills */}
+                      <div className="flex flex-wrap gap-3">
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-full">
+                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                          <span className="text-sm text-green-300 font-medium">3-5 minutes</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                          <span className="text-sm text-blue-300 font-medium">AI-powered matching</span>
+                        </div>
+                        <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-full">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                          <span className="text-sm text-purple-300 font-medium">100% private</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex flex-col items-end gap-3">
+                  </div>
+                  
+                  {/* Action Section */}
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                    <div className="flex-1">
+                      <p className="text-sm text-gray-400 mb-2">What you'll get:</p>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-300">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+                          <span>Personalized framework recommendation</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+                          <span>Custom practice suggestions</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+                          <span>Progress tracking setup</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
+                          <span>Daily wisdom insights</span>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="flex flex-col items-center gap-3 sm:items-end">
                       <Button
                         onClick={() => window.location.href = '/onboarding'}
                         size="lg"
-                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 text-base font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:scale-105"
+                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 text-base font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:scale-105"
                       >
                         Start Assessment
                         <ArrowRight className="ml-2 h-5 w-5" />

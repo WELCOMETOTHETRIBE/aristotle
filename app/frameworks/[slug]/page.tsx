@@ -14,7 +14,7 @@ import CounterCard from '../../../components/widgets/CounterCard';
 
 import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
-import { HydrationWidget } from '../../../components/ModuleWidgets';
+import { HydrationWidget, NaturePhotoLogWidget } from '../../../components/ModuleWidgets';
 import { BreathworkWidgetNew } from '../../../components/BreathworkWidgetNew';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
 import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
@@ -137,9 +137,10 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                   return <BreathworkWidgetNew frameworkTone={framework.tone} />;
                 case 'HYDRATION':
                   return <HydrationWidget frameworkTone={framework.tone} />;
+                case 'PHOTO':
+                  return <NaturePhotoLogWidget frameworkTone={framework.tone} />;
                 case 'JOURNAL':
                 case 'AUDIO_NOTE':
-                case 'PHOTO':
                 case 'WHEEL':
                 case 'DRAG_BOARD':
                 case 'CHECKLIST':
