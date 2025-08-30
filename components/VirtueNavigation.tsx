@@ -103,9 +103,11 @@ export function VirtueNavigation() {
           <div className="flex items-center justify-between h-8">
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 interactive">
-              <div className="w-5 h-5 bg-gradient-to-r from-accent to-accent-2 rounded-md flex items-center justify-center shadow-lg">
-                <GraduationCapIcon size={10} className="text-black" />
-              </div>
+              <img 
+                src="/academy-logo.png" 
+                alt="Academy Logo" 
+                className="w-5 h-5 rounded-md shadow-lg"
+              />
               <span className="font-semibold text-white text-xs">Academy</span>
             </Link>
 

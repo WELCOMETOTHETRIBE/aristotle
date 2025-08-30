@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Eye, EyeOff, Sparkles, Shield, Users, ArrowRight, CheckCircle, AlertCircle, Loader2, Brain, Target, TrendingUp, BookOpen, Zap } from 'lucide-react';
-import GraduationCapIcon from '@/components/GraduationCapIcon';
 import { useAuth } from '@/lib/auth-context';
 import PageLayout from '@/components/PageLayout';
 import AuroraBackground from '@/components/AuroraBackground';
@@ -150,8 +149,12 @@ export default function AuthPage() {
               transition={{ duration: 0.6 }}
             >
               <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-r from-accent to-accent-2 rounded-3xl flex items-center justify-center mr-8 shadow-2xl">
-                  <GraduationCapIcon size={48} className="text-black" />
+                <div className="w-24 h-24 bg-gradient-to-r from-accent to-accent-2 rounded-3xl flex items-center justify-center mr-8 shadow-2xl overflow-hidden">
+                  <img 
+                    src="/academy-logo.png" 
+                    alt="Academy Logo" 
+                    className="w-16 h-16 object-contain"
+                  />
                 </div>
                 <motion.div
                   className="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center"
