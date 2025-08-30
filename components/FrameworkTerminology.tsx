@@ -31,33 +31,75 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Agōgē",
-        definition: "The rigorous education and training system that transformed Spartan boys into warriors. It emphasized discipline, physical fitness, and mental toughness.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Krypteia",
-        definition: "A secret police force of young Spartan men who tested their skills through stealth missions and survival challenges.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Laconic Speech",
-        definition: "Brevity and conciseness in speech, reflecting Spartan values of efficiency and directness.",
+        term: "Discipline Through Hardship",
+        definition: "Embracing difficult challenges as opportunities to build mental and physical strength, rather than avoiding discomfort.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Phalanx Formation",
-        definition: "A military formation where soldiers stand shoulder to shoulder, emphasizing unity and collective strength.",
+        term: "Laconic Communication",
+        definition: "Speaking with precision and brevity, avoiding unnecessary words and focusing on what truly matters.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Collective Strength",
+        definition: "Understanding that individual excellence is amplified when working in unity with others toward common goals.",
         category: "concept",
         icon: Users
       },
       {
-        term: "Ephors",
-        definition: "Five elected officials who oversaw the Spartan government and ensured adherence to Spartan law and customs.",
-        category: "concept",
+        term: "Austerity Mindset",
+        definition: "Choosing simplicity over luxury, focusing on what is necessary rather than what is comfortable or impressive.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Physical Excellence",
+        definition: "Maintaining peak physical condition as a foundation for mental clarity and emotional resilience.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Unwavering Resolve",
+        definition: "Maintaining commitment to goals and principles even when faced with overwhelming obstacles or opposition.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Courage in Adversity",
+        definition: "Facing difficult situations with calm determination rather than fear or avoidance.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Mental Toughness",
+        definition: "Developing the ability to maintain focus and performance under pressure, stress, or discomfort.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Efficiency in Action",
+        definition: "Eliminating waste in time, energy, and resources to achieve maximum impact with minimum effort.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Honor Through Deeds",
+        definition: "Building reputation and respect through consistent actions that align with core values and principles.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Adaptive Rigor",
+        definition: "Maintaining high standards while being flexible enough to adapt to changing circumstances and challenges.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Sustained Excellence",
+        definition: "Consistently performing at a high level over time, rather than achieving temporary peaks followed by decline.",
+        category: "principle",
         icon: Target
       }
     ]
@@ -72,34 +114,76 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Bushidō",
-        definition: "The code of conduct for samurai warriors, emphasizing honor, loyalty, courage, and moral discipline.",
+        term: "Honor Above All",
+        definition: "Maintaining personal integrity and moral character as the foundation of all actions and decisions.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Seppuku",
-        definition: "Ritual suicide by disembowelment, performed to preserve honor or atone for failure.",
+        term: "Loyalty to Purpose",
+        definition: "Remaining committed to core values and long-term goals even when faced with temptation or difficulty.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Moral Discipline",
+        definition: "Consistently choosing what is right over what is easy, building character through daily choices.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Katana",
-        definition: "The curved, single-edged sword that symbolizes the samurai's soul and commitment to their code.",
+        term: "Service to Others",
+        definition: "Finding meaning and purpose through contributing to the well-being of others and the community.",
+        category: "principle",
+        icon: Users
+      },
+      {
+        term: "Mindful Action",
+        definition: "Acting with full awareness and intention, avoiding impulsive or thoughtless behavior.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Courage in Integrity",
+        definition: "Standing up for what is right even when it requires personal sacrifice or facing opposition.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Respect for All",
+        definition: "Treating every person with dignity and respect, regardless of their status or position.",
+        category: "principle",
+        icon: Users
+      },
+      {
+        term: "Continuous Self-Improvement",
+        definition: "Dedication to lifelong learning and personal development in all aspects of life.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Balance in Life",
+        definition: "Maintaining harmony between different life areas while staying true to core principles.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Daimyō",
-        definition: "A powerful feudal lord who ruled over territories and commanded samurai warriors.",
-        category: "concept",
-        icon: Users
+        term: "Grace Under Pressure",
+        definition: "Maintaining composure and effectiveness even in the most challenging circumstances.",
+        category: "practice",
+        icon: BookOpen
       },
       {
-        term: "Zen Meditation",
-        definition: "Mindfulness practice that cultivates focus, clarity, and the ability to act without hesitation.",
-        category: "technique",
-        icon: Zap
+        term: "Legacy of Character",
+        definition: "Building a reputation and influence that outlasts your physical presence through consistent values.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Warrior Spirit",
+        definition: "Cultivating inner strength, resilience, and determination to overcome life's challenges.",
+        category: "principle",
+        icon: Target
       }
     ]
   },
@@ -113,16 +197,16 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Logos",
-        definition: "The rational principle that governs the universe and human nature. Living in accordance with logos brings harmony.",
-        category: "concept",
+        term: "Focus on What You Control",
+        definition: "Directing energy and attention only to things within your power to change, accepting what you cannot control.",
+        category: "principle",
         icon: Target
       },
       {
-        term: "Apatheia",
-        definition: "Freedom from destructive emotions, achieved through rational thinking and self-discipline.",
+        term: "Virtue as the Only Good",
+        definition: "Understanding that true happiness comes from living with integrity, wisdom, courage, and justice.",
         category: "principle",
-        icon: Lightbulb
+        icon: Target
       },
       {
         term: "Negative Visualization",
@@ -131,14 +215,56 @@ const frameworkTerminologies: Record<string, {
         icon: Zap
       },
       {
-        term: "Dichotomy of Control",
-        definition: "Distinguishing between what we can control (our thoughts, actions) and what we cannot (external events).",
-        category: "concept",
+        term: "Emotional Mastery",
+        definition: "Developing the ability to choose rational responses over emotional reactions in all situations.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Acceptance of Reality",
+        definition: "Embracing life as it is rather than how we wish it to be, finding peace in what cannot be changed.",
+        category: "principle",
         icon: Target
       },
       {
         term: "Memento Mori",
         definition: "Remembering that we will die, which helps us live more meaningfully and prioritize what truly matters.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Amor Fati",
+        definition: "Loving your fate - embracing every experience as necessary for your growth and development.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Rational Thinking",
+        definition: "Using logic and reason to make decisions rather than being driven by emotions or external pressures.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Inner Freedom",
+        definition: "Finding liberation through self-discipline and mastery of your thoughts and desires.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Resilience Through Adversity",
+        definition: "Using challenges as opportunities to strengthen character and develop wisdom.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Living According to Nature",
+        definition: "Aligning your actions with universal principles and your own authentic nature.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Mindful Awareness",
+        definition: "Cultivating present-moment awareness to make conscious choices rather than automatic reactions.",
         category: "practice",
         icon: BookOpen
       }
@@ -154,34 +280,76 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Rule of Life",
-        definition: "A structured daily rhythm that balances prayer, work, and rest in a sustainable pattern.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Bell Schedule",
-        definition: "The seven canonical hours that structure the monastic day with prayer and work.",
+        term: "Daily Rhythm",
+        definition: "Creating a structured pattern of activities that balances work, rest, and reflection throughout the day.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Silence Practice",
-        definition: "Intentional periods of quiet to hear the inner voice and cultivate inner peace.",
-        category: "technique",
-        icon: Zap
+        term: "Silence and Solitude",
+        definition: "Regular periods of quiet to hear your inner voice and cultivate deeper self-awareness.",
+        category: "practice",
+        icon: BookOpen
       },
       {
-        term: "Humility Acts",
-        definition: "Small, unnoticed acts of service that cultivate humility and selflessness.",
+        term: "Service to Others",
+        definition: "Finding meaning through contributing to the well-being of others and the community.",
+        category: "principle",
+        icon: Users
+      },
+      {
+        term: "Humility in Action",
+        definition: "Performing small, unnoticed acts of service that cultivate genuine humility and selflessness.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Mindful Work",
+        definition: "Approaching all tasks with full attention and presence, treating work as a form of meditation.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Community Connection",
+        definition: "Building meaningful relationships and supporting others in their growth and development.",
+        category: "concept",
+        icon: Users
+      },
+      {
+        term: "Spiritual Practice",
+        definition: "Regular activities that nurture your inner life and connection to something greater than yourself.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Simplicity of Life",
+        definition: "Reducing complexity and distractions to focus on what truly matters and brings peace.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Community Chores",
-        definition: "Service to others as a spiritual practice that builds character and connection.",
+        term: "Gratitude Practice",
+        definition: "Cultivating appreciation for the blessings in your life, both big and small.",
         category: "practice",
-        icon: Users
+        icon: BookOpen
+      },
+      {
+        term: "Contemplative Reading",
+        definition: "Engaging with wisdom texts slowly and reflectively to absorb their deeper meaning.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Sacred Time",
+        definition: "Setting aside specific periods for reflection, prayer, or spiritual practice.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Inner Peace",
+        definition: "Cultivating a calm and centered state of mind that remains steady regardless of external circumstances.",
+        category: "principle",
+        icon: Target
       }
     ]
   },
