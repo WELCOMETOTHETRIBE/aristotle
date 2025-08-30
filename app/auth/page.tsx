@@ -168,6 +168,11 @@ export default function AuthPage() {
                     style={{ 
                       filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
                     }}
+                    onLoad={() => console.log('Logo loaded successfully')}
+                    onError={(e) => {
+                      console.error('Logo failed to load:', e);
+                      console.error('Current src:', (e.target as HTMLImageElement).src);
+                    }}
                   />
                 </div>
                 
