@@ -3,36 +3,35 @@ import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    // For now, we'll use a simple approach to check onboarding status
-    // In a full implementation, you'd check against the actual user session
-    
-    // Check if user facts exist (indicating onboarding completion)
-    let hasUserFacts = false;
-    let hasFrameworkPreference = false;
-    
-    try {
-      // Check for user facts
-      const factsResponse = await fetch(`${request.nextUrl.origin}/api/user-facts`);
-      if (factsResponse.ok) {
-        const factsData = await factsResponse.json();
-        hasUserFacts = factsData.facts && factsData.facts.length > 0;
-      }
-      
-      // Check for framework preference
-      const prefsResponse = await fetch(`${request.nextUrl.origin}/api/prefs`);
-      if (prefsResponse.ok) {
-        const prefsData = await prefsResponse.json();
-        hasFrameworkPreference = prefsData.framework && prefsData.framework !== null;
-      }
-    } catch (error) {
-      console.error('Error checking onboarding status:', error);
+    // For now, we'll use a demo user approach since we don't have proper auth
+    // In production, this would get the user from the session
+    const demoUser = await prisma.user.findFirst({
+      where: { username: 'demo-user' },
+    });
+
+    if (!demoUser) {
+      return NextResponse.json({
+        isComplete: false,
+        hasUserFacts: false,
+        hasFrameworkPreference: false,
+        shouldShowPrompt: true,
+      });
     }
 
-    const isOnboardingComplete = hasUserFacts && hasFrameworkPreference;
+    // Check for framework preference
+    const userPrefs = await prisma.userPreference.findUnique({
+      where: { userId: demoUser.id },
+    });
+    
+    const hasFrameworkPreference = userPrefs?.framework && userPrefs.framework !== null;
+
+    // For now, we'll consider onboarding complete if they have a framework preference
+    // In a full implementation, you'd also check for user facts
+    const isOnboardingComplete = hasFrameworkPreference;
 
     return NextResponse.json({
       isComplete: isOnboardingComplete,
-      hasUserFacts,
+      hasUserFacts: false, // TODO: Implement when UserFact model is available
       hasFrameworkPreference,
       shouldShowPrompt: !isOnboardingComplete,
     });

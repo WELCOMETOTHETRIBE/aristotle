@@ -522,7 +522,7 @@ export default function OnboardingPage() {
       }));
 
       // Create user facts via API
-      const response = await fetch('/api/user-facts', {
+      const factsResponse = await fetch('/api/user-facts', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -530,8 +530,21 @@ export default function OnboardingPage() {
         body: JSON.stringify({ facts }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to save user facts');
+      if (!factsResponse.ok) {
+        console.error('Failed to save user facts');
+      }
+
+      // Save framework preference
+      const prefsResponse = await fetch('/api/prefs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ framework: framework.slug }),
+      });
+
+      if (!prefsResponse.ok) {
+        console.error('Failed to save framework preference');
       }
 
       setShowResults(true);
@@ -544,13 +557,7 @@ export default function OnboardingPage() {
 
   const handleStartJourney = () => {
     if (recommendedFramework) {
-      // Save framework preference
-      fetch('/api/prefs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ framework: recommendedFramework.slug })
-      });
-      
+      // Framework preference is already saved in handleComplete
       router.push(`/frameworks/${recommendedFramework.slug}`);
     }
   };
