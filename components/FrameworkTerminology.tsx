@@ -62,7 +62,7 @@ const frameworkTerminologies: Record<string, {
       }
     ]
   },
-  samurai: {
+  bushido: {
     overview: "Bushidō, the way of the warrior, emphasizes honor, loyalty, and moral discipline. It teaches that true strength comes from living with integrity and serving others with unwavering dedication.",
     coreConcepts: [
       "Honor above all",
@@ -387,6 +387,47 @@ const frameworkTerminologies: Record<string, {
         definition: "A practice of sharing personal stories to build understanding and connection.",
         category: "technique",
         icon: Zap
+      }
+    ]
+  },
+  highperf: {
+    overview: "Modern High-Performance methodology combines cutting-edge psychology, neuroscience, and systems thinking to optimize human potential. It teaches that peak performance comes from understanding and leveraging the complex systems that drive human excellence.",
+    coreConcepts: [
+      "Systems-based optimization",
+      "Evidence-driven practices",
+      "Continuous improvement",
+      "Peak state management"
+    ],
+    terminology: [
+      {
+        term: "Flow State",
+        definition: "A state of complete absorption in an activity where time seems to disappear and performance is optimal.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Kaizen",
+        definition: "Japanese philosophy of continuous improvement through small, incremental changes.",
+        category: "principle",
+        icon: Lightbulb
+      },
+      {
+        term: "Biofeedback",
+        definition: "Using real-time data about physiological processes to improve performance and well-being.",
+        category: "technique",
+        icon: Zap
+      },
+      {
+        term: "Habit Stacking",
+        definition: "Building new habits by attaching them to existing routines and behaviors.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Energy Management",
+        definition: "Optimizing physical, mental, and emotional energy for peak performance throughout the day.",
+        category: "practice",
+        icon: Users
       }
     ]
   },

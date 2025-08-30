@@ -10,6 +10,7 @@ import CounterCard from '@/components/widgets/CounterCard';
 import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
+import MilestonesDropdown from '@/components/MilestonesDropdown';
 
 interface VirtueScores {
   wisdom: number;
@@ -465,6 +466,7 @@ export default function DashboardPage() {
                         <div className="text-white font-semibold">{Math.round(Object.values(virtueScores).reduce((a, b) => a + b, 0) / 4)}</div>
                         <div className="text-gray-400 text-xs">Avg Score</div>
                       </div>
+                      <MilestonesDropdown virtueTotals={virtueScores} />
                     </div>
 
                   </div>

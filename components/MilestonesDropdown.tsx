@@ -13,6 +13,7 @@ interface Milestone {
   requirement: number;
   achieved: boolean;
   achievedAt?: string;
+  framework?: string;
 }
 
 interface MilestonesDropdownProps {
@@ -23,261 +24,95 @@ interface MilestonesDropdownProps {
 const generateMilestones = (virtueTotals: VirtueTotals, frameworkSlug?: string): Milestone[] => {
   const milestones: Milestone[] = [];
   
-  // Wisdom milestones
-  if (virtueTotals.wisdom >= 10) {
-    milestones.push({
-      id: 'wisdom-10',
-      title: 'Seeker of Knowledge',
-      description: 'Reach 10 Wisdom points',
-      virtue: 'wisdom',
+  // Universal milestones (all frameworks)
+  const universalMilestones = [
+    {
+      id: 'first-steps',
+      title: 'First Steps',
+      description: 'Complete your first practice session',
+      virtue: 'wisdom' as const,
+      requirement: 5,
+      achieved: virtueTotals.wisdom >= 5
+    },
+    {
+      id: 'consistency-beginner',
+      title: 'Consistency Beginner',
+      description: 'Practice for 3 consecutive days',
+      virtue: 'temperance' as const,
       requirement: 10,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'wisdom-10',
-      title: 'Seeker of Knowledge',
-      description: 'Reach 10 Wisdom points',
-      virtue: 'wisdom',
-      requirement: 10,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.wisdom >= 25) {
-    milestones.push({
-      id: 'wisdom-25',
-      title: 'Student of Life',
-      description: 'Reach 25 Wisdom points',
-      virtue: 'wisdom',
+      achieved: virtueTotals.temperance >= 10
+    },
+    {
+      id: 'courage-initiate',
+      title: 'Courage Initiate',
+      description: 'Face your first challenge with courage',
+      virtue: 'courage' as const,
+      requirement: 8,
+      achieved: virtueTotals.courage >= 8
+    },
+    {
+      id: 'justice-seeker',
+      title: 'Justice Seeker',
+      description: 'Make your first fair decision',
+      virtue: 'justice' as const,
+      requirement: 8,
+      achieved: virtueTotals.justice >= 8
+    },
+    {
+      id: 'wisdom-apprentice',
+      title: 'Wisdom Apprentice',
+      description: 'Learn your first lesson',
+      virtue: 'wisdom' as const,
+      requirement: 15,
+      achieved: virtueTotals.wisdom >= 15
+    },
+    {
+      id: 'temperance-student',
+      title: 'Temperance Student',
+      description: 'Master your first habit',
+      virtue: 'temperance' as const,
+      requirement: 20,
+      achieved: virtueTotals.temperance >= 20
+    },
+    {
+      id: 'courage-warrior',
+      title: 'Courage Warrior',
+      description: 'Overcome a significant fear',
+      virtue: 'courage' as const,
       requirement: 25,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'wisdom-25',
-      title: 'Student of Life',
-      description: 'Reach 25 Wisdom points',
-      virtue: 'wisdom',
+      achieved: virtueTotals.courage >= 25
+    },
+    {
+      id: 'justice-guardian',
+      title: 'Justice Guardian',
+      description: 'Stand up for what is right',
+      virtue: 'justice' as const,
       requirement: 25,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.wisdom >= 50) {
-    milestones.push({
-      id: 'wisdom-50',
-      title: 'Wise One',
-      description: 'Reach 50 Wisdom points',
-      virtue: 'wisdom',
-      requirement: 50,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'wisdom-50',
-      title: 'Wise One',
-      description: 'Reach 50 Wisdom points',
-      virtue: 'wisdom',
-      requirement: 50,
-      achieved: false
-    });
-  }
+      achieved: virtueTotals.justice >= 25
+    },
+    {
+      id: 'wisdom-sage',
+      title: 'Wisdom Sage',
+      description: 'Share wisdom with others',
+      virtue: 'wisdom' as const,
+      requirement: 35,
+      achieved: virtueTotals.wisdom >= 35
+    },
+    {
+      id: 'mastery-aspirant',
+      title: 'Mastery Aspirant',
+      description: 'Achieve balance across all virtues',
+      virtue: 'temperance' as const,
+      requirement: 40,
+      achieved: virtueTotals.temperance >= 40
+    }
+  ];
 
-  // Courage milestones
-  if (virtueTotals.courage >= 10) {
-    milestones.push({
-      id: 'courage-10',
-      title: 'Brave Heart',
-      description: 'Reach 10 Courage points',
-      virtue: 'courage',
-      requirement: 10,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'courage-10',
-      title: 'Brave Heart',
-      description: 'Reach 10 Courage points',
-      virtue: 'courage',
-      requirement: 10,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.courage >= 25) {
-    milestones.push({
-      id: 'courage-25',
-      title: 'Fearless Warrior',
-      description: 'Reach 25 Courage points',
-      virtue: 'courage',
-      requirement: 25,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'courage-25',
-      title: 'Fearless Warrior',
-      description: 'Reach 25 Courage points',
-      virtue: 'courage',
-      requirement: 25,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.courage >= 50) {
-    milestones.push({
-      id: 'courage-50',
-      title: 'Lion Heart',
-      description: 'Reach 50 Courage points',
-      virtue: 'courage',
-      requirement: 50,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'courage-50',
-      title: 'Lion Heart',
-      description: 'Reach 50 Courage points',
-      virtue: 'courage',
-      requirement: 50,
-      achieved: false
-    });
-  }
-
-  // Justice milestones
-  if (virtueTotals.justice >= 10) {
-    milestones.push({
-      id: 'justice-10',
-      title: 'Fair Minded',
-      description: 'Reach 10 Justice points',
-      virtue: 'justice',
-      requirement: 10,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'justice-10',
-      title: 'Fair Minded',
-      description: 'Reach 10 Justice points',
-      virtue: 'justice',
-      requirement: 10,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.justice >= 25) {
-    milestones.push({
-      id: 'justice-25',
-      title: 'Guardian of Truth',
-      description: 'Reach 25 Justice points',
-      virtue: 'justice',
-      requirement: 25,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'justice-25',
-      title: 'Guardian of Truth',
-      description: 'Reach 25 Justice points',
-      virtue: 'justice',
-      requirement: 25,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.justice >= 50) {
-    milestones.push({
-      id: 'justice-50',
-      title: 'Just One',
-      description: 'Reach 50 Justice points',
-      virtue: 'justice',
-      requirement: 50,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'justice-50',
-      title: 'Just One',
-      description: 'Reach 50 Justice points',
-      virtue: 'justice',
-      requirement: 50,
-      achieved: false
-    });
-  }
-
-  // Temperance milestones
-  if (virtueTotals.temperance >= 10) {
-    milestones.push({
-      id: 'temperance-10',
-      title: 'Balanced Soul',
-      description: 'Reach 10 Temperance points',
-      virtue: 'temperance',
-      requirement: 10,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'temperance-10',
-      title: 'Balanced Soul',
-      description: 'Reach 10 Temperance points',
-      virtue: 'temperance',
-      requirement: 10,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.temperance >= 25) {
-    milestones.push({
-      id: 'temperance-25',
-      title: 'Master of Self',
-      description: 'Reach 25 Temperance points',
-      virtue: 'temperance',
-      requirement: 25,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'temperance-25',
-      title: 'Master of Self',
-      description: 'Reach 25 Temperance points',
-      virtue: 'temperance',
-      requirement: 25,
-      achieved: false
-    });
-  }
-  
-  if (virtueTotals.temperance >= 50) {
-    milestones.push({
-      id: 'temperance-50',
-      title: 'Sage of Balance',
-      description: 'Reach 50 Temperance points',
-      virtue: 'temperance',
-      requirement: 50,
-      achieved: true,
-      achievedAt: new Date().toISOString()
-    });
-  } else {
-    milestones.push({
-      id: 'temperance-50',
-      title: 'Sage of Balance',
-      description: 'Reach 50 Temperance points',
-      virtue: 'temperance',
-      requirement: 50,
-      achieved: false
-    });
-  }
+  // Add universal milestones
+  milestones.push(...universalMilestones.map(m => ({
+    ...m,
+    achievedAt: m.achieved ? new Date().toISOString() : undefined
+  })));
 
   // Framework-specific milestones
   if (frameworkSlug) {
@@ -293,76 +128,485 @@ const getFrameworkMilestones = (frameworkSlug: string, virtueTotals: VirtueTotal
   
   switch (frameworkSlug) {
     case 'spartan':
-      if (virtueTotals.courage >= 30) {
-        frameworkMilestones.push({
+      frameworkMilestones.push(
+        {
+          id: 'spartan-initiate',
+          title: 'Spartan Initiate',
+          description: 'Complete your first cold exposure session',
+          virtue: 'courage',
+          requirement: 15,
+          achieved: virtueTotals.courage >= 15,
+          framework: 'spartan'
+        },
+        {
           id: 'spartan-warrior',
           title: 'Spartan Warrior',
-          description: 'Complete 3 Spartan trials',
+          description: 'Complete 5 physical trials',
           virtue: 'courage',
-          requirement: 30,
-          achieved: true,
-          achievedAt: new Date().toISOString()
-        });
-      } else {
-        frameworkMilestones.push({
-          id: 'spartan-warrior',
-          title: 'Spartan Warrior',
-          description: 'Complete 3 Spartan trials',
+          requirement: 25,
+          achieved: virtueTotals.courage >= 25,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-disciplined',
+          title: 'Spartan Disciplined',
+          description: 'Maintain strict boundaries for 7 days',
+          virtue: 'temperance',
+          requirement: 20,
+          achieved: virtueTotals.temperance >= 20,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-endurance',
+          title: 'Spartan Endurance',
+          description: 'Complete a 30-minute endurance session',
           virtue: 'courage',
+          requirement: 35,
+          achieved: virtueTotals.courage >= 35,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-master',
+          title: 'Spartan Master',
+          description: 'Lead others through a trial',
+          virtue: 'courage',
+          requirement: 45,
+          achieved: virtueTotals.courage >= 45,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-philosopher',
+          title: 'Spartan Philosopher',
+          description: 'Reflect on adversity for 10 days',
+          virtue: 'wisdom',
           requirement: 30,
-          achieved: false
-        });
-      }
+          achieved: virtueTotals.wisdom >= 30,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-legend',
+          title: 'Spartan Legend',
+          description: 'Complete the ultimate trial',
+          virtue: 'courage',
+          requirement: 60,
+          achieved: virtueTotals.courage >= 60,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-mentor',
+          title: 'Spartan Mentor',
+          description: 'Train another in the Spartan way',
+          virtue: 'wisdom',
+          requirement: 40,
+          achieved: virtueTotals.wisdom >= 40,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-commander',
+          title: 'Spartan Commander',
+          description: 'Lead a group through challenges',
+          virtue: 'justice',
+          requirement: 35,
+          achieved: virtueTotals.justice >= 35,
+          framework: 'spartan'
+        },
+        {
+          id: 'spartan-immortal',
+          title: 'Spartan Immortal',
+          description: 'Achieve legendary status',
+          virtue: 'courage',
+          requirement: 80,
+          achieved: virtueTotals.courage >= 80,
+          framework: 'spartan'
+        }
+      );
       break;
       
-    case 'samurai':
-      if (virtueTotals.justice >= 30) {
-        frameworkMilestones.push({
-          id: 'samurai-honor',
-          title: 'Honorable Samurai',
+    case 'bushido':
+      frameworkMilestones.push(
+        {
+          id: 'bushido-initiate',
+          title: 'Bushido Initiate',
+          description: 'Learn the code of honor',
+          virtue: 'justice',
+          requirement: 15,
+          achieved: virtueTotals.justice >= 15,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-warrior',
+          title: 'Bushido Warrior',
           description: 'Maintain honor in 5 decisions',
           virtue: 'justice',
+          requirement: 25,
+          achieved: virtueTotals.justice >= 25,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-disciplined',
+          title: 'Bushido Disciplined',
+          description: 'Practice daily meditation for 7 days',
+          virtue: 'temperance',
+          requirement: 20,
+          achieved: virtueTotals.temperance >= 20,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-courageous',
+          title: 'Bushido Courageous',
+          description: 'Face fear with honor',
+          virtue: 'courage',
           requirement: 30,
-          achieved: true,
-          achievedAt: new Date().toISOString()
-        });
-      } else {
-        frameworkMilestones.push({
-          id: 'samurai-honor',
-          title: 'Honorable Samurai',
-          description: 'Maintain honor in 5 decisions',
+          achieved: virtueTotals.courage >= 30,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-wise',
+          title: 'Bushido Wise',
+          description: 'Study ancient wisdom texts',
+          virtue: 'wisdom',
+          requirement: 25,
+          achieved: virtueTotals.wisdom >= 25,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-master',
+          title: 'Bushido Master',
+          description: 'Master the way of the sword',
+          virtue: 'courage',
+          requirement: 45,
+          achieved: virtueTotals.courage >= 45,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-philosopher',
+          title: 'Bushido Philosopher',
+          description: 'Understand the deeper meaning',
+          virtue: 'wisdom',
+          requirement: 35,
+          achieved: virtueTotals.wisdom >= 35,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-just',
+          title: 'Bushido Just',
+          description: 'Uphold justice in all actions',
           virtue: 'justice',
-          requirement: 30,
-          achieved: false
-        });
-      }
+          requirement: 40,
+          achieved: virtueTotals.justice >= 40,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-balanced',
+          title: 'Bushido Balanced',
+          description: 'Achieve perfect balance',
+          virtue: 'temperance',
+          requirement: 35,
+          achieved: virtueTotals.temperance >= 35,
+          framework: 'bushido'
+        },
+        {
+          id: 'bushido-legend',
+          title: 'Bushido Legend',
+          description: 'Become a living legend',
+          virtue: 'justice',
+          requirement: 70,
+          achieved: virtueTotals.justice >= 70,
+          framework: 'bushido'
+        }
+      );
       break;
       
     case 'stoic':
-      if (virtueTotals.wisdom >= 30) {
-        frameworkMilestones.push({
-          id: 'stoic-philosopher',
-          title: 'Stoic Philosopher',
+      frameworkMilestones.push(
+        {
+          id: 'stoic-initiate',
+          title: 'Stoic Initiate',
+          description: 'Learn the basic principles',
+          virtue: 'wisdom',
+          requirement: 15,
+          achieved: virtueTotals.wisdom >= 15,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-practitioner',
+          title: 'Stoic Practitioner',
           description: 'Practice negative visualization for 7 days',
           virtue: 'wisdom',
+          requirement: 25,
+          achieved: virtueTotals.wisdom >= 25,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-disciplined',
+          title: 'Stoic Disciplined',
+          description: 'Control your emotions daily',
+          virtue: 'temperance',
+          requirement: 20,
+          achieved: virtueTotals.temperance >= 20,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-courageous',
+          title: 'Stoic Courageous',
+          description: 'Face adversity with equanimity',
+          virtue: 'courage',
           requirement: 30,
-          achieved: true,
-          achievedAt: new Date().toISOString()
-        });
-      } else {
-        frameworkMilestones.push({
+          achieved: virtueTotals.courage >= 30,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-just',
+          title: 'Stoic Just',
+          description: 'Act with justice in all situations',
+          virtue: 'justice',
+          requirement: 25,
+          achieved: virtueTotals.justice >= 25,
+          framework: 'stoic'
+        },
+        {
           id: 'stoic-philosopher',
           title: 'Stoic Philosopher',
-          description: 'Practice negative visualization for 7 days',
+          description: 'Study Stoic texts deeply',
           virtue: 'wisdom',
-          requirement: 30,
-          achieved: false
-        });
-      }
+          requirement: 35,
+          achieved: virtueTotals.wisdom >= 35,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-master',
+          title: 'Stoic Master',
+          description: 'Live according to nature',
+          virtue: 'temperance',
+          requirement: 40,
+          achieved: virtueTotals.temperance >= 40,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-sage',
+          title: 'Stoic Sage',
+          description: 'Achieve perfect wisdom',
+          virtue: 'wisdom',
+          requirement: 50,
+          achieved: virtueTotals.wisdom >= 50,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-virtuous',
+          title: 'Stoic Virtuous',
+          description: 'Exemplify all four virtues',
+          virtue: 'justice',
+          requirement: 45,
+          achieved: virtueTotals.justice >= 45,
+          framework: 'stoic'
+        },
+        {
+          id: 'stoic-legend',
+          title: 'Stoic Legend',
+          description: 'Become a modern sage',
+          virtue: 'wisdom',
+          requirement: 75,
+          achieved: virtueTotals.wisdom >= 75,
+          framework: 'stoic'
+        }
+      );
       break;
+      
+    case 'highperf':
+      frameworkMilestones.push(
+        {
+          id: 'highperf-initiate',
+          title: 'High Performance Initiate',
+          description: 'Learn the fundamentals of peak performance',
+          virtue: 'wisdom',
+          requirement: 15,
+          achieved: virtueTotals.wisdom >= 15,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-focused',
+          title: 'High Performance Focused',
+          description: 'Complete 5 deep work sessions',
+          virtue: 'temperance',
+          requirement: 25,
+          achieved: virtueTotals.temperance >= 25,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-courageous',
+          title: 'High Performance Courageous',
+          description: 'Take calculated risks for growth',
+          virtue: 'courage',
+          requirement: 30,
+          achieved: virtueTotals.courage >= 30,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-just',
+          title: 'High Performance Just',
+          description: 'Make ethical decisions under pressure',
+          virtue: 'justice',
+          requirement: 25,
+          achieved: virtueTotals.justice >= 25,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-optimized',
+          title: 'High Performance Optimized',
+          description: 'Optimize your daily routine',
+          virtue: 'wisdom',
+          requirement: 35,
+          achieved: virtueTotals.wisdom >= 35,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-resilient',
+          title: 'High Performance Resilient',
+          description: 'Bounce back from setbacks',
+          virtue: 'courage',
+          requirement: 40,
+          achieved: virtueTotals.courage >= 40,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-master',
+          title: 'High Performance Master',
+          description: 'Achieve consistent peak performance',
+          virtue: 'temperance',
+          requirement: 45,
+          achieved: virtueTotals.temperance >= 45,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-leader',
+          title: 'High Performance Leader',
+          description: 'Lead others to peak performance',
+          virtue: 'justice',
+          requirement: 40,
+          achieved: virtueTotals.justice >= 40,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-innovator',
+          title: 'High Performance Innovator',
+          description: 'Create new performance systems',
+          virtue: 'wisdom',
+          requirement: 50,
+          achieved: virtueTotals.wisdom >= 50,
+          framework: 'highperf'
+        },
+        {
+          id: 'highperf-legend',
+          title: 'High Performance Legend',
+          description: 'Become a performance legend',
+          virtue: 'courage',
+          requirement: 70,
+          achieved: virtueTotals.courage >= 70,
+          framework: 'highperf'
+        }
+      );
+      break;
+      
+    default:
+      // Generic framework milestones
+      frameworkMilestones.push(
+        {
+          id: 'framework-initiate',
+          title: 'Framework Initiate',
+          description: 'Begin your journey in this tradition',
+          virtue: 'wisdom',
+          requirement: 10,
+          achieved: virtueTotals.wisdom >= 10,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-practitioner',
+          title: 'Framework Practitioner',
+          description: 'Practice the core principles',
+          virtue: 'temperance',
+          requirement: 20,
+          achieved: virtueTotals.temperance >= 20,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-courageous',
+          title: 'Framework Courageous',
+          description: 'Face challenges with courage',
+          virtue: 'courage',
+          requirement: 25,
+          achieved: virtueTotals.courage >= 25,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-just',
+          title: 'Framework Just',
+          description: 'Act with justice and fairness',
+          virtue: 'justice',
+          requirement: 25,
+          achieved: virtueTotals.justice >= 25,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-wise',
+          title: 'Framework Wise',
+          description: 'Gain deep understanding',
+          virtue: 'wisdom',
+          requirement: 30,
+          achieved: virtueTotals.wisdom >= 30,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-disciplined',
+          title: 'Framework Disciplined',
+          description: 'Master self-discipline',
+          virtue: 'temperance',
+          requirement: 35,
+          achieved: virtueTotals.temperance >= 35,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-brave',
+          title: 'Framework Brave',
+          description: 'Show exceptional courage',
+          virtue: 'courage',
+          requirement: 40,
+          achieved: virtueTotals.courage >= 40,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-fair',
+          title: 'Framework Fair',
+          description: 'Uphold justice consistently',
+          virtue: 'justice',
+          requirement: 35,
+          achieved: virtueTotals.justice >= 35,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-sage',
+          title: 'Framework Sage',
+          description: 'Achieve wisdom in this tradition',
+          virtue: 'wisdom',
+          requirement: 45,
+          achieved: virtueTotals.wisdom >= 45,
+          framework: frameworkSlug
+        },
+        {
+          id: 'framework-master',
+          title: 'Framework Master',
+          description: 'Master this tradition',
+          virtue: 'temperance',
+          requirement: 50,
+          achieved: virtueTotals.temperance >= 50,
+          framework: frameworkSlug
+        }
+      );
   }
   
-  return frameworkMilestones;
+  return frameworkMilestones.map(m => ({
+    ...m,
+    achievedAt: m.achieved ? new Date().toISOString() : undefined
+  }));
 };
 
 export default function MilestonesDropdown({ virtueTotals, frameworkSlug }: MilestonesDropdownProps) {
@@ -389,9 +633,9 @@ export default function MilestonesDropdown({ virtueTotals, frameworkSlug }: Mile
         )}
       </button>
 
-      {/* Dropdown Content */}
+      {/* Dropdown Content - Fixed positioning */}
       {isExpanded && (
-        <div className="absolute top-full left-0 mt-2 w-96 bg-black/90 backdrop-blur-md border border-white/20 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full left-0 mt-2 w-96 bg-black/95 backdrop-blur-md border border-white/20 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto" style={{ maxHeight: '400px' }}>
           <div className="p-4">
             <h3 className="text-lg font-semibold text-white mb-3">Achievement Milestones</h3>
             
