@@ -26,6 +26,25 @@ export const PracticeDetailSchema = z.object({
   est_time_min: z.number().int().min(1).max(60)
 });
 
+export const FrameworkResourceSchema = z.object({
+  title: z.string(),
+  thinker: z.string(),
+  era: z.string(),
+  type: z.string(),
+  estMinutes: z.number().int().min(1).max(60),
+  keyIdeas: z.array(z.string()),
+  microPractices: z.array(z.string()),
+  reflections: z.array(z.string()),
+  level: z.string()
+});
+
+export const DailyWisdomSchema = z.object({
+  quote: z.string(),
+  author: z.string(),
+  framework: z.string(),
+  reflection: z.string()
+});
+
 export const HiddenWisdomSchema = z.object({
   insight: z.string(),
   micro_experiment: z.string(),
@@ -37,7 +56,7 @@ export const ReflectionSchema = z.object({
   next_step: z.string()
 });
 
-type Scope = "practice_detail" | "virtue_practice_detail" | "hidden_wisdom";
+type Scope = "practice_detail" | "virtue_practice_detail" | "hidden_wisdom" | "framework_resource" | "daily_wisdom";
 
 function fingerprint(input: Record<string, any>) {
   const raw = JSON.stringify(input);

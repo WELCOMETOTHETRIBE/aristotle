@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateWithCache, HiddenWisdomSchema } from '@/lib/ai';
+import { generateWithCache, DailyWisdomSchema } from '@/lib/ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,22 +21,17 @@ export async function POST(request: NextRequest) {
     - reflection: a brief reflection question to ponder`;
 
     const wisdom = await generateWithCache(
-      'hidden_wisdom',
+      'daily_wisdom',
       { 
         framework: framework || 'general',
         date: date || new Date().toISOString().split('T')[0],
         type: 'daily_wisdom'
       },
-      HiddenWisdomSchema,
+      DailyWisdomSchema,
       prompt
     );
 
-    return NextResponse.json({
-      quote: wisdom.insight,
-      author: wisdom.micro_experiment, // Using this field for the author
-      framework: framework || 'Ancient Wisdom',
-      reflection: wisdom.reflection
-    });
+    return NextResponse.json(wisdom);
 
   } catch (error) {
     console.error('Error generating daily wisdom:', error);

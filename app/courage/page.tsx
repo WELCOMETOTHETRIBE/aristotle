@@ -2,11 +2,34 @@
 
 import AuroraBackground from "@/components/AuroraBackground";
 import { GlassCard } from "@/components/GlassCard";
-import { Shield, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, Flame, Zap, Mountain } from "lucide-react";
+import { Shield, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, Flame, Zap, Mountain, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
 
-const practices = [
+interface HiddenWisdom {
+  insight: string;
+  micro_experiment: string;
+  reflection: string;
+}
+
+interface PracticeDetail {
+  title: string;
+  body: string;
+  bullets: string[];
+  coach_prompts: string[];
+  safety_reminders: string[];
+  est_time_min: number;
+}
+
+interface DailyWisdom {
+  quote: string;
+  author: string;
+  framework: string;
+  reflection: string;
+}
+
+const staticPractices = [
   {
     id: "1",
     title: "Spartan Discipline",
@@ -82,6 +105,80 @@ const practices = [
 ];
 
 export default function CouragePage() {
+  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
+  const [dailyWisdom, setDailyWisdom] = useState<DailyWisdom | null>(null);
+  const [generatedPractice, setGeneratedPractice] = useState<PracticeDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    loadCourageContent();
+  }, []);
+
+  const loadCourageContent = async () => {
+    try {
+      setLoading(true);
+      
+      // Load hidden wisdom
+      const dateBucket = new Date().toISOString().split('T')[0];
+      const wisdomResponse = await fetch(
+        `/api/generate/hidden-wisdom?dateBucket=${dateBucket}&style=spartan&locale=en`
+      );
+      if (wisdomResponse.ok) {
+        const wisdom = await wisdomResponse.json();
+        setHiddenWisdom(wisdom);
+      }
+
+      // Load daily wisdom
+      const dailyResponse = await fetch('/api/generate/daily-wisdom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ framework: 'spartan' })
+      });
+      if (dailyResponse.ok) {
+        const daily = await dailyResponse.json();
+        setDailyWisdom(daily);
+      }
+
+      // Load generated practice
+      const practiceResponse = await fetch(
+        `/api/generate/practice?moduleId=courage&level=Beginner&style=spartan&locale=en`
+      );
+      if (practiceResponse.ok) {
+        const practice = await practiceResponse.json();
+        setGeneratedPractice(practice);
+      }
+    } catch (error) {
+      console.error('Error loading courage content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshContent = async () => {
+    setRefreshing(true);
+    await loadCourageContent();
+    setRefreshing(false);
+  };
+
+  if (loading) {
+    return (
+      <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
+        <AuroraBackground />
+        <div className="page-section">
+          <div className="animate-pulse">
+            <div className="h-8 bg-white/20 rounded mb-8"></div>
+            <div className="space-y-6">
+              <div className="h-64 bg-white/10 rounded-lg"></div>
+              <div className="h-48 bg-white/10 rounded-lg"></div>
+              <div className="h-48 bg-white/10 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
       <AuroraBackground />
@@ -102,46 +199,145 @@ export default function CouragePage() {
             <p className="subheadline mt-2">
               The Virtue of Bravery & Strength
             </p>
-            <p className="text-gray-300 mt-2">
-              The virtue of facing challenges with bravery and inner strength
+            <p className="body-text mt-2">
+              The virtue of facing challenges with strength and determination
             </p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="glass-card p-4 text-center">
+          <div className="card-base text-center">
             <div className="text-2xl font-semibold text-white">4</div>
             <div className="text-sm text-gray-400">Practices</div>
           </div>
-          <div className="glass-card p-4 text-center">
+          <div className="card-base text-center">
             <div className="text-2xl font-semibold text-white">68%</div>
             <div className="text-sm text-gray-400">Progress</div>
           </div>
-          <div className="glass-card p-4 text-center">
+          <div className="card-base text-center">
             <div className="text-2xl font-semibold text-white">12</div>
             <div className="text-sm text-gray-400">Day Streak</div>
           </div>
         </div>
       </section>
 
-      {/* Practices Grid */}
+      {/* AI-Generated Hidden Wisdom */}
+      {hiddenWisdom && (
+        <section className="page-section">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title">⚔️ Today's Warrior Wisdom</h2>
+            <button 
+              onClick={refreshContent}
+              disabled={refreshing}
+              className="btn-secondary text-sm px-3 py-1 flex items-center gap-2"
+            >
+              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
+          
+          <div className="card-base bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-400/30">
+            <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-red-300 mb-2">Warrior Challenge</h4>
+                <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-orange-300 mb-2">Reflection</h4>
+                <p className="text-gray-300">{hiddenWisdom.reflection}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* AI-Generated Practice */}
+      {generatedPractice && (
+        <section className="page-section">
+          <h2 className="section-title">🎯 AI-Generated Courage Practice</h2>
+          <div className="card-base">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-white text-lg">{generatedPractice.title}</h3>
+              <div className="flex items-center gap-2">
+                <Clock size={14} className="text-gray-400" />
+                <span className="text-xs text-gray-400">{generatedPractice.est_time_min}m</span>
+              </div>
+            </div>
+            
+            <p className="body-text mb-4">{generatedPractice.body}</p>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-white mb-2">Steps</h4>
+                <ul className="space-y-2">
+                  {generatedPractice.bullets.map((bullet, index) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-300">
+                      <span className="text-red-300 mt-1">⚔️</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {generatedPractice.coach_prompts.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Warrior Prompts</h4>
+                  <ul className="space-y-2">
+                    {generatedPractice.coach_prompts.map((prompt, index) => (
+                      <li key={index} className="flex items-start gap-2 text-gray-300">
+                        <span className="text-orange-300 mt-1">🛡️</span>
+                        <span>{prompt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {generatedPractice.safety_reminders.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Safety Reminders</h4>
+                  <ul className="space-y-2">
+                    {generatedPractice.safety_reminders.map((reminder, index) => (
+                      <li key={index} className="flex items-start gap-2 text-gray-300">
+                        <span className="text-yellow-300 mt-1">⚠️</span>
+                        <span>{reminder}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2">
+                <button className="btn-primary text-sm px-3 py-1">
+                  <Play size={14} className="mr-1" />
+                  Start Practice
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Static Practices Grid */}
       <section className="page-section">
         <div className="flex items-center justify-between mb-8">
           <h2 className="section-title">Courage Practices</h2>
           <div className="flex gap-2">
-            <button className="btn-secondary btn-small">All</button>
-            <button className="btn-secondary btn-small">Beginner</button>
-            <button className="btn-secondary btn-small">Advanced</button>
+            <button className="btn-secondary text-sm px-3 py-1">All</button>
+            <button className="btn-secondary text-sm px-3 py-1">Beginner</button>
+            <button className="btn-secondary text-sm px-3 py-1">Advanced</button>
           </div>
         </div>
 
-        <div className="page-grid">
-          {practices.map((practice) => (
-            <GlassCard
+        <div className="page-grid page-grid-cols-2">
+          {staticPractices.map((practice) => (
+            <div
               key={practice.id}
-              title={practice.title}
-              subtitle={practice.description}
-              action={
+              className="card-base hover-lift cursor-pointer"
+            >
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-bold text-white text-lg">{practice.title}</h3>
                 <div className="flex items-center gap-2">
                   <Clock size={14} className="text-gray-400" />
                   <span className="text-xs text-gray-400">{practice.duration}m</span>
@@ -153,13 +349,14 @@ export default function CouragePage() {
                     {practice.difficulty}
                   </div>
                 </div>
-              }
-              className="group hover:scale-105 transition-transform duration-300 cursor-pointer"
-            >
+              </div>
+              
+              <p className="body-text mb-4">{practice.description}</p>
+              
               <div className="space-y-4">
                 {/* Benefits */}
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Benefits</h3>
+                  <h4 className="font-semibold text-white mb-2">Benefits</h4>
                   <div className="flex flex-wrap gap-2">
                     {practice.benefits.map((benefit) => (
                       <span
@@ -174,7 +371,7 @@ export default function CouragePage() {
 
                 {/* Cultural Context */}
                 <div>
-                  <h3 className="text-sm font-semibold mb-2">Cultural Context</h3>
+                  <h4 className="font-semibold text-white mb-2">Cultural Context</h4>
                   <p className="body-text line-clamp-2">
                     {practice.culturalContext}
                   </p>
@@ -182,7 +379,7 @@ export default function CouragePage() {
 
                 {/* Action */}
                 <div className="flex items-center justify-between pt-2">
-                  <button className="btn-primary btn-small">
+                  <button className="btn-primary text-sm px-3 py-1">
                     <Play size={14} className="mr-1" />
                     Start Practice
                   </button>
@@ -191,79 +388,76 @@ export default function CouragePage() {
                   </button>
                 </div>
               </div>
-            </GlassCard>
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Courage Quote */}
-      <section className="page-section">
-        <GlassCard
-          title="Courage Quote"
-          subtitle="Ancient wisdom for modern bravery"
-        >
-          <div className="text-center space-y-4">
-            <blockquote className="text-xl text-white italic">
-              "Courage is not the absence of fear, but the triumph over it."
-            </blockquote>
-            <cite className="text-red-300 font-medium">— Nelson Mandela</cite>
-            <p className="body-text max-w-2xl mx-auto">
-              True courage is not about being fearless, but about acting with 
-              integrity and strength even when we are afraid. It's the choice 
-              to move forward despite uncertainty and discomfort.
-            </p>
+      {/* AI-Generated Daily Wisdom Quote */}
+      {dailyWisdom && (
+        <section className="page-section">
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Daily Warrior Quote</h3>
+            <p className="body-text mb-4">AI-generated courage wisdom for modern warriors</p>
+            
+            <div className="text-center space-y-4">
+              <blockquote className="text-xl text-white italic">
+                "{dailyWisdom.quote}"
+              </blockquote>
+              <cite className="text-red-300 font-medium">— {dailyWisdom.author}</cite>
+              <p className="body-text max-w-2xl mx-auto">
+                {dailyWisdom.reflection}
+              </p>
+            </div>
           </div>
-        </GlassCard>
-      </section>
+        </section>
+      )}
 
       {/* Related Resources */}
       <section className="page-section">
         <h2 className="section-title">Related Resources</h2>
-        <div className="page-grid">
-          <GlassCard
-            title="Books"
-            subtitle="Essential readings"
-          >
+        <div className="page-grid page-grid-cols-3">
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Books</h3>
+            <p className="body-text mb-4">Essential readings</p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"Meditations" by Marcus Aurelius</span>
-              </div>
               <div className="flex items-center gap-2 text-sm">
                 <BookOpen size={14} className="text-red-300" />
                 <span className="text-white">"The Art of War" by Sun Tzu</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"Hagakure" by Yamamoto Tsunetomo</span>
+                <span className="text-white">"Bushido: The Soul of Japan"</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <BookOpen size={14} className="text-red-300" />
+                <span className="text-white">"Gates of Fire" by Steven Pressfield</span>
               </div>
             </div>
-          </GlassCard>
+          </div>
 
-          <GlassCard
-            title="Teachers"
-            subtitle="Courage guides"
-          >
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Teachers</h3>
+            <p className="body-text mb-4">Courage guides</p>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-red-300" />
-                <span className="text-white">Spartan Warriors</span>
+                <span className="text-white">Sun Tzu</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-red-300" />
-                <span className="text-white">Samurai</span>
+                <span className="text-white">Miyamoto Musashi</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-red-300" />
-                <span className="text-white">Stoic Philosophers</span>
+                <span className="text-white">Leonidas</span>
               </div>
             </div>
-          </GlassCard>
+          </div>
 
-          <GlassCard
-            title="Progress"
-            subtitle="Your courage journey"
-          >
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Progress</h3>
+            <p className="body-text mb-4">Your courage journey</p>
             <div className="space-y-4">
               <div className="text-center">
                 <div className="text-2xl font-semibold text-white">68%</div>
@@ -279,7 +473,7 @@ export default function CouragePage() {
                 ))}
               </div>
             </div>
-          </GlassCard>
+          </div>
         </div>
       </section>
     </PageLayout>

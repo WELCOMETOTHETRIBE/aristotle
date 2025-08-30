@@ -1,29 +1,29 @@
 {
   "instructions": {
-    "inhale": "/audio/tts_1756272135580.mp3",
-    "hold": "/audio/tts_1756272137541.mp3",
-    "exhale": "/audio/tts_1756272139919.mp3",
-    "holdEmpty": "/audio/tts_1756272142841.mp3"
+    "inhale": "/audio/breathwork/inhale.mp3",
+    "hold": "/audio/breathwork/hold.mp3",
+    "exhale": "/audio/breathwork/exhale.mp3",
+    "holdEmpty": "/audio/breathwork/hold-empty.mp3"
   },
   "counting": {
-    "1": "/audio/tts_1756272144326.mp3",
-    "2": "/audio/tts_1756272147387.mp3",
-    "3": "/audio/tts_1756272149054.mp3",
-    "4": "/audio/tts_1756272150679.mp3",
-    "5": "/audio/tts_1756272152486.mp3",
-    "6": "/audio/tts_1756272155039.mp3",
-    "7": "/audio/tts_1756272156375.mp3",
-    "8": "/audio/tts_1756272158466.mp3",
-    "9": "/audio/tts_1756272159814.mp3",
-    "10": "/audio/tts_1756272161308.mp3",
-    "11": "/audio/tts_1756272163888.mp3",
-    "12": "/audio/tts_1756272174096.mp3",
-    "13": "/audio/tts_1756272175947.mp3",
-    "14": "/audio/tts_1756272178275.mp3",
-    "15": "/audio/tts_1756272179596.mp3"
+    "1": "/audio/breathwork/count-1.mp3",
+    "2": "/audio/breathwork/count-2.mp3",
+    "3": "/audio/breathwork/count-3.mp3",
+    "4": "/audio/breathwork/count-4.mp3",
+    "5": "/audio/breathwork/count-5.mp3",
+    "6": "/audio/breathwork/count-6.mp3",
+    "7": "/audio/breathwork/count-7.mp3",
+    "8": "/audio/breathwork/count-8.mp3",
+    "9": "/audio/breathwork/count-9.mp3",
+    "10": "/audio/breathwork/count-10.mp3",
+    "11": "/audio/breathwork/count-11.mp3",
+    "12": "/audio/breathwork/count-12.mp3",
+    "13": "/audio/breathwork/count-13.mp3",
+    "14": "/audio/breathwork/count-14.mp3",
+    "15": "/audio/breathwork/count-15.mp3"
   },
   "session": {
-    "start": "/audio/tts_1756272183271.mp3",
-    "complete": "/audio/tts_1756272181379.mp3"
+    "start": "/audio/breathwork/session-start.mp3",
+    "complete": "/audio/breathwork/session-complete.mp3"
   }
 }

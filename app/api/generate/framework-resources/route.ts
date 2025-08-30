@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateWithCache, PracticeDetailSchema } from '@/lib/ai';
+import { generateWithCache, FrameworkResourceSchema } from '@/lib/ai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -26,28 +26,20 @@ export async function POST(request: NextRequest) {
     - level: difficulty level (Beginner, Intermediate, Advanced)`;
 
     const resource = await generateWithCache(
-      'practice_detail',
+      'framework_resource',
       { 
         frameworkId,
         frameworkName,
         frameworkTone,
         type: 'framework_resource'
       },
-      PracticeDetailSchema,
+      FrameworkResourceSchema,
       prompt
     );
 
     return NextResponse.json({
       id: `ai-generated-${Date.now()}`,
-      title: resource.title,
-      thinker: (resource.safety_reminders || [])[0] || 'Ancient Sage',
-      era: 'Timeless',
-      type: 'capsule',
-      estMinutes: resource.est_time_min,
-      keyIdeas: resource.bullets || ['Foundational principles', 'Practical application'],
-      microPractices: resource.coach_prompts || ['Daily reflection', 'Mindful practice'],
-      reflections: (resource.safety_reminders || []).slice(1) || ['How does this wisdom apply today?'],
-      level: 'Beginner'
+      ...resource
     });
 
   } catch (error) {

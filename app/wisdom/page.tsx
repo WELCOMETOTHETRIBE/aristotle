@@ -1,10 +1,33 @@
 'use client';
 
-import { Brain, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star } from "lucide-react";
+import { Brain, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, RefreshCw } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
 
-const practices = [
+interface HiddenWisdom {
+  insight: string;
+  micro_experiment: string;
+  reflection: string;
+}
+
+interface PracticeDetail {
+  title: string;
+  body: string;
+  bullets: string[];
+  coach_prompts: string[];
+  safety_reminders: string[];
+  est_time_min: number;
+}
+
+interface DailyWisdom {
+  quote: string;
+  author: string;
+  framework: string;
+  reflection: string;
+}
+
+const staticPractices = [
   {
     id: "1",
     title: "Socratic Dialogue",
@@ -80,6 +103,79 @@ const practices = [
 ];
 
 export default function WisdomPage() {
+  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
+  const [dailyWisdom, setDailyWisdom] = useState<DailyWisdom | null>(null);
+  const [generatedPractice, setGeneratedPractice] = useState<PracticeDetail | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    loadWisdomContent();
+  }, []);
+
+  const loadWisdomContent = async () => {
+    try {
+      setLoading(true);
+      
+      // Load hidden wisdom
+      const dateBucket = new Date().toISOString().split('T')[0];
+      const wisdomResponse = await fetch(
+        `/api/generate/hidden-wisdom?dateBucket=${dateBucket}&style=stoic&locale=en`
+      );
+      if (wisdomResponse.ok) {
+        const wisdom = await wisdomResponse.json();
+        setHiddenWisdom(wisdom);
+      }
+
+      // Load daily wisdom
+      const dailyResponse = await fetch('/api/generate/daily-wisdom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ framework: 'stoic' })
+      });
+      if (dailyResponse.ok) {
+        const daily = await dailyResponse.json();
+        setDailyWisdom(daily);
+      }
+
+      // Load generated practice
+      const practiceResponse = await fetch(
+        `/api/generate/practice?moduleId=wisdom&level=Beginner&style=stoic&locale=en`
+      );
+      if (practiceResponse.ok) {
+        const practice = await practiceResponse.json();
+        setGeneratedPractice(practice);
+      }
+    } catch (error) {
+      console.error('Error loading wisdom content:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const refreshContent = async () => {
+    setRefreshing(true);
+    await loadWisdomContent();
+    setRefreshing(false);
+  };
+
+  if (loading) {
+    return (
+      <PageLayout title="Wisdom" description="The Virtue of Knowledge & Understanding">
+        <div className="page-section">
+          <div className="animate-pulse">
+            <div className="h-8 bg-white/20 rounded mb-8"></div>
+            <div className="space-y-6">
+              <div className="h-64 bg-white/10 rounded-lg"></div>
+              <div className="h-48 bg-white/10 rounded-lg"></div>
+              <div className="h-48 bg-white/10 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </PageLayout>
+    );
+  }
+
   return (
     <PageLayout title="Wisdom" description="The Virtue of Knowledge & Understanding">
       {/* Header */}
@@ -120,7 +216,105 @@ export default function WisdomPage() {
         </div>
       </div>
 
-      {/* Practices Grid */}
+      {/* AI-Generated Hidden Wisdom */}
+      {hiddenWisdom && (
+        <div className="page-section">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="section-title">✨ Today's Hidden Wisdom</h2>
+            <button 
+              onClick={refreshContent}
+              disabled={refreshing}
+              className="btn-secondary text-sm px-3 py-1 flex items-center gap-2"
+            >
+              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
+              Refresh
+            </button>
+          </div>
+          
+          <div className="card-base bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-400/30">
+            <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
+            <div className="space-y-4">
+              <div>
+                <h4 className="text-sm font-medium text-blue-300 mb-2">Micro Experiment</h4>
+                <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-medium text-purple-300 mb-2">Reflection</h4>
+                <p className="text-gray-300">{hiddenWisdom.reflection}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI-Generated Practice */}
+      {generatedPractice && (
+        <div className="page-section">
+          <h2 className="section-title">🎯 AI-Generated Wisdom Practice</h2>
+          <div className="card-base">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-bold text-white text-lg">{generatedPractice.title}</h3>
+              <div className="flex items-center gap-2">
+                <Clock size={14} className="text-gray-400" />
+                <span className="text-xs text-gray-400">{generatedPractice.est_time_min}m</span>
+              </div>
+            </div>
+            
+            <p className="body-text mb-4">{generatedPractice.body}</p>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-white mb-2">Steps</h4>
+                <ul className="space-y-2">
+                  {generatedPractice.bullets.map((bullet, index) => (
+                    <li key={index} className="flex items-start gap-2 text-gray-300">
+                      <span className="text-blue-300 mt-1">•</span>
+                      <span>{bullet}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {generatedPractice.coach_prompts.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Coach Prompts</h4>
+                  <ul className="space-y-2">
+                    {generatedPractice.coach_prompts.map((prompt, index) => (
+                      <li key={index} className="flex items-start gap-2 text-gray-300">
+                        <span className="text-purple-300 mt-1">💭</span>
+                        <span>{prompt}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {generatedPractice.safety_reminders.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-white mb-2">Safety Reminders</h4>
+                  <ul className="space-y-2">
+                    {generatedPractice.safety_reminders.map((reminder, index) => (
+                      <li key={index} className="flex items-start gap-2 text-gray-300">
+                        <span className="text-yellow-300 mt-1">⚠️</span>
+                        <span>{reminder}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              <div className="flex items-center justify-between pt-2">
+                <button className="btn-primary text-sm px-3 py-1">
+                  <Play size={14} className="mr-1" />
+                  Start Practice
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Static Practices Grid */}
       <div className="page-section">
         <div className="flex items-center justify-between mb-8">
           <h2 className="section-title">Wisdom Practices</h2>
@@ -132,7 +326,7 @@ export default function WisdomPage() {
         </div>
 
         <div className="page-grid page-grid-cols-2">
-          {practices.map((practice) => (
+          {staticPractices.map((practice) => (
             <div
               key={practice.id}
               className="card-base hover-lift cursor-pointer"
@@ -194,25 +388,25 @@ export default function WisdomPage() {
         </div>
       </div>
 
-      {/* Wisdom Quote */}
-      <div className="page-section">
-        <div className="card-base">
-          <h3 className="font-bold text-white text-lg mb-2">Wisdom Quote</h3>
-          <p className="body-text mb-4">Ancient wisdom for modern reflection</p>
-          
-          <div className="text-center space-y-4">
-            <blockquote className="text-xl text-white italic">
-              "The only true wisdom is in knowing you know nothing."
-            </blockquote>
-            <cite className="text-blue-300 font-medium">— Socrates</cite>
-            <p className="body-text max-w-2xl mx-auto">
-              This famous quote from Socrates embodies the essence of wisdom: 
-              intellectual humility and the recognition that true knowledge begins 
-              with acknowledging our limitations and being open to learning.
-            </p>
+      {/* AI-Generated Daily Wisdom Quote */}
+      {dailyWisdom && (
+        <div className="page-section">
+          <div className="card-base">
+            <h3 className="font-bold text-white text-lg mb-2">Daily Wisdom Quote</h3>
+            <p className="body-text mb-4">AI-generated wisdom for modern reflection</p>
+            
+            <div className="text-center space-y-4">
+              <blockquote className="text-xl text-white italic">
+                "{dailyWisdom.quote}"
+              </blockquote>
+              <cite className="text-blue-300 font-medium">— {dailyWisdom.author}</cite>
+              <p className="body-text max-w-2xl mx-auto">
+                {dailyWisdom.reflection}
+              </p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Related Resources */}
       <div className="page-section">
