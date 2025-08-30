@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createUser, generateToken } from '@/lib/auth';
+import { createUser, generateToken, hashPassword } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
@@ -22,33 +22,40 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Check if username already exists
-    const existingUser = await prisma.user.findUnique({
-      where: { username }
-    });
-
-    if (existingUser) {
-      return NextResponse.json(
-        { error: 'Username already exists' },
-        { status: 409 }
-      );
-    }
-
-    // Check if email already exists (if provided)
-    if (email) {
-      const existingEmail = await prisma.user.findUnique({
-        where: { email }
+    // Use a transaction to prevent race conditions
+    const user = await prisma.$transaction(async (tx) => {
+      // Check if username already exists
+      const existingUser = await tx.user.findUnique({
+        where: { username }
       });
 
-      if (existingEmail) {
-        return NextResponse.json(
-          { error: 'Email already exists' },
-          { status: 409 }
-        );
+      if (existingUser) {
+        throw new Error('USERNAME_EXISTS');
       }
-    }
 
-    const user = await createUser(username, password, email, displayName);
+      // Check if email already exists (if provided)
+      if (email) {
+        const existingEmail = await tx.user.findUnique({
+          where: { email }
+        });
+
+        if (existingEmail) {
+          throw new Error('EMAIL_EXISTS');
+        }
+      }
+
+      // Create the user within the transaction
+      const hashedPassword = await hashPassword(password);
+      
+      return tx.user.create({
+        data: {
+          username,
+          password: hashedPassword,
+          email,
+          displayName: displayName || username
+        }
+      });
+    });
 
     const token = await generateToken({
       userId: user.id,
@@ -74,10 +81,55 @@ export async function POST(request: NextRequest) {
     });
 
     return response;
-  } catch (error) {
+  } catch (error: any) {
     console.error('Sign-up error:', error);
+    
+    // Handle our custom transaction errors
+    if (error.message === 'USERNAME_EXISTS') {
+      return NextResponse.json(
+        { error: 'This username is already taken. Please choose a different username.' },
+        { status: 409 }
+      );
+    }
+    
+    if (error.message === 'EMAIL_EXISTS') {
+      return NextResponse.json(
+        { error: 'An account with this email already exists. Please try signing in instead.' },
+        { status: 409 }
+      );
+    }
+    
+    // Handle Prisma unique constraint errors (fallback)
+    if (error.code === 'P2002') {
+      const target = error.meta?.target;
+      if (target && target.includes('email')) {
+        return NextResponse.json(
+          { error: 'An account with this email already exists. Please try signing in instead.' },
+          { status: 409 }
+        );
+      }
+      if (target && target.includes('username')) {
+        return NextResponse.json(
+          { error: 'This username is already taken. Please choose a different username.' },
+          { status: 409 }
+        );
+      }
+      return NextResponse.json(
+        { error: 'This account already exists. Please try signing in instead.' },
+        { status: 409 }
+      );
+    }
+    
+    // Handle other Prisma errors
+    if (error.code && error.code.startsWith('P')) {
+      return NextResponse.json(
+        { error: 'Database error occurred. Please try again.' },
+        { status: 500 }
+      );
+    }
+    
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Internal server error. Please try again later.' },
       { status: 500 }
     );
   }
