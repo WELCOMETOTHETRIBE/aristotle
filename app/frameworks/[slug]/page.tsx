@@ -14,7 +14,8 @@ import CounterCard from '../../../components/widgets/CounterCard';
 
 import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
-import { BreathworkWidget, HydrationWidget } from '../../../components/ModuleWidgets';
+import { HydrationWidget } from '../../../components/ModuleWidgets';
+import { BreathworkWidgetNew } from '../../../components/BreathworkWidgetNew';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
 import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -133,7 +134,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                 case 'COUNTER':
                   return <CounterCard {...commonProps} />;
                 case 'BREATH':
-                  return <BreathworkWidget frameworkTone={framework.tone} />;
+                  return <BreathworkWidgetNew frameworkTone={framework.tone} />;
                 case 'HYDRATION':
                   return <HydrationWidget frameworkTone={framework.tone} />;
                 case 'JOURNAL':
@@ -301,7 +302,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             </div>
           )}
           <div className="max-w-md mx-auto">
-            <BreathworkWidget frameworkTone={framework.tone} />
+            <BreathworkWidgetNew frameworkTone={framework.tone} />
           </div>
         </div>
 

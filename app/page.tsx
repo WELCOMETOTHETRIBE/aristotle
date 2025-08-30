@@ -7,7 +7,8 @@ import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplet
 
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
-import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
+import { HydrationWidget } from '@/components/ModuleWidgets';
+import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
@@ -846,7 +847,7 @@ export default function DashboardPage() {
                       <p className="text-sm text-cyan-200">{getWidgetInfo('breathwork_timer')?.description}</p>
                     </div>
                   )}
-                  <BreathworkWidget frameworkTone="stoic" />
+                  <BreathworkWidgetNew frameworkTone="stoic" />
                 </CardContent>
               </Card>
 
