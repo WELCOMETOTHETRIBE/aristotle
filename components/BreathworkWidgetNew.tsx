@@ -75,8 +75,77 @@ interface BreathworkWidgetNewProps {
   frameworkTone?: string;
 }
 
+// Framework-specific color schemes
+const frameworkColors = {
+  spartan: {
+    primary: 'from-red-600 to-orange-600',
+    secondary: 'from-orange-500 to-red-500',
+    accent: 'text-red-600 bg-red-100 border-red-200'
+  },
+  bushido: {
+    primary: 'from-gray-700 to-gray-900',
+    secondary: 'from-gray-600 to-gray-800',
+    accent: 'text-gray-700 bg-gray-100 border-gray-200'
+  },
+  stoic: {
+    primary: 'from-blue-600 to-indigo-700',
+    secondary: 'from-indigo-500 to-blue-600',
+    accent: 'text-blue-600 bg-blue-100 border-blue-200'
+  },
+  monastic: {
+    primary: 'from-purple-600 to-violet-700',
+    secondary: 'from-violet-500 to-purple-600',
+    accent: 'text-purple-600 bg-purple-100 border-purple-200'
+  },
+  yogic: {
+    primary: 'from-green-600 to-emerald-700',
+    secondary: 'from-emerald-500 to-green-600',
+    accent: 'text-green-600 bg-green-100 border-green-200'
+  },
+  indigenous: {
+    primary: 'from-amber-600 to-orange-600',
+    secondary: 'from-orange-500 to-amber-500',
+    accent: 'text-amber-600 bg-amber-100 border-amber-200'
+  },
+  martial: {
+    primary: 'from-slate-700 to-gray-800',
+    secondary: 'from-gray-600 to-slate-700',
+    accent: 'text-slate-700 bg-slate-100 border-slate-200'
+  },
+  sufi: {
+    primary: 'from-rose-600 to-pink-700',
+    secondary: 'from-pink-500 to-rose-600',
+    accent: 'text-rose-600 bg-rose-100 border-rose-200'
+  },
+  ubuntu: {
+    primary: 'from-teal-600 to-cyan-700',
+    secondary: 'from-cyan-500 to-teal-600',
+    accent: 'text-teal-600 bg-teal-100 border-teal-200'
+  },
+  highperf: {
+    primary: 'from-indigo-600 to-purple-700',
+    secondary: 'from-purple-500 to-indigo-600',
+    accent: 'text-indigo-600 bg-indigo-100 border-indigo-200'
+  },
+  systems: {
+    primary: 'from-blue-600 to-cyan-700',
+    secondary: 'from-cyan-500 to-blue-600',
+    accent: 'text-blue-600 bg-blue-100 border-blue-200'
+  }
+};
+
 export function BreathworkWidgetNew({ frameworkTone }: BreathworkWidgetNewProps) {
   const [selectedPattern, setSelectedPattern] = useState<BreathPattern>(breathPatterns[0]);
+  
+  // Get framework-specific colors
+  const getFrameworkColor = () => {
+    if (frameworkTone && frameworkColors[frameworkTone as keyof typeof frameworkColors]) {
+      return frameworkColors[frameworkTone as keyof typeof frameworkColors];
+    }
+    return frameworkColors.stoic; // Default fallback
+  };
+  
+  const frameworkColor = getFrameworkColor();
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'hold2'>('inhale');
   const [timeLeft, setTimeLeft] = useState(0);
@@ -282,43 +351,71 @@ export function BreathworkWidgetNew({ frameworkTone }: BreathworkWidgetNewProps)
   };
 
   const getPhaseBorderColor = (phase: string): string => {
+    // Use framework-specific colors for phases
+    const baseColor = frameworkColor.primary.includes('red') ? '#dc2626' :
+                     frameworkColor.primary.includes('blue') ? '#2563eb' :
+                     frameworkColor.primary.includes('green') ? '#16a34a' :
+                     frameworkColor.primary.includes('purple') ? '#7c3aed' :
+                     frameworkColor.primary.includes('gray') ? '#4b5563' :
+                     frameworkColor.primary.includes('teal') ? '#0d9488' :
+                     frameworkColor.primary.includes('indigo') ? '#4f46e5' :
+                     frameworkColor.primary.includes('rose') ? '#e11d48' :
+                     frameworkColor.primary.includes('amber') ? '#d97706' :
+                     frameworkColor.primary.includes('slate') ? '#475569' : '#3b82f6';
+    
     switch (phase) {
-      case 'inhale': return '#3b82f6';
-      case 'hold': return '#8b5cf6';
-      case 'exhale': return '#10b981';
-      case 'hold2': return '#f59e0b';
+      case 'inhale': return baseColor;
+      case 'hold': return baseColor;
+      case 'exhale': return baseColor;
+      case 'hold2': return baseColor;
       default: return '#e5e7eb';
     }
   };
 
   const getPhaseGlowColor = (phase: string): string => {
+    const baseColor = frameworkColor.primary.includes('red') ? 'rgba(220, 38, 38, 0.5)' :
+                     frameworkColor.primary.includes('blue') ? 'rgba(37, 99, 235, 0.5)' :
+                     frameworkColor.primary.includes('green') ? 'rgba(22, 163, 74, 0.5)' :
+                     frameworkColor.primary.includes('purple') ? 'rgba(124, 58, 237, 0.5)' :
+                     frameworkColor.primary.includes('gray') ? 'rgba(75, 85, 99, 0.5)' :
+                     frameworkColor.primary.includes('teal') ? 'rgba(13, 148, 136, 0.5)' :
+                     frameworkColor.primary.includes('indigo') ? 'rgba(79, 70, 229, 0.5)' :
+                     frameworkColor.primary.includes('rose') ? 'rgba(225, 29, 72, 0.5)' :
+                     frameworkColor.primary.includes('amber') ? 'rgba(217, 119, 6, 0.5)' :
+                     frameworkColor.primary.includes('slate') ? 'rgba(71, 85, 105, 0.5)' : 'rgba(59, 130, 246, 0.5)';
+    
     switch (phase) {
-      case 'inhale': return 'rgba(59, 130, 246, 0.5)';
-      case 'hold': return 'rgba(139, 92, 246, 0.5)';
-      case 'exhale': return 'rgba(16, 185, 129, 0.5)';
-      case 'hold2': return 'rgba(245, 158, 11, 0.5)';
-      default: return 'rgba(59, 130, 246, 0.3)';
+      case 'inhale': return baseColor;
+      case 'hold': return baseColor;
+      case 'exhale': return baseColor;
+      case 'hold2': return baseColor;
+      default: return baseColor;
     }
   };
 
   const getPhaseProgressColor = (phase: string): string => {
+    const baseColor = frameworkColor.primary.includes('red') ? '#dc2626' :
+                     frameworkColor.primary.includes('blue') ? '#2563eb' :
+                     frameworkColor.primary.includes('green') ? '#16a34a' :
+                     frameworkColor.primary.includes('purple') ? '#7c3aed' :
+                     frameworkColor.primary.includes('gray') ? '#4b5563' :
+                     frameworkColor.primary.includes('teal') ? '#0d9488' :
+                     frameworkColor.primary.includes('indigo') ? '#4f46e5' :
+                     frameworkColor.primary.includes('rose') ? '#e11d48' :
+                     frameworkColor.primary.includes('amber') ? '#d97706' :
+                     frameworkColor.primary.includes('slate') ? '#475569' : '#3b82f6';
+    
     switch (phase) {
-      case 'inhale': return '#3b82f6';
-      case 'hold': return '#8b5cf6';
-      case 'exhale': return '#10b981';
-      case 'hold2': return '#f59e0b';
-      default: return '#3b82f6';
+      case 'inhale': return baseColor;
+      case 'hold': return baseColor;
+      case 'exhale': return baseColor;
+      case 'hold2': return baseColor;
+      default: return baseColor;
     }
   };
 
   const getPhaseColor = (phase: string): string => {
-    switch (phase) {
-      case 'inhale': return 'text-blue-600 bg-blue-100 border-blue-200';
-      case 'hold': return 'text-purple-600 bg-purple-100 border-purple-200';
-      case 'exhale': return 'text-green-600 bg-green-100 border-green-200';
-      case 'hold2': return 'text-orange-600 bg-orange-100 border-orange-200';
-      default: return 'text-gray-600 bg-gray-100 border-gray-200';
-    }
+    return frameworkColor.accent;
   };
 
   const handleStart = async () => {
@@ -470,7 +567,7 @@ export function BreathworkWidgetNew({ frameworkTone }: BreathworkWidgetNewProps)
                 }}
               >
                 <div 
-                  className={`w-24 h-24 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-2xl transition-all duration-500 ease-out relative`}
+                  className={`w-24 h-24 rounded-full bg-gradient-to-r ${frameworkColor.primary} flex items-center justify-center shadow-2xl transition-all duration-500 ease-out relative`}
                   style={{
                     boxShadow: isActive 
                       ? `0 0 20px ${getPhaseGlowColor(currentPhase)}, 0 4px 16px rgba(0,0,0,0.1)` 
@@ -531,7 +628,7 @@ export function BreathworkWidgetNew({ frameworkTone }: BreathworkWidgetNewProps)
             </div>
             <div className="w-full max-w-sm mx-auto bg-gray-200 rounded-full h-2">
               <div 
-                className={`h-2 rounded-full bg-gradient-to-r ${selectedPattern.color} transition-all duration-500`}
+                className={`h-2 rounded-full bg-gradient-to-r ${frameworkColor.primary} transition-all duration-500`}
                 style={{ width: `${(currentCycle / totalCycles) * 100}%` }}
               />
             </div>
@@ -543,7 +640,7 @@ export function BreathworkWidgetNew({ frameworkTone }: BreathworkWidgetNewProps)
               <Button 
                 onClick={handleStart} 
                 size="lg" 
-                className="px-6 py-2 text-sm bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
+                className={`px-6 py-2 text-sm bg-gradient-to-r ${frameworkColor.primary} hover:${frameworkColor.secondary} shadow-lg`}
               >
                 <Play className="h-4 w-4 mr-2" />
                 Start Session

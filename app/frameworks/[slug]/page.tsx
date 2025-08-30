@@ -303,37 +303,12 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         />
       </div>
 
-      {/* Breathwork Practice */}
-      <div className="page-section">
-          <div className="flex items-center gap-2 mb-4">
-            <h2 className="section-title">Breathwork Practice</h2>
-            <button
-              onClick={() => setShowWidgetInfo(showWidgetInfo === 'breathwork' ? null : 'breathwork')}
-              className="p-1 text-muted-foreground hover:text-white transition-colors"
-            >
-              <Info className="h-4 w-4" />
-            </button>
-          </div>
-          <p className="section-description">
-            Master your breath with {framework.name} breathing patterns
-          </p>
-          {showWidgetInfo === 'breathwork' && (
-            <div className="mb-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
-              <p className="text-sm text-cyan-200">
-                Practice framework-specific breathing patterns to cultivate the core virtues of this tradition. 
-                Each pattern is designed to align with the philosophical principles and practical wisdom of {framework.name}.
-              </p>
-            </div>
-          )}
-          <div className="max-w-md mx-auto">
-            <BreathworkWidgetNew frameworkTone={framework.tone} />
-          </div>
-        </div>
 
-      {/* Widgets Grid */}
+
+      {/* Practice Widgets */}
       <div className="page-section">
           <div className="flex items-center gap-2 mb-4">
-            <h2 className="section-title">Practice Widgets</h2>
+            <h2 className="section-title">Practice Tools</h2>
             <button
               onClick={() => setShowWidgetInfo(showWidgetInfo === 'practice_widgets' ? null : 'practice_widgets')}
               className="p-1 text-muted-foreground hover:text-white transition-colors"
@@ -347,14 +322,14 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           {showWidgetInfo === 'practice_widgets' && (
             <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
               <p className="text-sm text-blue-200">
-                These interactive widgets are specifically designed to help you embody the principles and practices of {framework.name}. 
-                Each widget focuses on cultivating the core virtues of this tradition through practical, daily exercises.
+                These interactive tools are specifically designed to help you embody the principles and practices of {framework.name}. 
+                Each tool focuses on cultivating the core virtues of this tradition through practical, daily exercises.
               </p>
             </div>
           )}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {framework.widgets.map((widget: any) => (
-              <div key={widget.id}>
+              <div key={widget.id} className="relative group">
                 {renderWidget(widget)}
               </div>
             ))}
@@ -393,46 +368,66 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
       {/* Progress Panel */}
       <div className="page-section">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card-base">
+          <div className="card-base bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
             <div className="flex items-center gap-2 mb-4">
               <TrendingUp className="w-5 h-5 text-blue-400" />
-              <h3 className="font-semibold text-white">Progress</h3>
+              <h3 className="font-semibold text-white">Virtue Progress</h3>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-3">
               {Object.entries(virtueTotals).map(([virtue, total]) => (
                 <div key={virtue} className="flex justify-between items-center">
-                  <span className="text-sm text-gray-300">{virtue}</span>
-                  <span className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueTotals)}`}>
-                    {total} XP
-                  </span>
+                  <span className="text-sm text-gray-300 capitalize">{virtue}</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-16 bg-gray-700 rounded-full h-2">
+                      <div
+                        className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueTotals)}`}
+                        style={{ width: `${Math.min(100, (total / 100) * 100)}%` }}
+                      />
+                    </div>
+                    <span className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueTotals)}`}>
+                      {total}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="card-base">
+          <div className="card-base bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
             <div className="flex items-center gap-2 mb-4">
               <Target className="w-5 h-5 text-green-400" />
               <h3 className="font-semibold text-white">Today's Progress</h3>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white mb-2">
+              <div className="text-3xl font-bold text-white mb-2">
                 {completedWidgets.length} / {framework.widgets.length}
               </div>
-              <div className="text-sm text-gray-400">Widgets Completed</div>
+              <div className="text-sm text-gray-400 mb-3">Tools Completed</div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div 
+                  className="h-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
+                  style={{ width: `${(completedWidgets.length / framework.widgets.length) * 100}%` }}
+                />
+              </div>
             </div>
           </div>
 
-          <div className="card-base">
+          <div className="card-base bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
             <div className="flex items-center gap-2 mb-4">
               <Trophy className="w-5 h-5 text-yellow-400" />
-              <h3 className="font-semibold text-white">Certification</h3>
+              <h3 className="font-semibold text-white">Framework Mastery</h3>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-white mb-2">
+              <div className="text-3xl font-bold text-white mb-2">
                 {Math.round((completedWidgets.length / framework.widgets.length) * 100)}%
               </div>
-              <div className="text-sm text-gray-400">Framework Progress</div>
+              <div className="text-sm text-gray-400 mb-3">Overall Progress</div>
+              <div className="w-full bg-gray-700 rounded-full h-2">
+                <div 
+                  className="h-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500"
+                  style={{ width: `${(completedWidgets.length / framework.widgets.length) * 100}%` }}
+                />
+              </div>
             </div>
           </div>
         </div>
