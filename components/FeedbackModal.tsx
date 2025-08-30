@@ -25,6 +25,8 @@ export default function FeedbackModal({ isOpen, onClose, elementInfo, clickPosit
   const [priority, setPriority] = useState<'low' | 'medium' | 'high' | 'critical'>('medium');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  console.log('FeedbackModal props:', { isOpen, elementInfo, clickPosition });
+
   useEffect(() => {
     if (isOpen) {
       setComment('');

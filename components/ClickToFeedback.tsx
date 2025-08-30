@@ -64,6 +64,8 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
       }))
     };
 
+    console.log('Opening feedback modal with element info:', elementInfo);
+
     // Set element info and open modal
     setSelectedElementInfo(elementInfo);
     setClickPosition({ x: event.clientX, y: event.clientY });

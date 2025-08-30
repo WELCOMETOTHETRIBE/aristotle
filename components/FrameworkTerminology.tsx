@@ -1,8 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, ChevronDown, ChevronUp, Lightbulb, Target, Users, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, BookOpen, Target, Zap, Users, Lightbulb } from 'lucide-react';
 
 interface FrameworkTerminologyProps {
   frameworkSlug: string;
@@ -10,154 +9,136 @@ interface FrameworkTerminologyProps {
   frameworkTone: string;
 }
 
-interface TerminologyItem {
+interface Term {
   term: string;
   definition: string;
   category: 'technique' | 'concept' | 'practice' | 'principle';
-  icon: React.ComponentType<{ className?: string }>;
+  icon: any;
 }
 
 const frameworkTerminologies: Record<string, {
   overview: string;
   coreConcepts: string[];
-  terminology: TerminologyItem[];
+  terminology: Term[];
 }> = {
   spartan: {
-    overview: "The Spartan Agōgē is a rigorous training system focused on building mental and physical resilience through deliberate hardship. It emphasizes that strength is forged through chosen adversity, teaching practitioners to embrace discomfort as a path to growth.",
+    overview: "The Spartan Agōgē emphasizes discipline, courage, and physical excellence. It teaches that true strength comes from overcoming adversity and maintaining unwavering resolve in the face of challenges.",
     coreConcepts: [
-      "Embrace discomfort to build mental fortitude",
-      "Physical strength builds mental resilience", 
-      "Discipline is the foundation of freedom",
-      "Master your breath to master your mind"
+      "Discipline through hardship",
+      "Courage in adversity",
+      "Physical and mental strength",
+      "Unwavering resolve"
     ],
     terminology: [
       {
         term: "Agōgē",
-        definition: "The rigorous education and training system of ancient Sparta, designed to produce disciplined warriors and citizens.",
-        category: "concept",
-        icon: Target
+        definition: "The rigorous education and training system that transformed Spartan boys into warriors. It emphasized discipline, physical fitness, and mental toughness.",
+        category: "practice",
+        icon: BookOpen
       },
       {
-        term: "Cold Exposure",
-        definition: "Intentional exposure to cold temperatures to build mental resilience and improve stress response.",
+        term: "Krypteia",
+        definition: "A secret police force of young Spartan men who tested their skills through stealth missions and survival challenges.",
         category: "technique",
         icon: Zap
       },
       {
-        term: "RPE (Rate of Perceived Exertion)",
-        definition: "A subjective scale to measure workout intensity, teaching you to listen to your body's signals.",
-        category: "practice",
-        icon: Lightbulb
-      },
-      {
-        term: "Boundary Setting",
-        definition: "The practice of clearly defining and communicating your limits, essential for maintaining discipline.",
+        term: "Laconic Speech",
+        definition: "Brevity and conciseness in speech, reflecting Spartan values of efficiency and directness.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Wim Hof Method",
-        definition: "A breathing technique that combines controlled hyperventilation with cold exposure for enhanced performance.",
-        category: "technique",
-        icon: Zap
+        term: "Phalanx Formation",
+        definition: "A military formation where soldiers stand shoulder to shoulder, emphasizing unity and collective strength.",
+        category: "concept",
+        icon: Users
       },
       {
-        term: "Adversity Log",
-        definition: "A reflective practice of documenting challenges and your responses to build mental toughness.",
-        category: "practice",
-        icon: BookOpen
+        term: "Ephors",
+        definition: "Five elected officials who oversaw the Spartan government and ensured adherence to Spartan law and customs.",
+        category: "concept",
+        icon: Target
       }
     ]
   },
   samurai: {
-    overview: "Samurai Bushidō is the way of the warrior, emphasizing honor, justice, and ethical conduct. It teaches that honor is clarity in action, guiding practitioners to live with integrity and purpose in every decision.",
+    overview: "Bushidō, the way of the warrior, emphasizes honor, loyalty, and moral discipline. It teaches that true strength comes from living with integrity and serving others with unwavering dedication.",
     coreConcepts: [
-      "Honor is clarity in action",
-      "Choose your guiding virtue for today",
-      "Control your breath to control your power",
-      "Seek understanding before being understood"
+      "Honor above all",
+      "Loyalty to master",
+      "Moral discipline",
+      "Service to others"
     ],
     terminology: [
       {
         term: "Bushidō",
-        definition: "The way of the warrior - a code of conduct emphasizing honor, loyalty, courage, and ethical behavior.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Rectitude",
-        definition: "Righteousness and moral integrity; the ability to make decisions with unwavering ethical clarity.",
+        definition: "The code of conduct for samurai warriors, emphasizing honor, loyalty, courage, and moral discipline.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Benevolence",
-        definition: "Compassion and kindness; the warrior's duty to protect and serve others with mercy.",
-        category: "principle",
-        icon: Users
-      },
-      {
-        term: "Box Breathing",
-        definition: "A controlled breathing pattern (4-4-4-4) to maintain calm and focus in any situation.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Oath Journal",
-        definition: "A practice of declaring daily duties and commitments to maintain honor and accountability.",
+        term: "Seppuku",
+        definition: "Ritual suicide by disembowelment, performed to preserve honor or atone for failure.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Conflict Simulator",
-        definition: "A method for practicing ethical decision-making in complex situations before they arise.",
+        term: "Katana",
+        definition: "The curved, single-edged sword that symbolizes the samurai's soul and commitment to their code.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Daimyō",
+        definition: "A powerful feudal lord who ruled over territories and commanded samurai warriors.",
+        category: "concept",
+        icon: Users
+      },
+      {
+        term: "Zen Meditation",
+        definition: "Mindfulness practice that cultivates focus, clarity, and the ability to act without hesitation.",
         category: "technique",
-        icon: Lightbulb
+        icon: Zap
       }
     ]
   },
   stoic: {
-    overview: "Stoicism is a philosophy of personal ethics that teaches the development of self-control and fortitude to overcome destructive emotions. It emphasizes focusing on what you can control and accepting what you cannot.",
+    overview: "Stoicism teaches that virtue is the only good and that we should focus on what we can control while accepting what we cannot. It emphasizes rational thinking and emotional resilience.",
     coreConcepts: [
-      "Focus on what you can control",
+      "Virtue is the only good",
+      "Focus on what you control",
       "Accept what you cannot change",
-      "Practice negative visualization",
       "Live according to nature"
     ],
     terminology: [
       {
-        term: "Dichotomy of Control",
-        definition: "The fundamental Stoic principle that some things are within our control and others are not.",
+        term: "Logos",
+        definition: "The rational principle that governs the universe and human nature. Living in accordance with logos brings harmony.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Negative Visualization",
-        definition: "Imagining the worst-case scenario to appreciate what you have and prepare for adversity.",
-        category: "technique",
+        term: "Apatheia",
+        definition: "Freedom from destructive emotions, achieved through rational thinking and self-discipline.",
+        category: "principle",
         icon: Lightbulb
       },
       {
-        term: "Amor Fati",
-        definition: "Love of fate - embracing everything that happens as necessary and beneficial for your growth.",
-        category: "principle",
-        icon: Target
-      },
-      {
-        term: "Memento Mori",
-        definition: "Remember that you must die - a practice to live each day with purpose and urgency.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Premeditatio Malorum",
-        definition: "The premeditation of evils - preparing mentally for potential difficulties.",
+        term: "Negative Visualization",
+        definition: "Imagining the loss of what we value to appreciate it more and prepare for potential hardships.",
         category: "technique",
         icon: Zap
       },
       {
-        term: "Stoic Journal",
-        definition: "Daily reflection on your thoughts, actions, and adherence to Stoic principles.",
+        term: "Dichotomy of Control",
+        definition: "Distinguishing between what we can control (our thoughts, actions) and what we cannot (external events).",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Memento Mori",
+        definition: "Remembering that we will die, which helps us live more meaningfully and prioritize what truly matters.",
         category: "practice",
         icon: BookOpen
       }
@@ -201,12 +182,6 @@ const frameworkTerminologies: Record<string, {
         definition: "Service to others as a spiritual practice that builds character and connection.",
         category: "practice",
         icon: Users
-      },
-      {
-        term: "Ocean Breathing",
-        definition: "A slow, rhythmic breathing pattern that mimics the natural flow of ocean waves.",
-        category: "technique",
-        icon: Zap
       }
     ]
   },
@@ -248,12 +223,6 @@ const frameworkTerminologies: Record<string, {
         definition: "A breathing technique that balances the left and right energies of the body.",
         category: "technique",
         icon: Zap
-      },
-      {
-        term: "Sun Salutation",
-        definition: "A flowing sequence of postures that energizes the body and honors the sun.",
-        category: "practice",
-        icon: BookOpen
       }
     ]
   },
@@ -295,12 +264,6 @@ const frameworkTerminologies: Record<string, {
         definition: "The oral tradition of sharing wisdom, history, and values through stories.",
         category: "technique",
         icon: Zap
-      },
-      {
-        term: "Seasonal Awareness",
-        definition: "Living in harmony with the natural cycles and rhythms of the earth.",
-        category: "principle",
-        icon: Lightbulb
       }
     ]
   },
@@ -342,12 +305,6 @@ const frameworkTerminologies: Record<string, {
         definition: "Moving meditation practices that develop focus and awareness.",
         category: "technique",
         icon: Zap
-      },
-      {
-        term: "Bushido",
-        definition: "The way of the warrior - ethical principles that guide martial practice.",
-        category: "principle",
-        icon: Target
       }
     ]
   },
@@ -389,12 +346,6 @@ const frameworkTerminologies: Record<string, {
         definition: "Subsistence in God - living in the world while remaining connected to the divine.",
         category: "concept",
         icon: Target
-      },
-      {
-        term: "Heart Opening",
-        definition: "Cultivating love, compassion, and receptivity to divine guidance.",
-        category: "principle",
-        icon: Lightbulb
       }
     ]
   },
@@ -436,12 +387,6 @@ const frameworkTerminologies: Record<string, {
         definition: "A practice of sharing personal stories to build understanding and connection.",
         category: "technique",
         icon: Zap
-      },
-      {
-        term: "Intergenerational Learning",
-        definition: "Learning from elders and passing wisdom to younger generations.",
-        category: "practice",
-        icon: BookOpen
       }
     ]
   },
@@ -468,27 +413,21 @@ const frameworkTerminologies: Record<string, {
       },
       {
         term: "Feedback Loops",
-        definition: "Circular processes where outputs become inputs, creating self-reinforcing or balancing patterns.",
-        category: "technique",
-        icon: Zap
+        definition: "Circular processes where outputs become inputs, creating self-reinforcing or self-correcting patterns.",
+        category: "concept",
+        icon: Target
       },
       {
         term: "Leverage Points",
-        definition: "Strategic places in a system where small changes can create large effects.",
-        category: "principle",
-        icon: Target
+        definition: "Strategic places in a system where small changes can create large, lasting improvements.",
+        category: "technique",
+        icon: Zap
       },
       {
         term: "Pattern Recognition",
         definition: "Identifying recurring structures and relationships that help understand system behavior.",
         category: "practice",
         icon: BookOpen
-      },
-      {
-        term: "Holistic Solutions",
-        definition: "Approaches that address the whole system rather than just individual parts.",
-        category: "principle",
-        icon: Target
       }
     ]
   }
@@ -496,27 +435,27 @@ const frameworkTerminologies: Record<string, {
 
 const getCategoryColor = (category: string) => {
   switch (category) {
-    case 'technique': return 'from-blue-500 to-cyan-500';
-    case 'concept': return 'from-purple-500 to-pink-500';
-    case 'practice': return 'from-green-500 to-emerald-500';
-    case 'principle': return 'from-orange-500 to-red-500';
-    default: return 'from-gray-500 to-gray-600';
+    case 'technique': return 'text-blue-400';
+    case 'concept': return 'text-purple-400';
+    case 'practice': return 'text-green-400';
+    case 'principle': return 'text-orange-400';
+    default: return 'text-gray-400';
   }
 };
 
-const getCategoryLabel = (category: string) => {
+const getCategoryBg = (category: string) => {
   switch (category) {
-    case 'technique': return 'Technique';
-    case 'concept': return 'Concept';
-    case 'practice': return 'Practice';
-    case 'principle': return 'Principle';
-    default: return 'Term';
+    case 'technique': return 'bg-blue-500/10 border-blue-500/30';
+    case 'concept': return 'bg-purple-500/10 border-purple-500/30';
+    case 'practice': return 'bg-green-500/10 border-green-500/30';
+    case 'principle': return 'bg-orange-500/10 border-orange-500/30';
+    default: return 'bg-gray-500/10 border-gray-500/30';
   }
 };
 
 export default function FrameworkTerminology({ frameworkSlug, frameworkName, frameworkTone }: FrameworkTerminologyProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [currentTermIndex, setCurrentTermIndex] = useState(0);
+  const [showDefinition, setShowDefinition] = useState(false);
 
   const frameworkData = frameworkTerminologies[frameworkSlug];
   
@@ -524,113 +463,104 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
     return null;
   }
 
-  const categories = ['all', ...Array.from(new Set(frameworkData.terminology.map(item => item.category)))];
-  
-  const filteredTerminology = selectedCategory === 'all' 
-    ? frameworkData.terminology 
-    : frameworkData.terminology.filter(item => item.category === selectedCategory);
+  const currentTerm = frameworkData.terminology[currentTermIndex];
+  const totalTerms = frameworkData.terminology.length;
+
+  const nextTerm = () => {
+    setCurrentTermIndex((prev) => (prev + 1) % totalTerms);
+    setShowDefinition(false);
+  };
+
+  const prevTerm = () => {
+    setCurrentTermIndex((prev) => (prev - 1 + totalTerms) % totalTerms);
+    setShowDefinition(false);
+  };
+
+  const handleDefine = () => {
+    setShowDefinition(!showDefinition);
+  };
 
   return (
-    <div className="glass-card mb-8">
-      <div className="p-6">
-        {/* Header */}
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-600 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-white" />
+    <div className="page-section">
+      <div className="max-w-2xl mx-auto">
+        <div className="text-center mb-6">
+          <h2 className="section-title mb-2">Framework Terminology</h2>
+          <p className="section-description">
+            Key concepts and practices from the {frameworkName} tradition
+          </p>
+        </div>
+
+        {/* Term Gallery */}
+        <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+          {/* Current Term Display */}
+          <div className="text-center mb-6">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <currentTerm.icon className="w-6 h-6 text-blue-400" />
+              <span className={`text-sm font-medium px-3 py-1 rounded-full border ${getCategoryBg(currentTerm.category)} ${getCategoryColor(currentTerm.category)}`}>
+                {currentTerm.category.charAt(0).toUpperCase() + currentTerm.category.slice(1)}
+              </span>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-white mb-4">{currentTerm.term}</h3>
+            
+            {showDefinition ? (
+              <div className="bg-white/10 rounded-lg p-4 mb-4">
+                <p className="text-gray-200 leading-relaxed">{currentTerm.definition}</p>
+              </div>
+            ) : (
+              <div className="h-16 flex items-center justify-center">
+                <p className="text-gray-400 italic">Click "Define" to learn more</p>
+              </div>
+            )}
+            
+            <button
+              onClick={handleDefine}
+              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
+            >
+              {showDefinition ? 'Hide Definition' : 'Define'}
+            </button>
           </div>
-          <div>
-            <h2 className="text-xl font-semibold text-white">Framework Terminology</h2>
-            <p className="text-gray-300 text-sm">Core concepts and practices of {frameworkName}</p>
+
+          {/* Navigation */}
+          <div className="flex items-center justify-between">
+            <button
+              onClick={prevTerm}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              disabled={totalTerms <= 1}
+            >
+              <ChevronLeft className="w-5 h-5 text-white" />
+            </button>
+            
+            {/* Progress Slider */}
+            <div className="flex-1 mx-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-gray-400">
+                  {currentTermIndex + 1} of {totalTerms}
+                </span>
+                <div className="flex-1 bg-gray-700 rounded-full h-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${((currentTermIndex + 1) / totalTerms) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <button
+              onClick={nextTerm}
+              className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              disabled={totalTerms <= 1}
+            >
+              <ChevronRight className="w-5 h-5 text-white" />
+            </button>
           </div>
         </div>
 
         {/* Overview */}
-        <div className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10">
-          <h3 className="text-lg font-medium text-white mb-2">Overview</h3>
+        <div className="mt-6 text-center">
+          <h4 className="text-lg font-semibold text-white mb-2">About {frameworkName}</h4>
           <p className="text-gray-300 leading-relaxed">{frameworkData.overview}</p>
         </div>
-
-        {/* Core Concepts */}
-        <div className="mb-6">
-          <h3 className="text-lg font-medium text-white mb-3">Core Concepts</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {frameworkData.coreConcepts.map((concept, index) => (
-              <div key={index} className="flex items-start gap-2 p-3 bg-white/5 rounded-lg border border-white/10">
-                <div className="w-2 h-2 bg-amber-400 rounded-full mt-2 flex-shrink-0"></div>
-                <p className="text-gray-300 text-sm">{concept}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Category Filter */}
-        <div className="mb-4">
-          <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setSelectedCategory(category)}
-                className={`px-3 py-1 rounded-full text-xs font-medium transition-colors ${
-                  selectedCategory === category
-                    ? 'bg-amber-500 text-white'
-                    : 'bg-white/10 text-gray-300 hover:bg-white/20'
-                }`}
-              >
-                {category === 'all' ? 'All' : getCategoryLabel(category)}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Terminology List */}
-        <div className="space-y-3">
-          {filteredTerminology.slice(0, isExpanded ? undefined : 3).map((item, index) => (
-            <motion.div
-              key={item.term}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className="p-4 bg-white/5 rounded-lg border border-white/10 hover:border-white/20 transition-colors"
-            >
-              <div className="flex items-start gap-3">
-                <div className={`w-8 h-8 bg-gradient-to-r ${getCategoryColor(item.category)} rounded-lg flex items-center justify-center flex-shrink-0`}>
-                  <item.icon className="w-4 h-4 text-white" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <h4 className="font-medium text-white">{item.term}</h4>
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium bg-gradient-to-r ${getCategoryColor(item.category)} text-white`}>
-                      {getCategoryLabel(item.category)}
-                    </span>
-                  </div>
-                  <p className="text-gray-300 text-sm leading-relaxed">{item.definition}</p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-
-        {/* Expand/Collapse Button */}
-        {frameworkData.terminology.length > 3 && (
-          <div className="mt-4 text-center">
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
-            >
-              {isExpanded ? (
-                <>
-                  <ChevronUp className="w-4 h-4" />
-                  Show Less
-                </>
-              ) : (
-                <>
-                  <ChevronDown className="w-4 h-4" />
-                  Show More ({frameworkData.terminology.length - 3} more)
-                </>
-              )}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
