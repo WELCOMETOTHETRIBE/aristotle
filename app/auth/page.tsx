@@ -8,6 +8,7 @@ import { useAuth } from '@/lib/auth-context';
 import PageLayout from '@/components/PageLayout';
 import AuroraBackground from '@/components/AuroraBackground';
 import GraduationCapIcon from '@/components/GraduationCapIcon';
+import AcademyLogoSVG from '@/components/AcademyLogoSVG';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -161,18 +162,11 @@ export default function AuthPage() {
                   {/* Animated background gradient */}
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-indigo-500/30 animate-pulse"></div>
                   
-                  <img 
-                    src="/academy_logo_r2.png" 
-                    alt="Academy Logo" 
-                    className="w-24 h-24 object-contain relative z-10"
-                    style={{ 
-                      filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
-                    }}
-                    onLoad={() => console.log('Logo loaded successfully')}
-                    onError={(e) => {
-                      console.error('Logo failed to load:', e);
-                      console.error('Current src:', (e.target as HTMLImageElement).src);
-                    }}
+                  <img
+                    src="/academy_logo_r2.png"
+                    alt="Academy Logo"
+                    className="w-24 h-24 object-contain relative z-10 rounded-md shadow-lg"
+                    style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
                   />
                 </div>
                 
