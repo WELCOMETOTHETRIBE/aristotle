@@ -11,6 +11,7 @@ import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
+import VirtueRadar from '@/components/VirtueRadar';
 
 interface VirtueScores {
   wisdom: number;
@@ -69,13 +70,6 @@ interface WidgetInfo {
 }
 
 const WIDGET_INFO: WidgetInfo[] = [
-  {
-    id: 'virtue_progress',
-    title: 'Virtue Progress',
-    description: 'Track your daily virtue scores and see your 7-day averages. Click on the circles to update your scores.',
-    icon: Trophy,
-    category: 'core'
-  },
   {
     id: 'breathwork_timer',
     title: 'Breathwork Practice',
@@ -473,30 +467,18 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Bottom Row - Virtue Visualization */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-
-
-                  {/* Virtue Score Cards */}
-                  <div className="space-y-3">
-                    {Object.entries(virtueScores).map(([virtue, score]) => (
-                      <div key={virtue} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xl">{getVirtueEmoji(virtue as keyof VirtueScores)}</span>
-                          <div>
-                            <div className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueScores)} capitalize`}>
-                              {virtue}
-                            </div>
-                            <div className="text-xs text-gray-400">{score}/100</div>
-                          </div>
-                        </div>
-                        <div className="w-16 bg-gray-700 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueScores)}`}
-                            style={{ width: `${Math.min(100, score)}%` }}
-                          />
-                        </div>
-                      </div>
-                    ))}
+                <div className="flex items-center justify-center">
+                  <div className="w-full max-w-md">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Trophy className="h-5 w-5 text-blue-400" />
+                      <h3 className="text-lg font-semibold text-white">Your Virtue Balance</h3>
+                    </div>
+                    <VirtueRadar data={[
+                      { virtue: 'Wisdom', score: virtueScores.wisdom },
+                      { virtue: 'Courage', score: virtueScores.courage },
+                      { virtue: 'Justice', score: virtueScores.justice },
+                      { virtue: 'Temperance', score: virtueScores.temperance }
+                    ]} />
                   </div>
                 </div>
               </div>
@@ -553,63 +535,7 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              {/* Virtue Progress */}
-              <Card className="glass-effect">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Trophy className="h-5 w-5 text-primary" />
-                    Virtue Progress
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'virtue_progress' ? null : 'virtue_progress')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </CardTitle>
-                  <CardDescription>
-                    7-day average scores for your core virtues
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {showWidgetInfo === 'virtue_progress' && (
-                    <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                      <p className="text-sm text-blue-200">{getWidgetInfo('virtue_progress')?.description}</p>
-                    </div>
-                  )}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {Object.entries(virtueScores).map(([virtue, score]) => (
-                      <div key={virtue} className="text-center">
-                        <div className="flex items-center justify-center gap-2 mb-2">
-                          <span className="text-2xl">{getVirtueEmoji(virtue as keyof VirtueScores)}</span>
-                          <span className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueScores)}`}>
-                            {virtue.charAt(0).toUpperCase() + virtue.slice(1)}
-                          </span>
-                        </div>
-                        <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-                          <div 
-                            className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueScores)}`}
-                            style={{ width: `${Math.min(100, score)}%` }}
-                          />
-                        </div>
-                        <div className="text-xs text-muted-foreground">{score}/100</div>
-                        <div className="flex gap-1 mt-2">
-                          {[20, 40, 60, 80, 100].map((value) => (
-                            <button
-                              key={value}
-                              onClick={() => handleVirtueUpdate(virtue as keyof VirtueScores, value)}
-                              className={`w-4 h-4 rounded-full text-xs ${
-                                score >= value ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
-                              }`}
-                            >
-                              {value}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
+
 
               {/* Today's Tasks */}
               <Card className="glass-effect">
