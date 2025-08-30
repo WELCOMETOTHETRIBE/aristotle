@@ -17,7 +17,7 @@ import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpo
 import { HydrationWidget, NaturePhotoLogWidget } from '../../../components/ModuleWidgets';
 import { BreathworkWidgetNew } from '../../../components/BreathworkWidgetNew';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
-import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
+import { Trophy, Target, TrendingUp, BookOpen, Zap, Info, Brain, Shield, Scale, Leaf } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import WidgetGuard from '../../../components/WidgetGuard';
 import DeveloperToolbar from '../../../components/DeveloperToolbar';
@@ -109,6 +109,36 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
       }
     } catch (error) {
       console.error('Error completing widget:', error);
+    }
+  };
+
+  const getVirtueIcon = (virtue: string) => {
+    switch (virtue.toLowerCase()) {
+      case 'wisdom':
+        return Brain;
+      case 'courage':
+        return Shield;
+      case 'justice':
+        return Scale;
+      case 'temperance':
+        return Leaf;
+      default:
+        return Brain;
+    }
+  };
+
+  const getVirtueIconColor = (virtue: string) => {
+    switch (virtue.toLowerCase()) {
+      case 'wisdom':
+        return 'from-blue-400 to-cyan-400';
+      case 'courage':
+        return 'from-red-400 to-orange-400';
+      case 'justice':
+        return 'from-green-400 to-emerald-400';
+      case 'temperance':
+        return 'from-purple-400 to-violet-400';
+      default:
+        return 'from-blue-400 to-cyan-400';
     }
   };
 
@@ -235,24 +265,28 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
     );
   }
 
+  const VirtueIcon = getVirtueIcon(framework.virtuePrimary);
+  const virtueIconColor = getVirtueIconColor(framework.virtuePrimary);
+
   return (
     <PageLayout showAurora={false} title={framework.name} description={framework.teachingChip}>
+      {/* Back to Frameworks Link */}
+      <div className="mb-6">
+        <Link href="/frameworks" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
+          ← Back to All Frameworks
+        </Link>
+      </div>
 
-
-      {/* Hero Section */}
-      <div className={`bg-gradient-to-br ${getToneGradient(framework.tone)} py-16 -mt-12 mb-8`}>
+      {/* Hero Section with Updated Virtue Badge */}
+      <div className={`bg-gradient-to-br ${getToneGradient(framework.tone)} py-16 -mt-12 mb-8 rounded-xl border border-white/20`}>
         <div className="text-center">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-4">
+          <div className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-4">
+            <div className={`w-6 h-6 bg-gradient-to-r ${virtueIconColor} rounded-md flex items-center justify-center`}>
+              <VirtueIcon className="w-4 h-4 text-white" />
+            </div>
             <span className={`text-lg font-medium ${getToneTextColor(framework.tone)}`}>
               {framework.virtuePrimary.charAt(0).toUpperCase() + framework.virtuePrimary.slice(1)}
             </span>
-          </div>
-          
-          {/* Framework Intention */}
-          <div className="max-w-2xl mx-auto mb-6">
-            <p className={`text-lg ${getToneTextColor(framework.tone)} opacity-90 leading-relaxed`}>
-              {framework.teachingChip}
-            </p>
           </div>
           
           {/* Milestones Dropdown */}
@@ -261,8 +295,6 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           </div>
         </div>
       </div>
-
-
 
       {/* AI Chat - Prominently Displayed */}
       <div className="page-section">
@@ -291,33 +323,31 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         />
       </div>
 
-
-
       {/* Practice Widgets */}
       <div className="page-section">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="section-title">Practice Tools</h2>
             <button
-              onClick={() => setShowWidgetInfo(showWidgetInfo === 'practice_widgets' ? null : 'practice_widgets')}
+              onClick={() => setShowWidgetInfo(showWidgetInfo === 'practice_tools' ? null : 'practice_tools')}
               className="p-1 text-muted-foreground hover:text-white transition-colors"
             >
               <Info className="h-4 w-4" />
             </button>
           </div>
           <p className="section-description">
-            Interactive tools to embody the {framework.name} tradition
+            Interactive tools and practices from the {framework.name} tradition
           </p>
-          {showWidgetInfo === 'practice_widgets' && (
+          {showWidgetInfo === 'practice_tools' && (
             <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
               <p className="text-sm text-blue-200">
-                These interactive tools are specifically designed to help you embody the principles and practices of {framework.name}. 
-                Each tool focuses on cultivating the core virtues of this tradition through practical, daily exercises.
+                These interactive widgets help you practice {framework.name} principles in your daily life. 
+                Each completion contributes to your virtue development and overall progress.
               </p>
             </div>
           )}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {framework.widgets.map((widget: any) => (
-              <div key={widget.id} className="relative group">
+          <div className="page-grid">
+            {framework.widgets?.map((widget: any) => (
+              <div key={widget.id}>
                 {renderWidget(widget)}
               </div>
             ))}
@@ -355,82 +385,43 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
       {/* Progress Panel */}
       <div className="page-section">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div className="card-base bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
-            <div className="flex items-center gap-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-blue-400" />
-              <h3 className="font-semibold text-white">Virtue Progress</h3>
-            </div>
-            <div className="space-y-3">
-              {Object.entries(virtueTotals).map(([virtue, total]) => (
-                <div key={virtue} className="flex justify-between items-center">
-                  <span className="text-sm text-gray-300 capitalize">{virtue}</span>
-                  <div className="flex items-center gap-2">
-                    <div className="w-16 bg-gray-700 rounded-full h-2">
-                      <div
-                        className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueTotals)}`}
-                        style={{ width: `${Math.min(100, (total / 100) * 100)}%` }}
-                      />
-                    </div>
-                    <span className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueTotals)}`}>
-                      {total}
-                    </span>
-                  </div>
+        <div className="flex items-center gap-2 mb-4">
+          <h2 className="section-title">Your Progress</h2>
+          <button
+            onClick={() => setShowWidgetInfo(showWidgetInfo === 'progress' ? null : 'progress')}
+            className="p-1 text-muted-foreground hover:text-white transition-colors"
+          >
+            <Info className="h-4 w-4" />
+          </button>
+        </div>
+        <p className="section-description">
+          Track your development across the four cardinal virtues
+        </p>
+        {showWidgetInfo === 'progress' && (
+          <div className="mb-4 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
+            <p className="text-sm text-green-200">
+              Your progress is measured across the four cardinal virtues: Wisdom, Courage, Justice, and Temperance. 
+              Each practice and reflection contributes to your overall development.
+            </p>
+          </div>
+        )}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {Object.entries(virtueTotals).map(([virtue, total]) => {
+            const VirtueIconComponent = getVirtueIcon(virtue);
+            const virtueColor = getVirtueIconColor(virtue);
+            return (
+              <div key={virtue} className="glass-card p-4 text-center">
+                <div className={`w-12 h-12 bg-gradient-to-r ${virtueColor} rounded-xl flex items-center justify-center mx-auto mb-3`}>
+                  <VirtueIconComponent className="w-6 h-6 text-white" />
                 </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="card-base bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20">
-            <div className="flex items-center gap-2 mb-4">
-              <Target className="w-5 h-5 text-green-400" />
-              <h3 className="font-semibold text-white">Today's Progress</h3>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {completedWidgets.length} / {framework.widgets.length}
+                <h3 className="text-sm font-semibold text-white mb-1 capitalize">{virtue}</h3>
+                <p className="text-2xl font-bold text-white">{total}</p>
               </div>
-              <div className="text-sm text-gray-400 mb-3">Tools Completed</div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div 
-                  className="h-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 transition-all duration-500"
-                  style={{ width: `${(completedWidgets.length / framework.widgets.length) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
-
-          <div className="card-base bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border-yellow-500/20">
-            <div className="flex items-center gap-2 mb-4">
-              <Trophy className="w-5 h-5 text-yellow-400" />
-              <h3 className="font-semibold text-white">Framework Mastery</h3>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-2">
-                {Math.round((completedWidgets.length / framework.widgets.length) * 100)}%
-              </div>
-              <div className="text-sm text-gray-400 mb-3">Overall Progress</div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div 
-                  className="h-2 rounded-full bg-gradient-to-r from-yellow-500 to-orange-500 transition-all duration-500"
-                  style={{ width: `${(completedWidgets.length / framework.widgets.length) * 100}%` }}
-                />
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
 
-
-
-      {/* Back to Frameworks */}
-      <div className="text-center mt-12">
-        <Link href="/frameworks" className="btn-secondary">
-          ← Back to All Frameworks
-        </Link>
-      </div>
-
-      {/* Developer Toolbar */}
       <DeveloperToolbar />
     </PageLayout>
   );
