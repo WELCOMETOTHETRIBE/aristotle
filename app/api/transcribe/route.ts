@@ -57,21 +57,35 @@ export async function POST(request: NextRequest) {
       size: audioFile.size,
     });
 
-    // Send to OpenAI Whisper using the original file
+    // Create a new FormData for OpenAI API
+    const openaiFormData = new FormData();
+    openaiFormData.append('file', audioFile, 'audio.webm');
+    openaiFormData.append('model', 'whisper-1');
+    openaiFormData.append('language', 'en');
+
+    // Send to OpenAI Whisper using fetch directly
     console.log('Sending to OpenAI Whisper...');
-    const transcription = await openai.audio.transcriptions.create({
-      file: audioFile,
-      model: 'whisper-1',
-      language: 'en',
+    const response = await fetch('https://api.openai.com/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: openaiFormData,
     });
 
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error?.message || `HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
     console.log('Transcription successful:', {
-      textLength: transcription.text.length,
-      preview: transcription.text.substring(0, 100) + '...',
+      textLength: data.text.length,
+      preview: data.text.substring(0, 100) + '...',
     });
 
     return NextResponse.json({
-      text: transcription.text,
+      text: data.text,
     });
 
   } catch (error: any) {
@@ -84,43 +98,38 @@ export async function POST(request: NextRequest) {
     });
     
     // Handle specific OpenAI errors
-    if (error.status === 400) {
-      if (error.error?.message?.includes('Invalid file format')) {
-        return NextResponse.json(
-          { 
-            error: 'Audio format not supported. Please try recording again.',
-            details: 'The recorded audio format is not compatible with OpenAI Whisper. Try using a different browser or recording method.'
-          },
-          { status: 400 }
-        );
-      }
-      if (error.error?.message?.includes('file size')) {
-        return NextResponse.json(
-          { error: 'Audio file too large. Please record a shorter message.' },
-          { status: 400 }
-        );
-      }
+    if (error.message?.includes('Invalid file format')) {
       return NextResponse.json(
-        { error: 'Invalid request to OpenAI API', details: error.error?.message },
+        { 
+          error: 'Audio format not supported. Please try recording again.',
+          details: 'The recorded audio format is not compatible with OpenAI Whisper. Try using a different browser or recording method.'
+        },
+        { status: 400 }
+      );
+    }
+    
+    if (error.message?.includes('file size')) {
+      return NextResponse.json(
+        { error: 'Audio file too large. Please record a shorter message.' },
         { status: 400 }
       );
     }
 
-    if (error.status === 401) {
+    if (error.message?.includes('401')) {
       return NextResponse.json(
         { error: 'OpenAI API key is invalid or missing' },
         { status: 401 }
       );
     }
 
-    if (error.status === 429) {
+    if (error.message?.includes('429')) {
       return NextResponse.json(
         { error: 'Rate limit exceeded. Please try again in a moment.' },
         { status: 429 }
       );
     }
 
-    if (error.status === 500) {
+    if (error.message?.includes('500')) {
       return NextResponse.json(
         { error: 'OpenAI service temporarily unavailable. Please try again.' },
         { status: 500 }
