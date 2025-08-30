@@ -517,13 +517,6 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
   return (
     <div className="page-section">
       <div className="max-w-2xl mx-auto">
-        <div className="text-center mb-6">
-          <h2 className="section-title mb-2">Terminology</h2>
-          <p className="section-description">
-            Key concepts and practices from the {frameworkName} tradition
-          </p>
-        </div>
-
         {/* Overview - Moved Above */}
         <div className="mb-6 text-center">
           <h4 className="text-lg font-semibold text-white mb-2">About {frameworkName}</h4>
@@ -532,6 +525,13 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
 
         {/* Term Gallery */}
         <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
+          {/* Terminology Header */}
+          <div className="text-center mb-6">
+            <h3 className="text-xl font-semibold text-white mb-2">Terminology</h3>
+            <p className="text-gray-400 text-sm">
+              Key concepts and practices from the {frameworkName} tradition
+            </p>
+          </div>
           {/* Current Term Display */}
           <div className="text-center mb-6">
             <div className="flex items-center justify-center gap-2 mb-4">
