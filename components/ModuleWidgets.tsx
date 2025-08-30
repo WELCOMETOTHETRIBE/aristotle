@@ -26,13 +26,15 @@ export function BreathworkWidget({
 }: BreathworkWidgetProps) {
   const [isActive, setIsActive] = useState(false);
   const [currentPhase, setCurrentPhase] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(duration * 60);
   const [phaseTimeLeft, setPhaseTimeLeft] = useState(pattern.inhale);
   const [breathScale, setBreathScale] = useState(1);
   const [sessionCount, setSessionCount] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
   const [selectedPattern, setSelectedPattern] = useState('box');
   const [currentPattern, setCurrentPattern] = useState(pattern);
+  const [cycleCount, setCycleCount] = useState(0);
+  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
+  const [sessionDuration, setSessionDuration] = useState(0);
 
   // Breathing patterns
   const breathingPatterns = {
@@ -60,23 +62,18 @@ export function BreathworkWidget({
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
-    if (isActive && timeLeft > 0) {
+    if (isActive) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsActive(false);
-            setIsCompleted(true);
-            setSessionCount(prev => prev + 1);
-            triggerHaptic();
-            return 0;
-          }
-          return prev - 1;
-        });
-
         setPhaseTimeLeft((prev) => {
           if (prev <= 1) {
             const nextPhase = (currentPhase + 1) % phases.length;
             setCurrentPhase(nextPhase);
+            
+            // Count cycles when we complete a full breath cycle
+            if (nextPhase === 0) {
+              setCycleCount(prev => prev + 1);
+            }
+            
             triggerHaptic();
             return phases[nextPhase].duration;
           }
@@ -96,15 +93,37 @@ export function BreathworkWidget({
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, currentPhase, phases, triggerHaptic]);
+  }, [isActive, currentPhase, phases, triggerHaptic]);
+
+  // Track session duration
+  useEffect(() => {
+    let durationInterval: NodeJS.Timeout;
+
+    if (isActive && sessionStartTime) {
+      durationInterval = setInterval(() => {
+        const now = new Date();
+        const duration = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
+        setSessionDuration(duration);
+      }, 1000);
+    }
+
+    return () => clearInterval(durationInterval);
+  }, [isActive, sessionStartTime]);
 
   const toggleTimer = () => {
     if (isCompleted) {
-      setTimeLeft(duration * 60);
       setIsCompleted(false);
       setCurrentPhase(0);
       setPhaseTimeLeft(currentPattern.inhale);
+      setCycleCount(0);
+      setSessionDuration(0);
+      setSessionStartTime(null);
     } else {
+      if (!isActive) {
+        // Starting session
+        setSessionStartTime(new Date());
+        setSessionDuration(0);
+      }
       setIsActive(!isActive);
       triggerHaptic();
     }
@@ -119,11 +138,13 @@ export function BreathworkWidget({
 
   const resetTimer = () => {
     setIsActive(false);
-    setTimeLeft(duration * 60);
     setCurrentPhase(0);
     setPhaseTimeLeft(currentPattern.inhale);
     setBreathScale(1);
     setIsCompleted(false);
+    setCycleCount(0);
+    setSessionDuration(0);
+    setSessionStartTime(null);
     triggerHaptic();
   };
 

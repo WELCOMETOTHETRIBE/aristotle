@@ -7,6 +7,7 @@ import { Eye, EyeOff, Sparkles, Shield, Users, ArrowRight, CheckCircle, AlertCir
 import { useAuth } from '@/lib/auth-context';
 import PageLayout from '@/components/PageLayout';
 import AuroraBackground from '@/components/AuroraBackground';
+import GraduationCapIcon from '@/components/GraduationCapIcon';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -60,17 +61,10 @@ export default function AuthPage() {
         const result = await signUp(formData.username, formData.password, formData.email, formData.displayName);
         if (result.success) {
           setSuccess('Account created successfully!');
-          // Wait for auth context to update before redirecting
-          setTimeout(async () => {
-            try {
-              await authContext?.checkAuth();
-              router.push('/');
-            } catch (error) {
-              console.error('Auth check failed after signup:', error);
-              // Fallback redirect
-              window.location.href = '/';
-            }
-          }, 1500);
+          // Redirect immediately since auth context already updated
+          setTimeout(() => {
+            router.push('/');
+          }, 1000);
         } else {
           setError(result.error || 'Sign up failed');
         }
@@ -78,17 +72,10 @@ export default function AuthPage() {
         const result = await signIn(formData.username, formData.password);
         if (result.success) {
           setSuccess('Welcome back!');
-          // Wait for auth context to update before redirecting
-          setTimeout(async () => {
-            try {
-              await authContext?.checkAuth();
-              router.push('/');
-            } catch (error) {
-              console.error('Auth check failed after signin:', error);
-              // Fallback redirect
-              window.location.href = '/';
-            }
-          }, 1500);
+          // Redirect immediately since auth context already updated
+          setTimeout(() => {
+            router.push('/');
+          }, 1000);
         } else {
           setError(result.error || 'Sign in failed');
         }
@@ -175,6 +162,15 @@ export default function AuthPage() {
                     src="/academy_logo.png" 
                     alt="Academy Logo" 
                     className="w-20 h-20 object-contain"
+                    onError={(e) => {
+                      // Fallback to graduation cap icon if image fails to load
+                      const target = e.target as HTMLImageElement;
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = '<div class="w-20 h-20 flex items-center justify-center"><svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 7V17C2 17.5523 2.44772 18 3 18H21C21.5523 18 22 17.5523 22 17V7"/><path d="M12 12V18"/><path d="M12 18C12 18 10 20 8 20C6 20 4 18 4 18"/></svg></div>';
+                      }
+                    }}
                   />
                 </div>
                 <motion.div
