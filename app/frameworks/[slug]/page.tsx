@@ -11,10 +11,10 @@ import PageLayout from '../../../components/PageLayout';
 import QuestDeck from '../../../components/QuestDeck';
 import TimerCard from '../../../components/widgets/TimerCard';
 import CounterCard from '../../../components/widgets/CounterCard';
-import BreathPacer from '../../../components/widgets/BreathPacer';
+
 import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
-import BreathTimerCircle from '../../../components/BreathTimerCircle';
+import { BreathworkWidget, HydrationWidget } from '../../../components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
 import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 import WidgetGuard from '../../../components/WidgetGuard';
@@ -132,7 +132,9 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                 case 'COUNTER':
                   return <CounterCard {...commonProps} />;
                 case 'BREATH':
-                  return <BreathPacer {...commonProps} />;
+                  return <BreathworkWidget frameworkTone={framework.tone} />;
+                case 'HYDRATION':
+                  return <HydrationWidget frameworkTone={framework.tone} />;
                 default:
                   return (
                     <div className="p-6 bg-gray-800 rounded-lg">
@@ -259,21 +261,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             </div>
           )}
           <div className="max-w-md mx-auto">
-            <BreathTimerCircle 
-              patternId={params.slug}
-              ratio="4:4:4:4"
-              useVoice={true}
-              volume={0.7}
-              onSessionComplete={(session) => {
-                console.log('Breathwork session completed:', session);
-                // Update virtue totals based on framework
-                const virtueGain = 5; // Base virtue gain for breathwork
-                setVirtueTotals(prev => ({
-                  ...prev,
-                  [framework.virtuePrimary]: prev[framework.virtuePrimary as keyof VirtueTotals] + virtueGain
-                }));
-              }}
-            />
+            <BreathworkWidget frameworkTone={framework.tone} />
           </div>
         </div>
 

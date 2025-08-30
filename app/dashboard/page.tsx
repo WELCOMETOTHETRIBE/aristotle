@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale } from 'lucide-react';
-import BreathTimerCircle from '@/components/BreathTimerCircle';
+
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
 import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
