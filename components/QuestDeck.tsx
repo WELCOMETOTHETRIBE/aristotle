@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, Clock, Target, Sparkles } from 'lucide-react';
+import { CheckCircle, Clock, Target, Sparkles, ChevronLeft, ChevronRight } from 'lucide-react';
 import { GlassCard } from './GlassCard';
 import { Quest } from '@/lib/quest-engine';
 import { getVirtueEmoji, getVirtueColor } from '@/lib/virtue';
@@ -14,6 +14,7 @@ interface QuestDeckProps {
 
 export default function QuestDeck({ quests, completedWidgets, onQuestComplete }: QuestDeckProps) {
   const [expandedQuest, setExpandedQuest] = useState<string | null>(null);
+  const [currentQuestIndex, setCurrentQuestIndex] = useState(0);
 
   const getQuestProgress = (quest: Quest) => {
     const completedCount = quest.widgetIds.filter(widgetId => 
@@ -39,6 +40,14 @@ export default function QuestDeck({ quests, completedWidgets, onQuestComplete }:
     ));
   };
 
+  const nextQuest = () => {
+    setCurrentQuestIndex((prev) => (prev + 1) % quests.length);
+  };
+
+  const prevQuest = () => {
+    setCurrentQuestIndex((prev) => (prev - 1 + quests.length) % quests.length);
+  };
+
   return (
     <div className="space-y-4">
       <div className="flex items-center gap-2 mb-6">
@@ -46,25 +55,49 @@ export default function QuestDeck({ quests, completedWidgets, onQuestComplete }:
         <h2 className="text-xl font-semibold text-white">Today's Quest Deck</h2>
       </div>
 
-      <div className="grid gap-4">
-        {quests.map((quest) => {
-          const progress = getQuestProgress(quest);
-          const complete = isQuestComplete(quest);
-          
-          return (
-            <GlassCard
-              key={quest.id}
-              title={quest.title}
-              action={
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  <span className="text-sm text-gray-400">{quest.minutes}m</span>
-                </div>
-              }
-              className={`transition-all duration-300 ${
-                complete ? 'ring-2 ring-green-500' : ''
-              }`}
-            >
+      {/* Quest Gallery */}
+      <div className="relative">
+        {/* Navigation Buttons */}
+        <button
+          onClick={prevQuest}
+          className="absolute left-4 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+          disabled={quests.length <= 1}
+        >
+          <ChevronLeft className="w-5 h-5 text-white" />
+        </button>
+        
+        <button
+          onClick={nextQuest}
+          className="absolute right-4 top-1/2 transform -translate-y-1/2 z-10 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+          disabled={quests.length <= 1}
+        >
+          <ChevronRight className="w-5 h-5 text-white" />
+        </button>
+
+        {/* Quest Cards Container */}
+        <div className="overflow-hidden">
+          <div 
+            className="flex transition-transform duration-300 ease-in-out"
+            style={{ transform: `translateX(-${currentQuestIndex * 100}%)` }}
+          >
+            {quests.map((quest) => {
+              const progress = getQuestProgress(quest);
+              const complete = isQuestComplete(quest);
+              
+              return (
+                <div key={quest.id} className="w-full flex-shrink-0 px-4">
+                  <GlassCard
+                    title={quest.title}
+                    action={
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-gray-400" />
+                        <span className="text-sm text-gray-400">{quest.minutes}m</span>
+                      </div>
+                    }
+                    className={`transition-all duration-300 ${
+                      complete ? 'ring-2 ring-green-500' : ''
+                    }`}
+                  >
               <div className="mb-4">
                 <p className="text-sm text-gray-300 mb-3">{quest.description}</p>
                 
@@ -132,9 +165,27 @@ export default function QuestDeck({ quests, completedWidgets, onQuestComplete }:
                   </div>
                 </div>
               )}
-            </GlassCard>
-          );
-        })}
+                  </GlassCard>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Progress Indicators */}
+        {quests.length > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            {quests.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentQuestIndex(index)}
+                className={`w-2 h-2 rounded-full transition-colors ${
+                  index === currentQuestIndex ? 'bg-blue-500' : 'bg-gray-600'
+                }`}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Summary */}
