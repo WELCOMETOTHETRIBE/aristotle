@@ -31,12 +31,23 @@ export function BreathworkWidget({
   const [breathScale, setBreathScale] = useState(1);
   const [sessionCount, setSessionCount] = useState(0);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [selectedPattern, setSelectedPattern] = useState('box');
+  const [currentPattern, setCurrentPattern] = useState(pattern);
+
+  // Breathing patterns
+  const breathingPatterns = {
+    box: { name: 'Box Breathing', pattern: { inhale: 4, hold: 4, exhale: 4, hold2: 4 }, total: 16 },
+    triangle: { name: 'Triangle Breathing', pattern: { inhale: 4, hold: 4, exhale: 4 }, total: 12 },
+    coherent: { name: 'Coherent Breathing', pattern: { inhale: 5, hold: 0, exhale: 5 }, total: 10 },
+    stoic: { name: 'Stoic Pattern', pattern: { inhale: 4, hold: 7, exhale: 8 }, total: 19 },
+    spartan: { name: 'Spartan Pattern', pattern: { inhale: 3, hold: 2, exhale: 3 }, total: 8 }
+  };
 
   const phases = [
-    { name: "Inhale", duration: pattern.inhale, color: "#7ad7ff", icon: "↗", emoji: "🫁" },
-    { name: "Hold", duration: pattern.hold, color: "#a78bfa", icon: "●", emoji: "⏸️" },
-    { name: "Exhale", duration: pattern.exhale, color: "#7ad7ff", icon: "↘", emoji: "💨" },
-    ...(pattern.hold2 ? [{ name: "Hold", duration: pattern.hold2, color: "#a78bfa", icon: "●", emoji: "⏸️" }] : [])
+    { name: "Inhale", duration: currentPattern.inhale, color: "#7ad7ff", icon: "↗", emoji: "🫁" },
+    { name: "Hold", duration: currentPattern.hold, color: "#a78bfa", icon: "●", emoji: "⏸️" },
+    { name: "Exhale", duration: currentPattern.exhale, color: "#7ad7ff", icon: "↘", emoji: "💨" },
+    ...(currentPattern.hold2 ? [{ name: "Hold", duration: currentPattern.hold2, color: "#a78bfa", icon: "●", emoji: "⏸️" }] : [])
   ];
 
   // Haptic feedback simulation
@@ -92,18 +103,25 @@ export function BreathworkWidget({
       setTimeLeft(duration * 60);
       setIsCompleted(false);
       setCurrentPhase(0);
-      setPhaseTimeLeft(pattern.inhale);
+      setPhaseTimeLeft(currentPattern.inhale);
     } else {
       setIsActive(!isActive);
       triggerHaptic();
     }
   };
 
+  const handlePatternChange = (patternKey: string) => {
+    const newPattern = breathingPatterns[patternKey as keyof typeof breathingPatterns];
+    setSelectedPattern(patternKey);
+    setCurrentPattern(newPattern.pattern);
+    resetTimer();
+  };
+
   const resetTimer = () => {
     setIsActive(false);
     setTimeLeft(duration * 60);
     setCurrentPhase(0);
-    setPhaseTimeLeft(pattern.inhale);
+    setPhaseTimeLeft(currentPattern.inhale);
     setBreathScale(1);
     setIsCompleted(false);
     triggerHaptic();
@@ -137,13 +155,30 @@ export function BreathworkWidget({
           </motion.div>
           <div>
             <h3 className="font-bold text-white text-lg">Breathwork</h3>
-            <p className="text-sm text-gray-400">Box {pattern.inhale}-{pattern.hold}-{pattern.exhale}-{pattern.hold2 || 0}</p>
+            <p className="text-sm text-gray-400">{breathingPatterns[selectedPattern as keyof typeof breathingPatterns].name}</p>
           </div>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-blue-400">{sessionCount}</div>
           <div className="text-xs text-gray-400">Sessions</div>
         </div>
+      </div>
+
+      {/* Pattern Selection */}
+      <div className="mb-6">
+        <label className="block text-sm font-medium text-gray-300 mb-2">Breathing Pattern</label>
+        <select
+          value={selectedPattern}
+          onChange={(e) => handlePatternChange(e.target.value)}
+          disabled={isActive}
+          className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+        >
+          {Object.entries(breathingPatterns).map(([key, pattern]) => (
+            <option key={key} value={key} className="bg-gray-800 text-white">
+              {pattern.name} ({pattern.pattern.inhale}-{pattern.pattern.hold}-{pattern.pattern.exhale}{'hold2' in pattern.pattern && pattern.pattern.hold2 ? `-${pattern.pattern.hold2}` : ''})
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Progress Bar */}
