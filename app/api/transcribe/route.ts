@@ -52,32 +52,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Convert File to Buffer
-    const arrayBuffer = await audioFile.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
     console.log('Processing audio file:', {
       originalType: audioFile.type,
-      size: buffer.length,
+      size: audioFile.size,
     });
 
-    // Create a file-like object compatible with OpenAI API
-    // Use a different approach that works in Node.js environment
-    const fileObject = {
-      name: 'audio.webm',
-      type: 'audio/webm',
-      size: buffer.length,
-      arrayBuffer: () => Promise.resolve(buffer),
-      stream: () => {
-        const { Readable } = require('stream');
-        return Readable.from(buffer);
-      }
-    } as any;
-
-    // Send to OpenAI Whisper
+    // Send to OpenAI Whisper using the original file
     console.log('Sending to OpenAI Whisper...');
     const transcription = await openai.audio.transcriptions.create({
-      file: fileObject,
+      file: audioFile,
       model: 'whisper-1',
       language: 'en',
     });
