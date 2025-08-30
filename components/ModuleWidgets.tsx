@@ -1075,17 +1075,21 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
       {/* Water Level Visualization */}
       <div className="flex justify-center mb-6">
         <div className="relative w-24 h-32">
-          <div className="w-full h-full border-4 border-blue-400/30 rounded-lg bg-blue-500/10">
+          <div className="w-full h-full border-4 border-blue-400/30 rounded-lg bg-blue-500/10 overflow-hidden">
             <motion.div
-              className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-cyan-400 rounded-b-sm"
+              className="absolute bottom-0 w-full bg-gradient-to-t from-blue-500 to-cyan-400"
               initial={{ height: 0 }}
               animate={{ height: `${getProgressPercentage()}%` }}
               transition={{ duration: 0.5 }}
+              style={{ 
+                maxHeight: '100%',
+                borderRadius: '0 0 4px 4px'
+              }}
             />
           </div>
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             <div className="text-center">
-              <div className="text-2xl">{getWaterLevel() === "Full" ? "💧" : "💧"}</div>
+              <div className="text-2xl">💧</div>
               <div className="text-xs text-white font-medium">{getWaterLevel()}</div>
             </div>
           </div>

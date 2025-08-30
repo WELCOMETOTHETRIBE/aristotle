@@ -10,8 +10,6 @@ import CounterCard from '@/components/widgets/CounterCard';
 import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
-import MilestonesDropdown from '@/components/MilestonesDropdown';
-import VirtueRadar from '@/components/VirtueRadar';
 
 interface VirtueScores {
   wisdom: number;
@@ -468,30 +466,13 @@ export default function DashboardPage() {
                         <div className="text-gray-400 text-xs">Avg Score</div>
                       </div>
                     </div>
-                    {/* Milestones Dropdown */}
-                    <div className="flex-shrink-0">
-                      <MilestonesDropdown virtueTotals={virtueScores} />
-                    </div>
+
                   </div>
                 </div>
 
                 {/* Bottom Row - Virtue Visualization */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-                  {/* Virtue Radar Chart */}
-                  <div className="lg:col-span-2">
-                    <div className="flex items-center gap-3 mb-3">
-                      <Trophy className="h-5 w-5 text-blue-400" />
-                      <h3 className="text-lg font-semibold text-white">Virtue Balance</h3>
-                    </div>
-                    <div className="h-48">
-                      <VirtueRadar data={[
-                        { virtue: 'Wisdom', score: virtueScores.wisdom },
-                        { virtue: 'Courage', score: virtueScores.courage },
-                        { virtue: 'Justice', score: virtueScores.justice },
-                        { virtue: 'Temperance', score: virtueScores.temperance }
-                      ]} />
-                    </div>
-                  </div>
+
 
                   {/* Virtue Score Cards */}
                   <div className="space-y-3">
