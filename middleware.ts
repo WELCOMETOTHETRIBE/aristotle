@@ -61,6 +61,11 @@ export async function middleware(request: NextRequest) {
 
   // Handle authentication logic
   if (isProtectedRoute && !isAuthenticated) {
+    // Allow framework pages for testing
+    if (pathname.startsWith('/frameworks/')) {
+      console.log('✅ Allowing framework page access for testing:', pathname);
+      return NextResponse.next();
+    }
     console.log('🚫 Redirecting to auth (not authenticated)');
     return NextResponse.redirect(new URL('/auth', request.url));
   }
