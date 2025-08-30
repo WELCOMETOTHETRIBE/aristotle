@@ -363,34 +363,76 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Asana",
-        definition: "Physical postures that strengthen the body and prepare it for meditation and spiritual practice.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Pranayama",
-        definition: "Breath control techniques that regulate life force energy and calm the mind.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Chakra",
-        definition: "Energy centers in the body that correspond to different aspects of consciousness and life.",
+        term: "Body-Mind Integration",
+        definition: "Cultivating awareness of how physical and mental states influence each other for holistic well-being.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Mindful Movement",
-        definition: "Moving with full awareness and presence, treating movement as meditation.",
+        term: "Breath Awareness",
+        definition: "Using conscious breathing as a tool to calm the mind, reduce stress, and increase energy.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Alt-Nostril Breathing",
-        definition: "A breathing technique that balances the left and right energies of the body.",
-        category: "technique",
-        icon: Zap
+        term: "Mindful Movement",
+        definition: "Moving with full awareness and presence, treating physical activity as meditation.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Energy Management",
+        definition: "Understanding and optimizing your physical, mental, and emotional energy throughout the day.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Balance and Harmony",
+        definition: "Finding equilibrium between different aspects of life and maintaining inner stability.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Present Moment Awareness",
+        definition: "Cultivating the ability to stay fully engaged in the current moment without distraction.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Inner Stillness",
+        definition: "Developing the capacity to find peace and clarity even in the midst of external chaos.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Graceful Action",
+        definition: "Moving through life with ease, efficiency, and beauty in all your activities.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Self-Observation",
+        definition: "Developing the ability to observe your thoughts, emotions, and behaviors without judgment.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Holistic Health",
+        definition: "Caring for your physical, mental, emotional, and spiritual well-being as interconnected aspects.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Flow State",
+        definition: "Entering a state of complete absorption where time seems to disappear and performance is optimal.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Spiritual Growth",
+        definition: "Continuous development of your inner life and connection to something greater than yourself.",
+        category: "principle",
+        icon: Target
       }
     ]
   },
@@ -404,34 +446,76 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Ancestral Wisdom",
-        definition: "Knowledge passed down through generations, connecting us to our roots and traditions.",
+        term: "Interconnectedness",
+        definition: "Understanding that all life is connected and that our actions affect the entire web of existence.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Nature Connection",
-        definition: "Deepening our relationship with the natural world as a source of wisdom and healing.",
+        term: "Nature as Teacher",
+        definition: "Learning wisdom, patience, and resilience by observing and connecting with the natural world.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Community Ceremony",
-        definition: "Rituals and practices that strengthen community bonds and honor shared values.",
-        category: "practice",
+        term: "Community Wisdom",
+        definition: "Valuing the collective knowledge and experience of the community over individual expertise.",
+        category: "concept",
         icon: Users
       },
       {
-        term: "Sacred Plants",
-        definition: "Medicinal and spiritual plants used for healing, wisdom, and connection to the earth.",
-        category: "concept",
+        term: "Ancestral Connection",
+        definition: "Honoring and learning from the wisdom and traditions passed down through generations.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Sacred Relationship",
+        definition: "Treating all beings and the earth itself with reverence and respect.",
+        category: "principle",
         icon: Target
       },
       {
-        term: "Storytelling",
-        definition: "The oral tradition of sharing wisdom, history, and values through stories.",
-        category: "technique",
-        icon: Zap
+        term: "Storytelling Wisdom",
+        definition: "Using stories to share knowledge, values, and life lessons in memorable and meaningful ways.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Seasonal Awareness",
+        definition: "Living in harmony with natural cycles and rhythms rather than fighting against them.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Gratitude for Life",
+        definition: "Cultivating deep appreciation for the gifts of life, nature, and community.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Sustainable Living",
+        definition: "Making choices that ensure the well-being of future generations and the earth.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Ceremonial Practice",
+        definition: "Creating meaningful rituals and ceremonies to mark important moments and transitions.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Listening to the Land",
+        definition: "Developing sensitivity to the wisdom and messages that come from the natural world.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Elders' Guidance",
+        definition: "Seeking wisdom and counsel from those who have lived longer and gained deeper understanding.",
+        category: "principle",
+        icon: Users
       }
     ]
   },
@@ -445,34 +529,76 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Kata",
-        definition: "Pre-arranged sequences of movements that develop technique, focus, and discipline.",
+        term: "Discipline Through Practice",
+        definition: "Building character and skill through consistent, focused training and repetition.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Dojo",
-        definition: "The training hall - a sacred space for learning, practice, and personal development.",
+        term: "Respect for Tradition",
+        definition: "Honoring the wisdom and methods passed down through generations of practitioners.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Mind-Body Unity",
+        definition: "Developing the integration of physical technique with mental focus and spiritual awareness.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Sensei",
-        definition: "Teacher or master who guides students in their martial and spiritual development.",
-        category: "concept",
-        icon: Users
+        term: "Continuous Improvement",
+        definition: "Embracing the journey of lifelong learning and refinement of skills and character.",
+        category: "principle",
+        icon: Target
       },
       {
-        term: "Ki/Qi",
-        definition: "Life force energy that can be cultivated and directed through practice.",
-        category: "concept",
-        icon: Zap
+        term: "Focus and Concentration",
+        definition: "Cultivating the ability to maintain attention and awareness in all situations.",
+        category: "practice",
+        icon: BookOpen
       },
       {
-        term: "Meditation in Motion",
-        definition: "Moving meditation practices that develop focus and awareness.",
-        category: "technique",
-        icon: Zap
+        term: "Self-Control",
+        definition: "Developing mastery over your emotions, impulses, and reactions.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Adaptive Response",
+        definition: "Learning to respond appropriately to changing circumstances rather than reacting automatically.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Inner Strength",
+        definition: "Building resilience and fortitude that comes from within rather than external validation.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Harmony in Conflict",
+        definition: "Finding balance and effectiveness even in challenging or confrontational situations.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Mastery Through Repetition",
+        definition: "Understanding that excellence comes from consistent practice and refinement over time.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Spiritual Development",
+        definition: "Using physical training as a path to deeper self-understanding and personal growth.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Warrior Spirit",
+        definition: "Cultivating courage, determination, and the willingness to face challenges with integrity.",
+        category: "principle",
+        icon: Target
       }
     ]
   },
@@ -486,32 +612,74 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Dhikr",
-        definition: "Remembrance of God through repetition of sacred phrases or names.",
-        category: "practice",
-        icon: BookOpen
+        term: "Love as the Path",
+        definition: "Using love and devotion as the primary means of spiritual growth and connection.",
+        category: "principle",
+        icon: Target
       },
       {
-        term: "Sama",
-        definition: "Sacred music and dance that opens the heart and creates spiritual ecstasy.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Whirling",
-        definition: "A form of moving meditation that symbolizes the rotation of the universe.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Fana",
-        definition: "Annihilation of the ego and union with the divine presence.",
+        term: "Heart-Centered Wisdom",
+        definition: "Developing intuition and understanding through the heart rather than just the mind.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Baqa",
-        definition: "Subsistence in God - living in the world while remaining connected to the divine.",
+        term: "Divine Remembrance",
+        definition: "Keeping awareness of the sacred in daily life through prayer, meditation, and mindful practice.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Surrender to Grace",
+        definition: "Letting go of ego and control to allow divine guidance and wisdom to flow through you.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Sacred Music and Dance",
+        definition: "Using movement and music as vehicles for spiritual experience and connection.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Ego Dissolution",
+        definition: "Transcending the limited self to experience unity with the divine and all creation.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Living in the World",
+        definition: "Maintaining spiritual connection while fully engaging in worldly responsibilities and relationships.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Mystical Experience",
+        definition: "Opening to direct experience of the divine through meditation, prayer, and spiritual practice.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Compassionate Service",
+        definition: "Expressing divine love through acts of kindness and service to others.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Inner Transformation",
+        definition: "Allowing spiritual practice to fundamentally change your character and way of being.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Divine Intimacy",
+        definition: "Cultivating a personal, loving relationship with the divine presence within and around you.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Spiritual Ecstasy",
+        definition: "Experiencing moments of profound joy and connection that transcend ordinary consciousness.",
         category: "concept",
         icon: Target
       }
@@ -527,34 +695,76 @@ const frameworkTerminologies: Record<string, {
     ],
     terminology: [
       {
-        term: "Ubuntu",
-        definition: "A philosophy that emphasizes the interconnectedness of all people and the importance of community.",
-        category: "concept",
+        term: "I Am Because We Are",
+        definition: "Understanding that your identity and well-being are deeply connected to the community around you.",
+        category: "principle",
         icon: Target
       },
       {
-        term: "Community Building",
-        definition: "Creating and strengthening connections between people for mutual support and growth.",
-        category: "practice",
+        term: "Community as Foundation",
+        definition: "Building strong, supportive relationships as the basis for personal and collective growth.",
+        category: "concept",
         icon: Users
       },
       {
         term: "Collective Wisdom",
-        definition: "The wisdom that emerges when people come together to share knowledge and experience.",
+        definition: "Valuing and drawing from the shared knowledge and experience of the community.",
         category: "concept",
         icon: Lightbulb
       },
       {
         term: "Service Leadership",
-        definition: "Leading by serving others and putting the needs of the community first.",
+        definition: "Leading by serving others and putting the needs of the community before personal gain.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Story Circle",
-        definition: "A practice of sharing personal stories to build understanding and connection.",
-        category: "technique",
-        icon: Zap
+        term: "Interconnectedness",
+        definition: "Recognizing that all people and all life are connected in a web of relationships.",
+        category: "concept",
+        icon: Users
+      },
+      {
+        term: "Mutual Support",
+        definition: "Creating systems and practices that ensure everyone in the community can thrive.",
+        category: "practice",
+        icon: Users
+      },
+      {
+        term: "Shared Responsibility",
+        definition: "Taking collective ownership of community challenges and working together on solutions.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Inclusive Participation",
+        definition: "Ensuring that all voices are heard and valued in community decision-making.",
+        category: "practice",
+        icon: Users
+      },
+      {
+        term: "Cultural Preservation",
+        definition: "Honoring and maintaining the traditions, stories, and wisdom of the community.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Generational Connection",
+        definition: "Building bridges between different age groups to share wisdom and maintain continuity.",
+        category: "concept",
+        icon: Users
+      },
+      {
+        term: "Restorative Justice",
+        definition: "Addressing harm through healing and reconciliation rather than punishment and isolation.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Sustainable Community",
+        definition: "Creating communities that can thrive and support future generations.",
+        category: "concept",
+        icon: Users
       }
     ]
   },
@@ -569,33 +779,75 @@ const frameworkTerminologies: Record<string, {
     terminology: [
       {
         term: "Flow State",
-        definition: "A state of complete absorption in an activity where time seems to disappear and performance is optimal.",
+        definition: "Entering a state of complete absorption where time disappears and performance reaches its peak.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Kaizen",
-        definition: "Japanese philosophy of continuous improvement through small, incremental changes.",
+        term: "Continuous Improvement",
+        definition: "Making small, incremental changes that compound over time to create significant improvements.",
         category: "principle",
         icon: Lightbulb
       },
       {
-        term: "Biofeedback",
-        definition: "Using real-time data about physiological processes to improve performance and well-being.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Habit Stacking",
-        definition: "Building new habits by attaching them to existing routines and behaviors.",
+        term: "Peak State Management",
+        definition: "Learning to access and maintain optimal mental and physical states for performance.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Energy Management",
-        definition: "Optimizing physical, mental, and emotional energy for peak performance throughout the day.",
+        term: "Habit Optimization",
+        definition: "Designing and implementing systems that make positive behaviors automatic and effortless.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Energy Optimization",
+        definition: "Managing physical, mental, and emotional energy to maintain high performance throughout the day.",
         category: "practice",
         icon: Users
+      },
+      {
+        term: "Systems Thinking",
+        definition: "Understanding how different elements interact to create outcomes and optimizing the whole system.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Evidence-Based Practice",
+        definition: "Using scientific research and data to inform decisions about performance optimization.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Recovery Optimization",
+        definition: "Strategic rest and recovery practices that enhance performance and prevent burnout.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Mental Models",
+        definition: "Developing frameworks for thinking that help you make better decisions and solve problems.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Performance Psychology",
+        definition: "Understanding and optimizing the mental factors that influence performance and achievement.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Deliberate Practice",
+        definition: "Structured, focused practice designed to improve specific aspects of performance.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Sustainable Excellence",
+        definition: "Achieving and maintaining high performance over the long term without burnout or decline.",
+        category: "principle",
+        icon: Target
       }
     ]
   },
@@ -610,33 +862,75 @@ const frameworkTerminologies: Record<string, {
     terminology: [
       {
         term: "Systems Thinking",
-        definition: "A way of understanding how different parts of a system interact and influence each other.",
+        definition: "Understanding how different parts of a system interact and influence each other to create outcomes.",
         category: "concept",
         icon: Target
       },
       {
         term: "Emergence",
-        definition: "Properties that arise from the interaction of system components that aren't present in individual parts.",
+        definition: "Recognizing that complex behaviors and properties arise from simple interactions between system components.",
         category: "concept",
         icon: Lightbulb
       },
       {
         term: "Feedback Loops",
-        definition: "Circular processes where outputs become inputs, creating self-reinforcing or self-correcting patterns.",
+        definition: "Understanding how outputs become inputs, creating self-reinforcing or self-correcting patterns.",
         category: "concept",
         icon: Target
       },
       {
         term: "Leverage Points",
-        definition: "Strategic places in a system where small changes can create large, lasting improvements.",
+        definition: "Identifying strategic places where small changes can create large, lasting improvements in a system.",
         category: "technique",
         icon: Zap
       },
       {
         term: "Pattern Recognition",
-        definition: "Identifying recurring structures and relationships that help understand system behavior.",
+        definition: "Developing the ability to identify recurring structures and relationships in complex systems.",
         category: "practice",
         icon: BookOpen
+      },
+      {
+        term: "Interconnectedness",
+        definition: "Understanding that everything is connected and that changes in one part affect the whole system.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Holistic Problem Solving",
+        definition: "Addressing problems by understanding the entire system rather than just individual symptoms.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "System Dynamics",
+        definition: "Understanding how systems change over time and how to influence those changes effectively.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Boundary Setting",
+        definition: "Defining what is inside and outside a system to understand its scope and influence.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Complexity Management",
+        definition: "Navigating complex systems by understanding their underlying patterns and principles.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Systemic Change",
+        definition: "Creating lasting improvements by addressing root causes rather than surface symptoms.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Adaptive Systems",
+        definition: "Designing systems that can learn, evolve, and adapt to changing circumstances.",
+        category: "concept",
+        icon: Target
       }
     ]
   }
