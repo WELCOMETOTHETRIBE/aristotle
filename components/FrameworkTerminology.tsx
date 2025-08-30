@@ -517,12 +517,6 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
   return (
     <div className="page-section">
       <div className="max-w-2xl mx-auto">
-        {/* Overview - Moved Above */}
-        <div className="mb-6 text-center">
-          <h4 className="text-lg font-semibold text-white mb-2">About {frameworkName}</h4>
-          <p className="text-gray-300 leading-relaxed">{frameworkData.overview}</p>
-        </div>
-
         {/* Term Gallery */}
         <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
           {/* Terminology Header */}

@@ -264,15 +264,21 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         </div>
       </div>
 
-      {/* AI Chat - Prominently Displayed */}
+      {/* About Framework - Moved Above Chat */}
       <div className="page-section">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="section-title text-3xl mb-4">Chat with Your {framework.name} Guide</h2>
-            <p className="section-description text-lg">
-              Get personalized guidance, ask questions, and deepen your understanding of the {framework.name} tradition
+            <h2 className="section-title text-3xl mb-4">About {framework.name}</h2>
+            <p className="section-description text-lg leading-relaxed">
+              {framework.teachingChip}
             </p>
           </div>
+        </div>
+      </div>
+
+      {/* AI Chat - Prominently Displayed */}
+      <div className="page-section">
+        <div className="max-w-4xl mx-auto">
           <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 shadow-2xl">
             <FrameworkPersonaChat 
               frameworkId={params.slug} 
