@@ -166,9 +166,7 @@ export default function AuthPage() {
                     alt="Academy Logo" 
                     className="w-24 h-24 object-contain relative z-10"
                     style={{ 
-                      filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
-                      border: '2px solid red',
-                      backgroundColor: 'rgba(255,0,0,0.1)'
+                      filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))'
                     }}
                   />
                 </div>
