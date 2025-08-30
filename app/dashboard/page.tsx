@@ -10,6 +10,7 @@ import CounterCard from '@/components/widgets/CounterCard';
 import { HydrationWidget } from '@/components/ModuleWidgets';
 import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { HedonicAwarenessWidget } from '@/components/HedonicAwarenessWidget';
+import { MoodTrackerWidget } from '@/components/MoodTrackerWidget';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
@@ -920,44 +921,16 @@ export default function DashboardPage() {
                     </button>
                   </CardTitle>
                   <CardDescription>
-                    How are you feeling today?
+                    Track your emotional well-being and patterns
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'mood_tracker' && (
                     <div className="mb-4 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                      <p className="text-sm text-yellow-200">{getWidgetInfo('mood_tracker')?.description}</p>
+                      <p className="text-sm text-yellow-200">Track your daily mood with detailed notes, activity tags, and energy/stress levels. View patterns and trends over time to better understand your emotional well-being.</p>
                     </div>
                   )}
-                  {moodData.logged ? (
-                    <div className="text-center">
-                      <div className="text-4xl mb-2">{getMoodEmoji(moodData.mood!)}</div>
-                      <div className="text-lg font-medium mb-2">Mood: {moodData.mood}/5</div>
-                      {moodData.note && (
-                        <p className="text-sm text-muted-foreground">{moodData.note}</p>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      <p className="text-sm text-muted-foreground text-center">
-                        Rate your mood today
-                      </p>
-                      <div className="grid grid-cols-5 gap-2">
-                        {[1, 2, 3, 4, 5].map((mood) => (
-                          <Button
-                            key={mood}
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleMoodUpdate(mood)}
-                            className="flex flex-col items-center p-2"
-                          >
-                            <span className="text-lg">{getMoodEmoji(mood)}</span>
-                            <span className="text-xs">{mood}</span>
-                          </Button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <MoodTrackerWidget frameworkTone="stoic" />
                 </CardContent>
               </Card>
 
