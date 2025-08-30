@@ -247,25 +247,54 @@ export default function OnboardingPage() {
   const transcribeAudio = async (audioBlob: Blob) => {
     try {
       setIsProcessing(true);
+      setTranscript('Processing your audio...');
       
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
+
+      console.log('Sending audio for transcription, size:', audioBlob.size);
 
       const response = await fetch('/api/transcribe', {
         method: 'POST',
         body: formData,
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Transcription failed');
+        console.error('Transcription API error:', data);
+        throw new Error(data.error || data.details || 'Transcription failed');
       }
 
-      const data = await response.json();
+      if (!data.text || data.text.trim() === '') {
+        throw new Error('No text was transcribed. Please try speaking more clearly.');
+      }
+
+      console.log('Transcription successful:', data.text);
       setTranscript(data.text);
     } catch (error: any) {
       console.error('Transcription error:', error);
-      setTranscript(`Error transcribing audio: ${error.message}. Please try again.`);
+      
+      // Provide more specific error messages
+      let errorMessage = 'Error transcribing audio. ';
+      
+      if (error.message.includes('OpenAI API key')) {
+        errorMessage += 'Service configuration error. Please contact support.';
+      } else if (error.message.includes('Network error')) {
+        errorMessage += 'Please check your internet connection and try again.';
+      } else if (error.message.includes('Rate limit')) {
+        errorMessage += 'Too many requests. Please wait a moment and try again.';
+      } else if (error.message.includes('file too large')) {
+        errorMessage += 'Recording too long. Please keep it under 25MB.';
+      } else if (error.message.includes('file too small')) {
+        errorMessage += 'Recording too short. Please speak for at least a few seconds.';
+      } else if (error.message.includes('No text was transcribed')) {
+        errorMessage += 'Please try speaking more clearly or check your microphone.';
+      } else {
+        errorMessage += error.message || 'Please try again.';
+      }
+      
+      setTranscript(errorMessage);
     } finally {
       setIsProcessing(false);
     }
@@ -717,7 +746,7 @@ export default function OnboardingPage() {
 
               {/* Voice Recording Section */}
               {currentStepData.type === 'voice' && (
-                <div className="text-center">
+                <div className="text-center space-y-4">
                   <Button
                     onClick={handleVoiceRecord}
                     size="lg"
@@ -751,6 +780,21 @@ export default function OnboardingPage() {
                       ))}
                     </div>
                   )}
+
+                  {/* Manual Text Input Fallback */}
+                  <div className="border-t pt-4">
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Or type your response manually:
+                    </p>
+                    <textarea
+                      value={transcript}
+                      onChange={(e) => setTranscript(e.target.value)}
+                      placeholder={currentStepData.placeholder || "Type your response here..."}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                      rows={3}
+                      disabled={isProcessing}
+                    />
+                  </div>
                 </div>
               )}
 

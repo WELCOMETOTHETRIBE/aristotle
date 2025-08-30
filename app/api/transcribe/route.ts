@@ -8,6 +8,7 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
 export async function POST(request: NextRequest) {
   try {
     if (!openai) {
+      console.error('OpenAI API key not configured');
       return NextResponse.json(
         { error: 'OpenAI API key not configured' },
         { status: 400 }
@@ -18,6 +19,7 @@ export async function POST(request: NextRequest) {
     const audioFile = formData.get('audio') as File;
 
     if (!audioFile) {
+      console.error('No audio file provided');
       return NextResponse.json(
         { error: 'No audio file provided' },
         { status: 400 }
@@ -34,6 +36,7 @@ export async function POST(request: NextRequest) {
     // Validate file size (max 25MB for OpenAI Whisper)
     const maxSize = 25 * 1024 * 1024; // 25MB
     if (audioFile.size > maxSize) {
+      console.error('Audio file too large:', audioFile.size);
       return NextResponse.json(
         { error: 'Audio file too large. Maximum size is 25MB.' },
         { status: 400 }
@@ -42,6 +45,7 @@ export async function POST(request: NextRequest) {
 
     // Validate minimum file size
     if (audioFile.size < 100) {
+      console.error('Audio file too small:', audioFile.size);
       return NextResponse.json(
         { error: 'Audio file too small. Please record for at least a few seconds.' },
         { status: 400 }
@@ -49,51 +53,22 @@ export async function POST(request: NextRequest) {
     }
 
     // Convert File to Buffer
-    const buffer = Buffer.from(await audioFile.arrayBuffer());
-
-    // Determine the best file extension based on MIME type
-    let fileName = 'audio';
-    let mimeType = audioFile.type;
-    
-    if (audioFile.type.includes('webm')) {
-      fileName = 'audio.webm';
-    } else if (audioFile.type.includes('mp3')) {
-      fileName = 'audio.mp3';
-    } else if (audioFile.type.includes('wav')) {
-      fileName = 'audio.wav';
-    } else if (audioFile.type.includes('m4a')) {
-      fileName = 'audio.m4a';
-    } else if (audioFile.type.includes('mp4')) {
-      fileName = 'audio.mp4';
-    } else if (audioFile.type.includes('ogg')) {
-      fileName = 'audio.ogg';
-    } else {
-      // Default to webm if we can't determine the type
-      fileName = 'audio.webm';
-      mimeType = 'audio/webm';
-    }
+    const arrayBuffer = await audioFile.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
 
     console.log('Processing audio file:', {
-      fileName,
-      mimeType,
+      originalType: audioFile.type,
       size: buffer.length,
     });
 
-    // Create a file-like object compatible with OpenAI API
-    const fileObject = {
-      name: fileName,
-      type: mimeType,
-      size: buffer.length,
-      arrayBuffer: () => Promise.resolve(buffer),
-      stream: () => {
-        const { Readable } = require('stream');
-        return Readable.from(buffer);
-      }
-    } as any;
+    // Create a proper file object for OpenAI API
+    // OpenAI expects a file-like object with specific properties
+    const file = new File([buffer], 'audio.webm', { type: 'audio/webm' });
 
     // Send to OpenAI Whisper
+    console.log('Sending to OpenAI Whisper...');
     const transcription = await openai.audio.transcriptions.create({
-      file: fileObject,
+      file: file,
       model: 'whisper-1',
       language: 'en',
     });
@@ -109,6 +84,12 @@ export async function POST(request: NextRequest) {
 
   } catch (error: any) {
     console.error('Transcription error:', error);
+    console.error('Error details:', {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      type: error.type,
+    });
     
     // Handle specific OpenAI errors
     if (error.status === 400) {
@@ -162,8 +143,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Handle other errors
     return NextResponse.json(
-      { error: 'Failed to transcribe audio. Please try again.' },
+      { 
+        error: 'Failed to transcribe audio. Please try again.',
+        details: error.message || 'Unknown error occurred'
+      },
       { status: 500 }
     );
   }
