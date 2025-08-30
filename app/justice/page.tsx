@@ -4,6 +4,8 @@ import { useState } from 'react';
 import { Scale, Heart, Users, Target, Sparkles, ArrowRight, Play, Calendar, Award, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import PageLayout from '@/components/PageLayout';
+import PracticeSessionModal from '@/components/PracticeSessionModal';
+import { usePracticeSession } from '@/lib/hooks/usePracticeSession';
 
 const justicePractices = [
   {
@@ -73,6 +75,28 @@ const relationshipAreas = [
 
 export default function JusticePage() {
   const [selectedPractice, setSelectedPractice] = useState(justicePractices[0]);
+  const { isModalOpen, currentPractice, startPractice, closeModal } = usePracticeSession();
+
+  const handleStartPractice = () => {
+    const practiceData = {
+      id: 'justice-relationship-practice',
+      title: 'Relationship Justice Practice',
+      description: 'Practice fairness and balance in your relationships through structured reflection and action.',
+      duration: 20,
+      difficulty: 'intermediate',
+      benefits: ['Better relationships', 'Fairness', 'Conflict resolution', 'Trust building'],
+      instructions: [
+        'Reflect on your current relationships',
+        'Identify areas where fairness could be improved',
+        'Consider the other person\'s perspective',
+        'Plan specific actions to restore balance',
+        'Commit to following through on your plan'
+      ],
+      moduleId: 'justice',
+      frameworkId: 'stoic'
+    };
+    startPractice(practiceData);
+  };
 
   return (
     <PageLayout title="Justice" description="The Virtue of Fairness & Right Relationships">
@@ -146,7 +170,10 @@ export default function JusticePage() {
               </div>
               
               <div className="mt-6 text-center">
-                <button className="btn-primary">
+                <button 
+                  className="btn-primary w-full"
+                  onClick={handleStartPractice}
+                >
                   <Play className="w-4 h-4 mr-2" />
                   Start Practice
                 </button>
@@ -261,6 +288,15 @@ export default function JusticePage() {
           </div>
         </div>
       </div>
+
+      {/* Practice Session Modal */}
+      {currentPractice && (
+        <PracticeSessionModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          practice={currentPractice}
+        />
+      )}
     </PageLayout>
   );
 } 

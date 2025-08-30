@@ -6,7 +6,6 @@ import GraduationCapIcon from "./GraduationCapIcon";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
 import FrameworksDropdown from "./FrameworksDropdown";
-import OnboardingNotification from "./OnboardingNotification";
 
 const virtues = [
   {
@@ -127,7 +126,6 @@ export function VirtueNavigation() {
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Notifications">
                 <Bell size={12} />
               </button>
-              <OnboardingNotification variant="badge" className="text-xs" />
               
               {/* Profile Menu */}
               <div className="relative" ref={profileMenuRef}>

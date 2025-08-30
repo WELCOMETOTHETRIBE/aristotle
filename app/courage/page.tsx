@@ -6,6 +6,8 @@ import { Shield, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, Flame, Z
 import Link from "next/link";
 import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
+import PracticeSessionModal from '@/components/PracticeSessionModal';
+import { usePracticeSession } from '@/lib/hooks/usePracticeSession';
 
 interface HiddenWisdom {
   insight: string;
@@ -32,75 +34,79 @@ interface DailyWisdom {
 const staticPractices = [
   {
     id: "1",
-    title: "Spartan Discipline",
-    description: "Build mental and physical toughness through structured training and self-control.",
-    duration: 30,
-    difficulty: "intermediate",
-    benefits: ["Mental toughness", "Physical strength", "Self-discipline"],
-    category: "Warrior Practice",
-    culturalContext: "Rooted in ancient Spartan military training, emphasizing discipline, courage, and resilience.",
-    scientificValidation: "Research shows that structured physical training improves mental resilience and stress tolerance.",
+    title: "Cold Exposure",
+    description: "Build mental resilience through controlled exposure to discomfort, starting with cold showers and progressing to ice baths.",
+    duration: 5,
+    difficulty: "beginner",
+    benefits: ["Mental toughness", "Stress resilience", "Improved focus"],
+    category: "Physical Challenge",
+    culturalContext: "Ancient Spartan warriors used cold exposure to build discipline and mental fortitude.",
+    scientificValidation: "Cold exposure increases norepinephrine and reduces inflammation, improving mental clarity and resilience.",
     instructions: [
-      "Begin with basic physical conditioning",
-      "Practice mental focus during physical exertion",
-      "Gradually increase challenge levels",
-      "Maintain consistent daily practice",
-      "Reflect on your growing strength"
-    ]
+      "Start with 30 seconds of cold water at the end of your shower",
+      "Gradually increase duration to 2-3 minutes",
+      "Focus on steady breathing throughout",
+      "Embrace the discomfort as a mental challenge",
+      "Reflect on your growing resilience"
+    ],
+    moduleId: "cold_heat"
   },
   {
     id: "2",
-    title: "Samurai Bushido",
-    description: "Cultivate honor, loyalty, and mastery through the way of the warrior.",
-    duration: 45,
-    difficulty: "advanced",
-    benefits: ["Honor", "Loyalty", "Mastery", "Focus"],
-    category: "Philosophical Practice",
-    culturalContext: "The samurai code of Bushido emphasizes honor, loyalty, and the pursuit of mastery in all endeavors.",
-    scientificValidation: "Studies show that having a strong moral code improves decision-making and reduces stress.",
+    title: "Public Speaking Practice",
+    description: "Develop confidence and overcome fear through structured public speaking exercises.",
+    duration: 20,
+    difficulty: "intermediate",
+    benefits: ["Confidence", "Communication skills", "Fear management"],
+    category: "Social Challenge",
+    culturalContext: "Ancient Greek philosophers emphasized rhetoric and public speaking as essential skills for leadership.",
+    scientificValidation: "Public speaking practice reduces anxiety and improves self-confidence through systematic desensitization.",
     instructions: [
-      "Study the seven virtues of Bushido",
-      "Practice honor in daily interactions",
-      "Develop loyalty to your commitments",
-      "Pursue mastery in your chosen field",
-      "Maintain focus and presence"
-    ]
+      "Choose a topic you're passionate about",
+      "Practice in front of a mirror first",
+      "Record yourself and review",
+      "Present to a small group of friends",
+      "Gradually increase audience size"
+    ],
+    moduleId: "focus_deepwork"
   },
   {
     id: "3",
-    title: "Cold Exposure Training",
-    description: "Build resilience through controlled exposure to challenging conditions.",
+    title: "Boundary Setting",
+    description: "Practice asserting your needs and setting healthy boundaries in relationships and work.",
     duration: 15,
     difficulty: "beginner",
-    benefits: ["Resilience", "Stress tolerance", "Mental strength"],
-    category: "Physical Practice",
-    culturalContext: "Ancient warrior traditions used cold exposure to build mental and physical resilience.",
-    scientificValidation: "Cold exposure has been shown to improve stress tolerance and immune function.",
+    benefits: ["Self-respect", "Better relationships", "Reduced stress"],
+    category: "Social Practice",
+    culturalContext: "Stoic philosophy teaches the importance of knowing what you can and cannot control.",
+    scientificValidation: "Setting boundaries improves mental health and relationship satisfaction.",
     instructions: [
-      "Start with cold showers (30 seconds)",
-      "Gradually increase duration",
-      "Focus on controlled breathing",
-      "Embrace the discomfort",
-      "Build mental resilience"
-    ]
+      "Identify areas where you need boundaries",
+      "Practice saying 'no' to small requests",
+      "Use 'I' statements to express needs",
+      "Stay firm but respectful",
+      "Reflect on how it feels to assert yourself"
+    ],
+    moduleId: "mood_regulation"
   },
   {
     id: "4",
-    title: "Challenge Response",
-    description: "Transform stress into strength by viewing challenges as opportunities for growth.",
-    duration: 20,
+    title: "Fear Journaling",
+    description: "Confront and analyze your fears through structured reflection and planning.",
+    duration: 25,
     difficulty: "intermediate",
-    benefits: ["Growth mindset", "Stress transformation", "Adaptability"],
+    benefits: ["Self-awareness", "Fear management", "Personal growth"],
     category: "Mental Practice",
-    culturalContext: "Warrior traditions teach that challenges are opportunities to demonstrate courage and grow stronger.",
-    scientificValidation: "Research shows that viewing stress as enhancing rather than harmful improves performance.",
+    culturalContext: "Ancient warriors used fear as a teacher rather than an enemy.",
+    scientificValidation: "Writing about fears reduces their power and helps develop coping strategies.",
     instructions: [
-      "Identify a current challenge",
-      "Reframe it as an opportunity",
-      "Develop a growth mindset",
-      "Take action despite fear",
-      "Learn from the experience"
-    ]
+      "Write down your biggest fears",
+      "Analyze what triggers each fear",
+      "Consider the worst-case scenario",
+      "Plan how you would handle it",
+      "Reflect on past fears you've overcome"
+    ],
+    moduleId: "visualization"
   }
 ];
 
@@ -110,6 +116,8 @@ export default function CouragePage() {
   const [generatedPractice, setGeneratedPractice] = useState<PracticeDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  const { isModalOpen, currentPractice, startPractice, closeModal } = usePracticeSession();
 
   useEffect(() => {
     loadCourageContent();
@@ -161,10 +169,42 @@ export default function CouragePage() {
     setRefreshing(false);
   };
 
+  const handleStartPractice = (practice: any) => {
+    // Convert practice to the format expected by the modal
+    const practiceData = {
+      id: practice.id,
+      title: practice.title,
+      description: practice.description,
+      duration: practice.duration,
+      difficulty: practice.difficulty,
+      benefits: practice.benefits,
+      instructions: practice.instructions,
+      moduleId: practice.moduleId || 'strength',
+      frameworkId: 'spartan'
+    };
+    startPractice(practiceData);
+  };
+
+  const handleStartGeneratedPractice = () => {
+    if (generatedPractice) {
+      const practiceData = {
+        id: 'ai-generated-courage',
+        title: generatedPractice.title,
+        description: generatedPractice.body,
+        duration: Math.ceil(generatedPractice.est_time_min / 5) * 5, // Round to nearest 5 minutes
+        difficulty: 'beginner',
+        benefits: ['AI-generated courage', 'Personalized practice', 'Daily growth'],
+        instructions: generatedPractice.bullets,
+        moduleId: 'strength',
+        frameworkId: 'spartan'
+      };
+      startPractice(practiceData);
+    }
+  };
+
   if (loading) {
     return (
       <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
-        <AuroraBackground />
         <div className="page-section">
           <div className="animate-pulse">
             <div className="h-8 bg-white/20 rounded mb-8"></div>
@@ -181,18 +221,16 @@ export default function CouragePage() {
 
   return (
     <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
-      <AuroraBackground />
-      
       {/* Header */}
-      <section className="page-section">
+      <div className="page-section">
         <Link href="/academy" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
           <ArrowLeft size={16} />
           Back to Academy
         </Link>
         
         <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-red-500 to-orange-500 rounded-2xl flex items-center justify-center">
-            <Shield size={32} className="text-white" />
+          <div className="w-16 h-16 bg-gradient-to-r from-red-400 to-orange-400 rounded-2xl flex items-center justify-center shadow-lg">
+            <Shield size={32} className="text-white drop-shadow-sm" />
           </div>
           <div>
             <h1 className="headline">Courage</h1>
@@ -200,7 +238,7 @@ export default function CouragePage() {
               The Virtue of Bravery & Strength
             </p>
             <p className="body-text mt-2">
-              The virtue of facing challenges with strength and determination
+              The virtue of facing fear, adversity, and challenges with bravery
             </p>
           </div>
         </div>
@@ -219,11 +257,11 @@ export default function CouragePage() {
             <div className="text-sm text-gray-400">Day Streak</div>
           </div>
         </div>
-      </section>
+      </div>
 
       {/* AI-Generated Hidden Wisdom */}
       {hiddenWisdom && (
-        <section className="page-section">
+        <div className="page-section">
           <div className="flex items-center justify-between mb-6">
             <h2 className="section-title">⚔️ Today's Warrior Wisdom</h2>
             <button 
@@ -240,7 +278,7 @@ export default function CouragePage() {
             <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
             <div className="space-y-4">
               <div>
-                <h4 className="text-sm font-medium text-red-300 mb-2">Warrior Challenge</h4>
+                <h4 className="text-sm font-medium text-red-300 mb-2">Challenge</h4>
                 <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
               </div>
               <div>
@@ -249,12 +287,12 @@ export default function CouragePage() {
               </div>
             </div>
           </div>
-        </section>
+        </div>
       )}
 
       {/* AI-Generated Practice */}
       {generatedPractice && (
-        <section className="page-section">
+        <div className="page-section">
           <h2 className="section-title">🎯 AI-Generated Courage Practice</h2>
           <div className="card-base">
             <div className="flex items-center justify-between mb-4">
@@ -273,7 +311,7 @@ export default function CouragePage() {
                 <ul className="space-y-2">
                   {generatedPractice.bullets.map((bullet, index) => (
                     <li key={index} className="flex items-start gap-2 text-gray-300">
-                      <span className="text-red-300 mt-1">⚔️</span>
+                      <span className="text-red-300 mt-1">•</span>
                       <span>{bullet}</span>
                     </li>
                   ))}
@@ -282,11 +320,11 @@ export default function CouragePage() {
 
               {generatedPractice.coach_prompts.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-white mb-2">Warrior Prompts</h4>
+                  <h4 className="font-semibold text-white mb-2">Coach Prompts</h4>
                   <ul className="space-y-2">
                     {generatedPractice.coach_prompts.map((prompt, index) => (
                       <li key={index} className="flex items-start gap-2 text-gray-300">
-                        <span className="text-orange-300 mt-1">🛡️</span>
+                        <span className="text-orange-300 mt-1">💭</span>
                         <span>{prompt}</span>
                       </li>
                     ))}
@@ -309,18 +347,21 @@ export default function CouragePage() {
               )}
 
               <div className="flex items-center justify-between pt-2">
-                <button className="btn-primary text-sm px-3 py-1">
+                <button 
+                  className="btn-primary text-sm px-3 py-1"
+                  onClick={handleStartGeneratedPractice}
+                >
                   <Play size={14} className="mr-1" />
                   Start Practice
                 </button>
               </div>
             </div>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Static Practices Grid */}
-      <section className="page-section">
+      <div className="page-section">
         <div className="flex items-center justify-between mb-8">
           <h2 className="section-title">Courage Practices</h2>
           <div className="flex gap-2">
@@ -379,7 +420,10 @@ export default function CouragePage() {
 
                 {/* Action */}
                 <div className="flex items-center justify-between pt-2">
-                  <button className="btn-primary text-sm px-3 py-1">
+                  <button 
+                    className="btn-primary text-sm px-3 py-1"
+                    onClick={() => handleStartPractice(practice)}
+                  >
                     <Play size={14} className="mr-1" />
                     Start Practice
                   </button>
@@ -391,14 +435,14 @@ export default function CouragePage() {
             </div>
           ))}
         </div>
-      </section>
+      </div>
 
       {/* AI-Generated Daily Wisdom Quote */}
       {dailyWisdom && (
-        <section className="page-section">
+        <div className="page-section">
           <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Daily Warrior Quote</h3>
-            <p className="body-text mb-4">AI-generated courage wisdom for modern warriors</p>
+            <h3 className="font-bold text-white text-lg mb-2">Daily Courage Quote</h3>
+            <p className="body-text mb-4">AI-generated wisdom for modern bravery</p>
             
             <div className="text-center space-y-4">
               <blockquote className="text-xl text-white italic">
@@ -410,11 +454,11 @@ export default function CouragePage() {
               </p>
             </div>
           </div>
-        </section>
+        </div>
       )}
 
       {/* Related Resources */}
-      <section className="page-section">
+      <div className="page-section">
         <h2 className="section-title">Related Resources</h2>
         <div className="page-grid page-grid-cols-3">
           <div className="card-base">
@@ -427,11 +471,11 @@ export default function CouragePage() {
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"Bushido: The Soul of Japan"</span>
+                <span className="text-white">"Gates of Fire" by Steven Pressfield</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"Gates of Fire" by Steven Pressfield</span>
+                <span className="text-white">"The Warrior Ethos" by Steven Pressfield</span>
               </div>
             </div>
           </div>
@@ -442,15 +486,15 @@ export default function CouragePage() {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-red-300" />
+                <span className="text-white">Leonidas of Sparta</span>
+              </div>
+              <div className="flex items-center gap-2 text-sm">
+                <Users size={14} className="text-red-300" />
                 <span className="text-white">Sun Tzu</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Users size={14} className="text-red-300" />
-                <span className="text-white">Miyamoto Musashi</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-red-300" />
-                <span className="text-white">Leonidas</span>
+                <span className="text-white">Marcus Aurelius</span>
               </div>
             </div>
           </div>
@@ -475,7 +519,16 @@ export default function CouragePage() {
             </div>
           </div>
         </div>
-      </section>
+      </div>
+
+      {/* Practice Session Modal */}
+      {currentPractice && (
+        <PracticeSessionModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          practice={currentPractice}
+        />
+      )}
     </PageLayout>
   );
 } 

@@ -4,6 +4,8 @@ import { Brain, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, RefreshCw
 import Link from "next/link";
 import { useEffect, useState } from 'react';
 import PageLayout from '@/components/PageLayout';
+import PracticeSessionModal from '@/components/PracticeSessionModal';
+import { usePracticeSession } from '@/lib/hooks/usePracticeSession';
 
 interface HiddenWisdom {
   insight: string;
@@ -44,7 +46,8 @@ const staticPractices = [
       "Consider alternative perspectives",
       "Question your assumptions",
       "Reflect on what you've learned"
-    ]
+    ],
+    moduleId: "philosophy_capsules"
   },
   {
     id: "2",
@@ -55,14 +58,15 @@ const staticPractices = [
     benefits: ["Deep understanding", "Intellectual growth", "Wisdom accumulation"],
     category: "Study Practice",
     culturalContext: "Ancient philosophers emphasized slow, contemplative reading as essential for true learning.",
-    scientificValidation: "Studies show that slow reading improves comprehension and retention compared to speed reading.",
+    scientificValidation: "Slow reading improves comprehension and retention compared to speed reading.",
     instructions: [
       "Choose a philosophical text",
       "Read slowly, pausing after each paragraph",
       "Reflect on what you've read",
       "Write down key insights",
       "Consider how it applies to your life"
-    ]
+    ],
+    moduleId: "philosophy_capsules"
   },
   {
     id: "3",
@@ -80,7 +84,8 @@ const staticPractices = [
       "Identify what went well and why",
       "Consider what could have been done better",
       "Plan how to apply these lessons tomorrow"
-    ]
+    ],
+    moduleId: "meditation"
   },
   {
     id: "4",
@@ -98,7 +103,8 @@ const staticPractices = [
       "Compare with your existing knowledge",
       "Identify universal principles",
       "Integrate insights into your worldview"
-    ]
+    ],
+    moduleId: "resource_library"
   }
 ];
 
@@ -108,6 +114,8 @@ export default function WisdomPage() {
   const [generatedPractice, setGeneratedPractice] = useState<PracticeDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  const { isModalOpen, currentPractice, startPractice, closeModal } = usePracticeSession();
 
   useEffect(() => {
     loadWisdomContent();
@@ -157,6 +165,39 @@ export default function WisdomPage() {
     setRefreshing(true);
     await loadWisdomContent();
     setRefreshing(false);
+  };
+
+  const handleStartPractice = (practice: any) => {
+    // Convert practice to the format expected by the modal
+    const practiceData = {
+      id: practice.id,
+      title: practice.title,
+      description: practice.description,
+      duration: practice.duration,
+      difficulty: practice.difficulty,
+      benefits: practice.benefits,
+      instructions: practice.instructions,
+      moduleId: practice.moduleId || 'philosophy_capsules',
+      frameworkId: 'stoic'
+    };
+    startPractice(practiceData);
+  };
+
+  const handleStartGeneratedPractice = () => {
+    if (generatedPractice) {
+      const practiceData = {
+        id: 'ai-generated-wisdom',
+        title: generatedPractice.title,
+        description: generatedPractice.body,
+        duration: Math.ceil(generatedPractice.est_time_min / 5) * 5, // Round to nearest 5 minutes
+        difficulty: 'beginner',
+        benefits: ['AI-generated wisdom', 'Personalized practice', 'Daily growth'],
+        instructions: generatedPractice.bullets,
+        moduleId: 'philosophy_capsules',
+        frameworkId: 'stoic'
+      };
+      startPractice(practiceData);
+    }
   };
 
   if (loading) {
@@ -304,7 +345,10 @@ export default function WisdomPage() {
               )}
 
               <div className="flex items-center justify-between pt-2">
-                <button className="btn-primary text-sm px-3 py-1">
+                <button 
+                  className="btn-primary text-sm px-3 py-1"
+                  onClick={handleStartGeneratedPractice}
+                >
                   <Play size={14} className="mr-1" />
                   Start Practice
                 </button>
@@ -374,7 +418,10 @@ export default function WisdomPage() {
 
                 {/* Action */}
                 <div className="flex items-center justify-between pt-2">
-                  <button className="btn-primary text-sm px-3 py-1">
+                  <button 
+                    className="btn-primary text-sm px-3 py-1"
+                    onClick={() => handleStartPractice(practice)}
+                  >
                     <Play size={14} className="mr-1" />
                     Start Practice
                   </button>
@@ -471,6 +518,15 @@ export default function WisdomPage() {
           </div>
         </div>
       </div>
+
+      {/* Practice Session Modal */}
+      {currentPractice && (
+        <PracticeSessionModal
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          practice={currentPractice}
+        />
+      )}
     </PageLayout>
   );
 } 

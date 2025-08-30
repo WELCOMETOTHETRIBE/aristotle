@@ -488,32 +488,61 @@ export default function DashboardPage() {
 
           {/* Onboarding Call-to-Action */}
           {shouldShowPrompt && (
-            <div className="mb-6">
-              <Card className="glass-effect bg-gradient-to-r from-amber-500/20 to-orange-600/20 border-amber-500/30 overflow-hidden">
-                <div className="p-6">
+            <div className="mb-8">
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 backdrop-blur-sm">
+                {/* Background Pattern */}
+                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5 opacity-50"></div>
+                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl transform translate-x-16 -translate-y-16"></div>
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-500/10 to-red-500/10 rounded-full blur-2xl transform -translate-x-12 translate-y-12"></div>
+                
+                <div className="relative p-8">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
-                        <Sparkles className="w-6 h-6 text-white" />
+                    <div className="flex items-center gap-6">
+                      <div className="relative">
+                        <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25">
+                          <Sparkles className="w-8 h-8 text-white" />
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                          <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-white mb-1">Unlock Your Personalized Path</h3>
-                        <p className="text-gray-300 text-sm">
-                          Complete a quick assessment to get matched with your ideal philosophical framework and practices
+                      <div className="space-y-2">
+                        <h3 className="text-xl font-bold text-white mb-2">Unlock Your Personalized Path</h3>
+                        <p className="text-gray-300 text-base leading-relaxed max-w-md">
+                          Complete a quick assessment to get matched with your ideal philosophical framework and practices tailored to your unique personality
                         </p>
+                        <div className="flex items-center gap-4 text-sm text-gray-400">
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span>3-5 minutes</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                            <span>AI-powered matching</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                            <span>100% private</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => window.location.href = '/onboarding'}
-                      size="lg"
-                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
-                    >
-                      Start Assessment
-                      <ArrowRight className="ml-2 h-5 w-5" />
-                    </Button>
+                    <div className="flex flex-col items-end gap-3">
+                      <Button
+                        onClick={() => window.location.href = '/onboarding'}
+                        size="lg"
+                        className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 text-base font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:scale-105"
+                      >
+                        Start Assessment
+                        <ArrowRight className="ml-2 h-5 w-5" />
+                      </Button>
+                      <p className="text-xs text-gray-400 text-center">
+                        Get your personalized framework recommendation
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </Card>
+              </div>
             </div>
           )}
 
