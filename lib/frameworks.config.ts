@@ -131,7 +131,7 @@ export const FRAMEWORKS: FrameworkConfig[] = [
     }
   },
   {
-    slug: 'samurai',
+    slug: 'bushido',
     name: 'Samurai Bushidō',
     tone: 'honor',
     virtuePrimary: 'JUSTICE',
@@ -969,7 +969,7 @@ export const FRAMEWORKS: FrameworkConfig[] = [
     }
   },
   {
-    slug: 'systems',
+    slug: 'highperf',
     name: 'Modern High-Performance',
     tone: 'crisp',
     virtuePrimary: 'WISDOM',
@@ -1036,7 +1036,7 @@ export const FRAMEWORKS: FrameworkConfig[] = [
     ],
     quests: [
       {
-        id: 'systems_quest_1',
+        id: 'highperf_quest_1',
         title: 'One flow block + kaizen note',
         description: 'Complete flow session and identify improvement',
         widgetIds: ['flow_timer', 'kaizen_log'],
@@ -1044,7 +1044,7 @@ export const FRAMEWORKS: FrameworkConfig[] = [
         virtueGrants: { wisdom: 3, courage: 1 }
       },
       {
-        id: 'systems_quest_2',
+        id: 'highperf_quest_2',
         title: 'Habit stack + 6-2 energizer',
         description: 'Build habit stack and practice energizing breath',
         widgetIds: ['habit_stack_builder', 'flow_breath'],
@@ -1052,7 +1052,7 @@ export const FRAMEWORKS: FrameworkConfig[] = [
         virtueGrants: { wisdom: 1, temperance: 1, courage: 1 }
       },
       {
-        id: 'systems_quest_3',
+        id: 'highperf_quest_3',
         title: 'Metrics check + reflection',
         description: 'Check biofeedback metrics and reflect',
         widgetIds: ['biofeedback_tiles', 'kaizen_log'],
