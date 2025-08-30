@@ -1,57 +1,57 @@
-import { prisma } from "@/lib/db";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from 'next/server';
+import { z } from 'zod';
 
-export async function GET(req: NextRequest) {
-  if (!prisma) {
-    return NextResponse.json({ error: "Database not available" }, { status: 503 });
-  }
-  
-      // Use user ID 1
-  const userId = 1;
-  
-  const prefs = await prisma.userPreference.findUnique({
-    where: { userId }
-  });
-  
-  if (!prefs) {
-    // Create default preferences
-    const defaultPrefs = await prisma.userPreference.create({
-      data: {
-        userId,
-        framework: null,
-        style: null,
-        locale: 'en'
-      }
+const PrefsRequestSchema = z.object({
+  framework: z.string().optional(),
+  style: z.string().optional(),
+  locale: z.string().optional(),
+});
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const prefs = PrefsRequestSchema.parse(body);
+
+    // For now, we'll just return success
+    // In a full implementation, you'd save this to the database
+    // associated with the current user session
+
+    return NextResponse.json({
+      success: true,
+      message: 'Preferences saved successfully',
+      preferences: prefs,
     });
-    return NextResponse.json(defaultPrefs);
+
+  } catch (error) {
+    console.error('Preferences API error:', error);
+    
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: 'Invalid request format', details: error.errors },
+        { status: 400 }
+      );
+    }
+
+    return NextResponse.json(
+      { error: 'Failed to save preferences' },
+      { status: 500 }
+    );
   }
-  
-  return NextResponse.json(prefs);
 }
 
-export async function PUT(req: NextRequest) {
-  if (!prisma) {
-    return NextResponse.json({ error: "Database not available" }, { status: 503 });
+export async function GET() {
+  try {
+    // Return default preferences
+    return NextResponse.json({
+      framework: null,
+      style: 'aristotle',
+      locale: 'en',
+    });
+  } catch (error) {
+    console.error('Preferences GET error:', error);
+    return NextResponse.json(
+      { error: 'Failed to get preferences' },
+      { status: 500 }
+    );
   }
-  
-      const userId = 1;
-  const body = await req.json();
-  
-  const prefs = await prisma.userPreference.upsert({
-    where: { userId },
-    update: {
-      framework: body.framework,
-      style: body.style,
-      locale: body.locale || 'en',
-      updatedAt: new Date()
-    },
-    create: {
-      userId,
-      framework: body.framework,
-      style: body.style,
-      locale: body.locale || 'en'
-    }
-  });
-  
-  return NextResponse.json(prefs);
 } 

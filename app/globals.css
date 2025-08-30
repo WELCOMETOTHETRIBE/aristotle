@@ -2,6 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Waveform Animation */
+.waveform {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.waveform-bar {
+  height: 20px;
+  background: currentColor;
+  border-radius: 2px;
+  animation: waveform 1.5s ease-in-out infinite;
+}
+
+@keyframes waveform {
+  0%, 100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* Glass Effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
 /* ===== DESIGN TOKENS ===== */
 :root {
   --bg: #0b0f14;
