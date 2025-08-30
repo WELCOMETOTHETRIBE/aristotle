@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Brain, Shield, Scale, Leaf, Search, User, Home, Bell, LogOut, Target, Settings, MessageSquare } from "lucide-react";
+import { Brain, Shield, Scale, Leaf, Search, User, Home, Bell, LogOut, Target, Settings, MessageSquare, TestTube } from "lucide-react";
 import GraduationCapIcon from "./GraduationCapIcon";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
@@ -170,6 +170,15 @@ export function VirtueNavigation() {
                 >
                   <MessageSquare size={14} />
                   Feedback Dashboard
+                </Link>
+                
+                <Link
+                  href="/debug/conformance-matrix"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <TestTube size={14} />
+                  Conformance Matrix
                 </Link>
                           
                           <button

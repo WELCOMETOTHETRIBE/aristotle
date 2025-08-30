@@ -1,17 +1,42 @@
 'use client';
 
-import { useState } from 'react';
-import { Settings, Activity, BarChart3, TestTube, Bug } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { Settings, Activity, BarChart3, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import ConformanceMatrix from './ConformanceMatrix';
 import IntegrityDashboard from './IntegrityDashboard';
 
 export default function DeveloperToolbar() {
-  const [showConformanceMatrix, setShowConformanceMatrix] = useState(false);
   const [showIntegrityDashboard, setShowIntegrityDashboard] = useState(false);
+  const [isDevMode, setIsDevMode] = useState(false);
+  const pathname = usePathname();
 
-  // No environment check needed - controlled by DeveloperAuth component
+  // Check if dev mode is active and not on auth page
+  useEffect(() => {
+    const checkDevMode = () => {
+      const authenticated = sessionStorage.getItem('devAuthenticated') === 'true';
+      setIsDevMode(authenticated);
+    };
+
+    checkDevMode();
+    
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      checkDevMode();
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  // Don't show on auth page or if not in dev mode
+  if (pathname === '/auth' || !isDevMode) {
+    return null;
+  }
 
   return (
     <>
@@ -22,15 +47,7 @@ export default function DeveloperToolbar() {
               DEV
             </Badge>
             
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowConformanceMatrix(true)}
-              className="flex items-center gap-1"
-            >
-              <TestTube className="h-3 w-3" />
-              Test
-            </Button>
+
             
             <Button
               variant="outline"
@@ -67,11 +84,6 @@ export default function DeveloperToolbar() {
           </div>
         </div>
       </div>
-
-      <ConformanceMatrix
-        isVisible={showConformanceMatrix}
-        onClose={() => setShowConformanceMatrix(false)}
-      />
 
       <IntegrityDashboard
         isVisible={showIntegrityDashboard}
