@@ -397,7 +397,7 @@ export default function AuthPage() {
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <label htmlFor="displayName" className="block text-sm font-semibold mb-3 text-text">
+                        <label htmlFor="displayName" className="block text-sm font-semibold mb-3 text-gray-200">
                           Display Name (optional)
                         </label>
                         <input
@@ -406,7 +406,7 @@ export default function AuthPage() {
                           name="displayName"
                           value={formData.displayName}
                           onChange={handleInputChange}
-                          className="input-base"
+                          className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg"
                           placeholder="Enter your display name"
                         />
                       </motion.div>

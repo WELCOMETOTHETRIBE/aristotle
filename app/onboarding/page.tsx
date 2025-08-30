@@ -797,7 +797,7 @@ export default function OnboardingPage() {
                       value={transcript}
                       onChange={(e) => setTranscript(e.target.value)}
                       placeholder={currentStepData.placeholder || "Type your response here..."}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent resize-none"
+                      className="w-full p-3 border border-white/20 rounded-lg bg-white/10 text-white placeholder-gray-400 focus:ring-2 focus:ring-amber-500 focus:border-transparent focus:outline-none resize-none transition-all duration-300"
                       rows={3}
                       disabled={isProcessing}
                     />
