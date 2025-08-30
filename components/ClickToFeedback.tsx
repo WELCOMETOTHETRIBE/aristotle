@@ -125,9 +125,16 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
     }
   };
 
-  // Cleanup on unmount
+  // Listen for custom events and cleanup on unmount
   useEffect(() => {
+    const handleStartClickToFeedback = () => {
+      startClickToFeedback();
+    };
+
+    window.addEventListener('startClickToFeedback', handleStartClickToFeedback);
+    
     return () => {
+      window.removeEventListener('startClickToFeedback', handleStartClickToFeedback);
       stopClickToFeedback();
     };
   }, []);
@@ -139,21 +146,6 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   return (
     <>
       {children}
-      
-      {/* Click-to-Feedback Button */}
-      <div className="fixed bottom-4 left-4 z-50">
-        <button
-          onClick={isWaitingForClick ? stopClickToFeedback : startClickToFeedback}
-          className={`px-3 py-2 rounded-lg shadow-lg transition-all duration-200 text-sm font-medium ${
-            isWaitingForClick 
-              ? 'bg-red-500 hover:bg-red-600 text-white' 
-              : 'bg-blue-500 hover:bg-blue-600 text-white'
-          }`}
-          title={isWaitingForClick ? 'Cancel click-to-feedback' : 'Start click-to-feedback'}
-        >
-          {isWaitingForClick ? 'Cancel' : 'Click to Feedback'}
-        </button>
-      </div>
     </>
   );
 } 

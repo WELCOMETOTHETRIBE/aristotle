@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Settings, Activity, BarChart3, TestTube, Bug, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,19 @@ export default function DeveloperToolbar() {
   const [showConformanceMatrix, setShowConformanceMatrix] = useState(false);
   const [showIntegrityDashboard, setShowIntegrityDashboard] = useState(false);
   const [showFeedbackDashboard, setShowFeedbackDashboard] = useState(false);
+
+  // Listen for custom event to open feedback dashboard
+  useEffect(() => {
+    const handleOpenFeedbackDashboard = () => {
+      setShowFeedbackDashboard(true);
+    };
+
+    window.addEventListener('openFeedbackDashboard', handleOpenFeedbackDashboard);
+    
+    return () => {
+      window.removeEventListener('openFeedbackDashboard', handleOpenFeedbackDashboard);
+    };
+  }, []);
 
   // No environment check needed - controlled by DeveloperAuth component
 

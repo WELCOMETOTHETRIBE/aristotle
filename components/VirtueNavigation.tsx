@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Brain, Shield, Scale, Leaf, Search, User, Home, Bell, LogOut, Target } from "lucide-react";
+import { Brain, Shield, Scale, Leaf, Search, User, Home, Bell, LogOut, Target, Settings, MessageSquare } from "lucide-react";
 import GraduationCapIcon from "./GraduationCapIcon";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
@@ -138,6 +138,59 @@ export function VirtueNavigation() {
                 {showProfileMenu && (
                   <div className="absolute right-0 mt-2 w-48 bg-white/95 backdrop-blur border border-gray-200 rounded-lg shadow-xl z-50">
                     <div className="py-1">
+                      {/* Dev Mode Button */}
+                      <button
+                        onClick={() => {
+                          // Toggle dev mode by setting session storage
+                          const isDevMode = sessionStorage.getItem('devAuthenticated') === 'true';
+                          if (isDevMode) {
+                            sessionStorage.removeItem('devAuthenticated');
+                          } else {
+                            sessionStorage.setItem('devAuthenticated', 'true');
+                          }
+                          setShowProfileMenu(false);
+                          // Force re-render
+                          window.dispatchEvent(new Event('storage'));
+                        }}
+                        className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                      >
+                        <Settings size={14} />
+                        {sessionStorage.getItem('devAuthenticated') === 'true' ? 'Disable Dev Mode' : 'Enable Dev Mode'}
+                      </button>
+                      
+                      {/* Feedback Dashboard Button - Only show when dev mode is active */}
+                      {sessionStorage.getItem('devAuthenticated') === 'true' && (
+                        <>
+                          <button
+                            onClick={() => {
+                              // Open feedback dashboard
+                              const event = new CustomEvent('openFeedbackDashboard');
+                              window.dispatchEvent(event);
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                          >
+                            <MessageSquare size={14} />
+                            Feedback Dashboard
+                          </button>
+                          
+                          <button
+                            onClick={() => {
+                              // Start click-to-feedback mode
+                              const event = new CustomEvent('startClickToFeedback');
+                              window.dispatchEvent(event);
+                              setShowProfileMenu(false);
+                            }}
+                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                          >
+                            <MessageSquare size={14} />
+                            Click to Feedback
+                          </button>
+                        </>
+                      )}
+                      
+                      <div className="border-t border-gray-200 my-1"></div>
+                      
                       <button
                         onClick={handleSignOut}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"

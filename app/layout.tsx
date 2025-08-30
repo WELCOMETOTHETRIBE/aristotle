@@ -5,9 +5,8 @@ import { QueryProvider } from "@/components/providers/query-provider";
 import { VirtueNavigation } from "@/components/VirtueNavigation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
-import DeveloperAuth from "@/components/DeveloperAuth";
-import DeveloperToolbar from "@/components/DeveloperToolbar";
 import ClickToFeedback from "@/components/ClickToFeedback";
+import DeveloperToolbar from "@/components/DeveloperToolbar";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,9 +31,7 @@ export default function RootLayout({
                 <ClickToFeedback>
                   {children}
                 </ClickToFeedback>
-                <DeveloperAuth>
-                  <DeveloperToolbar />
-                </DeveloperAuth>
+                <DeveloperToolbar />
               </div>
             </AuthProvider>
           </QueryProvider>
