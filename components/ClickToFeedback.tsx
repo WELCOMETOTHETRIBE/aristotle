@@ -37,7 +37,12 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   }, []);
 
   const handleElementClick = (event: MouseEvent) => {
-    if (!isDevMode || !isWaitingForClick) return;
+    console.log('Element clicked:', { isDevMode, isWaitingForClick, target: event.target });
+    
+    if (!isDevMode || !isWaitingForClick) {
+      console.log('Click ignored - dev mode or waiting state not active');
+      return;
+    }
 
     event.preventDefault();
     event.stopPropagation();
@@ -91,7 +96,10 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   };
 
   const startClickToFeedback = () => {
-    if (!isDevMode) return;
+    if (!isDevMode) {
+      console.log('Dev mode not active, cannot start click-to-feedback');
+      return;
+    }
     
     setIsWaitingForClick(true);
     
@@ -113,6 +121,8 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
     document.getElementById('cancel-click-feedback')?.addEventListener('click', () => {
       stopClickToFeedback();
     });
+    
+    console.log('Click-to-feedback mode activated');
   };
 
   const stopClickToFeedback = () => {
@@ -128,7 +138,15 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   // Listen for custom events and cleanup on unmount
   useEffect(() => {
     const handleStartClickToFeedback = () => {
-      startClickToFeedback();
+      // Re-check dev mode when the event is triggered
+      const authenticated = sessionStorage.getItem('devAuthenticated') === 'true';
+      setIsDevMode(authenticated);
+      
+      if (authenticated) {
+        startClickToFeedback();
+      } else {
+        console.log('Dev mode not active, cannot start click-to-feedback');
+      }
     };
 
     window.addEventListener('startClickToFeedback', handleStartClickToFeedback);
@@ -146,6 +164,10 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   return (
     <>
       {children}
+      {/* Dev mode indicator */}
+      <div className="fixed bottom-4 left-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium shadow-lg z-50">
+        Dev Mode Active
+      </div>
     </>
   );
 } 
