@@ -155,7 +155,9 @@ export function BreathworkWidget({
   };
 
   const getProgressPercentage = () => {
-    return ((duration * 60 - timeLeft) / (duration * 60)) * 100;
+    // Calculate progress based on cycles completed vs target cycles
+    const targetCycles = 10; // Default target
+    return Math.min(100, (cycleCount / targetCycles) * 100);
   };
 
   return (
@@ -180,8 +182,8 @@ export function BreathworkWidget({
           </div>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-blue-400">{sessionCount}</div>
-          <div className="text-xs text-gray-400">Sessions</div>
+          <div className="text-2xl font-bold text-blue-400">{cycleCount}</div>
+          <div className="text-xs text-gray-400">Cycles</div>
         </div>
       </div>
 
@@ -262,7 +264,7 @@ export function BreathworkWidget({
           animate={{ scale: isActive ? [1, 1.05, 1] : 1 }}
           transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
         >
-          {formatTime(timeLeft)}
+          {formatTime(sessionDuration)}
         </motion.div>
         <div className="text-sm text-gray-400">Session Time</div>
       </div>
