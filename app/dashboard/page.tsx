@@ -9,7 +9,7 @@ import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
-import ProgressDropdown from '@/components/ProgressDropdown';
+import MilestonesDropdown from '@/components/MilestonesDropdown';
 
 interface VirtueScores {
   wisdom: number;
@@ -451,7 +451,7 @@ export default function DashboardPage() {
                   Track your progress toward flourishing and intentional living
                 </p>
               </div>
-              <ProgressDropdown virtueTotals={virtueScores} />
+              <MilestonesDropdown virtueTotals={virtueScores} />
             </div>
           </div>
 

@@ -20,7 +20,7 @@ import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 import WidgetGuard from '../../../components/WidgetGuard';
 import DeveloperToolbar from '../../../components/DeveloperToolbar';
 import FrameworkTerminology from '../../../components/FrameworkTerminology';
-import ProgressDropdown from '../../../components/ProgressDropdown';
+import MilestonesDropdown from '../../../components/MilestonesDropdown';
 
 interface FrameworkDetailPageProps {
   params: { slug: string };
@@ -214,9 +214,9 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             </p>
           </div>
           
-          {/* Progress Dropdown */}
+          {/* Milestones Dropdown */}
           <div className="flex justify-center">
-            <ProgressDropdown virtueTotals={virtueTotals} />
+            <MilestonesDropdown virtueTotals={virtueTotals} frameworkSlug={framework.slug} />
           </div>
         </div>
       </div>
