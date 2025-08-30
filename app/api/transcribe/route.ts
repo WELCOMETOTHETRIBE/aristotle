@@ -61,14 +61,23 @@ export async function POST(request: NextRequest) {
       size: buffer.length,
     });
 
-    // Create a proper file object for OpenAI API
-    // OpenAI expects a file-like object with specific properties
-    const file = new File([buffer], 'audio.webm', { type: 'audio/webm' });
+    // Create a file-like object compatible with OpenAI API
+    // Use a different approach that works in Node.js environment
+    const fileObject = {
+      name: 'audio.webm',
+      type: 'audio/webm',
+      size: buffer.length,
+      arrayBuffer: () => Promise.resolve(buffer),
+      stream: () => {
+        const { Readable } = require('stream');
+        return Readable.from(buffer);
+      }
+    } as any;
 
     // Send to OpenAI Whisper
     console.log('Sending to OpenAI Whisper...');
     const transcription = await openai.audio.transcriptions.create({
-      file: file,
+      file: fileObject,
       model: 'whisper-1',
       language: 'en',
     });
