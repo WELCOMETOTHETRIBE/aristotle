@@ -38,9 +38,17 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
 }
 
 export async function authenticateUser(username: string, password: string) {
-  const user = await prisma.user.findUnique({
+  // Try to find user by username first
+  let user = await prisma.user.findUnique({
     where: { username }
   });
+
+  // If not found by username, try by email
+  if (!user) {
+    user = await prisma.user.findUnique({
+      where: { email: username }
+    });
+  }
 
   if (!user) {
     return null;

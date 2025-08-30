@@ -8,7 +8,10 @@ export async function POST(request: NextRequest) {
   try {
     const { username, password, email, displayName } = await request.json();
 
+    console.log('🔐 Signup request received for username:', username, 'email:', email);
+
     if (!username || !password) {
+      console.log('❌ Missing username or password');
       return NextResponse.json(
         { error: 'Username and password are required' },
         { status: 400 }
@@ -16,6 +19,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (password.length < 6) {
+      console.log('❌ Password too short');
       return NextResponse.json(
         { error: 'Password must be at least 6 characters long' },
         { status: 400 }
@@ -30,6 +34,7 @@ export async function POST(request: NextRequest) {
       });
 
       if (existingUser) {
+        console.log('❌ Username already exists:', username);
         throw new Error('USERNAME_EXISTS');
       }
 
@@ -40,11 +45,13 @@ export async function POST(request: NextRequest) {
         });
 
         if (existingEmail) {
+          console.log('❌ Email already exists:', email);
           throw new Error('EMAIL_EXISTS');
         }
       }
 
       // Create the user within the transaction
+      console.log('✅ Creating new user:', username);
       const hashedPassword = await hashPassword(password);
       
       return tx.user.create({
@@ -57,6 +64,7 @@ export async function POST(request: NextRequest) {
       });
     });
 
+    console.log('✅ User created successfully:', user.username);
     const token = await generateToken({
       userId: user.id,
       username: user.username
@@ -82,7 +90,9 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (error: any) {
-    console.error('Sign-up error:', error);
+    console.error('💥 Sign-up error:', error);
+    console.error('💥 Error code:', error.code);
+    console.error('💥 Error meta:', error.meta);
     
     // Handle our custom transaction errors
     if (error.message === 'USERNAME_EXISTS') {
@@ -102,6 +112,8 @@ export async function POST(request: NextRequest) {
     // Handle Prisma unique constraint errors (fallback)
     if (error.code === 'P2002') {
       const target = error.meta?.target;
+      console.log('🔍 Unique constraint violation on:', target);
+      
       if (target && target.includes('email')) {
         return NextResponse.json(
           { error: 'An account with this email already exists. Please try signing in instead.' },
@@ -122,6 +134,7 @@ export async function POST(request: NextRequest) {
     
     // Handle other Prisma errors
     if (error.code && error.code.startsWith('P')) {
+      console.error('💥 Prisma error:', error.code, error.message);
       return NextResponse.json(
         { error: 'Database error occurred. Please try again.' },
         { status: 500 }

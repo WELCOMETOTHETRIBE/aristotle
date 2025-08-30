@@ -314,7 +314,7 @@ export default function AuthPage() {
                   {/* Username */}
                   <div>
                     <label htmlFor="username" className="block text-sm font-semibold mb-3 text-gray-200">
-                      Username
+                      {isSignUp ? 'Username' : 'Username or Email'}
                     </label>
                     <div className="relative">
                       <input
@@ -325,10 +325,15 @@ export default function AuthPage() {
                         onChange={handleInputChange}
                         required
                         className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg"
-                        placeholder="Enter your username"
+                        placeholder={isSignUp ? "Enter your username" : "Enter your username or email"}
                       />
                       <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
                     </div>
+                    {!isSignUp && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        You can sign in with either your username or email address
+                      </p>
+                    )}
                   </div>
 
                   {/* Password */}
