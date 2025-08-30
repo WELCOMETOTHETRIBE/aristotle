@@ -155,85 +155,126 @@ export default function AuthPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              {/* Logo Container */}
-              <div className="relative mb-8">
-                <div className="w-32 h-32 bg-gradient-to-br from-accent via-accent-2 to-purple-500 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden border-2 border-white/10">
+              {/* Enhanced Logo Container */}
+              <div className="relative mb-10">
+                <div className="w-36 h-36 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden border-2 border-white/20 relative">
+                  {/* Animated background gradient */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-indigo-500/30 animate-pulse"></div>
+                  
                   <img 
                     src="/academy_logo_r2.png" 
                     alt="Academy Logo" 
-                    className="w-20 h-20 object-contain"
-                    onError={(e) => {
-                      // Fallback to graduation cap icon if image fails to load
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = '<div class="w-20 h-20 flex items-center justify-center"><svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7L12 12L22 7L12 2Z"/><path d="M2 7V17C2 17.5523 2.44772 18 3 18H21C21.5523 18 22 17.5523 22 17V7"/><path d="M12 12V18"/><path d="M12 18C12 18 10 20 8 20C6 20 4 18 4 18"/></svg></div>';
-                      }
-                    }}
+                    className="w-24 h-24 object-contain relative z-10"
+                    style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
                   />
                 </div>
+                
+                {/* Enhanced animated elements */}
                 <motion.div
-                  className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 2, repeat: Infinity }}
+                  className="absolute -top-4 -right-4 w-12 h-12 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full flex items-center justify-center shadow-xl"
+                  animate={{ 
+                    scale: [1, 1.3, 1],
+                    rotate: [0, 180, 360]
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 >
-                  <div className="w-4 h-4 bg-white rounded-full"></div>
+                  <div className="w-5 h-5 bg-white rounded-full shadow-inner"></div>
                 </motion.div>
+                
                 <motion.div
-                  className="absolute -bottom-2 -left-2 w-6 h-6 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full flex items-center justify-center shadow-md"
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+                  className="absolute -bottom-3 -left-3 w-8 h-8 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center shadow-lg"
+                  animate={{ 
+                    scale: [1, 1.2, 1],
+                    y: [0, -5, 0]
+                  }}
+                  transition={{ duration: 2, repeat: Infinity, delay: 0.7 }}
                 >
-                  <div className="w-2 h-2 bg-white rounded-full"></div>
+                  <div className="w-3 h-3 bg-white rounded-full"></div>
                 </motion.div>
+                
+                <motion.div
+                  className="absolute top-1/2 -right-8 w-4 h-4 bg-gradient-to-r from-pink-400 to-rose-500 rounded-full"
+                  animate={{ 
+                    scale: [1, 1.5, 1],
+                    opacity: [0.5, 1, 0.5]
+                  }}
+                  transition={{ duration: 2.5, repeat: Infinity, delay: 1.2 }}
+                />
               </div>
               
-              {/* Title and Subtitle */}
-              <div className="space-y-4">
+              {/* Enhanced Title and Subtitle */}
+              <div className="space-y-6">
                 <motion.h1 
-                  className="text-6xl font-bold bg-gradient-to-r from-white via-accent to-accent-2 bg-clip-text text-transparent"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.1 }}
+                  className="text-7xl font-black bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent tracking-tight"
+                  initial={{ opacity: 0, y: 30, scale: 0.9 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  transition={{ duration: 0.8, delay: 0.1, ease: "easeOut" }}
+                  style={{ textShadow: '0 4px 8px rgba(0,0,0,0.3)' }}
                 >
                   Aristotle
                 </motion.h1>
                 <motion.p 
-                  className="text-xl text-gray-300 font-medium tracking-wide"
+                  className="text-2xl text-gray-200 font-semibold tracking-wider"
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
+                  transition={{ duration: 0.6, delay: 0.3 }}
                 >
                   Ancient Wisdom for Modern Life
                 </motion.p>
+                <motion.div
+                  className="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-500 rounded-full mx-auto"
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 96, opacity: 1 }}
+                  transition={{ duration: 0.8, delay: 0.4 }}
+                />
               </div>
             </motion.div>
             
             <motion.div 
-              className="max-w-2xl mx-auto"
+              className="max-w-3xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
             >
-              <p className="text-lg text-gray-400 leading-relaxed">
-                {isSignUp 
-                  ? 'Begin your journey of wisdom and discover the path to flourishing through timeless philosophical practices.' 
-                  : 'Continue your practice and deepen your understanding of virtue, purpose, and intentional living.'
-                }
-              </p>
+              <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
+                <p className="text-lg text-gray-200 leading-relaxed text-center font-medium">
+                  {isSignUp 
+                    ? 'Begin your journey of wisdom and discover the path to flourishing through timeless philosophical practices.' 
+                    : 'Continue your practice and deepen your understanding of virtue, purpose, and intentional living.'
+                  }
+                </p>
+                <motion.div 
+                  className="flex justify-center gap-4 mt-4"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.7 }}
+                >
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                    <span>Virtue Development</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    <span>Mindful Practice</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                    <span>Personal Growth</span>
+                  </div>
+                </motion.div>
+              </div>
             </motion.div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Auth Form */}
+            {/* Enhanced Auth Form */}
             <motion.div 
-              className="panel-base"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
+              className="bg-white/10 backdrop-blur-xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden"
+              initial={{ opacity: 0, x: -30, scale: 0.95 }}
+              animate={{ opacity: 1, x: 0, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
             >
-              <div className="p-8">
+              <div className="p-10">
                 <AnimatePresence mode="wait">
                   {error && (
                     <motion.div 
@@ -270,27 +311,30 @@ export default function AuthPage() {
                   )}
                 </AnimatePresence>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-8">
                   {/* Username */}
                   <div>
-                    <label htmlFor="username" className="block text-sm font-semibold mb-3 text-text">
+                    <label htmlFor="username" className="block text-sm font-semibold mb-3 text-gray-200">
                       Username
                     </label>
-                    <input
-                      type="text"
-                      id="username"
-                      name="username"
-                      value={formData.username}
-                      onChange={handleInputChange}
-                      required
-                      className="input-base"
-                      placeholder="Enter your username"
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg"
+                        placeholder="Enter your username"
+                      />
+                      <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/10 to-purple-500/10 opacity-0 hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
+                    </div>
                   </div>
 
                   {/* Password */}
                   <div>
-                    <label htmlFor="password" className="block text-sm font-semibold mb-3 text-text">
+                    <label htmlFor="password" className="block text-sm font-semibold mb-3 text-gray-200">
                       Password
                     </label>
                     <div className="relative">
@@ -301,7 +345,7 @@ export default function AuthPage() {
                         value={formData.password}
                         onChange={handleInputChange}
                         required
-                        className="input-base pr-12"
+                        className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg pr-12"
                         placeholder="Enter your password"
                       />
                       <button
@@ -364,37 +408,43 @@ export default function AuthPage() {
                     )}
                   </AnimatePresence>
 
-                  {/* Submit Button */}
-                  <button
+                  {/* Enhanced Submit Button */}
+                  <motion.button
                     type="submit"
                     disabled={isLoading}
-                    className="btn-primary w-full flex items-center justify-center gap-3"
+                    className="w-full py-4 px-6 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold rounded-2xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-3 text-lg shadow-xl"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        {isSignUp ? 'Creating Account...' : 'Signing In...'}
+                        <Loader2 className="w-6 h-6 animate-spin" />
+                        <span>{isSignUp ? 'Creating Account...' : 'Signing In...'}</span>
                       </>
                     ) : (
                       <>
-                        {isSignUp ? 'Create Account' : 'Sign In'}
-                        <ArrowRight className="w-5 h-5" />
+                        <span>{isSignUp ? 'Create Account' : 'Sign In'}</span>
+                        <ArrowRight className="w-6 h-6" />
                       </>
                     )}
-                  </button>
+                  </motion.button>
                 </form>
 
-                {/* Toggle Sign In/Sign Up */}
-                <div className="mt-8 text-center">
-                  <p className="body-text text-sm">
-                    {isSignUp ? 'Already have an account?' : "Don't have an account?"}
-                    <button
-                      onClick={toggleMode}
-                      className="ml-2 font-semibold text-accent hover:text-accent/80 transition-colors"
-                    >
-                      {isSignUp ? 'Sign In' : 'Sign Up'}
-                    </button>
-                  </p>
+                {/* Enhanced Toggle Sign In/Sign Up */}
+                <div className="mt-10 text-center">
+                  <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-4 border border-white/10">
+                    <p className="text-gray-300 text-sm">
+                      {isSignUp ? 'Already have an account?' : "Don't have an account?"}
+                      <motion.button
+                        onClick={toggleMode}
+                        className="ml-2 font-semibold text-blue-400 hover:text-blue-300 transition-colors underline decoration-blue-400/30 hover:decoration-blue-300/50"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        {isSignUp ? 'Sign In' : 'Sign Up'}
+                      </motion.button>
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>
