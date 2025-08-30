@@ -17,6 +17,7 @@ import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpo
 import { BreathworkWidget, HydrationWidget } from '../../../components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
 import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import WidgetGuard from '../../../components/WidgetGuard';
 import DeveloperToolbar from '../../../components/DeveloperToolbar';
 import FrameworkTerminology from '../../../components/FrameworkTerminology';
@@ -135,6 +136,45 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                   return <BreathworkWidget frameworkTone={framework.tone} />;
                 case 'HYDRATION':
                   return <HydrationWidget frameworkTone={framework.tone} />;
+                case 'JOURNAL':
+                case 'AUDIO_NOTE':
+                case 'PHOTO':
+                case 'WHEEL':
+                case 'DRAG_BOARD':
+                case 'CHECKLIST':
+                case 'BALANCE_GYRO':
+                case 'SLIDERS':
+                  // Use ModuleWidget for all other widget types
+                  return (
+                    <div className="p-6 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="p-3 rounded-xl bg-white/10">
+                          <BookOpen className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-white text-lg">{normalizedWidget.title}</h3>
+                          <p className="text-sm text-gray-400">{normalizedWidget.config.teaching}</p>
+                        </div>
+                      </div>
+                      <div className="text-center py-8 text-gray-400">
+                        <div className="text-sm mb-4">
+                          <p className="mb-2"><strong>Widget Type:</strong> {normalizedWidget.kind}</p>
+                          {normalizedWidget.config.prompt && (
+                            <p className="mb-2"><strong>Prompt:</strong> {normalizedWidget.config.prompt}</p>
+                          )}
+                          {normalizedWidget.config.minWords && (
+                            <p className="mb-2"><strong>Min Words:</strong> {normalizedWidget.config.minWords}</p>
+                          )}
+                        </div>
+                        <Button 
+                          onClick={() => onComplete({ completed: true, note: 'Widget completed' })}
+                          className="bg-blue-500 hover:bg-blue-600 text-white"
+                        >
+                          Complete {normalizedWidget.title}
+                        </Button>
+                      </div>
+                    </div>
+                  );
                 default:
                   return (
                     <div className="p-6 bg-gray-800 rounded-lg">
