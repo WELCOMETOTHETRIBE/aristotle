@@ -117,7 +117,6 @@ export default function FrameworksPage() {
     <PageLayout title="Ancient Wisdom Frameworks" description="Explore timeless traditions and their practical applications for modern life">
       <section className="page-section">
         <div className="text-center">
-          <h1 className="headline">Ancient Wisdom Frameworks</h1>
           <p className="subheadline mt-4 max-w-2xl mx-auto">
             Explore timeless traditions and their practical applications for modern life
           </p>

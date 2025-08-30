@@ -235,15 +235,12 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
   }
 
   return (
-    <PageLayout showAurora={false}>
+    <PageLayout showAurora={false} title={framework.name} description={framework.teachingChip}>
 
 
       {/* Hero Section */}
       <div className={`bg-gradient-to-br ${getToneGradient(framework.tone)} py-16 -mt-12 mb-8`}>
         <div className="text-center">
-          <h1 className={`headline mb-4 ${getToneTextColor(framework.tone)}`}>
-            {framework.name}
-          </h1>
           <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-4">
             <span className={`text-lg font-medium ${getToneTextColor(framework.tone)}`}>
               {framework.virtuePrimary.charAt(0).toUpperCase() + framework.virtuePrimary.slice(1)}
@@ -264,17 +261,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         </div>
       </div>
 
-      {/* About Framework - Moved Above Chat */}
-      <div className="page-section">
-        <div className="max-w-4xl mx-auto">
-          <div className="text-center mb-8">
-            <h2 className="section-title text-3xl mb-4">About {framework.name}</h2>
-            <p className="section-description text-lg leading-relaxed">
-              {framework.teachingChip}
-            </p>
-          </div>
-        </div>
-      </div>
+
 
       {/* AI Chat - Prominently Displayed */}
       <div className="page-section">

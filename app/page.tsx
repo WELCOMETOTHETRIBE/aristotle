@@ -9,6 +9,7 @@ import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
 import { HydrationWidget } from '@/components/ModuleWidgets';
 import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
+import { HedonicAwarenessWidget } from '@/components/HedonicAwarenessWidget';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
@@ -1032,32 +1033,24 @@ export default function DashboardPage() {
                   <CardTitle className="flex items-center gap-2">
                     <Heart className="h-5 w-5 text-primary" />
                     Hedonic Awareness
+                    <button
+                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'hedonic_awareness' ? null : 'hedonic_awareness')}
+                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                    >
+                      <Info className="h-4 w-4" />
+                    </button>
                   </CardTitle>
                   <CardDescription>
                     Monitor your patterns and triggers
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center">
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getHedonicColor(hedonicScore)}`}>
-                      <div className={`w-2 h-2 rounded-full ${hedonicScore <= 30 ? 'bg-green-600' : hedonicScore <= 70 ? 'bg-yellow-600' : 'bg-red-600'}`} />
-                      {getHedonicLabel(hedonicScore)}
+                  {showWidgetInfo === 'hedonic_awareness' && (
+                    <div className="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
+                      <p className="text-sm text-purple-200">Analyze your thoughts and activities to identify hedonic treadmill patterns. Get personalized insights and counter-moves to break negative cycles.</p>
                     </div>
-                    <div className="mt-4">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div 
-                          className={`h-2 rounded-full transition-all duration-300 ${
-                            hedonicScore <= 30 ? 'bg-green-500' : 
-                            hedonicScore <= 70 ? 'bg-yellow-500' : 'bg-red-500'
-                          }`}
-                          style={{ width: `${hedonicScore}%` }}
-                        />
-                      </div>
-                      <p className="text-xs text-muted-foreground mt-2">
-                        Score: {hedonicScore}/100
-                      </p>
-                    </div>
-                  </div>
+                  )}
+                  <HedonicAwarenessWidget frameworkTone="stoic" />
                 </CardContent>
               </Card>
 

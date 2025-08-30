@@ -18,6 +18,14 @@ export function BreathworkWidget({
 }: BreathworkWidgetProps) {
   return <BreathworkWidgetNew frameworkTone={frameworkTone} />;
 }
+
+// ===== FOCUS TIMER WIDGET =====
+interface FocusTimerWidgetProps {
+  duration?: number;
+  technique?: string;
+  frameworkTone?: string;
+}
+
 export function FocusTimerWidget({ 
   duration = 25, 
   technique = 'pomodoro',
@@ -699,6 +707,8 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
   const [waterIntake, setWaterIntake] = useState(0);
   const [goal, setGoal] = useState(8); // cups
   const [lastDrink, setLastDrink] = useState<Date | null>(null);
+  const [showGoalSettings, setShowGoalSettings] = useState(false);
+  const [tempGoal, setTempGoal] = useState(8);
 
   const addWater = (amount: number) => {
     setWaterIntake(prev => Math.min(prev + amount, goal * 2)); // Cap at 2x goal
@@ -750,6 +760,12 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
         <div className="text-right">
           <div className="text-2xl font-bold text-blue-400">{waterIntake}</div>
           <div className="text-xs text-gray-400">Cups</div>
+          <button
+            onClick={() => setShowGoalSettings(!showGoalSettings)}
+            className="text-xs text-blue-300 hover:text-blue-200 mt-1 underline"
+          >
+            Set Goal
+          </button>
         </div>
       </div>
 
@@ -795,6 +811,50 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
           {waterIntake} / {goal} cups
         </div>
       </div>
+
+      {/* Goal Settings */}
+      {showGoalSettings && (
+        <motion.div 
+          className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <div className="text-sm text-white mb-3">Set Daily Water Goal</div>
+          <div className="flex items-center gap-3 mb-3">
+            <input
+              type="range"
+              min="4"
+              max="16"
+              step="0.5"
+              value={tempGoal}
+              onChange={(e) => setTempGoal(parseFloat(e.target.value))}
+              className="flex-1"
+            />
+            <span className="text-white font-medium min-w-[3rem]">{tempGoal} cups</span>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                setGoal(tempGoal);
+                setShowGoalSettings(false);
+              }}
+              className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded transition-colors"
+            >
+              Save Goal
+            </button>
+            <button
+              onClick={() => {
+                setTempGoal(goal);
+                setShowGoalSettings(false);
+              }}
+              className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </motion.div>
+      )}
 
       {/* Quick Add Buttons */}
       <div className="grid grid-cols-3 gap-2 mb-6">
