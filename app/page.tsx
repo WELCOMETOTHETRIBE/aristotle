@@ -444,43 +444,79 @@ export default function DashboardPage() {
       
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          {/* Header */}
+          {/* Sleek Header with Integrated Virtue Visualization */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h1 className="text-4xl font-bold mb-2">Your Dashboard</h1>
-                <p className="text-muted-foreground">
-                  Track your progress toward flourishing and intentional living
-                </p>
-              </div>
-              <MilestonesDropdown virtueTotals={virtueScores} />
-            </div>
-          </div>
-
-          {/* Virtue Balance Visualization */}
-          <div className="mb-8">
-            <Card className="glass-effect bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Trophy className="h-5 w-5 text-blue-400" />
-                  Your Virtue Balance
-                </CardTitle>
-                <CardDescription>
-                  Visual representation of your current virtue alignment
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex justify-center">
-                  <div className="w-full max-w-md">
-                    <VirtueRadar data={[
-                      { virtue: 'Wisdom', score: virtueScores.wisdom },
-                      { virtue: 'Courage', score: virtueScores.courage },
-                      { virtue: 'Justice', score: virtueScores.justice },
-                      { virtue: 'Temperance', score: virtueScores.temperance }
-                    ]} />
+            <Card className="glass-effect bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20 overflow-hidden">
+              <div className="p-6">
+                {/* Top Row - Title and Milestones */}
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h1 className="text-3xl font-bold text-white mb-1">Your Dashboard</h1>
+                    <p className="text-gray-300 text-sm">
+                      Track your progress toward flourishing and intentional living
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    {/* Quick Stats */}
+                    <div className="hidden md:flex items-center gap-6 text-sm">
+                      <div className="text-center">
+                        <div className="text-white font-semibold">{Object.values(virtueScores).reduce((a, b) => a + b, 0)}</div>
+                        <div className="text-gray-400 text-xs">Total Virtue XP</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-white font-semibold">{Math.round(Object.values(virtueScores).reduce((a, b) => a + b, 0) / 4)}</div>
+                        <div className="text-gray-400 text-xs">Avg Score</div>
+                      </div>
+                    </div>
+                    {/* Milestones Dropdown */}
+                    <div className="flex-shrink-0">
+                      <MilestonesDropdown virtueTotals={virtueScores} />
+                    </div>
                   </div>
                 </div>
-              </CardContent>
+
+                {/* Bottom Row - Virtue Visualization */}
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+                  {/* Virtue Radar Chart */}
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center gap-3 mb-3">
+                      <Trophy className="h-5 w-5 text-blue-400" />
+                      <h3 className="text-lg font-semibold text-white">Virtue Balance</h3>
+                    </div>
+                    <div className="h-48">
+                      <VirtueRadar data={[
+                        { virtue: 'Wisdom', score: virtueScores.wisdom },
+                        { virtue: 'Courage', score: virtueScores.courage },
+                        { virtue: 'Justice', score: virtueScores.justice },
+                        { virtue: 'Temperance', score: virtueScores.temperance }
+                      ]} />
+                    </div>
+                  </div>
+
+                  {/* Virtue Score Cards */}
+                  <div className="space-y-3">
+                    {Object.entries(virtueScores).map(([virtue, score]) => (
+                      <div key={virtue} className="flex items-center justify-between p-3 bg-white/5 rounded-lg border border-white/10">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xl">{getVirtueEmoji(virtue as keyof VirtueScores)}</span>
+                          <div>
+                            <div className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueScores)} capitalize`}>
+                              {virtue}
+                            </div>
+                            <div className="text-xs text-gray-400">{score}/100</div>
+                          </div>
+                        </div>
+                        <div className="w-16 bg-gray-700 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueScores)}`}
+                            style={{ width: `${Math.min(100, score)}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </Card>
           </div>
 
