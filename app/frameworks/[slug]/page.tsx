@@ -20,6 +20,7 @@ import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 import WidgetGuard from '../../../components/WidgetGuard';
 import DeveloperToolbar from '../../../components/DeveloperToolbar';
 import FrameworkTerminology from '../../../components/FrameworkTerminology';
+import ProgressDropdown from '../../../components/ProgressDropdown';
 
 interface FrameworkDetailPageProps {
   params: { slug: string };
@@ -213,25 +214,9 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             </p>
           </div>
           
-          {/* Virtue Bars */}
-          <div className="flex justify-center gap-4 flex-wrap">
-            {Object.entries(virtueTotals).map(([virtue, total]) => (
-              <div key={virtue} className="text-center">
-                <div className="flex items-center gap-1 mb-1">
-                  <span className="text-lg">{getVirtueEmoji(virtue as keyof VirtueTotals)}</span>
-                  <span className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueTotals)}`}>
-                    {virtue.charAt(0).toUpperCase() + virtue.slice(1)}
-                  </span>
-                </div>
-                <div className="w-16 h-2 bg-gray-700 rounded-full">
-                  <div 
-                    className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueTotals)}`}
-                    style={{ width: `${Math.min(100, (total / 100) * 100)}%` }}
-                  />
-                </div>
-                <div className="text-xs text-gray-300 mt-1">{total} XP</div>
-              </div>
-            ))}
+          {/* Progress Dropdown */}
+          <div className="flex justify-center">
+            <ProgressDropdown virtueTotals={virtueTotals} />
           </div>
         </div>
       </div>
