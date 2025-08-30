@@ -191,16 +191,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
   return (
     <PageLayout showAurora={false}>
-      {/* General Page Feedback */}
-      <DeveloperFeedbackButton
-        targetId="framework_page"
-        type="general"
-        className="fixed top-4 right-4 z-50"
-      >
-        <div className="p-2 bg-blue-500 hover:bg-blue-600 text-white rounded-full shadow-lg transition-colors">
-          <MessageSquare className="h-4 w-4" />
-        </div>
-      </DeveloperFeedbackButton>
+
 
       {/* Hero Section */}
       <div className={`bg-gradient-to-br ${getToneGradient(framework.tone)} py-16 -mt-12 mb-8`}>
@@ -245,26 +236,15 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
       </div>
 
       {/* Quest Deck */}
-      <DeveloperFeedbackButton
-        targetId="quest_deck"
-        type="section"
-        className="block"
-      >
-        <div className="page-section">
-          <QuestDeck 
-            quests={quests} 
-            completedWidgets={completedWidgets}
-          />
-        </div>
-      </DeveloperFeedbackButton>
+      <div className="page-section">
+        <QuestDeck 
+          quests={quests} 
+          completedWidgets={completedWidgets}
+        />
+      </div>
 
       {/* Breathwork Practice */}
-      <DeveloperFeedbackButton
-        targetId="breathwork_practice"
-        type="section"
-        className="block"
-      >
-        <div className="page-section">
+      <div className="page-section">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="section-title">Breathwork Practice</h2>
             <button
@@ -303,15 +283,9 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             />
           </div>
         </div>
-      </DeveloperFeedbackButton>
 
       {/* Widgets Grid */}
-      <DeveloperFeedbackButton
-        targetId="practice_widgets"
-        type="section"
-        className="block"
-      >
-        <div className="page-section">
+      <div className="page-section">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="section-title">Practice Widgets</h2>
             <button
@@ -340,15 +314,9 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             ))}
           </div>
         </div>
-      </DeveloperFeedbackButton>
 
       {/* Resources Spotlight */}
-      <DeveloperFeedbackButton
-        targetId="wisdom_resources"
-        type="section"
-        className="block"
-      >
-        <div className="page-section">
+      <div className="page-section">
           <div className="flex items-center gap-2 mb-4">
             <h2 className="section-title">Wisdom Resources</h2>
             <button
@@ -375,7 +343,6 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             frameworkTone={framework.tone}
           />
         </div>
-      </DeveloperFeedbackButton>
 
       {/* Progress Panel */}
       <div className="page-section">
