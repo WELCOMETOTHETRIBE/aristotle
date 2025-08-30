@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale } from 'lucide-react';
+import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale, Sparkles, ArrowRight } from 'lucide-react';
 
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
@@ -13,7 +13,7 @@ import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue'
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
 import VirtueRadar from '@/components/VirtueRadar';
-import OnboardingBanner from '@/components/OnboardingBanner';
+import { useOnboardingStatus } from '@/lib/hooks/useOnboardingStatus';
 
 interface VirtueScores {
   wisdom: number;
@@ -204,6 +204,7 @@ export default function DashboardPage() {
   const [hedonicScore, setHedonicScore] = useState(50);
   const [showWidgetInfo, setShowWidgetInfo] = useState<string | null>(null);
   const [frameworks, setFrameworks] = useState<any[]>([]);
+  const { isComplete, shouldShowPrompt } = useOnboardingStatus();
 
   useEffect(() => {
     fetchDashboardData();
@@ -435,9 +436,6 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      {/* Onboarding Banner */}
-      <OnboardingBanner />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Sleek Header with Integrated Virtue Visualization */}
@@ -487,6 +485,37 @@ export default function DashboardPage() {
               </div>
             </Card>
           </div>
+
+          {/* Onboarding Call-to-Action */}
+          {shouldShowPrompt && (
+            <div className="mb-6">
+              <Card className="glass-effect bg-gradient-to-r from-amber-500/20 to-orange-600/20 border-amber-500/30 overflow-hidden">
+                <div className="p-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+                        <Sparkles className="w-6 h-6 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-white mb-1">Unlock Your Personalized Path</h3>
+                        <p className="text-gray-300 text-sm">
+                          Complete a quick assessment to get matched with your ideal philosophical framework and practices
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => window.location.href = '/onboarding'}
+                      size="lg"
+                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white"
+                    >
+                      Start Assessment
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          )}
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
