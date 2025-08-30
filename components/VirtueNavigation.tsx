@@ -151,6 +151,8 @@ export function VirtueNavigation() {
                           setShowProfileMenu(false);
                           // Force re-render
                           window.dispatchEvent(new Event('storage'));
+                          // Also trigger a page reload to ensure all components update
+                          setTimeout(() => window.location.reload(), 100);
                         }}
                         className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
                       >

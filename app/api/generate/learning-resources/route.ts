@@ -38,30 +38,30 @@ export async function POST(request: NextRequest) {
     const lessons = [
       {
         id: 'lesson-1',
-        title: resource.title || 'Introduction to Ancient Wisdom',
-        content: resource.body || 'Begin your journey into ancient wisdom...',
-        questions: resource.coach_prompts?.map((prompt, index) => ({
+        title: resource.title,
+        content: resource.body,
+        questions: (resource.coach_prompts || []).map((prompt, index) => ({
           id: `q-${index + 1}`,
           question: prompt,
           type: 'text'
-        })) || [],
-        practices: resource.safety_reminders?.map((reminder, index) => ({
+        })),
+        practices: (resource.safety_reminders || []).map((reminder, index) => ({
           id: `p-${index + 1}`,
           title: `Practice ${index + 1}`,
           description: reminder,
           instructions: [reminder]
-        })) || [],
+        })),
         isCompleted: false
       }
     ];
 
     return NextResponse.json({
       id: `ai-learning-${Date.now()}`,
-      title: resource.title || 'Ancient Wisdom for Modern Life',
-      author: resource.safety_reminders?.[0] || 'Ancient Sage',
-      description: resource.body || 'A comprehensive guide to applying ancient wisdom in your daily life.',
+      title: resource.title,
+      author: (resource.safety_reminders || [])[0] || 'Ancient Sage',
+      description: resource.body,
       difficulty: difficulty || 'beginner',
-      estimatedTime: resource.est_time_min || 30,
+      estimatedTime: resource.est_time_min,
       lessons: lessons
     });
 

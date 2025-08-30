@@ -205,29 +205,13 @@ export default function CoachPage() {
 
   return (
     <PageLayout title="Aristotle AI" description="Your philosophical guide for cultivating wisdom, courage, justice, and temperance">
-      {/* Header */}
-      <section className="page-section">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
+      {/* Back to Home Link */}
+      <div className="mb-6">
+        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
           <ArrowLeft size={16} />
           Back to Home
         </Link>
-        
-        <div className="text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg">
-              <Sparkles className="w-10 h-10 text-white" />
-            </div>
-            <div>
-              <h1 className="headline bg-gradient-to-r from-amber-400 to-orange-500 bg-clip-text text-transparent">
-                Aristotle AI
-              </h1>
-              <p className="subheadline mt-2">
-                Your philosophical guide for cultivating wisdom, courage, justice, and temperance
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Main Chat Area */}
