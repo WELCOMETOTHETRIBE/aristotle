@@ -6,44 +6,18 @@ import {
   Users, Sun, Moon, Coffee, Droplets, Dumbbell, CheckCircle,
   Clock, TrendingUp, Activity, Sparkles, Flame, Wind
 } from 'lucide-react';
+import { BreathworkWidgetNew } from './BreathworkWidgetNew';
 
 // ===== ENHANCED BREATHWORK WIDGET =====
 interface BreathworkWidgetProps {
-  pattern?: {
-    inhale: number;
-    hold: number;
-    exhale: number;
-    hold2?: number;
-  };
-  duration?: number;
   frameworkTone?: string;
 }
 
 export function BreathworkWidget({ 
-  pattern = { inhale: 4, hold: 4, exhale: 4, hold2: 4 },
-  duration = 5,
   frameworkTone = "stoic"
 }: BreathworkWidgetProps) {
-  const [isActive, setIsActive] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState(0);
-  const [phaseTimeLeft, setPhaseTimeLeft] = useState(pattern.inhale);
-  const [breathScale, setBreathScale] = useState(1);
-  const [sessionCount, setSessionCount] = useState(0);
-  const [isCompleted, setIsCompleted] = useState(false);
-  const [selectedPattern, setSelectedPattern] = useState('box');
-  const [currentPattern, setCurrentPattern] = useState(pattern);
-  const [cycleCount, setCycleCount] = useState(0);
-  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
-  const [sessionDuration, setSessionDuration] = useState(0);
-
-  // Breathing patterns
-  const breathingPatterns = {
-    box: { name: 'Box Breathing', pattern: { inhale: 4, hold: 4, exhale: 4, hold2: 4 }, total: 16 },
-    triangle: { name: 'Triangle Breathing', pattern: { inhale: 4, hold: 4, exhale: 4 }, total: 12 },
-    coherent: { name: 'Coherent Breathing', pattern: { inhale: 5, hold: 0, exhale: 5 }, total: 10 },
-    stoic: { name: 'Stoic Pattern', pattern: { inhale: 4, hold: 7, exhale: 8 }, total: 19 },
-    spartan: { name: 'Spartan Pattern', pattern: { inhale: 3, hold: 2, exhale: 3 }, total: 8 }
-  };
+  return <BreathworkWidgetNew frameworkTone={frameworkTone} />;
+}
 
   const phases = [
     { name: "Inhale", duration: currentPattern.inhale, color: "#7ad7ff", icon: "↗", emoji: "🫁" },
