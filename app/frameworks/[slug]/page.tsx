@@ -19,6 +19,7 @@ import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/
 import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 import WidgetGuard from '../../../components/WidgetGuard';
 import DeveloperToolbar from '../../../components/DeveloperToolbar';
+import FrameworkTerminology from '../../../components/FrameworkTerminology';
 
 interface FrameworkDetailPageProps {
   params: { slug: string };
@@ -234,6 +235,13 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
           </div>
         </div>
       </div>
+
+      {/* Framework Terminology */}
+      <FrameworkTerminology 
+        frameworkSlug={framework.slug}
+        frameworkName={framework.name}
+        frameworkTone={framework.tone}
+      />
 
       {/* Quest Deck */}
       <div className="page-section">
