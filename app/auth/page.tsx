@@ -151,7 +151,7 @@ export default function AuthPage() {
               <div className="relative">
                 <div className="w-24 h-24 bg-gradient-to-r from-accent to-accent-2 rounded-3xl flex items-center justify-center mr-8 shadow-2xl overflow-hidden">
                   <img 
-                    src="/academy-logo.png" 
+                    src="/academy_logo.png" 
                     alt="Academy Logo" 
                     className="w-16 h-16 object-contain"
                   />

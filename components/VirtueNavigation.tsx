@@ -104,7 +104,7 @@ export function VirtueNavigation() {
             {/* Logo */}
             <Link href="/" className="flex items-center gap-1.5 interactive">
               <img 
-                src="/academy-logo.png" 
+                src="/academy_logo.png" 
                 alt="Academy Logo" 
                 className="w-5 h-5 rounded-md shadow-lg"
               />
