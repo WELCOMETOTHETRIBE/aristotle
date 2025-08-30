@@ -162,10 +162,14 @@ export default function AuthPage() {
                   <div className="absolute inset-0 bg-gradient-to-br from-blue-500/30 via-purple-500/30 to-indigo-500/30 animate-pulse"></div>
                   
                   <img 
-                    src="/academy_logo_r2.png?v=3" 
+                    src="/academy_logo_r2.png" 
                     alt="Academy Logo" 
                     className="w-24 h-24 object-contain relative z-10"
-                    style={{ filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
+                    style={{ 
+                      filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))',
+                      border: '2px solid red',
+                      backgroundColor: 'rgba(255,0,0,0.1)'
+                    }}
                   />
                 </div>
                 
