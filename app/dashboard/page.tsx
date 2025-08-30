@@ -7,6 +7,7 @@ import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplet
 import BreathTimerCircle from '@/components/BreathTimerCircle';
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
+import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
@@ -872,15 +873,7 @@ export default function DashboardPage() {
                       <p className="text-sm text-cyan-200">{getWidgetInfo('breathwork_timer')?.description}</p>
                     </div>
                   )}
-                  <BreathTimerCircle 
-                    patternId="stoic"
-                    ratio="4:4:4:4"
-                    useVoice={true}
-                    volume={0.7}
-                    onSessionComplete={(session) => {
-                      console.log('Breathwork session completed:', session);
-                    }}
-                  />
+                  <BreathworkWidget frameworkTone="stoic" />
                 </CardContent>
               </Card>
 
@@ -907,32 +900,7 @@ export default function DashboardPage() {
                       <p className="text-sm text-blue-200">{getWidgetInfo('hydration_tracker')?.description}</p>
                     </div>
                   )}
-                  <div className="text-center">
-                    <div className="text-3xl font-bold mb-2">
-                      {hydrationData.current}ml
-                    </div>
-                    <div className="text-sm text-muted-foreground mb-4">
-                      of {hydrationData.target}ml target
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-3 mb-4">
-                      <div 
-                        className="bg-blue-500 h-3 rounded-full transition-all duration-300"
-                        style={{ width: `${Math.min(100, hydrationData.percentage)}%` }}
-                      />
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      {[250, 500, 1000].map((amount) => (
-                        <Button
-                          key={amount}
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleHydrationAdd(amount)}
-                        >
-                          +{amount}ml
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
+                  <HydrationWidget frameworkTone="stoic" />
                 </CardContent>
               </Card>
 

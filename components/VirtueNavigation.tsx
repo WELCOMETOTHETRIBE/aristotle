@@ -180,6 +180,15 @@ export function VirtueNavigation() {
                   <TestTube size={14} />
                   Conformance Matrix
                 </Link>
+                
+                <Link
+                  href="/debug/module-widgets"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <Target size={14} />
+                  Module Widgets
+                </Link>
                           
                           <button
                             onClick={() => {
