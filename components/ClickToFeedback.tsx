@@ -40,10 +40,18 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   }, []);
 
   const handleElementClick = (event: MouseEvent) => {
-    console.log('Element clicked:', { isDevMode, isWaitingForClick, target: event.target });
+    console.log('Element clicked:', { 
+      isDevMode, 
+      isWaitingForClick, 
+      target: event.target,
+      sessionStorage: sessionStorage.getItem('devAuthenticated')
+    });
     
-    if (!isDevMode || !isWaitingForClick) {
-      console.log('Click ignored - dev mode or waiting state not active');
+    // Check session storage directly
+    const authenticated = sessionStorage.getItem('devAuthenticated') === 'true';
+    
+    if (!authenticated || !isWaitingForClick) {
+      console.log('Click ignored - dev mode or waiting state not active', { authenticated, isWaitingForClick });
       return;
     }
 
@@ -74,15 +82,21 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
   };
 
   const startClickToFeedback = () => {
-    if (!isDevMode) {
+    // Check session storage directly instead of relying on state
+    const authenticated = sessionStorage.getItem('devAuthenticated') === 'true';
+    console.log('startClickToFeedback called, dev mode:', authenticated);
+    
+    if (!authenticated) {
       console.log('Dev mode not active, cannot start click-to-feedback');
       return;
     }
     
+    console.log('Setting isWaitingForClick to true');
     setIsWaitingForClick(true);
     
     // Add click listener to document
     document.addEventListener('click', handleElementClick, true);
+    console.log('Click event listener added to document');
     
     // Show instruction
     const instruction = document.createElement('div');
@@ -94,13 +108,23 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
       <button id="cancel-click-feedback" class="mt-2 px-3 py-1 bg-red-500 hover:bg-red-600 rounded text-xs">Cancel</button>
     `;
     document.body.appendChild(instruction);
+    console.log('Instruction banner added to DOM');
     
     // Add cancel button listener
-    document.getElementById('cancel-click-feedback')?.addEventListener('click', () => {
-      stopClickToFeedback();
-    });
+    setTimeout(() => {
+      const cancelButton = document.getElementById('cancel-click-feedback');
+      if (cancelButton) {
+        cancelButton.addEventListener('click', () => {
+          console.log('Cancel button clicked');
+          stopClickToFeedback();
+        });
+        console.log('Cancel button listener added');
+      } else {
+        console.log('Cancel button not found');
+      }
+    }, 100);
     
-    console.log('Click-to-feedback mode activated');
+    console.log('Click-to-feedback mode activated successfully');
   };
 
   const stopClickToFeedback = () => {
@@ -146,6 +170,13 @@ export default function ClickToFeedback({ children }: ClickToFeedbackProps) {
       <div className="fixed bottom-4 left-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-medium shadow-lg z-50">
         Dev Mode Active
       </div>
+      
+      {/* Click-to-feedback mode indicator */}
+      {isWaitingForClick && (
+        <div className="fixed bottom-4 right-4 bg-blue-500 text-white px-3 py-1 rounded-lg text-xs font-medium shadow-lg z-50">
+          Click Mode Active
+        </div>
+      )}
       
       {/* Feedback Modal */}
       <FeedbackModal
