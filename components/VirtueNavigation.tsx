@@ -163,18 +163,14 @@ export function VirtueNavigation() {
                       {/* Feedback Dashboard Button - Only show when dev mode is active */}
                       {sessionStorage.getItem('devAuthenticated') === 'true' && (
                         <>
-                          <button
-                            onClick={() => {
-                              // Open feedback dashboard
-                              const event = new CustomEvent('openFeedbackDashboard');
-                              window.dispatchEvent(event);
-                              setShowProfileMenu(false);
-                            }}
-                            className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
-                          >
-                            <MessageSquare size={14} />
-                            Feedback Dashboard
-                          </button>
+                                          <Link
+                  href="/debug/developer-feedback"
+                  onClick={() => setShowProfileMenu(false)}
+                  className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 flex items-center gap-2"
+                >
+                  <MessageSquare size={14} />
+                  Feedback Dashboard
+                </Link>
                           
                           <button
                             onClick={() => {

@@ -1,30 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Settings, Activity, BarChart3, TestTube, Bug, MessageSquare } from 'lucide-react';
+import { useState } from 'react';
+import { Settings, Activity, BarChart3, TestTube, Bug } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import ConformanceMatrix from './ConformanceMatrix';
 import IntegrityDashboard from './IntegrityDashboard';
-import DeveloperFeedbackDashboard from './DeveloperFeedbackDashboard';
 
 export default function DeveloperToolbar() {
   const [showConformanceMatrix, setShowConformanceMatrix] = useState(false);
   const [showIntegrityDashboard, setShowIntegrityDashboard] = useState(false);
-  const [showFeedbackDashboard, setShowFeedbackDashboard] = useState(false);
-
-  // Listen for custom event to open feedback dashboard
-  useEffect(() => {
-    const handleOpenFeedbackDashboard = () => {
-      setShowFeedbackDashboard(true);
-    };
-
-    window.addEventListener('openFeedbackDashboard', handleOpenFeedbackDashboard);
-    
-    return () => {
-      window.removeEventListener('openFeedbackDashboard', handleOpenFeedbackDashboard);
-    };
-  }, []);
 
   // No environment check needed - controlled by DeveloperAuth component
 
@@ -57,15 +42,7 @@ export default function DeveloperToolbar() {
               Monitor
             </Button>
             
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowFeedbackDashboard(true)}
-              className="flex items-center gap-1"
-            >
-              <MessageSquare className="h-3 w-3" />
-              Feedback
-            </Button>
+
             
             <Button
               variant="outline"
@@ -101,10 +78,7 @@ export default function DeveloperToolbar() {
         onClose={() => setShowIntegrityDashboard(false)}
       />
 
-      <DeveloperFeedbackDashboard
-        isVisible={showFeedbackDashboard}
-        onClose={() => setShowFeedbackDashboard(false)}
-      />
+
     </>
   );
 } 
