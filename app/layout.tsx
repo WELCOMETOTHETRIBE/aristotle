@@ -7,6 +7,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
 import DeveloperAuth from "@/components/DeveloperAuth";
 import DeveloperToolbar from "@/components/DeveloperToolbar";
+import ClickToFeedback from "@/components/ClickToFeedback";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,9 @@ export default function RootLayout({
             <AuthProvider>
               <div className="min-h-screen bg-bg">
                 <VirtueNavigation />
-                {children}
+                <ClickToFeedback>
+                  {children}
+                </ClickToFeedback>
                 <DeveloperAuth>
                   <DeveloperToolbar />
                 </DeveloperAuth>

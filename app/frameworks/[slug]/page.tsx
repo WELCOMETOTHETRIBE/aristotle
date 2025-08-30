@@ -16,10 +16,9 @@ import FrameworkPersonaChat from '../../../components/FrameworkPersonaChat';
 import FrameworkResourceSpotlight from '../../../components/FrameworkResourceSpotlight';
 import BreathTimerCircle from '../../../components/BreathTimerCircle';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '../../../lib/virtue';
-import { Trophy, Target, TrendingUp, BookOpen, Zap, Info, MessageSquare } from 'lucide-react';
+import { Trophy, Target, TrendingUp, BookOpen, Zap, Info } from 'lucide-react';
 import WidgetGuard from '../../../components/WidgetGuard';
 import DeveloperToolbar from '../../../components/DeveloperToolbar';
-import DeveloperFeedbackButton from '../../../components/DeveloperFeedbackButton';
 
 interface FrameworkDetailPageProps {
   params: { slug: string };
@@ -111,13 +110,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
   const renderWidget = (widget: any) => {
     return (
-      <DeveloperFeedbackButton
-        targetId={widget.id}
-        type="widget"
-        frameworkSlug={framework.slug}
-        className="group"
-      >
-        <WidgetGuard
+      <WidgetGuard
           widget={widget}
           framework={framework}
           onComplete={(payload) => handleWidgetComplete(widget.id, payload)}
@@ -169,7 +162,6 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             );
           }}
         </WidgetGuard>
-      </DeveloperFeedbackButton>
     );
   };
 
