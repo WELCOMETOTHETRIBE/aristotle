@@ -518,7 +518,7 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
     <div className="page-section">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-6">
-          <h2 className="section-title mb-2">Framework Terminology</h2>
+          <h2 className="section-title mb-2">Terminology</h2>
           <p className="section-description">
             Key concepts and practices from the {frameworkName} tradition
           </p>

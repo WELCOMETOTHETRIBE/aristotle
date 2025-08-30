@@ -263,7 +263,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         </div>
       </div>
 
-      {/* Framework Terminology */}
+      {/* Terminology */}
       <FrameworkTerminology 
         frameworkSlug={framework.slug}
         frameworkName={framework.name}
