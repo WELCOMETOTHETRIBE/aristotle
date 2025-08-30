@@ -120,7 +120,7 @@ export function VirtueNavigation() {
               <Link href="/today" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Today's Plan">
                 <Target size={12} />
               </Link>
-              <Link href="/coach" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="AI Coach">
+              <Link href="/philosophers" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Philosopher's Journey">
                 <Brain size={12} />
               </Link>
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Notifications">
