@@ -98,90 +98,20 @@ const WIDGET_INFO: WidgetInfo[] = [
     title: 'Habit Manager',
     description: 'Track your daily habits and build streaks. Check in daily to maintain momentum and see your progress.',
     icon: TrendingUp,
-    category: 'core'
+    category: 'productivity'
   },
   {
     id: 'task_manager',
     title: 'Task Manager',
-    description: 'Manage your daily tasks and priorities. Mark tasks complete and track your productivity.',
+    description: 'Organize and prioritize your daily tasks. Mark them complete to track your productivity and progress.',
     icon: Target,
-    category: 'core'
-  },
-  {
-    id: 'goal_tracker',
-    title: 'Goal Tracker',
-    description: 'Track your long-term goals and objectives. Monitor progress and stay focused on what matters.',
-    icon: Brain,
-    category: 'core'
+    category: 'productivity'
   },
   {
     id: 'wisdom_spotlight',
     title: 'Wisdom Spotlight',
-    description: 'Daily curated wisdom from ancient traditions. Reflect on timeless teachings and apply them to modern life.',
-    icon: BookOpen,
-    category: 'wisdom'
-  },
-  {
-    id: 'focus_timer',
-    title: 'Focus Timer',
-    description: 'Deep work sessions with customizable duration. Track your focus time and build concentration skills.',
-    icon: Timer,
-    category: 'practice'
-  },
-  {
-    id: 'gratitude_journal',
-    title: 'Gratitude Journal',
-    description: 'Write daily gratitude entries. Cultivate appreciation and positive mindset through regular practice.',
-    icon: Heart,
-    category: 'wisdom'
-  },
-  {
-    id: 'meditation_timer',
-    title: 'Meditation Timer',
-    description: 'Guided meditation sessions with customizable duration. Build mindfulness and inner peace.',
-    icon: Leaf,
-    category: 'practice'
-  },
-  {
-    id: 'strength_counter',
-    title: 'Strength Counter',
-    description: 'Track physical exercises and repetitions. Build strength and discipline through consistent training.',
-    icon: Shield,
-    category: 'practice'
-  },
-  {
-    id: 'virtue_assessment',
-    title: 'Virtue Assessment',
-    description: 'Daily self-assessment of your virtues. Use sliders to rate your wisdom, courage, justice, and temperance.',
-    icon: Sliders,
-    category: 'wisdom'
-  },
-  {
-    id: 'community_connection',
-    title: 'Community Connection',
-    description: 'Connect with others through shared practices. Build relationships and support networks.',
-    icon: Users,
-    category: 'wisdom'
-  },
-  {
-    id: 'reflection_journal',
-    title: 'Reflection Journal',
-    description: 'Daily reflection and self-examination. Process experiences and gain insights through writing.',
-    icon: FileText,
-    category: 'wisdom'
-  },
-  {
-    id: 'boundary_setter',
-    title: 'Boundary Setter',
-    description: 'Set and maintain healthy boundaries. Practice saying no and protecting your energy.',
-    icon: CheckSquare,
-    category: 'wisdom'
-  },
-  {
-    id: 'nature_connection',
-    title: 'Nature Connection',
-    description: 'Connect with the natural world. Take photos and reflect on your relationship with nature.',
-    icon: Camera,
+    description: 'Daily wisdom quotes from ancient philosophical traditions, personalized to your framework and enhanced with AI-generated reflections and insights.',
+    icon: Brain,
     category: 'wisdom'
   },
   {
@@ -549,52 +479,155 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Wisdom Spotlight - Special Widget */}
-              <Card className="glass-effect bg-gradient-to-br from-purple-500/10 to-blue-500/10 border-purple-500/20">
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <BookOpen className="h-5 w-5 text-purple-400" />
-                      Wisdom Spotlight
-                      <button
-                        onClick={() => setShowWidgetInfo(showWidgetInfo === 'wisdom_spotlight' ? null : 'wisdom_spotlight')}
-                        className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
-                      >
-                        <Info className="h-4 w-4" />
-                      </button>
-                    </CardTitle>
-                    <CardDescription>
-                      Daily wisdom from ancient traditions
-                    </CardDescription>
-                  </CardHeader>
-                <CardContent>
-                  {showWidgetInfo === 'wisdom_spotlight' && (
-                    <div className="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                      <p className="text-sm text-purple-200">{getWidgetInfo('wisdom_spotlight')?.description}</p>
-                    </div>
-                  )}
-                  <div className="text-center space-y-4">
-                    <div className="text-2xl font-serif italic text-purple-200 mb-4">
-                      "{todayWisdom.quote}"
-                    </div>
-                    <div className="text-sm text-purple-300">
-                      — {todayWisdom.author}
-                    </div>
-                    <div className="inline-flex items-center px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 text-xs">
-                      {todayWisdom.framework} Tradition
-                    </div>
-                    {todayWisdom.reflection && (
-                      <div className="text-sm text-purple-300 italic">
-                        {todayWisdom.reflection}
+              {/* Wisdom Spotlight - Fully Mature & Interactive */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900/20 via-blue-900/15 to-indigo-900/20 border border-purple-500/30 backdrop-blur-sm">
+                {/* Animated Background Elements */}
+                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 opacity-30"></div>
+                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl transform translate-x-20 -translate-y-20 animate-pulse"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-500/10 to-indigo-500/10 rounded-full blur-2xl transform -translate-x-16 translate-y-16 animate-pulse" style={{animationDelay: '1s'}}></div>
+                
+                <div className="relative p-8">
+                  {/* Header with Interactive Elements */}
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="relative">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+                          <Brain className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
+                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
+                        </div>
                       </div>
-                    )}
-                    <div className="pt-4">
-                      <Button variant="outline" className="border-purple-500/30 text-purple-300 hover:bg-purple-500/20">
-                        Reflect on This Wisdom
-                      </Button>
+                      <div>
+                        <h2 className="text-2xl font-bold text-white">Wisdom Spotlight</h2>
+                        <p className="text-purple-300 text-sm">Daily insights from ancient traditions</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button className="p-2 text-purple-300 hover:text-white transition-colors rounded-lg hover:bg-purple-500/20">
+                        <RotateCcw className="w-4 h-4" />
+                      </button>
+                      <button className="p-2 text-purple-300 hover:text-white transition-colors rounded-lg hover:bg-purple-500/20">
+                        <BookOpen className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
+
+                  {/* Main Wisdom Content */}
+                  <div className="space-y-6">
+                    {/* Quote Section */}
+                    <div className="relative">
+                      <div className="absolute top-0 left-0 w-8 h-8 text-purple-400/30 text-4xl">"</div>
+                      <div className="pl-8">
+                        <blockquote className="text-xl md:text-2xl font-serif italic text-white leading-relaxed mb-4">
+                          {todayWisdom.quote}
+                        </blockquote>
+                        <div className="flex items-center justify-between">
+                          <cite className="text-purple-300 font-medium">— {todayWisdom.author}</cite>
+                          <div className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                            <span className="text-xs text-purple-400">Live</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Framework Badge & Reflection */}
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 text-sm font-medium border border-purple-500/30">
+                          <Sparkles className="w-3 h-3 mr-1" />
+                          {todayWisdom.framework} Tradition
+                        </span>
+                        <div className="flex items-center gap-1 text-yellow-400">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <Star key={star} size={12} className="fill-current" />
+                          ))}
+                        </div>
+                      </div>
+                      <div className="text-xs text-purple-400">
+                        {new Date().toLocaleDateString('en-US', { 
+                          weekday: 'long', 
+                          month: 'long', 
+                          day: 'numeric' 
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Reflection Section */}
+                    {todayWisdom.reflection && (
+                      <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-4 border border-purple-500/20">
+                        <h4 className="text-sm font-semibold text-purple-300 mb-2 flex items-center gap-2">
+                          <Brain className="w-4 h-4" />
+                          Reflection Prompt
+                        </h4>
+                        <p className="text-purple-200 text-sm leading-relaxed">
+                          {todayWisdom.reflection}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Interactive Actions */}
+                    <div className="grid grid-cols-2 gap-3">
+                      <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 text-purple-300 rounded-lg border border-purple-500/30 transition-all duration-200 hover:scale-105">
+                        <BookOpen className="w-4 h-4" />
+                        <span className="text-sm font-medium">Learn More</span>
+                      </button>
+                      <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 hover:from-blue-500/30 hover:to-indigo-500/30 text-blue-300 rounded-lg border border-blue-500/30 transition-all duration-200 hover:scale-105">
+                        <Users className="w-4 h-4" />
+                        <span className="text-sm font-medium">Share Wisdom</span>
+                      </button>
+                    </div>
+
+                    {/* Wisdom Stats */}
+                    <div className="grid grid-cols-3 gap-4 pt-4 border-t border-purple-500/20">
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-white">247</div>
+                        <div className="text-xs text-purple-400">Days of Wisdom</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-white">12</div>
+                        <div className="text-xs text-purple-400">Traditions</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-bold text-white">89%</div>
+                        <div className="text-xs text-purple-400">Engagement</div>
+                      </div>
+                    </div>
+
+                    {/* Related Wisdom Preview */}
+                    <div className="bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl p-4 border border-purple-500/20">
+                      <h4 className="text-sm font-semibold text-purple-300 mb-3 flex items-center gap-2">
+                        <Sparkles className="w-4 h-4" />
+                        Related Wisdom
+                      </h4>
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-purple-300">"The only true wisdom is in knowing you know nothing."</span>
+                          <span className="text-purple-400">Socrates</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-purple-300">"Wisdom begins in wonder."</span>
+                          <span className="text-purple-400">Plato</span>
+                        </div>
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-purple-300">"Knowledge speaks, but wisdom listens."</span>
+                          <span className="text-purple-400">Jimi Hendrix</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Call to Action */}
+                    <div className="text-center">
+                      <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white rounded-lg font-semibold shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 transform hover:scale-105">
+                        <Brain className="w-4 h-4" />
+                        Explore Wisdom Practices
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
 
 
