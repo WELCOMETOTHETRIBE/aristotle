@@ -496,7 +496,6 @@ const getCategoryBg = (category: string) => {
 
 export default function FrameworkTerminology({ frameworkSlug, frameworkName, frameworkTone }: FrameworkTerminologyProps) {
   const [currentTermIndex, setCurrentTermIndex] = useState(0);
-  const [showDefinition, setShowDefinition] = useState(false);
 
   const frameworkData = frameworkTerminologies[frameworkSlug];
   
@@ -509,16 +508,10 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
 
   const nextTerm = () => {
     setCurrentTermIndex((prev) => (prev + 1) % totalTerms);
-    setShowDefinition(false);
   };
 
   const prevTerm = () => {
     setCurrentTermIndex((prev) => (prev - 1 + totalTerms) % totalTerms);
-    setShowDefinition(false);
-  };
-
-  const handleDefine = () => {
-    setShowDefinition(!showDefinition);
   };
 
   return (
@@ -529,6 +522,12 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
           <p className="section-description">
             Key concepts and practices from the {frameworkName} tradition
           </p>
+        </div>
+
+        {/* Overview - Moved Above */}
+        <div className="mb-6 text-center">
+          <h4 className="text-lg font-semibold text-white mb-2">About {frameworkName}</h4>
+          <p className="text-gray-300 leading-relaxed">{frameworkData.overview}</p>
         </div>
 
         {/* Term Gallery */}
@@ -544,22 +543,10 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
             
             <h3 className="text-2xl font-bold text-white mb-4">{currentTerm.term}</h3>
             
-            {showDefinition ? (
-              <div className="bg-white/10 rounded-lg p-4 mb-4">
-                <p className="text-gray-200 leading-relaxed">{currentTerm.definition}</p>
-              </div>
-            ) : (
-              <div className="h-16 flex items-center justify-center">
-                <p className="text-gray-400 italic">Click "Define" to learn more</p>
-              </div>
-            )}
-            
-            <button
-              onClick={handleDefine}
-              className="px-6 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors font-medium"
-            >
-              {showDefinition ? 'Hide Definition' : 'Define'}
-            </button>
+            {/* Always Show Definition */}
+            <div className="bg-white/10 rounded-lg p-4 mb-4">
+              <p className="text-gray-200 leading-relaxed">{currentTerm.definition}</p>
+            </div>
           </div>
 
           {/* Navigation */}
@@ -595,12 +582,6 @@ export default function FrameworkTerminology({ frameworkSlug, frameworkName, fra
               <ChevronRight className="w-5 h-5 text-white" />
             </button>
           </div>
-        </div>
-
-        {/* Overview */}
-        <div className="mt-6 text-center">
-          <h4 className="text-lg font-semibold text-white mb-2">About {frameworkName}</h4>
-          <p className="text-gray-300 leading-relaxed">{frameworkData.overview}</p>
         </div>
       </div>
     </div>
