@@ -18,6 +18,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!email) {
+      console.log('❌ Missing email');
+      return NextResponse.json(
+        { error: 'Email address is required' },
+        { status: 400 }
+      );
+    }
+
     if (password.length < 6) {
       console.log('❌ Password too short');
       return NextResponse.json(

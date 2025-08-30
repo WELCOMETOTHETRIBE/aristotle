@@ -7,7 +7,6 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
 import ClickToFeedback from "@/components/ClickToFeedback";
 import DeveloperToolbar from "@/components/DeveloperToolbar";
-import OnboardingGuard from "@/components/OnboardingGuard";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,15 +26,13 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryProvider>
             <AuthProvider>
-              <OnboardingGuard>
-                <div className="min-h-screen bg-bg">
-                  <VirtueNavigation />
-                  <ClickToFeedback>
-                    {children}
-                  </ClickToFeedback>
-                  <DeveloperToolbar />
-                </div>
-              </OnboardingGuard>
+              <div className="min-h-screen bg-bg">
+                <VirtueNavigation />
+                <ClickToFeedback>
+                  {children}
+                </ClickToFeedback>
+                <DeveloperToolbar />
+              </div>
             </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>

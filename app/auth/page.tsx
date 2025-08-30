@@ -371,8 +371,8 @@ export default function AuthPage() {
                         exit={{ opacity: 0, height: 0 }}
                         transition={{ duration: 0.3 }}
                       >
-                        <label htmlFor="email" className="block text-sm font-semibold mb-3 text-text">
-                          Email (optional)
+                        <label htmlFor="email" className="block text-sm font-semibold mb-3 text-gray-200">
+                          Email <span className="text-red-400">*</span>
                         </label>
                         <input
                           type="email"
@@ -380,8 +380,9 @@ export default function AuthPage() {
                           name="email"
                           value={formData.email}
                           onChange={handleInputChange}
-                          className="input-base"
-                          placeholder="Enter your email"
+                          required
+                          className="w-full px-5 py-4 bg-white/10 border border-white/20 rounded-2xl text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-300 text-lg"
+                          placeholder="Enter your email address"
                         />
                       </motion.div>
                     )}
