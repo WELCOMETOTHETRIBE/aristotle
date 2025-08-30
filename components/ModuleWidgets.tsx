@@ -18,8 +18,6 @@ export function BreathworkWidget({
 }: BreathworkWidgetProps) {
   return <BreathworkWidgetNew frameworkTone={frameworkTone} />;
 }
-
-  const phases = [
     { name: "Inhale", duration: currentPattern.inhale, color: "#7ad7ff", icon: "↗", emoji: "🫁" },
     { name: "Hold", duration: currentPattern.hold, color: "#a78bfa", icon: "●", emoji: "⏸️" },
     { name: "Exhale", duration: currentPattern.exhale, color: "#7ad7ff", icon: "↘", emoji: "💨" },
