@@ -7,7 +7,6 @@ import { Eye, EyeOff, Sparkles, Shield, Users, ArrowRight, CheckCircle, AlertCir
 import { useAuth } from '@/lib/auth-context';
 import PageLayout from '@/components/PageLayout';
 import AuroraBackground from '@/components/AuroraBackground';
-import VirtueRadar from '@/components/VirtueRadar';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -221,30 +220,12 @@ export default function AuthPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
             >
-              <p className="text-lg text-gray-400 leading-relaxed mb-8">
+              <p className="text-lg text-gray-400 leading-relaxed">
                 {isSignUp 
                   ? 'Begin your journey of wisdom and discover the path to flourishing through timeless philosophical practices.' 
                   : 'Continue your practice and deepen your understanding of virtue, purpose, and intentional living.'
                 }
               </p>
-              
-              {/* Virtue Visualization */}
-              <motion.div
-                className="max-w-md mx-auto"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-                  <h3 className="text-center text-white font-medium mb-4">Your Virtue Balance</h3>
-                  <VirtueRadar data={[
-                    { virtue: 'Wisdom', score: 75 },
-                    { virtue: 'Courage', score: 60 },
-                    { virtue: 'Justice', score: 80 },
-                    { virtue: 'Temperance', score: 70 }
-                  ]} />
-                </div>
-              </motion.div>
             </motion.div>
           </div>
 

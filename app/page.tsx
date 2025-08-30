@@ -11,6 +11,7 @@ import { BreathworkWidget, HydrationWidget } from '@/components/ModuleWidgets';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
+import VirtueRadar from '@/components/VirtueRadar';
 
 interface VirtueScores {
   wisdom: number;
@@ -454,6 +455,33 @@ export default function DashboardPage() {
               </div>
               <MilestonesDropdown virtueTotals={virtueScores} />
             </div>
+          </div>
+
+          {/* Virtue Balance Visualization */}
+          <div className="mb-8">
+            <Card className="glass-effect bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Trophy className="h-5 w-5 text-blue-400" />
+                  Your Virtue Balance
+                </CardTitle>
+                <CardDescription>
+                  Visual representation of your current virtue alignment
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="flex justify-center">
+                  <div className="w-full max-w-md">
+                    <VirtueRadar data={[
+                      { virtue: 'Wisdom', score: virtueScores.wisdom },
+                      { virtue: 'Courage', score: virtueScores.courage },
+                      { virtue: 'Justice', score: virtueScores.justice },
+                      { virtue: 'Temperance', score: virtueScores.temperance }
+                    ]} />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
