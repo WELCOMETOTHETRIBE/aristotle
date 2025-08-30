@@ -24,7 +24,7 @@ export default function AuthPage() {
   const router = useRouter();
   
   // Safe auth context usage
-  let authContext;
+  let authContext: any;
   try {
     authContext = useAuth();
   } catch (error) {
@@ -60,7 +60,17 @@ export default function AuthPage() {
         const result = await signUp(formData.username, formData.password, formData.email, formData.displayName);
         if (result.success) {
           setSuccess('Account created successfully!');
-          setTimeout(() => router.push('/'), 1000);
+          // Wait for auth context to update before redirecting
+          setTimeout(async () => {
+            try {
+              await authContext?.checkAuth();
+              router.push('/');
+            } catch (error) {
+              console.error('Auth check failed after signup:', error);
+              // Fallback redirect
+              window.location.href = '/';
+            }
+          }, 1500);
         } else {
           setError(result.error || 'Sign up failed');
         }
@@ -68,7 +78,17 @@ export default function AuthPage() {
         const result = await signIn(formData.username, formData.password);
         if (result.success) {
           setSuccess('Welcome back!');
-          setTimeout(() => router.push('/'), 1000);
+          // Wait for auth context to update before redirecting
+          setTimeout(async () => {
+            try {
+              await authContext?.checkAuth();
+              router.push('/');
+            } catch (error) {
+              console.error('Auth check failed after signin:', error);
+              // Fallback redirect
+              window.location.href = '/';
+            }
+          }, 1500);
         } else {
           setError(result.error || 'Sign in failed');
         }
@@ -141,45 +161,72 @@ export default function AuthPage() {
       <div className="relative z-10 flex items-center justify-center min-h-screen p-4">
         <div className="w-full max-w-4xl">
           {/* Header */}
-          <div className="text-center mb-12">
+          <div className="text-center mb-16">
             <motion.div 
-              className="flex items-center justify-center mb-8"
+              className="flex flex-col items-center justify-center mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <div className="relative">
-                <div className="w-24 h-24 bg-gradient-to-r from-accent to-accent-2 rounded-3xl flex items-center justify-center mr-8 shadow-2xl overflow-hidden">
+              {/* Logo Container */}
+              <div className="relative mb-8">
+                <div className="w-32 h-32 bg-gradient-to-br from-accent via-accent-2 to-purple-500 rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden border-2 border-white/10">
                   <img 
                     src="/academy_logo.png" 
                     alt="Academy Logo" 
-                    className="w-16 h-16 object-contain"
+                    className="w-20 h-20 object-contain"
                   />
                 </div>
                 <motion.div
-                  className="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center"
+                  className="absolute -top-3 -right-3 w-10 h-10 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center shadow-lg"
                   animate={{ scale: [1, 1.2, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <div className="w-3 h-3 bg-white rounded-full"></div>
+                  <div className="w-4 h-4 bg-white rounded-full"></div>
+                </motion.div>
+                <motion.div
+                  className="absolute -bottom-2 -left-2 w-6 h-6 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-full flex items-center justify-center shadow-md"
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.5 }}
+                >
+                  <div className="w-2 h-2 bg-white rounded-full"></div>
                 </motion.div>
               </div>
-              <div>
-                <h1 className="headline text-5xl mb-4">Aristotle</h1>
-                <p className="body-text text-xl">
+              
+              {/* Title and Subtitle */}
+              <div className="space-y-4">
+                <motion.h1 
+                  className="text-6xl font-bold bg-gradient-to-r from-white via-accent to-accent-2 bg-clip-text text-transparent"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.1 }}
+                >
+                  Aristotle
+                </motion.h1>
+                <motion.p 
+                  className="text-xl text-gray-300 font-medium tracking-wide"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 }}
+                >
                   Ancient Wisdom for Modern Life
-                </p>
+                </motion.p>
               </div>
             </motion.div>
             
-            <motion.p 
-              className="body-text text-lg"
+            <motion.div 
+              className="max-w-2xl mx-auto"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
             >
-              {isSignUp ? 'Begin your journey of wisdom' : 'Continue your practice'}
-            </motion.p>
+              <p className="text-lg text-gray-400 leading-relaxed">
+                {isSignUp 
+                  ? 'Begin your journey of wisdom and discover the path to flourishing through timeless philosophical practices.' 
+                  : 'Continue your practice and deepen your understanding of virtue, purpose, and intentional living.'
+                }
+              </p>
+            </motion.div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
