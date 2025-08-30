@@ -633,9 +633,9 @@ export default function MilestonesDropdown({ virtueTotals, frameworkSlug }: Mile
         )}
       </button>
 
-      {/* Dropdown Content - Fixed positioning */}
+      {/* Dropdown Content - Fixed positioning with proper centering */}
       {isExpanded && (
-        <div className="absolute top-full left-0 mt-2 w-96 bg-black/95 backdrop-blur-md border border-white/20 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto" style={{ maxHeight: '400px' }}>
+        <div className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-96 bg-black/95 backdrop-blur-md border border-white/20 rounded-lg shadow-xl z-50 max-h-96 overflow-y-auto" style={{ maxHeight: '400px' }}>
           <div className="p-4">
             <h3 className="text-lg font-semibold text-white mb-3">Achievement Milestones</h3>
             

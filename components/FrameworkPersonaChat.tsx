@@ -6,6 +6,35 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
   const [msgs, setMsgs] = useState<Array<{role:"user"|"assistant"; content:string}>>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  const getRepresentativeInfo = (frameworkId: string) => {
+    switch (frameworkId) {
+      case 'spartan':
+        return { name: 'King Leonidas', avatar: '🛡️', description: 'Legendary Spartan King' };
+      case 'samurai':
+        return { name: 'Miyamoto Musashi', avatar: '⚔️', description: 'Greatest Samurai' };
+      case 'stoic':
+        return { name: 'Marcus Aurelius', avatar: '🏛️', description: 'Philosopher-Emperor' };
+      case 'monastic':
+        return { name: 'Saint Benedict', avatar: '⛪', description: 'Founder of Western Monasticism' };
+      case 'yogic':
+        return { name: 'Patanjali', avatar: '🧘', description: 'Father of Classical Yoga' };
+      case 'indigenous':
+        return { name: 'Chief Seattle', avatar: '🌍', description: 'Great Tribal Leader' };
+      case 'martial':
+        return { name: 'Bruce Lee', avatar: '🥋', description: 'Legendary Martial Artist' };
+      case 'sufi':
+        return { name: 'Rumi', avatar: '🕊️', description: 'Great Persian Poet' };
+      case 'ubuntu':
+        return { name: 'Archbishop Tutu', avatar: '🤝', description: 'Nobel Peace Laureate' };
+      case 'highperf':
+        return { name: 'Cal Newport', avatar: '🎯', description: 'Deep Work Pioneer' };
+      default:
+        return { name: 'Ancient Sage', avatar: '🧙', description: 'Wisdom Keeper' };
+    }
+  };
+
+  const representative = getRepresentativeInfo(frameworkId);
+
   async function send() {
     if (!input.trim() || isLoading) return;
     const user = input.trim();
@@ -41,12 +70,12 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
   return (
     <div className="w-full">
       <div className="flex items-center gap-3 mb-4 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20">
-        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-          <span className="text-white font-bold text-lg">🤖</span>
+        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-2xl">
+          {representative.avatar}
         </div>
         <div>
-          <div className="font-semibold text-lg text-white">Your {title} Guide</div>
-          <div className="text-sm text-gray-300">AI-powered wisdom from the {title} tradition</div>
+          <div className="font-semibold text-lg text-white">{representative.name}</div>
+          <div className="text-sm text-gray-300">{representative.description} • {title} Representative</div>
         </div>
       </div>
       
@@ -56,8 +85,8 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
             <div className="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">💬</span>
             </div>
-            <div className="text-gray-400 text-sm mb-2">Start a conversation with your guide</div>
-            <div className="text-gray-500 text-xs">Ask for wisdom, guidance, or practical advice from the {title} tradition</div>
+            <div className="text-gray-400 text-sm mb-2">Begin a conversation with {representative.name}</div>
+            <div className="text-gray-500 text-xs">Ask for wisdom, guidance, or insights from this legendary figure</div>
           </div>
         ) : (
           msgs.map((m, i) => (
@@ -68,7 +97,7 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
                   : "bg-white/10 text-white border border-white/20"
               }`}>
                 <div className="font-medium text-xs mb-1 opacity-70">
-                  {m.role === "user" ? "You" : `${title} Guide`}
+                  {m.role === "user" ? "You" : representative.name}
                 </div>
                 <div className="leading-relaxed">{m.content}</div>
               </div>
@@ -78,7 +107,7 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
         {isLoading && (
           <div className="flex justify-start">
             <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm bg-white/10 text-white border border-white/20">
-              <div className="font-medium text-xs mb-1 opacity-70">{title} Guide</div>
+              <div className="font-medium text-xs mb-1 opacity-70">{representative.name}</div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
@@ -95,7 +124,7 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Ask for guidance, wisdom, or practical advice from the tradition..."
+          placeholder={`Ask ${representative.name} for wisdom, guidance, or insights...`}
           className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
           disabled={isLoading}
         />
