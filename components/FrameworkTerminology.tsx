@@ -163,332 +163,332 @@ const frameworkTerminologies: Record<string, {
       }
     ]
   },
-  buddhist: {
-    overview: "Buddhist mindfulness practices focus on developing awareness, compassion, and inner peace. They teach that suffering comes from attachment and that liberation comes through understanding the nature of reality.",
+  monastic: {
+    overview: "The Monastic Rule emphasizes rhythm, order, and service as the foundation of spiritual growth. It teaches that consistent daily practices and community service create the conditions for inner peace and wisdom.",
     coreConcepts: [
-      "Mindfulness in every moment",
-      "Compassion for all beings",
-      "Non-attachment to outcomes",
-      "Understanding impermanence"
+      "Rhythm roots the soul",
+      "Keep the rhythm of prayer and work",
+      "Silence reveals the voice within",
+      "Service is the highest calling"
     ],
     terminology: [
       {
-        term: "Mindfulness",
-        definition: "Present-moment awareness without judgment; observing thoughts and sensations as they arise.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Metta",
-        definition: "Loving-kindness meditation; cultivating unconditional love and compassion for all beings.",
-        category: "technique",
-        icon: Users
-      },
-      {
-        term: "Impermanence",
-        definition: "The understanding that all things are constantly changing; nothing lasts forever.",
+        term: "Rule of Life",
+        definition: "A structured daily rhythm that balances prayer, work, and rest in a sustainable pattern.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Non-Attachment",
-        definition: "Freedom from clinging to outcomes, possessions, or identities that cause suffering.",
-        category: "principle",
-        icon: Target
+        term: "Bell Schedule",
+        definition: "The seven canonical hours that structure the monastic day with prayer and work.",
+        category: "practice",
+        icon: BookOpen
       },
       {
-        term: "Vipassana",
-        definition: "Insight meditation; developing clear seeing into the true nature of reality.",
+        term: "Silence Practice",
+        definition: "Intentional periods of quiet to hear the inner voice and cultivate inner peace.",
         category: "technique",
         icon: Zap
       },
       {
-        term: "Compassion Practice",
-        definition: "Cultivating empathy and kindness toward yourself and others in daily interactions.",
-        category: "practice",
-        icon: Users
-      }
-    ]
-  },
-  taoist: {
-    overview: "Taoism emphasizes living in harmony with the natural flow of life (the Tao). It teaches the principle of wu-wei - effortless action - and finding balance between opposing forces.",
-    coreConcepts: [
-      "Flow with the natural way",
-      "Balance yin and yang",
-      "Practice effortless action",
-      "Embrace simplicity"
-    ],
-    terminology: [
-      {
-        term: "Tao",
-        definition: "The way or path; the natural order of the universe that cannot be fully described in words.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Wu-Wei",
-        definition: "Effortless action; doing without doing, acting in harmony with the natural flow.",
+        term: "Humility Acts",
+        definition: "Small, unnoticed acts of service that cultivate humility and selflessness.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Yin-Yang",
-        definition: "The balance of opposing forces; understanding that everything contains its opposite.",
-        category: "concept",
-        icon: Lightbulb
+        term: "Community Chores",
+        definition: "Service to others as a spiritual practice that builds character and connection.",
+        category: "practice",
+        icon: Users
       },
       {
-        term: "Qi Gong",
-        definition: "Energy cultivation practices that harmonize body, breath, and mind with the Tao.",
+        term: "Ocean Breathing",
+        definition: "A slow, rhythmic breathing pattern that mimics the natural flow of ocean waves.",
         category: "technique",
         icon: Zap
-      },
-      {
-        term: "Te",
-        definition: "Virtue or power that comes from living in accordance with the Tao.",
-        category: "principle",
-        icon: Target
-      },
-      {
-        term: "Flow State",
-        definition: "A state of complete absorption where action feels effortless and time seems to disappear.",
-        category: "practice",
-        icon: BookOpen
       }
     ]
   },
-  vedic: {
-    overview: "Vedic wisdom encompasses ancient Indian philosophical traditions that explore consciousness, karma, and the nature of reality. It teaches that true knowledge leads to liberation and self-realization.",
+  yogic: {
+    overview: "The Yogic Path integrates body, breath, and mind through ancient practices that cultivate balance, awareness, and spiritual growth. It teaches that alignment of these three elements leads to harmony and wisdom.",
     coreConcepts: [
-      "Self-realization through knowledge",
-      "Karma and dharma in action",
-      "Meditation for consciousness",
-      "Service to others"
+      "Align body, breath, and mind",
+      "Find balance in body and mind",
+      "Stillness reveals the warrior within",
+      "Move with awareness and grace"
     ],
     terminology: [
       {
-        term: "Dharma",
-        definition: "Righteous duty or cosmic law; living in accordance with your true nature and purpose.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Karma",
-        definition: "Action and its consequences; understanding that your actions shape your future.",
-        category: "concept",
-        icon: Lightbulb
-      },
-      {
-        term: "Meditation",
-        definition: "Techniques to quiet the mind and experience pure consciousness beyond thought.",
+        term: "Asana",
+        definition: "Physical postures that strengthen the body and prepare it for meditation and spiritual practice.",
         category: "practice",
         icon: BookOpen
-      },
-      {
-        term: "Seva",
-        definition: "Selfless service; helping others without expectation of reward or recognition.",
-        category: "practice",
-        icon: Users
       },
       {
         term: "Pranayama",
-        definition: "Breath control techniques to regulate life force energy and calm the mind.",
+        definition: "Breath control techniques that regulate life force energy and calm the mind.",
         category: "technique",
         icon: Zap
       },
       {
-        term: "Self-Realization",
-        definition: "Understanding your true nature beyond the ego and temporary identities.",
-        category: "principle",
-        icon: Target
-      }
-    ]
-  },
-  shamanic: {
-    overview: "Shamanic practices connect with the natural world and spiritual realms through ritual, ceremony, and altered states of consciousness. They emphasize healing, transformation, and deep connection with all of creation.",
-    coreConcepts: [
-      "Connection with nature and spirit",
-      "Healing through ceremony",
-      "Transformation through ritual",
-      "Honoring all life"
-    ],
-    terminology: [
-      {
-        term: "Shamanic Journey",
-        definition: "An altered state of consciousness to access spiritual wisdom and healing insights.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Power Animal",
-        definition: "A spiritual guide in animal form that offers protection, wisdom, and strength.",
+        term: "Chakra",
+        definition: "Energy centers in the body that correspond to different aspects of consciousness and life.",
         category: "concept",
         icon: Target
       },
       {
-        term: "Sacred Space",
-        definition: "Creating a protected environment for spiritual work and healing ceremonies.",
+        term: "Mindful Movement",
+        definition: "Moving with full awareness and presence, treating movement as meditation.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Ritual Practice",
-        definition: "Intentional ceremonies that honor the cycles of nature and spiritual forces.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Energy Healing",
-        definition: "Working with life force energy to restore balance and promote healing.",
+        term: "Alt-Nostril Breathing",
+        definition: "A breathing technique that balances the left and right energies of the body.",
         category: "technique",
         icon: Zap
+      },
+      {
+        term: "Sun Salutation",
+        definition: "A flowing sequence of postures that energizes the body and honors the sun.",
+        category: "practice",
+        icon: BookOpen
+      }
+    ]
+  },
+  indigenous: {
+    overview: "Indigenous wisdom traditions emphasize deep connection with the natural world, community, and ancestral knowledge. They teach that all life is interconnected and that wisdom comes from living in harmony with nature.",
+    coreConcepts: [
+      "All life is interconnected",
+      "Honor the ancestors and traditions",
+      "Learn from the natural world",
+      "Community is the foundation"
+    ],
+    terminology: [
+      {
+        term: "Ancestral Wisdom",
+        definition: "Knowledge passed down through generations, connecting us to our roots and traditions.",
+        category: "concept",
+        icon: Target
       },
       {
         term: "Nature Connection",
-        definition: "Deepening your relationship with the natural world as a source of wisdom and healing.",
-        category: "principle",
-        icon: Users
-      }
-    ]
-  },
-  hermetic: {
-    overview: "Hermetic philosophy explores the relationship between the microcosm (human) and macrocosm (universe). It teaches that 'as above, so below' - the principles governing the universe also govern human consciousness.",
-    coreConcepts: [
-      "As above, so below",
-      "Mentalism - all is mind",
-      "Correspondence between levels",
-      "Transmutation of energy"
-    ],
-    terminology: [
-      {
-        term: "Mentalism",
-        definition: "The principle that the universe is mental in nature - all is mind, and reality is shaped by consciousness.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Correspondence",
-        definition: "The principle that there are correspondences between different levels of reality - patterns repeat across scales.",
-        category: "principle",
-        icon: Lightbulb
-      },
-      {
-        term: "Vibration",
-        definition: "Everything in the universe vibrates at different frequencies; understanding this allows for transformation.",
-        category: "concept",
-        icon: Zap
-      },
-      {
-        term: "Polarity",
-        definition: "Everything has its opposite; understanding polarity allows for transmutation and balance.",
-        category: "principle",
-        icon: Target
-      },
-      {
-        term: "Rhythm",
-        definition: "Everything flows in cycles and rhythms; working with these natural patterns brings harmony.",
-        category: "concept",
-        icon: BookOpen
-      },
-      {
-        term: "Transmutation",
-        definition: "The process of changing one form of energy into another through understanding and application of principles.",
-        category: "technique",
-        icon: Zap
-      }
-    ]
-  },
-  alchemical: {
-    overview: "Alchemy is the art of transformation - both physical and spiritual. It teaches the process of turning base materials into gold, symbolizing the transformation of the human soul from ignorance to wisdom.",
-    coreConcepts: [
-      "Transformation through process",
-      "Purification leads to perfection",
-      "Unity of opposites",
-      "The philosopher's stone"
-    ],
-    terminology: [
-      {
-        term: "Nigredo",
-        definition: "The blackening phase - breaking down old structures and confronting the shadow self.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Albedo",
-        definition: "The whitening phase - purification and clarification of consciousness.",
-        category: "concept",
-        icon: Lightbulb
-      },
-      {
-        term: "Citrinitas",
-        definition: "The yellowing phase - the dawn of spiritual understanding and wisdom.",
-        category: "concept",
-        icon: Zap
-      },
-      {
-        term: "Rubedo",
-        definition: "The reddening phase - the final integration and perfection of the soul.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Philosopher's Stone",
-        definition: "The ultimate goal of alchemy - the perfected state of consciousness and being.",
-        category: "principle",
-        icon: Target
-      },
-      {
-        term: "Solve et Coagula",
-        definition: "Dissolve and coagulate - the process of breaking down and rebuilding for transformation.",
-        category: "technique",
-        icon: Zap
-      }
-    ]
-  },
-  neoplatonic: {
-    overview: "Neoplatonism explores the nature of reality through the concept of the One - the ultimate source from which all existence flows. It teaches the soul's journey back to unity through contemplation and virtue.",
-    coreConcepts: [
-      "The One as ultimate reality",
-      "Soul's journey to unity",
-      "Contemplation of the divine",
-      "Virtue as purification"
-    ],
-    terminology: [
-      {
-        term: "The One",
-        definition: "The ultimate, ineffable source of all existence - beyond being and non-being.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Nous",
-        definition: "Divine intellect - the realm of pure thought and eternal forms.",
-        category: "concept",
-        icon: Lightbulb
-      },
-      {
-        term: "Psyche",
-        definition: "The soul - the intermediary between the material and spiritual realms.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Contemplation",
-        definition: "The practice of turning inward to experience the divine and achieve union with the One.",
+        definition: "Deepening our relationship with the natural world as a source of wisdom and healing.",
         category: "practice",
         icon: BookOpen
       },
       {
-        term: "Purification",
-        definition: "The process of cleansing the soul of material attachments to ascend toward the divine.",
-        category: "principle",
+        term: "Community Ceremony",
+        definition: "Rituals and practices that strengthen community bonds and honor shared values.",
+        category: "practice",
+        icon: Users
+      },
+      {
+        term: "Sacred Plants",
+        definition: "Medicinal and spiritual plants used for healing, wisdom, and connection to the earth.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Storytelling",
+        definition: "The oral tradition of sharing wisdom, history, and values through stories.",
+        category: "technique",
         icon: Zap
       },
       {
-        term: "Theurgy",
-        definition: "Sacred rituals and practices that help the soul ascend to higher levels of reality.",
+        term: "Seasonal Awareness",
+        definition: "Living in harmony with the natural cycles and rhythms of the earth.",
+        category: "principle",
+        icon: Lightbulb
+      }
+    ]
+  },
+  martial: {
+    overview: "Martial arts traditions teach discipline, respect, and the development of both physical and mental strength. They emphasize that true mastery comes from consistent practice and inner development.",
+    coreConcepts: [
+      "Discipline through practice",
+      "Respect for tradition and teachers",
+      "Physical and mental development",
+      "Mastery through repetition"
+    ],
+    terminology: [
+      {
+        term: "Kata",
+        definition: "Pre-arranged sequences of movements that develop technique, focus, and discipline.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Dojo",
+        definition: "The training hall - a sacred space for learning, practice, and personal development.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Sensei",
+        definition: "Teacher or master who guides students in their martial and spiritual development.",
+        category: "concept",
+        icon: Users
+      },
+      {
+        term: "Ki/Qi",
+        definition: "Life force energy that can be cultivated and directed through practice.",
+        category: "concept",
+        icon: Zap
+      },
+      {
+        term: "Meditation in Motion",
+        definition: "Moving meditation practices that develop focus and awareness.",
         category: "technique",
         icon: Zap
+      },
+      {
+        term: "Bushido",
+        definition: "The way of the warrior - ethical principles that guide martial practice.",
+        category: "principle",
+        icon: Target
+      }
+    ]
+  },
+  sufi: {
+    overview: "Sufism is the mystical dimension of Islam, emphasizing love, devotion, and direct experience of the divine. It teaches that the heart is the seat of wisdom and that love is the path to union with God.",
+    coreConcepts: [
+      "Love is the path to God",
+      "The heart is the seat of wisdom",
+      "Devotion through practice",
+      "Union through surrender"
+    ],
+    terminology: [
+      {
+        term: "Dhikr",
+        definition: "Remembrance of God through repetition of sacred phrases or names.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Sama",
+        definition: "Sacred music and dance that opens the heart and creates spiritual ecstasy.",
+        category: "technique",
+        icon: Zap
+      },
+      {
+        term: "Whirling",
+        definition: "A form of moving meditation that symbolizes the rotation of the universe.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Fana",
+        definition: "Annihilation of the ego and union with the divine presence.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Baqa",
+        definition: "Subsistence in God - living in the world while remaining connected to the divine.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Heart Opening",
+        definition: "Cultivating love, compassion, and receptivity to divine guidance.",
+        category: "principle",
+        icon: Lightbulb
+      }
+    ]
+  },
+  ubuntu: {
+    overview: "Ubuntu philosophy emphasizes the interconnectedness of all people and the importance of community. It teaches that 'I am because we are' - our humanity is defined by our relationships with others.",
+    coreConcepts: [
+      "I am because we are",
+      "Community is the foundation",
+      "Service to others",
+      "Interconnectedness of all life"
+    ],
+    terminology: [
+      {
+        term: "Ubuntu",
+        definition: "A philosophy that emphasizes the interconnectedness of all people and the importance of community.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Community Building",
+        definition: "Creating and strengthening connections between people for mutual support and growth.",
+        category: "practice",
+        icon: Users
+      },
+      {
+        term: "Collective Wisdom",
+        definition: "The wisdom that emerges when people come together to share knowledge and experience.",
+        category: "concept",
+        icon: Lightbulb
+      },
+      {
+        term: "Service Leadership",
+        definition: "Leading by serving others and putting the needs of the community first.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Story Circle",
+        definition: "A practice of sharing personal stories to build understanding and connection.",
+        category: "technique",
+        icon: Zap
+      },
+      {
+        term: "Intergenerational Learning",
+        definition: "Learning from elders and passing wisdom to younger generations.",
+        category: "practice",
+        icon: BookOpen
+      }
+    ]
+  },
+  systems: {
+    overview: "Systems thinking approaches complex problems by understanding the relationships and patterns that connect different parts of a system. It teaches that everything is interconnected and that solutions must address the whole system.",
+    coreConcepts: [
+      "Everything is interconnected",
+      "Patterns reveal solutions",
+      "Whole systems thinking",
+      "Emergence from complexity"
+    ],
+    terminology: [
+      {
+        term: "Systems Thinking",
+        definition: "A way of understanding how different parts of a system interact and influence each other.",
+        category: "concept",
+        icon: Target
+      },
+      {
+        term: "Emergence",
+        definition: "Properties that arise from the interaction of system components that aren't present in individual parts.",
+        category: "concept",
+        icon: Lightbulb
+      },
+      {
+        term: "Feedback Loops",
+        definition: "Circular processes where outputs become inputs, creating self-reinforcing or balancing patterns.",
+        category: "technique",
+        icon: Zap
+      },
+      {
+        term: "Leverage Points",
+        definition: "Strategic places in a system where small changes can create large effects.",
+        category: "principle",
+        icon: Target
+      },
+      {
+        term: "Pattern Recognition",
+        definition: "Identifying recurring structures and relationships that help understand system behavior.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Holistic Solutions",
+        definition: "Approaches that address the whole system rather than just individual parts.",
+        category: "principle",
+        icon: Target
       }
     ]
   }
