@@ -264,6 +264,24 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         </div>
       </div>
 
+      {/* AI Chat - Prominently Displayed */}
+      <div className="page-section">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="section-title text-3xl mb-4">Chat with Your {framework.name} Guide</h2>
+            <p className="section-description text-lg">
+              Get personalized guidance, ask questions, and deepen your understanding of the {framework.name} tradition
+            </p>
+          </div>
+          <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6 shadow-2xl">
+            <FrameworkPersonaChat 
+              frameworkId={params.slug} 
+              title={framework.name}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Terminology */}
       <FrameworkTerminology 
         frameworkSlug={framework.slug}
@@ -414,17 +432,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         </div>
       </div>
 
-      {/* AI Chat */}
-      <div className="page-section">
-        <h2 className="section-title">Chat with {framework.name} Guide</h2>
-        <p className="section-description">
-          Get personalized guidance from the {framework.name} tradition
-        </p>
-        <FrameworkPersonaChat 
-          frameworkId={params.slug} 
-          title={framework.name}
-        />
-      </div>
+
 
       {/* Back to Frameworks */}
       <div className="text-center mt-12">

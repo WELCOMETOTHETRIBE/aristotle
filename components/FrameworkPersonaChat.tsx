@@ -39,53 +39,79 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
   };
 
   return (
-    <div className="rounded-2xl p-4 bg-white/5 border border-white/10">
-      <div className="font-medium mb-2 text-white">Chat with {title} Guide</div>
-      <div className="space-y-2 max-h-64 overflow-auto mb-3">
+    <div className="w-full">
+      <div className="flex items-center gap-3 mb-4 p-4 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-xl border border-blue-500/20">
+        <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+          <span className="text-white font-bold text-lg">🤖</span>
+        </div>
+        <div>
+          <div className="font-semibold text-lg text-white">Your {title} Guide</div>
+          <div className="text-sm text-gray-300">AI-powered wisdom from the {title} tradition</div>
+        </div>
+      </div>
+      
+      <div className="space-y-3 max-h-80 overflow-auto mb-4 p-4 bg-black/20 rounded-xl border border-white/10">
         {msgs.length === 0 ? (
-          <div className="text-center text-gray-400 py-4 text-sm">
-            Ask for guidance from the {title} tradition...
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">💬</span>
+            </div>
+            <div className="text-gray-400 text-sm mb-2">Start a conversation with your guide</div>
+            <div className="text-gray-500 text-xs">Ask for wisdom, guidance, or practical advice from the {title} tradition</div>
           </div>
         ) : (
           msgs.map((m, i) => (
-            <div key={i} className={m.role === "user" ? "text-right" : ""}>
-              <div className={`inline-block px-3 py-2 rounded-xl text-sm max-w-xs ${
+            <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+              <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm ${
                 m.role === "user" 
-                  ? "bg-cyan-500/20 text-cyan-100" 
-                  : "bg-white/10 text-white"
+                  ? "bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-white border border-blue-500/30" 
+                  : "bg-white/10 text-white border border-white/20"
               }`}>
-                {m.content}
+                <div className="font-medium text-xs mb-1 opacity-70">
+                  {m.role === "user" ? "You" : `${title} Guide`}
+                </div>
+                <div className="leading-relaxed">{m.content}</div>
               </div>
             </div>
           ))
         )}
         {isLoading && (
-          <div className="text-left">
-            <div className="inline-block px-3 py-2 rounded-xl text-sm bg-white/10 text-white">
+          <div className="flex justify-start">
+            <div className="max-w-xs lg:max-w-md px-4 py-3 rounded-2xl text-sm bg-white/10 text-white border border-white/20">
+              <div className="font-medium text-xs mb-1 opacity-70">{title} Guide</div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-white rounded-full animate-bounce"></div>
                 <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
                 <div className="w-2 h-2 bg-white rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <span className="text-xs opacity-70">Thinking...</span>
               </div>
             </div>
           </div>
         )}
       </div>
-      <div className="flex gap-2">
+      
+      <div className="flex gap-3">
         <input
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyPress={handleKeyPress}
-          placeholder="Ask for guidance…"
-          className="flex-1 bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none text-white placeholder-gray-400"
+          placeholder="Ask for guidance, wisdom, or practical advice from the tradition..."
+          className="flex-1 bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all"
           disabled={isLoading}
         />
         <button 
           onClick={send} 
           disabled={!input.trim() || isLoading}
-          className="px-3 py-2 rounded-xl bg-cyan-500 hover:bg-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed text-black text-sm font-medium transition-colors"
+          className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium transition-all transform hover:scale-105 active:scale-95"
         >
-          Send
+          {isLoading ? (
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+              <span>Sending...</span>
+            </div>
+          ) : (
+            'Send'
+          )}
         </button>
       </div>
     </div>
