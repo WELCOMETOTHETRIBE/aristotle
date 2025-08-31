@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getToneGradient, getToneTextColor } from '../../lib/tone';
+import { getAllFrameworks, type FrameworkConfig } from '../../lib/frameworks.config';
 import Link from 'next/link';
 import { 
   Sparkles, BookOpen, Target, Users, Star, ArrowRight, 
@@ -10,164 +11,148 @@ import {
   TrendingUp, Activity, Award, Compass
 } from 'lucide-react';
 
-interface Framework {
-  id: string;
-  name: string;
-  nav: {
-    tone: string;
-    badge: string;
-    emoji: string;
-  };
-  coreModules: string[];
-  featuredPractices: string[];
-  description?: string;
-  color?: string;
-  gradient?: string;
-}
-
-const frameworkData: Framework[] = [
-  {
-    id: 'spartan',
-    name: 'Spartan Agōgē',
-    nav: { tone: 'gritty', badge: 'Discipline', emoji: '🛡️' },
-    coreModules: ['strength', 'discipline', 'courage'],
-    featuredPractices: ['cold_exposure', 'adversity_training'],
-    description: 'Embrace hardship and build unbreakable character through disciplined training and mental fortitude.',
-    color: 'from-red-500 to-orange-500',
-    gradient: 'bg-gradient-to-br from-red-500/10 to-orange-500/10 border-red-500/20'
-  },
-  {
-    id: 'stoic',
-    name: 'Stoicism',
-    nav: { tone: 'calm', badge: 'Clarity', emoji: '🧱' },
-    coreModules: ['wisdom', 'temperance', 'reflection'],
-    featuredPractices: ['evening_reflection', 'memento_mori'],
-    description: 'Find inner peace through rational thinking, self-control, and acceptance of what you cannot change.',
-    color: 'from-blue-500 to-indigo-500',
-    gradient: 'bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border-blue-500/20'
-  },
-  {
-    id: 'bushido',
-    name: 'Bushido',
-    nav: { tone: 'honorable', badge: 'Honor', emoji: '⚔️' },
-    coreModules: ['honor', 'loyalty', 'courage'],
-    featuredPractices: ['meditation', 'martial_arts'],
-    description: 'Live with honor, loyalty, and courage. The way of the warrior emphasizes moral character and ethical behavior.',
-    color: 'from-gray-700 to-gray-900',
-    gradient: 'bg-gradient-to-br from-gray-700/10 to-gray-900/10 border-gray-700/20'
-  },
-  {
-    id: 'monastic',
-    name: 'Monastic',
-    nav: { tone: 'contemplative', badge: 'Wisdom', emoji: '🙏' },
-    coreModules: ['contemplation', 'simplicity', 'devotion'],
-    featuredPractices: ['prayer', 'meditation'],
-    description: 'Seek spiritual growth through contemplation, simplicity, and devotion to higher principles.',
-    color: 'from-purple-500 to-violet-500',
-    gradient: 'bg-gradient-to-br from-purple-500/10 to-violet-500/10 border-purple-500/20'
-  },
-  {
-    id: 'yogic',
-    name: 'Yogic',
-    nav: { tone: 'harmonious', badge: 'Balance', emoji: '🧘' },
-    coreModules: ['balance', 'awareness', 'unity'],
-    featuredPractices: ['yoga', 'pranayama'],
-    description: 'Achieve harmony of body, mind, and spirit through conscious practice and spiritual awareness.',
-    color: 'from-green-500 to-emerald-500',
-    gradient: 'bg-gradient-to-br from-green-500/10 to-emerald-500/10 border-green-500/20'
-  },
-  {
-    id: 'indigenous',
-    name: 'Indigenous',
-    nav: { tone: 'connected', badge: 'Connection', emoji: '🌿' },
-    coreModules: ['connection', 'stewardship', 'wisdom'],
-    featuredPractices: ['nature_connection', 'ceremony'],
-    description: 'Honor the interconnectedness of all life and live in harmony with nature and community.',
-    color: 'from-amber-500 to-orange-500',
-    gradient: 'bg-gradient-to-br from-amber-500/10 to-orange-500/10 border-amber-500/20'
-  },
-  {
-    id: 'martial',
-    name: 'Martial',
-    nav: { tone: 'focused', badge: 'Focus', emoji: '🥋' },
-    coreModules: ['focus', 'discipline', 'skill'],
-    featuredPractices: ['training', 'meditation'],
-    description: 'Develop mental and physical discipline through focused training and continuous improvement.',
-    color: 'from-slate-500 to-gray-500',
-    gradient: 'bg-gradient-to-br from-slate-500/10 to-gray-500/10 border-slate-500/20'
-  },
-  {
-    id: 'sufi',
-    name: 'Sufi',
-    nav: { tone: 'mystical', badge: 'Love', emoji: '💫' },
-    coreModules: ['love', 'devotion', 'mysticism'],
-    featuredPractices: ['dhikr', 'meditation'],
-    description: 'Seek divine love and spiritual enlightenment through devotion, prayer, and mystical practices.',
-    color: 'from-rose-500 to-pink-500',
-    gradient: 'bg-gradient-to-br from-rose-500/10 to-pink-500/10 border-rose-500/20'
-  },
-  {
-    id: 'ubuntu',
-    name: 'Ubuntu',
-    nav: { tone: 'communal', badge: 'Community', emoji: '🤝' },
-    coreModules: ['community', 'compassion', 'interconnectedness'],
-    featuredPractices: ['service', 'dialogue'],
-    description: 'Recognize that we are because others are. Build community through compassion and mutual support.',
-    color: 'from-teal-500 to-cyan-500',
-    gradient: 'bg-gradient-to-br from-teal-500/10 to-cyan-500/10 border-teal-500/20'
-  },
-  {
-    id: 'highperf',
-    name: 'High Performance',
-    nav: { tone: 'driven', badge: 'Excellence', emoji: '🚀' },
-    coreModules: ['excellence', 'optimization', 'growth'],
-    featuredPractices: ['goal_setting', 'optimization'],
-    description: 'Achieve peak performance through systematic optimization, goal setting, and continuous growth.',
-    color: 'from-indigo-500 to-purple-500',
-    gradient: 'bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20'
-  }
-];
-
 export default function FrameworksPage() {
-  const [frameworks, setFrameworks] = useState<Framework[]>(frameworkData);
-  const [loading, setLoading] = useState(false);
+  const [frameworks, setFrameworks] = useState<FrameworkConfig[]>([]);
   const [selectedFramework, setSelectedFramework] = useState<string | null>(null);
 
   useEffect(() => {
-    const loadFrameworks = async () => {
-      try {
-        setLoading(true);
-        
-        const response = await fetch('/api/frameworks');
-        if (response.ok) {
-          const data = await response.json();
-          setFrameworks(data);
-        }
-      } catch (err) {
-        console.error('Error loading frameworks:', err);
-        // Keep using fallback frameworks
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadFrameworks();
+    // Load frameworks from config
+    const allFrameworks = getAllFrameworks();
+    setFrameworks(allFrameworks);
   }, []);
 
-  const getFrameworkIcon = (frameworkId: string) => {
-    const icons: Record<string, React.ReactNode> = {
-      spartan: <Shield className="w-6 h-6" />,
-      stoic: <Brain className="w-6 h-6" />,
-      bushido: <Scale className="w-6 h-6" />,
-      monastic: <Leaf className="w-6 h-6" />,
-      yogic: <Wind className="w-6 h-6" />,
-      indigenous: <Sun className="w-6 h-6" />,
-      martial: <Target className="w-6 h-6" />,
-      sufi: <Moon className="w-6 h-6" />,
-      ubuntu: <Users className="w-6 h-6" />,
-      highperf: <TrendingUp className="w-6 h-6" />
+  const getFrameworkIcon = (slug: string) => {
+    switch (slug) {
+      case 'spartan':
+        return <Shield className="w-6 h-6 text-white" />;
+      case 'stoic':
+        return <Brain className="w-6 h-6 text-white" />;
+      case 'bushido':
+        return <Target className="w-6 h-6 text-white" />;
+      case 'monastic':
+        return <Scale className="w-6 h-6 text-white" />;
+      case 'yogic':
+        return <Leaf className="w-6 h-6 text-white" />;
+      case 'indigenous':
+        return <Sun className="w-6 h-6 text-white" />;
+      case 'martial':
+        return <Target className="w-6 h-6 text-white" />;
+      case 'sufi':
+        return <Wind className="w-6 h-6 text-white" />;
+      case 'zen':
+        return <Moon className="w-6 h-6 text-white" />;
+      case 'highperf':
+        return <TrendingUp className="w-6 h-6 text-white" />;
+      default:
+        return <BookOpen className="w-6 h-6 text-white" />;
+    }
+  };
+
+  const getFrameworkEmoji = (slug: string) => {
+    switch (slug) {
+      case 'spartan':
+        return '🛡️';
+      case 'stoic':
+        return '🧱';
+      case 'bushido':
+        return '⚔️';
+      case 'monastic':
+        return '🙏';
+      case 'yogic':
+        return '🧘';
+      case 'indigenous':
+        return '🌿';
+      case 'martial':
+        return '🥋';
+      case 'sufi':
+        return '🕊️';
+      case 'zen':
+        return '☸️';
+      case 'highperf':
+        return '🚀';
+      default:
+        return '📚';
+    }
+  };
+
+  const getFrameworkColor = (slug: string) => {
+    switch (slug) {
+      case 'spartan':
+        return 'from-red-500 to-orange-500';
+      case 'stoic':
+        return 'from-blue-500 to-indigo-500';
+      case 'bushido':
+        return 'from-gray-700 to-gray-900';
+      case 'monastic':
+        return 'from-purple-500 to-violet-500';
+      case 'yogic':
+        return 'from-green-500 to-emerald-500';
+      case 'indigenous':
+        return 'from-amber-500 to-orange-500';
+      case 'martial':
+        return 'from-slate-500 to-gray-500';
+      case 'sufi':
+        return 'from-teal-500 to-cyan-500';
+      case 'zen':
+        return 'from-stone-500 to-neutral-500';
+      case 'highperf':
+        return 'from-blue-500 to-indigo-500';
+      default:
+        return 'from-blue-500 to-indigo-500';
+    }
+  };
+
+  const getFrameworkGradient = (slug: string) => {
+    const color = getFrameworkColor(slug);
+    return `bg-gradient-to-br ${color}/10 border-${color.split('-')[1]}-500/20`;
+  };
+
+  const getFrameworkDescription = (framework: FrameworkConfig) => {
+    const descriptions: Record<string, string> = {
+      spartan: 'Embrace hardship and build unbreakable character through disciplined training and mental fortitude.',
+      stoic: 'Find inner peace through rational thinking, self-control, and acceptance of what you cannot change.',
+      bushido: 'Live with honor, loyalty, and courage. The way of the warrior emphasizes moral character and ethical behavior.',
+      monastic: 'Seek spiritual growth through contemplation, simplicity, and devotion to higher principles.',
+      yogic: 'Achieve harmony of body, mind, and spirit through conscious practice and spiritual awareness.',
+      indigenous: 'Honor the interconnectedness of all life and live in harmony with nature and community.',
+      martial: 'Develop mental and physical discipline through focused training and continuous improvement.',
+      sufi: 'Seek divine love and spiritual transformation through mystical practices and inner awakening.',
+      zen: 'Find enlightenment through meditation, mindfulness, and direct experience of reality.',
+      highperf: 'Optimize your performance through systematic training, biofeedback, and continuous improvement.'
     };
-    return icons[frameworkId] || <Star className="w-6 h-6" />;
+    return descriptions[framework.slug] || 'A philosophical framework for personal growth and development.';
+  };
+
+  const getCoreModules = (framework: FrameworkConfig) => {
+    const modules: Record<string, string[]> = {
+      spartan: ['strength', 'discipline', 'courage'],
+      stoic: ['wisdom', 'temperance', 'reflection'],
+      bushido: ['honor', 'loyalty', 'courage'],
+      monastic: ['contemplation', 'simplicity', 'devotion'],
+      yogic: ['balance', 'awareness', 'unity'],
+      indigenous: ['connection', 'stewardship', 'wisdom'],
+      martial: ['focus', 'discipline', 'skill'],
+      sufi: ['love', 'devotion', 'transformation'],
+      zen: ['mindfulness', 'meditation', 'enlightenment'],
+      highperf: ['optimization', 'biofeedback', 'improvement']
+    };
+    return modules[framework.slug] || ['growth', 'development', 'practice'];
+  };
+
+  const getFeaturedPractices = (framework: FrameworkConfig) => {
+    const practices: Record<string, string[]> = {
+      spartan: ['cold_exposure', 'adversity_training'],
+      stoic: ['evening_reflection', 'memento_mori'],
+      bushido: ['meditation', 'martial_arts'],
+      monastic: ['prayer', 'meditation'],
+      yogic: ['yoga', 'pranayama'],
+      indigenous: ['nature_connection', 'ceremony'],
+      martial: ['training', 'meditation'],
+      sufi: ['dhikr', 'meditation'],
+      zen: ['zazen', 'mindfulness'],
+      highperf: ['flow_timer', 'biofeedback']
+    };
+    return practices[framework.slug] || ['meditation', 'reflection'];
   };
 
   return (
@@ -175,70 +160,77 @@ export default function FrameworksPage() {
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           
-          {/* Hero Section */}
+          {/* Header */}
           <motion.div 
-            className="text-center mb-12"
+            className="mb-12 text-center"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <Compass className="w-8 h-8 text-white" />
+                <BookOpen className="w-8 h-8 text-white" />
+              </div>
+              <div>
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Philosophical Frameworks</h1>
+                <p className="text-xl text-gray-600 dark:text-gray-300">Choose your path to wisdom and growth</p>
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-6">
-              Ancient Wisdom Frameworks
-            </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Discover timeless philosophical traditions and choose the path that resonates with your journey toward flourishing and intentional living.
+            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+              Explore ancient and modern philosophical traditions that have guided humanity's greatest thinkers and practitioners. 
+              Each framework offers unique insights and practices for personal development.
             </p>
           </motion.div>
 
           {/* Frameworks Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
             {frameworks.map((framework, index) => (
               <motion.div
-                key={framework.id}
+                key={framework.slug}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
+                transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
                 whileHover={{ scale: 1.02, y: -5 }}
                 className="group cursor-pointer"
-                onClick={() => setSelectedFramework(selectedFramework === framework.id ? null : framework.id)}
+                onClick={() => setSelectedFramework(selectedFramework === framework.slug ? null : framework.slug)}
               >
-                <div className={`h-full p-6 rounded-2xl ${framework.gradient} backdrop-blur-sm border transition-all duration-300 group-hover:shadow-xl`}>
+                <div className={`h-full p-6 rounded-2xl ${getFrameworkGradient(framework.slug)} backdrop-blur-sm border transition-all duration-300 group-hover:shadow-xl`}>
                   
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 bg-gradient-to-r ${framework.color} rounded-xl flex items-center justify-center shadow-lg`}>
-                        {getFrameworkIcon(framework.id)}
+                      <div className={`w-12 h-12 bg-gradient-to-r ${getFrameworkColor(framework.slug)} rounded-xl flex items-center justify-center shadow-lg`}>
+                        {getFrameworkIcon(framework.slug)}
                       </div>
                       <div>
                         <h3 className="text-xl font-bold text-white">{framework.name}</h3>
                         <div className="flex items-center gap-2">
-                          <span className="text-2xl">{framework.nav.emoji}</span>
-                          <span className="text-sm text-gray-300">{framework.nav.badge}</span>
+                          <span className="text-2xl">{getFrameworkEmoji(framework.slug)}</span>
+                          <span className="text-sm text-gray-300">{framework.teachingChip}</span>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
                       <div className="text-xs text-gray-400 uppercase tracking-wide">Framework</div>
-                      <div className="text-sm text-white font-medium">{framework.nav.tone}</div>
+                      <div className="text-sm text-white font-medium">{framework.tone}</div>
                     </div>
                   </div>
 
                   {/* Description */}
                   <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                    {framework.description}
+                    {getFrameworkDescription(framework)}
                   </p>
 
                   {/* Core Modules */}
                   <div className="mb-6">
                     <div className="text-xs text-gray-400 uppercase tracking-wide mb-3">Core Modules</div>
                     <div className="flex flex-wrap gap-2">
-                      {framework.coreModules.map((module) => (
+                      {getCoreModules(framework).map((module) => (
                         <span
                           key={module}
                           className="px-3 py-1 bg-white/10 text-white text-xs rounded-full border border-white/20"
@@ -253,7 +245,7 @@ export default function FrameworksPage() {
                   <div className="mb-6">
                     <div className="text-xs text-gray-400 uppercase tracking-wide mb-3">Featured Practices</div>
                     <div className="flex flex-wrap gap-2">
-                      {framework.featuredPractices.map((practice) => (
+                      {getFeaturedPractices(framework).map((practice) => (
                         <span
                           key={practice}
                           className="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full border border-white/10"
@@ -267,7 +259,7 @@ export default function FrameworksPage() {
                   {/* Action Button */}
                   <div className="flex items-center justify-between">
                     <Link
-                      href={`/frameworks/${framework.id}`}
+                      href={`/frameworks/${framework.slug}`}
                       className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 group-hover:scale-105"
                     >
                       <BookOpen className="w-4 h-4" />
@@ -283,7 +275,7 @@ export default function FrameworksPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           {/* Call to Action */}
           <motion.div 
