@@ -52,27 +52,18 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         setLoading(true);
         setError(null);
 
+        console.log('Loading framework data for slug:', params.slug);
+
         // Load framework config
         const frameworkConfig = getFrameworkBySlug(params.slug);
         if (!frameworkConfig) {
-          throw new Error('Framework not found');
+          throw new Error(`Framework not found: ${params.slug}`);
         }
+        console.log('Framework config loaded:', frameworkConfig);
         setFramework(frameworkConfig);
 
-        // Load quests
-        const questResponse = await fetch(`/api/plan/today?frameworkSlug=${params.slug}`);
-        if (questResponse.ok) {
-          const questData = await questResponse.json();
-          setQuests(questData.quests);
-          setVirtueTotals(questData.userVirtues);
-        }
-
-        // Load progress summary
-        const progressResponse = await fetch(`/api/progress/summary?frameworkSlug=${params.slug}`);
-        if (progressResponse.ok) {
-          const progressData = await progressResponse.json();
-          setVirtueTotals(progressData.virtueTotals);
-        }
+        // For now, skip API calls to test basic loading
+        console.log('Skipping API calls for now to test basic loading');
 
       } catch (err) {
         console.error('Error loading framework data:', err);
