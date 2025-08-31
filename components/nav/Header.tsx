@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Search, Bell, User, ChevronDown } from 'lucide-react';
+import { Bell, User, ChevronDown } from 'lucide-react';
+import AcademyLogo from '@/components/AcademyLogo';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 
@@ -25,7 +26,6 @@ const virtueLabels = {
 
 export function Header({ focusVirtue }: HeaderProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
 
@@ -53,24 +53,18 @@ export function Header({ focusVirtue }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-surface border-b border-border">
       <div className="flex items-center justify-between px-4 py-3">
-        {/* Search Bar */}
-        <div className="flex-1 max-w-sm mr-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
-            <input
-              type="text"
-              placeholder="Search wisdom..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-            />
-          </div>
-        </div>
+        {/* Academy Logo - Home Button */}
+        <button
+          onClick={() => window.location.href = '/'}
+          className="flex items-center space-x-2 p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+        >
+          <AcademyLogo className="w-8 h-8" />
+        </button>
 
         {/* Focus Virtue Chip */}
         {focusVirtue && (
           <div className={cn(
-            'px-3 py-1 rounded-full border text-xs font-medium mr-3',
+            'px-3 py-1 rounded-full border text-xs font-medium',
             virtueColors[focusVirtue]
           )}>
             {virtueLabels[focusVirtue]}
@@ -78,7 +72,7 @@ export function Header({ focusVirtue }: HeaderProps) {
         )}
 
         {/* Notifications */}
-        <button className="p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150 mr-2">
+        <button className="p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150">
           <Bell className="w-5 h-5" />
         </button>
 

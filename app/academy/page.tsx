@@ -1,265 +1,376 @@
 'use client';
 
-import AuroraBackground from "@/components/AuroraBackground";
-import { GlassCard } from "@/components/GlassCard";
-import { Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Users } from "lucide-react";
-import Link from "next/link";
+import { useState, useRef, useEffect } from 'react';
+import { Header } from '@/components/nav/Header';
+import { TabBar } from '@/components/nav/TabBar';
+import { MessageSquare, Send, Bot, User, Sparkles, BookOpen, Brain, Shield, Scale, Leaf } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-const pillars = [
+interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: Date;
+  isTyping?: boolean;
+}
+
+interface Philosopher {
+  id: string;
+  name: string;
+  era: string;
+  school: string;
+  description: string;
+  icon: any;
+  color: string;
+  specialties: string[];
+}
+
+const philosophers: Philosopher[] = [
   {
-    name: "Wisdom",
-    description: "The virtue of knowledge, understanding, and sound judgment",
+    id: 'socrates',
+    name: 'Socrates',
+    era: '470-399 BCE',
+    school: 'Classical Greek',
+    description: 'The father of Western philosophy, known for the Socratic method and questioning everything.',
     icon: Brain,
-    color: "from-accent-primary to-blue-500",
-    practices: ["Philosophical Study", "Critical Thinking", "Reflection", "Learning"],
-    path: "/wisdom",
-    quote: "Wisdom begins in wonder.",
-    author: "Socrates"
+    color: 'bg-primary/20 text-primary border-primary/30',
+    specialties: ['Ethics', 'Knowledge', 'Self-examination', 'Dialogue']
   },
   {
-    name: "Courage",
-    description: "The virtue of facing challenges with strength and determination",
-    icon: Shield,
-    color: "from-red-500 to-orange-500",
-    practices: ["Action", "Challenge", "Growth", "Resilience"],
-    path: "/courage",
-    quote: "Courage is the first of human qualities because it is the quality which guarantees the others.",
-    author: "Aristotle"
-  },
-  {
-    name: "Justice",
-    description: "The virtue of fairness, right relationships, and social harmony",
-    icon: Scale,
-    color: "from-green-500 to-emerald-500",
-    practices: ["Relationships", "Community", "Service", "Balance"],
-    path: "/justice",
-    quote: "Justice is the constant and perpetual will to allot to every man his due.",
-    author: "Justinian"
-  },
-  {
-    name: "Temperance",
-    description: "The virtue of self-control, moderation, and inner harmony",
-    icon: Leaf,
-    color: "from-accent-secondary to-purple-500",
-    practices: ["Mindfulness", "Discipline", "Balance", "Harmony"],
-    path: "/temperance",
-    quote: "Temperance is the noblest gift of the gods.",
-    author: "Euripides"
-  }
-];
-
-const features = [
-  {
-    title: "Ancient Wisdom",
-    description: "Rooted in 2,400 years of philosophical tradition",
+    id: 'plato',
+    name: 'Plato',
+    era: '428-348 BCE',
+    school: 'Platonism',
+    description: 'Student of Socrates, founder of the Academy, and author of philosophical dialogues.',
     icon: BookOpen,
-    color: "from-accent-primary to-blue-500"
+    color: 'bg-courage/20 text-courage border-courage/30',
+    specialties: ['Metaphysics', 'Justice', 'Education', 'Forms']
   },
   {
-    title: "Modern Science",
-    description: "Validated by contemporary research and neuroscience",
-    icon: Target,
-    color: "from-green-500 to-emerald-500"
+    id: 'aristotle',
+    name: 'Aristotle',
+    era: '384-322 BCE',
+    school: 'Aristotelianism',
+    description: 'Student of Plato, founder of logic, and systematic philosopher of nature and ethics.',
+    icon: Shield,
+    color: 'bg-justice/20 text-justice border-justice/30',
+    specialties: ['Virtue Ethics', 'Logic', 'Politics', 'Natural Science']
   },
   {
-    title: "Community",
-    description: "Connect with fellow seekers on the path to flourishing",
-    icon: Users,
-    color: "from-accent-secondary to-purple-500"
+    id: 'marcus-aurelius',
+    name: 'Marcus Aurelius',
+    era: '121-180 CE',
+    school: 'Stoicism',
+    description: 'Roman Emperor and Stoic philosopher, author of Meditations.',
+    icon: Scale,
+    color: 'bg-temperance/20 text-temperance border-temperance/30',
+    specialties: ['Stoicism', 'Self-control', 'Leadership', 'Resilience']
+  },
+  {
+    id: 'epictetus',
+    name: 'Epictetus',
+    era: '50-135 CE',
+    school: 'Stoicism',
+    description: 'Former slave turned Stoic philosopher, teacher of practical wisdom.',
+    icon: Leaf,
+    color: 'bg-primary/20 text-primary border-primary/30',
+    specialties: ['Freedom', 'Acceptance', 'Inner peace', 'Practical wisdom']
+  },
+  {
+    id: 'seneca',
+    name: 'Seneca',
+    era: '4 BCE-65 CE',
+    school: 'Stoicism',
+    description: 'Roman statesman and Stoic philosopher, author of Letters and Essays.',
+    icon: Brain,
+    color: 'bg-courage/20 text-courage border-courage/30',
+    specialties: ['Virtue', 'Time', 'Anger', 'Friendship']
   }
 ];
 
 export default function AcademyPage() {
-  return (
-    <main className="container-academy">
-      <AuroraBackground />
-      
-      {/* Header */}
-      <header className="mb-12 text-center">
-        <h1 className="text-4xl font-semibold text-white mb-4">
-          Ancient Wisdom Academy
-        </h1>
-        <h2 className="text-xl text-accent font-medium mb-4">Overview</h2>
-        <p className="text-xl text-muted max-w-2xl mx-auto">
-          A comprehensive system for cultivating the four cardinal virtues through 
-          ancient practices and modern science.
-        </p>
-      </header>
+  const [selectedPhilosopher, setSelectedPhilosopher] = useState<Philosopher | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [userInput, setUserInput] = useState('');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
-      {/* Features */}
-      <section className="mb-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {features.map((feature) => {
-            const IconComponent = feature.icon;
-            return (
-              <GlassCard
-                key={feature.title}
-                title={feature.title}
-                subtitle={feature.description}
-                action={
-                  <div className={`w-12 h-12 bg-gradient-to-r ${feature.color} rounded-xl flex items-center justify-center`}>
-                    <IconComponent size={20} className="text-white" />
-                  </div>
-                }
-              >
-                <div className="h-32 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="text-2xl font-semibold text-white mb-2">
-                      {feature.title}
-                    </div>
-                    <p className="text-sm text-muted">
-                      {feature.description}
-                    </p>
-                  </div>
-                </div>
-              </GlassCard>
-            );
-          })}
-        </div>
-      </section>
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
-      {/* Pillars */}
-      <section className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-semibold text-white mb-4">
-            The Four Cardinal Virtues
-          </h2>
-          <p className="text-muted max-w-2xl mx-auto">
-            Aristotle identified these four virtues as essential for achieving eudaimonia - 
-            human flourishing and happiness. Each virtue represents a different aspect of 
-            human excellence.
-          </p>
-        </div>
+  const startConversation = (philosopher: Philosopher) => {
+    setSelectedPhilosopher(philosopher);
+    const welcomeMessage: Message = {
+      id: Date.now().toString(),
+      role: 'assistant',
+      content: `Greetings, seeker of wisdom. I am ${philosopher.name}, and I welcome you to our philosophical dialogue. What questions do you bring to our conversation today?`,
+      timestamp: new Date(),
+    };
+    setMessages([welcomeMessage]);
+  };
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {pillars.map((pillar) => {
-            const IconComponent = pillar.icon;
-            return (
-              <Link key={pillar.name} href={pillar.path}>
-                <GlassCard
-                  title={pillar.name}
-                  subtitle={pillar.description}
-                  action={
-                    <div className={`w-12 h-12 bg-gradient-to-r ${pillar.color} rounded-xl flex items-center justify-center`}>
-                      <IconComponent size={20} className="text-white" />
-                    </div>
+  const sendMessage = async () => {
+    if (!userInput.trim() || !selectedPhilosopher) return;
+
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: userInput.trim(),
+      timestamp: new Date(),
+    };
+
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setUserInput('');
+    setIsGenerating(true);
+
+    // Add typing indicator
+    const typingMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      role: 'assistant',
+      content: '',
+      timestamp: new Date(),
+      isTyping: true,
+    };
+
+    setMessages([...updatedMessages, typingMessage]);
+
+    try {
+      const response = await fetch('/api/ai/guide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `You are ${selectedPhilosopher.name}, a ${selectedPhilosopher.school} philosopher from ${selectedPhilosopher.era}. Respond to this question or reflection in your authentic philosophical voice: "${userInput.trim()}".
+
+IMPORTANT: Respond as ${selectedPhilosopher.name} would, using their philosophical perspective and style. Keep your response concise (2-3 sentences max) and conversational. Focus on practical wisdom that the user can immediately apply.`,
+          context: {
+            page: 'academy',
+            focusVirtue: 'wisdom',
+            timeOfDay: new Date().getHours(),
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let content = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') break;
+                
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.content) {
+                    content += parsed.content;
                   }
-                  className="group hover:scale-105 transition-transform duration-300 cursor-pointer"
-                >
-                  <div className="space-y-6">
-                    {/* Practices */}
-                    <div>
-                      <h4 className="text-sm font-medium text-white mb-3">Key Practices</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {pillar.practices.map((practice) => (
-                          <span
-                            key={practice}
-                            className="px-3 py-1 bg-white/10 text-white text-xs rounded-full border border-white/20"
-                          >
-                            {practice}
-                          </span>
-                        ))}
+                } catch (e) {
+                  // Ignore parsing errors
+                }
+              }
+            }
+          }
+          
+          // Clean markdown from response
+          const cleanContent = content
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/`(.*?)`/g, '$1')
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+            .replace(/^#+\s*/gm, '')
+            .replace(/^\s*[-*+]\s*/gm, '')
+            .replace(/^\s*\d+\.\s*/gm, '')
+            .trim();
+          
+          const aiMessage: Message = {
+            id: (Date.now() + 2).toString(),
+            role: 'assistant',
+            content: cleanContent || 'I appreciate your question. Let me reflect on this with you...',
+            timestamp: new Date(),
+          };
+
+          const finalMessages = [...updatedMessages, aiMessage];
+          setMessages(finalMessages);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to get AI response:', error);
+      const errorMessage: Message = {
+        id: (Date.now() + 2).toString(),
+        role: 'assistant',
+        content: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
+        timestamp: new Date(),
+      };
+
+      const finalMessages = [...updatedMessages, errorMessage];
+      setMessages(finalMessages);
+    }
+    
+    setIsGenerating(false);
+  };
+
+  return (
+    <div className="min-h-screen bg-bg pb-20">
+      <Header focusVirtue="wisdom" />
+      
+      <main className="px-4 py-6 space-y-6">
+        {/* Header */}
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-text mb-2">AI Academy</h1>
+          <p className="text-muted">Chat with ancient philosophers and learn timeless wisdom</p>
+        </div>
+
+        {!selectedPhilosopher ? (
+          /* Philosopher Selection */
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-text">Choose Your Philosopher</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {philosophers.map((philosopher) => {
+                const IconComponent = philosopher.icon;
+                return (
+                  <button
+                    key={philosopher.id}
+                    onClick={() => startConversation(philosopher)}
+                    className="p-4 bg-surface border border-border rounded-lg hover:bg-surface-2 transition-colors duration-150 text-left"
+                  >
+                    <div className="flex items-start space-x-3">
+                      <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', philosopher.color)}>
+                        <IconComponent className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-text">{philosopher.name}</h3>
+                        <p className="text-xs text-muted mb-1">{philosopher.era} • {philosopher.school}</p>
+                        <p className="text-sm text-muted mb-2">{philosopher.description}</p>
+                        <div className="flex flex-wrap gap-1">
+                          {philosopher.specialties.slice(0, 3).map((specialty) => (
+                            <span
+                              key={specialty}
+                              className="px-2 py-1 bg-surface-2 text-xs text-muted rounded-full"
+                            >
+                              {specialty}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : (
+          /* Chat Interface */
+          <div className="space-y-4">
+            {/* Philosopher Header */}
+            <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
+              <div className="flex items-center space-x-3">
+                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', selectedPhilosopher.color)}>
+                  <selectedPhilosopher.icon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">{selectedPhilosopher.name}</h3>
+                  <p className="text-xs text-muted">{selectedPhilosopher.era} • {selectedPhilosopher.school}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  setSelectedPhilosopher(null);
+                  setMessages([]);
+                }}
+                className="text-sm text-muted hover:text-text transition-colors"
+              >
+                Choose Another
+              </button>
+            </div>
 
-                    {/* Quote */}
-                    <div className="border-l-2 border-accent-primary pl-4">
-                      <blockquote className="text-sm text-muted italic mb-2">
-                        "{pillar.quote}"
-                      </blockquote>
-                      <cite className="text-xs text-accent-primary">
-                        — {pillar.author}
-                      </cite>
+            {/* Messages */}
+            <div className="bg-surface border border-border rounded-lg p-4 h-96 overflow-y-auto">
+              {messages.length === 0 ? (
+                <div className="text-center py-8">
+                  <MessageSquare className="w-8 h-8 text-muted mx-auto mb-2" />
+                  <p className="text-sm text-muted">Start a conversation with {selectedPhilosopher.name}</p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((message) => (
+                    <div
+                      key={message.id}
+                      className={cn(
+                        'flex gap-3',
+                        message.role === 'user' ? 'justify-end' : 'justify-start'
+                      )}
+                    >
+                      {message.role === 'assistant' && (
+                        <div className={cn('w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0', selectedPhilosopher.color)}>
+                          <selectedPhilosopher.icon className="w-4 h-4" />
+                        </div>
+                      )}
+                      <div
+                        className={cn(
+                          'max-w-[80%] p-3 rounded-lg text-sm',
+                          message.role === 'user'
+                            ? 'bg-primary text-white'
+                            : 'bg-surface-2 border border-border text-text'
+                        )}
+                      >
+                        {message.isTyping ? (
+                          <div className="flex items-center gap-1">
+                            <div className="animate-pulse">Thinking</div>
+                            <div className="flex gap-1">
+                              <div className="w-1 h-1 bg-muted rounded-full animate-bounce"></div>
+                              <div className="w-1 h-1 bg-muted rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                              <div className="w-1 h-1 bg-muted rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                        )}
+                      </div>
+                      {message.role === 'user' && (
+                        <div className="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center flex-shrink-0">
+                          <User className="w-4 h-4 text-muted" />
+                        </div>
+                      )}
                     </div>
-
-                    {/* CTA */}
-                    <div className="flex items-center justify-between pt-4">
-                      <span className="text-sm text-accent-primary font-medium">
-                        Explore {pillar.name}
-                      </span>
-                      <ArrowRight size={16} className="text-accent-primary group-hover:translate-x-1 transition-transform" />
-                    </div>
-                  </div>
-                </GlassCard>
-              </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="mb-16">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-semibold text-white mb-4">
-            How the System Works
-          </h2>
-          <p className="text-muted max-w-2xl mx-auto">
-            Our approach combines ancient philosophical wisdom with modern scientific 
-            understanding to create a comprehensive wellness system.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-accent-primary to-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <BookOpen size={24} className="text-white" />
+                  ))}
+                  <div ref={messagesEndRef} />
+                </div>
+              )}
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Learn</h3>
-            <p className="text-muted">
-              Study the philosophical foundations and scientific research behind each virtue.
-            </p>
-          </div>
 
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Target size={24} className="text-white" />
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Practice</h3>
-            <p className="text-muted">
-              Engage in daily practices and rituals designed to cultivate each virtue.
-            </p>
-          </div>
-
-          <div className="text-center">
-            <div className="w-16 h-16 bg-gradient-to-r from-accent-secondary to-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-              <Users size={24} className="text-white" />
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Reflect</h3>
-            <p className="text-muted">
-              Track your progress and reflect on how virtues manifest in your daily life.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="text-center">
-        <GlassCard
-          title="Begin Your Journey"
-          subtitle="Start with the virtue that calls to you most"
-          className="max-w-2xl mx-auto"
-        >
-          <div className="space-y-6">
-            <p className="text-muted">
-              Each virtue offers a unique path to personal growth and flourishing. 
-              Choose the one that resonates with your current needs and aspirations.
-            </p>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <Link href="/temperance">
-                <button className="btn-primary-light w-full">
-                  Start with Temperance
-                </button>
-              </Link>
-              <Link href="/wisdom">
-                <button className="btn-high-contrast w-full">
-                  Begin with Wisdom
-                </button>
-              </Link>
+            {/* Input */}
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={userInput}
+                onChange={(e) => setUserInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
+                placeholder={`Ask ${selectedPhilosopher.name} about wisdom, philosophy, or life...`}
+                className="flex-1 px-4 py-3 bg-surface border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+                disabled={isGenerating}
+              />
+              <button
+                onClick={sendMessage}
+                disabled={!userInput.trim() || isGenerating}
+                className="px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Send className="w-4 h-4" />
+              </button>
             </div>
           </div>
-        </GlassCard>
-      </section>
-    </main>
+        )}
+      </main>
+
+      <TabBar />
+    </div>
   );
 } 

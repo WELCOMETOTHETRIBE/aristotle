@@ -2,14 +2,14 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Users, TrendingUp, Wrench } from 'lucide-react';
+import { MessageSquare, BookOpen, Users, TrendingUp, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
   {
-    name: 'Today',
-    href: '/today',
-    icon: Home,
+    name: 'AI Academy',
+    href: '/academy',
+    icon: MessageSquare,
     activeColor: 'text-primary',
   },
   {
