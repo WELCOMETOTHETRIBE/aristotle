@@ -407,10 +407,25 @@ Make the content practical, thought-provoking, and immediately applicable. Keep 
           const categoryMatch = content.match(/CATEGORY:\s*(.+?)(?=\n|$)/i);
           const difficultyMatch = content.match(/DIFFICULTY:\s*(.+?)(?=\n|$)/i);
           
+          // Clean markdown from title and content
+          const cleanTitle = (titleMatch?.[1]?.trim() || 'Daily Wisdom')
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/`(.*?)`/g, '$1');
+          
+          const cleanContent = (contentMatch?.[1]?.trim() || content)
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/`(.*?)`/g, '$1')
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+            .replace(/^#+\s*/gm, '')
+            .replace(/^\s*[-*+]\s*/gm, '')
+            .replace(/^\s*\d+\.\s*/gm, '');
+          
           const insight: WisdomInsight = {
             id: Date.now().toString(),
-            title: titleMatch?.[1]?.trim() || 'Daily Wisdom',
-            content: contentMatch?.[1]?.trim() || content,
+            title: cleanTitle,
+            content: cleanContent,
             philosopher: philosopherMatch?.[1]?.trim() || philosophicalFrameworks[Math.floor(Math.random() * philosophicalFrameworks.length)],
             framework: frameworkMatch?.[1]?.trim() || philosophicalFrameworks[Math.floor(Math.random() * philosophicalFrameworks.length)],
             category: (categoryMatch?.[1]?.trim() as any) || (category as any) || 'reflection',
@@ -522,7 +537,7 @@ Respond in a warm, conversational tone as if you're having a thoughtful chat wit
             }
           }
           
-          // Clean up the response content
+          // Clean up the response content and remove markdown formatting
           const cleanContent = content
             .replace(/^Here's my response:/i, '')
             .replace(/^Response:/i, '')
@@ -535,6 +550,14 @@ Respond in a warm, conversational tone as if you're having a thoughtful chat wit
             .replace(/^Here's a perspective:/i, '')
             .replace(/^From a philosophical standpoint:/i, '')
             .replace(/^In terms of wisdom:/i, '')
+            // Remove markdown formatting
+            .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+            .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+            .replace(/`(.*?)`/g, '$1') // Remove code formatting
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+            .replace(/^#+\s*/gm, '') // Remove markdown headers
+            .replace(/^\s*[-*+]\s*/gm, '') // Remove markdown list markers
+            .replace(/^\s*\d+\.\s*/gm, '') // Remove numbered list markers
             .trim();
           
           const aiMessage: ConversationMessage = {
@@ -771,8 +794,17 @@ Provide 3 concise, actionable insights (max 1 sentence each) for continued growt
             }
           }
           
-          // Parse insights from response
-          const insights = content.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
+          // Parse insights from response and clean markdown
+          const insights = content.split('\n')
+            .filter(line => line.trim().startsWith('•') || line.trim().startsWith('-'))
+            .slice(0, 3)
+            .map(insight => insight
+              .replace(/^\s*[•-]\s*/, '') // Remove bullet points
+              .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold
+              .replace(/\*(.*?)\*/g, '$1') // Remove italic
+              .replace(/`(.*?)`/g, '$1') // Remove code
+              .trim()
+            );
           return insights.length > 0 ? insights : [
             'Continue reflecting on your daily practices',
             'Focus on one virtue or practice at a time',
@@ -846,11 +878,22 @@ Create a 2-3 sentence journal entry that reflects on this practice session and p
             }
           }
           
+          // Clean markdown from journal entry content
+          const cleanContent = content
+            .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+            .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+            .replace(/`(.*?)`/g, '$1') // Remove code formatting
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+            .replace(/^#+\s*/gm, '') // Remove markdown headers
+            .replace(/^\s*[-*+]\s*/gm, '') // Remove markdown list markers
+            .replace(/^\s*\d+\.\s*/gm, '') // Remove numbered list markers
+            .trim();
+          
           // Save journal entry to localStorage for integration with journal widget
           const journalEntry = {
             id: Date.now().toString(),
             title: `${questionnaireResponse.framework} Practice Reflection`,
-            content: content.trim(),
+            content: cleanContent,
             timestamp: new Date(),
             tags: ['wisdom-spotlight', questionnaireResponse.framework.toLowerCase(), 'eudaimonia'],
             eudaimoniaScore: questionnaireResponse.eudaimoniaScore

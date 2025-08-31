@@ -6,7 +6,7 @@ import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
 import { TaskCard } from '@/components/cards/TaskCard';
 import { BreathworkCard } from '@/components/cards/BreathworkCard';
-import { LessonCard } from '@/components/cards/LessonCard';
+
 import { StreakCard } from '@/components/cards/StreakCard';
 import { MoodTrackerCard } from '@/components/cards/MoodTrackerCard';
 import { HydrationTrackerCard } from '@/components/cards/HydrationTrackerCard';
@@ -156,10 +156,7 @@ export default function TodayPage() {
     );
   };
 
-  const handleApplyLesson = () => {
-    // TODO: Implement lesson application
-    console.log('Applying lesson...');
-  };
+
 
   const topTasks = tasks.filter(task => !task.completed).slice(0, 3);
   const completedTasks = tasks.filter(task => task.completed);
@@ -309,36 +306,9 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Wisdom Tile */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-text">Wisdom Tile</h2>
-          <LessonCard
-            title="The Stoic Dichotomy of Control"
-            summary="Focus on what you can control and accept what you cannot. This simple principle can transform how you approach daily challenges and reduce unnecessary stress."
-            framework="Stoicism"
-            duration="2 min read"
-            onApply={handleApplyLesson}
-          />
-        </div>
 
-        {/* AI Guide Card */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg p-4">
-          <div className="flex items-center space-x-3 mb-3">
-            <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-              <Sparkles className="w-4 h-4 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-sm font-semibold text-text">AI Guide Suggestion</h3>
-              <p className="text-xs text-muted">Personalized wisdom</p>
-            </div>
-          </div>
-          <p className="text-sm text-text mb-3">
-            "Let's try a 2-minute breathing exercise to center yourself before tackling your next task. This will help you approach it with clarity and calm."
-          </p>
-          <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-150">
-            <span className="text-sm font-medium">Try this now</span>
-          </button>
-        </div>
+
+
 
         {/* Evening Block */}
         {isEvening && (
