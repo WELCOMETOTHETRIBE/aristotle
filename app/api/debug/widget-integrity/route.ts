@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { runSelfTest, normalizeFramework, type SelfTestResult } from '@/lib/widget-integrity';
 import { getAllFrameworks } from '@/lib/frameworks.config';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
