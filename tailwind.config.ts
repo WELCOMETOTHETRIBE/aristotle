@@ -1,41 +1,52 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss'
 
-const config: Config = {
-  darkMode: ["class"],
+export default {
+  darkMode: ['class'],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    './pages/**/*.{ts,tsx}',
+    './components/**/*.{ts,tsx}',
+    './app/**/*.{ts,tsx}',
+    './src/**/*.{ts,tsx}',
   ],
-  prefix: "",
   theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
     extend: {
+      borderRadius: {
+        xl: 'var(--radius)',
+        '2xl': `calc(var(--radius) + 8px)`,
+      },
       colors: {
-        // Ancient Wisdom Design Tokens
-        bg: "#0b0f14",
-        surface: "rgba(255,255,255,0.06)",
-        "accent-primary": "#7ad7ff",
-        "accent-secondary": "#a78bfa",
-        text: "#e6eef7",
-        
-        // Legacy shadcn tokens for compatibility
-        border: "hsl(var(--border))",
+        bg:        'rgb(var(--bg))',
+        surface:   'rgb(var(--surface))',
+        'surface-2':'rgb(var(--surface-2))',
+        text:      'rgb(var(--text))',
+        muted:     'rgb(var(--muted))',
+        ring:      'rgb(var(--ring))',
+        border:    'rgb(var(--border))',
+
+        /* Virtue tokens */
+        primary:   'rgb(var(--wisdom))',     // default accent = Wisdom
+        courage:   'rgb(var(--courage))',
+        justice:   'rgb(var(--justice))',
+        temperance:'rgb(var(--temperance))',
+
+        /* Framework chips */
+        fw: {
+          spartan:    'rgb(var(--spartan))',
+          bushido:    'rgb(var(--bushido))',
+          stoic:      'rgb(var(--stoic))',
+          monastic:   'rgb(var(--monastic))',
+          yogic:      'rgb(var(--yogic))',
+          indigenous: 'rgb(var(--indigenous))',
+          martial:    'rgb(var(--martial))',
+          sufi:       'rgb(var(--sufi))',
+          ubuntu:     'rgb(var(--ubuntu))',
+          highperf:   'rgb(var(--highperf))',
+        },
+
+        /* Legacy shadcn tokens for compatibility */
         input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -43,10 +54,6 @@ const config: Config = {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
         },
         accent: {
           DEFAULT: "hsl(var(--accent))",
@@ -61,14 +68,29 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
       },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+      boxShadow: {
+        card: 'var(--shadow-1)',
+        pop:  'var(--shadow-2)',
+      },
+      transitionTimingFunction: {
+        soft: 'var(--ease-soft)',
+        snap: 'var(--ease-snap)',
+      },
+      transitionDuration: {
+        fast: 'var(--dur-fast)',
+        med:  'var(--dur-med)',
+        slow: 'var(--dur-slow)',
+      },
+      backgroundImage: {
+        /* Virtue gradients for hero bars and buttons */
+        'grad-wisdom':     'linear-gradient(135deg, rgba(var(--wisdom),1), rgba(126,180,255,.18))',
+        'grad-courage':    'linear-gradient(135deg, rgba(var(--courage),1), rgba(255,145,92,.18))',
+        'grad-justice':    'linear-gradient(135deg, rgba(var(--justice),1), rgba(90,214,161,.18))',
+        'grad-temperance': 'linear-gradient(135deg, rgba(var(--temperance),1), rgba(180,160,255,.18))',
       },
       fontFamily: {
-        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
-        serif: ['Playfair Display', 'serif'],
+        display: ['Playfair Display', 'serif'],
+        sans: ['Inter', 'ui-sans-serif', 'system-ui'],
       },
       fontSize: {
         'fluid-xs': ['clamp(0.75rem, 1vw, 0.875rem)', { lineHeight: '1.4' }],
@@ -135,10 +157,10 @@ const config: Config = {
         },
         "glow-pulse": {
           "0%, 100%": { 
-            boxShadow: "0 0 40px rgba(122, 215, 255, 0.3)" 
+            boxShadow: "0 0 40px rgb(var(--wisdom)/0.3)" 
           },
           "50%": { 
-            boxShadow: "0 0 60px rgba(122, 215, 255, 0.5)" 
+            boxShadow: "0 0 60px rgb(var(--wisdom)/0.5)" 
           },
         },
       },
@@ -158,14 +180,7 @@ const config: Config = {
       backdropBlur: {
         xs: '2px',
       },
-      boxShadow: {
-        'glass': '0 10px 40px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.06)',
-        'glow': '0 0 40px rgba(122, 215, 255, 0.3)',
-        'glow-strong': '0 0 60px rgba(122, 215, 255, 0.5)',
-      },
     },
   },
-  plugins: [require("tailwindcss-animate")],
-} satisfies Config;
-
-export default config; 
+  plugins: [require('tailwindcss-animate')],
+} satisfies Config 

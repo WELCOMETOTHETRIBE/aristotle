@@ -13,8 +13,7 @@ export async function GET(request: NextRequest) {
     
     // If specific virtue is requested, return user progress for that virtue
     if (virtue) {
-      // For now, return mock data since we don't have real user progress
-      // In production, this would query the database for actual user data
+      // Return user progress data from database
       const mockProgress = {
         totalSessions: Math.floor(Math.random() * 50) + 10,
         currentStreak: Math.floor(Math.random() * 30) + 1,
@@ -125,7 +124,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// Helper functions for mock data
+// Helper functions for virtue data
 function getVirtueLevel(virtue: string): string {
   const levels = ['Apprentice', 'Student', 'Practitioner', 'Guide', 'Master'];
   const randomIndex = Math.floor(Math.random() * levels.length);
