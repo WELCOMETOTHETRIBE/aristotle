@@ -7,43 +7,44 @@
 /* Surfaces: inky charcoal with warm, lamplight tints */
 
 :root {
-  /* Base (dark study) */
-  --bg: 15 17 21;           /* #0F1115 */
-  --surface: 21 24 33;      /* #151821 */
-  --surface-2: 27 31 42;    /* #1B1F2A */
-  --text: 230 233 239;      /* #E6E9EF */
-  --muted: 152 162 179;     /* #98a2b3 */
-  --ring: 171 196 255;      /* focus ring */
-  --border: 42 47 58;       /* #2A2F3A */
+  /* Core surfaces & text */
+  --bg: 14 16 22;           /* Midnight Ink #0E1016 */
+  --surface: 19 22 31;      /* Night Surface #13161F */
+  --surface-2: 25 28 39;    /* Deep Surface #191C27 */
+  --text: 238 241 246;      /* Bone White #EEF1F6 */
+  --muted: 152 162 179;     /* Slate Mist #98A2B3 */
+  --ring: 171 196 255;      /* Focus Ring #ABC4FF */
+  --border: 40 44 58;       /* Soft Border #282C3A */
 
-  /* Virtues (semantic primaries) */
-  --wisdom: 76 91 217;      /* indigo ~ #4C5BD9 */
-  --courage: 217 76 91;     /* crimson ~ #D94C5B */
-  --justice: 47 184 120;    /* emerald ~ #2FB878 */
-  --temperance: 217 164 76; /* ochre ~ #D9A44C */
+  /* Virtue accents (semantic) */
+  --wisdom: 126 180 255;    /* Wisdom Blue #7EB4FF */
+  --courage: 255 145 92;    /* Courage Ember #FF915C */
+  --justice: 90 214 161;    /* Justice Verdant #5AD6A1 */
+  --temperance: 180 160 255; /* Temperance Plum #B4A0FF */
 
-  /* Framework accents (chips/badges) */
-  --spartan: 255 173 68;    /* ochre */
-  --bushido: 226 76 67;     /* vermillion */
-  --stoic: 103 132 173;     /* slate blue */
-  --monastic: 196 172 136;  /* parchment */
-  --yogic: 120 210 190;     /* jade mist */
-  --indigenous: 157 202 82; /* sage */
-  --martial: 119 119 119;   /* steel */
-  --sufi: 255 196 110;      /* saffron */
-  --ubuntu: 102 186 255;    /* sky */
-  --highperf: 255 115 179;  /* neon rose */
+  /* Framework chips */
+  --spartan: 255 173 68;    /* Spartan Ochre #FFAD44 */
+  --bushido: 226 76 67;     /* Bushidō Vermilion #E24C43 */
+  --stoic: 103 132 173;     /* Stoic Slate #6784AD */
+  --monastic: 196 172 136;  /* Monastic Parchment #C4AC88 */
+  --yogic: 120 210 190;     /* Yogic Jade #78D2BE */
+  --indigenous: 157 202 82; /* Indigenous Sage #9DCA52 */
+  --martial: 119 119 119;   /* Martial Steel #777777 */
+  --sufi: 255 196 110;      /* Sufi Saffron #FFC46E */
+  --ubuntu: 102 186 255;    /* Ubuntu Sky #66BAFF */
+  --highperf: 255 115 179;  /* High-Performance Rose #FF73B3 */
+
+  /* Status colors */
+  --success: 53 196 141;    /* Success #35C48D */
+  --warning: 242 179 76;    /* Warning #F2B34C */
+  --error: 249 112 112;     /* Danger #F97070 */
+  --info: 94 161 255;       /* Info #5EA1FF */
 
   /* Elevation & radii */
   --radius: 16px;
   --shadow-1: 0 6px 22px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.02) inset;
   --shadow-2: 0 12px 42px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.03) inset;
   
-  /* Feedback colors */
-  --success: 47 184 120;    /* #2FB878 */
-  --warning: 217 164 76;    /* #D9A44C */
-  --error: 225 77 77;       /* #E14D4D */
-
   /* Motion */
   --ease-soft: cubic-bezier(.22,.61,.36,1);
   --ease-snap: cubic-bezier(.3,1,.3,1);
@@ -57,8 +58,8 @@ html {
 }
 
 body {
-  background: rgb(var(--bg));
-  color: rgb(var(--text));
+  background: rgb(14, 16, 22);
+  color: rgb(238, 241, 246);
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
@@ -75,7 +76,7 @@ body {
 
   /* Focus styles */
   *:focus-visible {
-    @apply outline-none ring-2 ring-[rgb(var(--ring))] ring-offset-2 ring-offset-[rgb(var(--bg))];
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-bg;
   }
 }
 
@@ -83,92 +84,92 @@ body {
 @layer components {
   /* Card Base */
   .card-base {
-    @apply rounded-2xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] shadow-card p-5;
+    @apply rounded-2xl bg-surface border border-border shadow-card p-5;
   }
 
   /* Panel Base */
   .panel-base {
-    @apply rounded-2xl bg-[rgb(var(--surface-2))] border border-[rgb(var(--border))] shadow-pop p-6;
+    @apply rounded-2xl bg-surface-2 border border-border shadow-pop p-6;
   }
 
   /* Primary button (virtue-aware) */
   .btn-primary {
     @apply rounded-xl px-4 py-2 font-medium text-black
-      bg-[rgb(var(--wisdom))] hover:brightness-110 active:brightness-95
+      bg-primary hover:brightness-110 active:brightness-95
       transition duration-fast ease-snap focus:outline-none
-      focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))];
+      focus-visible:ring-2 focus-visible:ring-ring;
   }
 
   /* Secondary button */
   .btn-secondary {
-    @apply rounded-xl px-4 py-2 font-medium text-[rgb(var(--text))]
-      bg-[rgb(var(--surface))] border border-[rgb(var(--border))]
-      hover:bg-[rgb(var(--surface-2))] transition duration-fast ease-soft
-      focus:outline-none focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))];
+    @apply rounded-xl px-4 py-2 font-medium text-text
+      bg-surface border border-border
+      hover:bg-surface-2 transition duration-fast ease-soft
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-ring;
   }
 
   /* Ghost button */
   .btn-ghost {
-    @apply rounded-xl px-4 py-2 font-medium text-[rgb(var(--muted))]
-      hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--surface))] 
+    @apply rounded-xl px-4 py-2 font-medium text-muted
+      hover:text-text hover:bg-surface 
       transition duration-fast ease-soft focus:outline-none
-      focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))];
+      focus-visible:ring-2 focus-visible:ring-ring;
   }
 
   /* Framework chip */
   .framework-chip {
     @apply inline-flex items-center gap-1 rounded-full px-3 py-1
-      text-xs font-medium bg-[rgb(var(--surface-2))] border border-[rgb(var(--border))]
+      text-xs font-medium bg-surface-2 border border-border
       shadow-card;
   }
 
   /* Hero strip for framework page */
   .hero-strip {
-    @apply rounded-2xl p-6 shadow-pop border border-[rgb(var(--border))]
+    @apply rounded-2xl p-6 shadow-pop border border-border
       bg-grad-wisdom;
   }
 
   /* Breath circle ring (virtue color) */
   .breath-circle {
     @apply relative grid place-items-center size-44 rounded-full
-      bg-[rgb(var(--surface-2))] border border-[rgb(var(--border))] shadow-card
-      ring-1 ring-[rgb(var(--wisdom))/0.25];
+      bg-surface-2 border border-border shadow-card
+      ring-1 ring-primary/25;
   }
 
   /* Input Base */
   .input-base {
-    @apply w-full px-4 py-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]
-      text-[rgb(var(--text))] placeholder-[rgb(var(--muted))] transition duration-fast ease-soft
-      focus:bg-[rgb(var(--surface-2))] focus:border-[rgb(var(--wisdom))] focus:outline-none
-      focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))];
+    @apply w-full px-4 py-3 rounded-xl bg-surface border border-border
+      text-text placeholder-muted transition duration-fast ease-soft
+      focus:bg-surface-2 focus:border-primary focus:outline-none
+      focus-visible:ring-2 focus-visible:ring-ring;
   }
 
   /* Badge variants */
   .badge-primary {
-    @apply bg-[rgb(var(--wisdom)/0.2)] text-[rgb(var(--wisdom))] border border-[rgb(var(--wisdom)/0.3)];
+    @apply bg-primary/20 text-primary border border-primary/30;
   }
 
   .badge-courage {
-    @apply bg-[rgb(var(--courage)/0.2)] text-[rgb(var(--courage))] border border-[rgb(var(--courage)/0.3)];
+    @apply bg-courage/20 text-courage border border-courage/30;
   }
 
   .badge-justice {
-    @apply bg-[rgb(var(--justice)/0.2)] text-[rgb(var(--justice))] border border-[rgb(var(--justice)/0.3)];
+    @apply bg-justice/20 text-justice border border-justice/30;
   }
 
   .badge-temperance {
-    @apply bg-[rgb(var(--temperance)/0.2)] text-[rgb(var(--temperance))] border border-[rgb(var(--temperance)/0.3)];
+    @apply bg-temperance/20 text-temperance border border-temperance/30;
   }
 
   /* Navigation */
   .nav-link {
-    @apply px-4 py-2 rounded-xl text-[rgb(var(--muted))] transition duration-fast ease-soft
-      hover:text-[rgb(var(--text))] hover:bg-[rgb(var(--surface))] focus:outline-none
-      focus-visible:ring-2 focus-visible:ring-[rgb(var(--ring))];
+    @apply px-4 py-2 rounded-xl text-muted transition duration-fast ease-soft
+      hover:text-text hover:bg-surface focus:outline-none
+      focus-visible:ring-2 focus-visible:ring-ring;
   }
 
   .nav-link-active {
-    @apply text-[rgb(var(--wisdom))] bg-[rgb(var(--surface))];
+    @apply text-primary bg-surface;
   }
 
   /* Modal */
@@ -178,20 +179,20 @@ body {
 
   .modal-content {
     @apply fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2
-      w-full max-w-md p-6 rounded-2xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]
+      w-full max-w-md p-6 rounded-2xl bg-surface border border-border
       shadow-pop z-50;
   }
 
   /* Toast */
   .toast {
-    @apply fixed bottom-4 right-4 p-4 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]
+    @apply fixed bottom-4 right-4 p-4 rounded-xl bg-surface border border-border
       shadow-pop z-50 max-w-sm;
   }
 
   /* Tooltip */
   .tooltip {
-    @apply absolute z-50 px-3 py-2 text-sm bg-[rgb(var(--surface-2))] text-[rgb(var(--text))]
-      rounded-xl shadow-pop border border-[rgb(var(--border))]
+    @apply absolute z-50 px-3 py-2 text-sm bg-surface-2 text-text
+      rounded-xl shadow-pop border border-border
       opacity-0 pointer-events-none transition-opacity duration-fast;
   }
 
@@ -201,24 +202,24 @@ body {
 
   /* Loading states */
   .loading-pulse {
-    @apply animate-pulse bg-[rgb(var(--surface-2))] rounded-xl;
+    @apply animate-pulse bg-surface-2 rounded-xl;
   }
 
   .loading-spinner {
-    @apply animate-spin rounded-full border-2 border-[rgb(var(--surface-2))] border-t-[rgb(var(--wisdom))];
+    @apply animate-spin rounded-full border-2 border-surface-2 border-t-primary;
   }
 
   /* Status indicators */
   .status-online {
-    @apply w-3 h-3 bg-[rgb(var(--justice))] rounded-full;
+    @apply w-3 h-3 bg-justice rounded-full;
   }
 
   .status-offline {
-    @apply w-3 h-3 bg-[rgb(var(--muted))] rounded-full;
+    @apply w-3 h-3 bg-muted rounded-full;
   }
 
   .status-warning {
-    @apply w-3 h-3 bg-[rgb(var(--courage))] rounded-full;
+    @apply w-3 h-3 bg-courage rounded-full;
   }
 
   /* Waveform Animation */
@@ -227,13 +228,13 @@ body {
   }
 
   .waveform-bar {
-    @apply h-8 bg-[rgb(var(--wisdom))] rounded-full animate-pulse;
+    @apply h-8 bg-primary rounded-full animate-pulse;
   }
 
   /* Custom scrollbar */
   .custom-scrollbar {
     scrollbar-width: thin;
-    scrollbar-color: rgb(var(--wisdom)/0.3) transparent;
+    scrollbar-color: rgb(126, 180, 255, 0.3) transparent;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -245,12 +246,12 @@ body {
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgb(var(--wisdom)/0.3);
+    background: rgb(126, 180, 255, 0.3);
     border-radius: 3px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgb(var(--wisdom)/0.5);
+    background: rgb(126, 180, 255, 0.5);
   }
 }
 
@@ -262,8 +263,8 @@ body {
   }
 
   @keyframes pulse-glow {
-    0%, 100% { box-shadow: 0 0 20px rgb(var(--wisdom)/0.3); }
-    50% { box-shadow: 0 0 40px rgb(var(--wisdom)/0.6); }
+    0%, 100% { box-shadow: 0 0 20px rgb(126, 180, 255, 0.3); }
+    50% { box-shadow: 0 0 40px rgb(126, 180, 255, 0.6); }
   }
 
   @keyframes breathe {

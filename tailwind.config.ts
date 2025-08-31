@@ -17,37 +17,39 @@ export default {
         '2xl': '16px',
       },
       colors: {
-        bg:        'rgb(var(--bg))',
-        surface:   'rgb(var(--surface))',
-        'surface-2':'rgb(var(--surface-2))',
-        text:      'rgb(var(--text))',
-        muted:     'rgb(var(--muted))',
-        ring:      'rgb(var(--ring))',
-        border:    'rgb(var(--border))',
+        /* Core surfaces & text */
+        bg:        'rgb(14, 16, 22)',        // Midnight Ink
+        surface:   'rgb(19, 22, 31)',        // Night Surface
+        'surface-2':'rgb(25, 28, 39)',       // Deep Surface
+        text:      'rgb(238, 241, 246)',     // Bone White
+        muted:     'rgb(152, 162, 179)',     // Slate Mist
+        ring:      'rgb(171, 196, 255)',     // Focus Ring
+        border:    'rgb(40, 44, 58)',        // Soft Border
 
-        /* Virtue tokens */
-        primary:   'rgb(var(--wisdom))',     // default accent = Wisdom
-        courage:   'rgb(var(--courage))',
-        justice:   'rgb(var(--justice))',
-        temperance:'rgb(var(--temperance))',
+        /* Virtue accents (semantic) */
+        primary:   'rgb(126, 180, 255)',     // Wisdom Blue
+        courage:   'rgb(255, 145, 92)',      // Courage Ember
+        justice:   'rgb(90, 214, 161)',      // Justice Verdant
+        temperance:'rgb(180, 160, 255)',     // Temperance Plum
         
-        /* Feedback colors */
-        success:   'rgb(var(--success))',
-        warning:   'rgb(var(--warning))',
-        error:     'rgb(var(--error))',
+        /* Status colors */
+        success:   'rgb(53, 196, 141)',      // Success
+        warning:   'rgb(242, 179, 76)',      // Warning
+        error:     'rgb(249, 112, 112)',     // Danger
+        info:      'rgb(94, 161, 255)',      // Info
 
         /* Framework chips */
         fw: {
-          spartan:    'rgb(var(--spartan))',
-          bushido:    'rgb(var(--bushido))',
-          stoic:      'rgb(var(--stoic))',
-          monastic:   'rgb(var(--monastic))',
-          yogic:      'rgb(var(--yogic))',
-          indigenous: 'rgb(var(--indigenous))',
-          martial:    'rgb(var(--martial))',
-          sufi:       'rgb(var(--sufi))',
-          ubuntu:     'rgb(var(--ubuntu))',
-          highperf:   'rgb(var(--highperf))',
+          spartan:    'rgb(255, 173, 68)',   // Spartan Ochre
+          bushido:    'rgb(226, 76, 67)',    // Bushidō Vermilion
+          stoic:      'rgb(103, 132, 173)',  // Stoic Slate
+          monastic:   'rgb(196, 172, 136)',  // Monastic Parchment
+          yogic:      'rgb(120, 210, 190)',  // Yogic Jade
+          indigenous: 'rgb(157, 202, 82)',   // Indigenous Sage
+          martial:    'rgb(119, 119, 119)',  // Martial Steel
+          sufi:       'rgb(255, 196, 110)',  // Sufi Saffron
+          ubuntu:     'rgb(102, 186, 255)',  // Ubuntu Sky
+          highperf:   'rgb(255, 115, 179)',  // High-Performance Rose
         },
 
         /* Legacy shadcn tokens for compatibility */
@@ -96,10 +98,10 @@ export default {
       },
       backgroundImage: {
         /* Virtue gradients for hero bars and buttons */
-        'grad-wisdom':     'linear-gradient(135deg, rgba(var(--wisdom),1), rgba(126,180,255,.18))',
-        'grad-courage':    'linear-gradient(135deg, rgba(var(--courage),1), rgba(255,145,92,.18))',
-        'grad-justice':    'linear-gradient(135deg, rgba(var(--justice),1), rgba(90,214,161,.18))',
-        'grad-temperance': 'linear-gradient(135deg, rgba(var(--temperance),1), rgba(180,160,255,.18))',
+        'grad-wisdom':     'linear-gradient(135deg, rgb(126, 180, 255), rgba(126, 180, 255, 0.18))',
+        'grad-courage':    'linear-gradient(135deg, rgb(255, 145, 92), rgba(255, 145, 92, 0.18))',
+        'grad-justice':    'linear-gradient(135deg, rgb(90, 214, 161), rgba(90, 214, 161, 0.18))',
+        'grad-temperance': 'linear-gradient(135deg, rgb(180, 160, 255), rgba(180, 160, 255, 0.18))',
       },
       fontFamily: {
         display: ['Spectral', 'Georgia', 'serif'],
