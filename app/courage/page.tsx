@@ -460,7 +460,26 @@ export default function CouragePage() {
                     {/* Progress tracking and analytics would go here */}
                     <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
                       <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Progress Overview</h2>
-                      <p className="text-gray-600 dark:text-gray-300">Detailed progress tracking and analytics coming soon.</p>
+                      <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl border border-violet-200 dark:border-violet-700">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{courageStats.totalSessions}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Total Practices</div>
+                    </div>
+                    <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl border border-violet-200 dark:border-violet-700">
+                      <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{courageStats.currentStreak}</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Day Streak</div>
+                    </div>
+                  </div>
+                  <div className="p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl border border-violet-200 dark:border-violet-700">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Recent Achievements</div>
+                    <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                      <div>✅ Faced fear of public speaking</div>
+                      <div>✅ Started difficult conversation</div>
+                      <div>✅ Tried new challenging activity</div>
+                    </div>
+                  </div>
+                </div>
                     </div>
                   </motion.div>
                 )}
