@@ -8,7 +8,9 @@ const openai = process.env.OPENAI_API_KEY ? new OpenAI({
 
 // Validation schema for transcription request
 const TranscriptionRequestSchema = z.object({
-  audio: z.instanceof(File, { message: 'Audio file is required' })
+  audio: z.any().refine((val) => val instanceof File || (typeof val === 'object' && val !== null), { 
+    message: 'Audio file is required' 
+  })
 });
 
 export async function POST(request: NextRequest) {
