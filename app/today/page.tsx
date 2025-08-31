@@ -6,6 +6,7 @@ import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
 import { TaskCard } from '@/components/cards/TaskCard';
 import { BreathworkCard } from '@/components/cards/BreathworkCard';
+import { useAuth } from '@/lib/auth-context';
 
 import { StreakCard } from '@/components/cards/StreakCard';
 import { MoodTrackerCard } from '@/components/cards/MoodTrackerCard';
@@ -38,75 +39,110 @@ interface Habit {
 }
 
 export default function TodayPage() {
+  const { user, loading } = useAuth();
   const [focusVirtue, setFocusVirtue] = useState<'wisdom' | 'courage' | 'justice' | 'temperance'>('wisdom');
   const [mood, setMood] = useState<number | null>(null);
   const [intention, setIntention] = useState('');
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: 'Morning meditation',
-      description: '10 minutes of focused breathing',
-      priority: 'H',
-      completed: false,
-    },
-    {
-      id: '2',
-      title: 'Read philosophy',
-      description: 'Continue with Stoic texts',
-      priority: 'M',
-      completed: false,
-    },
-    {
-      id: '3',
-      title: 'Exercise',
-      description: '30 minutes of movement',
-      priority: 'H',
-      completed: false,
-    },
-  ]);
-
-  const [habits, setHabits] = useState<Habit[]>([
-    {
-      id: '1',
-      title: 'Meditation',
-      streakCount: 7,
-      lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000),
-      checkedToday: true,
-    },
-    {
-      id: '2',
-      title: 'Reading',
-      streakCount: 5,
-      lastActivity: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      checkedToday: true,
-    },
-    {
-      id: '3',
-      title: 'Exercise',
-      streakCount: 3,
-      lastActivity: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-      checkedToday: false,
-    },
-  ]);
-
+  
+  // Initialize empty arrays for authenticated users, mockup data for demo
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [habits, setHabits] = useState<Habit[]>([]);
   const [userWidgets, setUserWidgets] = useState<string[]>([]);
+
+  // Load mockup data only for demo (unauthenticated users)
+  useEffect(() => {
+    if (!loading && !user) {
+      // Demo data for unauthenticated users
+      setTasks([
+        {
+          id: '1',
+          title: 'Morning meditation',
+          description: '10 minutes of focused breathing',
+          priority: 'H',
+          completed: false,
+        },
+        {
+          id: '2',
+          title: 'Read philosophy',
+          description: 'Continue with Stoic texts',
+          priority: 'M',
+          completed: false,
+        },
+        {
+          id: '3',
+          title: 'Exercise',
+          description: '30 minutes of movement',
+          priority: 'H',
+          completed: false,
+        },
+      ]);
+
+      setHabits([
+        {
+          id: '1',
+          title: 'Meditation',
+          streakCount: 7,
+          lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000),
+          checkedToday: true,
+        },
+        {
+          id: '2',
+          title: 'Reading',
+          streakCount: 5,
+          lastActivity: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          checkedToday: true,
+        },
+        {
+          id: '3',
+          title: 'Exercise',
+          streakCount: 3,
+          lastActivity: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+          checkedToday: false,
+        },
+      ]);
+    }
+  }, [user, loading]);
 
   // Load user's added widgets
   useEffect(() => {
-    const saved = localStorage.getItem('userWidgets');
-    if (saved) {
-      const parsedWidgets = JSON.parse(saved);
-      // Remove duplicates and ensure wisdom_spotlight only appears once
-      const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
-      setUserWidgets(uniqueWidgets);
-      localStorage.setItem('userWidgets', JSON.stringify(uniqueWidgets));
+    if (loading) return; // Wait for auth to load
+
+    if (user) {
+      // Authenticated user - load their personal widgets
+      const saved = localStorage.getItem(`userWidgets_${user.id}`);
+      if (saved) {
+        const parsedWidgets = JSON.parse(saved);
+        const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
+        setUserWidgets(uniqueWidgets);
+      } else {
+        // New authenticated user - start with empty widgets
+        setUserWidgets([]);
+      }
     } else {
-      // Add some default widgets for demonstration
-      const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
-      setUserWidgets(defaultWidgets);
-      localStorage.setItem('userWidgets', JSON.stringify(defaultWidgets));
+      // Demo mode for unauthenticated users
+      const saved = localStorage.getItem('demoWidgets');
+      if (saved) {
+        const parsedWidgets = JSON.parse(saved);
+        const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
+        setUserWidgets(uniqueWidgets);
+      } else {
+        // Default demo widgets
+        const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
+        setUserWidgets(defaultWidgets);
+        localStorage.setItem('demoWidgets', JSON.stringify(defaultWidgets));
+      }
     }
-  }, []);
+  }, [user, loading]);
+
+  // Save widget changes
+  const saveUserWidgets = (widgets: string[]) => {
+    if (user) {
+      localStorage.setItem(`userWidgets_${user.id}`, JSON.stringify(widgets));
+    } else {
+      localStorage.setItem('demoWidgets', JSON.stringify(widgets));
+    }
+    setUserWidgets(widgets);
+  };
 
   const renderWidget = (widgetId: string) => {
     switch (widgetId) {

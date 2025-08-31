@@ -10,6 +10,7 @@ import {
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
+import { useAuth } from '@/lib/auth-context';
 
 interface Widget {
   id: string;
@@ -186,6 +187,7 @@ const categories = [
 ];
 
 export default function ToolsPage() {
+  const { user, loading } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [widgets, setWidgets] = useState<Widget[]>(availableWidgets);
   const [showAddedOnly, setShowAddedOnly] = useState(false);
@@ -193,17 +195,52 @@ export default function ToolsPage() {
 
   // Load user's added widgets from localStorage
   useEffect(() => {
-    const savedWidgets = localStorage.getItem('userWidgets');
-    if (savedWidgets) {
-      const userWidgets = JSON.parse(savedWidgets);
-      setWidgets(prev => 
-        prev.map(widget => ({
-          ...widget,
-          isAdded: userWidgets.includes(widget.id)
-        }))
-      );
+    if (loading) return; // Wait for auth to load
+
+    if (user) {
+      // Authenticated user - load their personal widgets
+      const savedWidgets = localStorage.getItem(`userWidgets_${user.id}`);
+      if (savedWidgets) {
+        const userWidgets = JSON.parse(savedWidgets);
+        setWidgets(prev => 
+          prev.map(widget => ({
+            ...widget,
+            isAdded: userWidgets.includes(widget.id)
+          }))
+        );
+      } else {
+        // New authenticated user - start with no widgets added
+        setWidgets(prev => 
+          prev.map(widget => ({
+            ...widget,
+            isAdded: false
+          }))
+        );
+      }
+    } else {
+      // Demo mode for unauthenticated users
+      const savedWidgets = localStorage.getItem('demoWidgets');
+      if (savedWidgets) {
+        const userWidgets = JSON.parse(savedWidgets);
+        setWidgets(prev => 
+          prev.map(widget => ({
+            ...widget,
+            isAdded: userWidgets.includes(widget.id)
+          }))
+        );
+      } else {
+        // Default demo widgets
+        const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
+        setWidgets(prev => 
+          prev.map(widget => ({
+            ...widget,
+            isAdded: defaultWidgets.includes(widget.id)
+          }))
+        );
+        localStorage.setItem('demoWidgets', JSON.stringify(defaultWidgets));
+      }
     }
-  }, []);
+  }, [user, loading]);
 
   const toggleWidget = (widgetId: string) => {
     setWidgets(prev => {
@@ -213,12 +250,18 @@ export default function ToolsPage() {
           : widget
       );
       
-      // Save to localStorage
+      // Save to user-specific localStorage
       const addedWidgetIds = updatedWidgets
         .filter(widget => widget.isAdded)
         .map(widget => widget.id);
       
-      localStorage.setItem('userWidgets', JSON.stringify(addedWidgetIds));
+      if (user) {
+        // Authenticated user - save to user-specific storage
+        localStorage.setItem(`userWidgets_${user.id}`, JSON.stringify(addedWidgetIds));
+      } else {
+        // Demo mode - save to demo storage
+        localStorage.setItem('demoWidgets', JSON.stringify(addedWidgetIds));
+      }
       
       // Show feedback
       const widget = updatedWidgets.find(w => w.id === widgetId);

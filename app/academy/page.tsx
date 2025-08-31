@@ -5,6 +5,7 @@ import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/auth-context';
 
 interface VirtueSpotlight {
   id: string;
@@ -163,6 +164,7 @@ const virtueSpotlights: VirtueSpotlight[] = [
 ];
 
 export default function AcademyPage() {
+  const { user, loading } = useAuth();
   const [selectedVirtue, setSelectedVirtue] = useState<VirtueSpotlight | null>(null);
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [userResponse, setUserResponse] = useState('');
@@ -170,16 +172,37 @@ export default function AcademyPage() {
 
   // Load saved progress
   useEffect(() => {
-    const savedSpotlights = localStorage.getItem('academySpotlights');
-    if (savedSpotlights) {
-      setSpotlights(JSON.parse(savedSpotlights));
+    if (loading) return; // Wait for auth to load
+
+    if (user) {
+      // Authenticated user - load their personal progress
+      const savedSpotlights = localStorage.getItem(`academySpotlights_${user.id}`);
+      if (savedSpotlights) {
+        setSpotlights(JSON.parse(savedSpotlights));
+      } else {
+        // New authenticated user - start with fresh progress
+        setSpotlights(virtueSpotlights);
+      }
+    } else {
+      // Demo mode for unauthenticated users
+      const savedSpotlights = localStorage.getItem('demoAcademySpotlights');
+      if (savedSpotlights) {
+        setSpotlights(JSON.parse(savedSpotlights));
+      } else {
+        // Default demo progress
+        setSpotlights(virtueSpotlights);
+      }
     }
-  }, []);
+  }, [user, loading]);
 
   // Save progress
   const saveProgress = (updatedSpotlights: VirtueSpotlight[]) => {
     setSpotlights(updatedSpotlights);
-    localStorage.setItem('academySpotlights', JSON.stringify(updatedSpotlights));
+    if (user) {
+      localStorage.setItem(`academySpotlights_${user.id}`, JSON.stringify(updatedSpotlights));
+    } else {
+      localStorage.setItem('demoAcademySpotlights', JSON.stringify(updatedSpotlights));
+    }
   };
 
   const startVirtueJourney = (virtue: VirtueSpotlight) => {
@@ -223,10 +246,19 @@ export default function AcademyPage() {
       virtue: selectedVirtue.id
     };
 
-    const existingEntries = localStorage.getItem('journalEntries') || '[]';
-    const entries = JSON.parse(existingEntries);
-    entries.unshift(journalEntry);
-    localStorage.setItem('journalEntries', JSON.stringify(entries));
+    if (user) {
+      // Authenticated user - save to user-specific storage
+      const existingEntries = localStorage.getItem(`journalEntries_${user.id}`) || '[]';
+      const entries = JSON.parse(existingEntries);
+      entries.unshift(journalEntry);
+      localStorage.setItem(`journalEntries_${user.id}`, JSON.stringify(entries));
+    } else {
+      // Demo mode - save to demo storage
+      const existingEntries = localStorage.getItem('demoJournalEntries') || '[]';
+      const entries = JSON.parse(existingEntries);
+      entries.unshift(journalEntry);
+      localStorage.setItem('demoJournalEntries', JSON.stringify(entries));
+    }
 
     setUserResponse('');
     
