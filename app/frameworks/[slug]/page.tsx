@@ -11,7 +11,8 @@ import Link from 'next/link';
 import { 
   Trophy, Target, TrendingUp, BookOpen, Zap, Info, Brain, Shield, Scale, Leaf, 
   ArrowLeft, Users, Star, Clock, Activity, BarChart3, Compass, Lightbulb,
-  ChevronRight, ChevronDown, Play, Pause, SkipForward, Heart, Sparkles
+  ChevronRight, ChevronDown, Play, Pause, SkipForward, Heart, Sparkles,
+  Sun, Wind, Moon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import WidgetGuard from '../../../components/WidgetGuard';
@@ -134,6 +135,33 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         return 'from-purple-400 to-violet-400';
       default:
         return 'from-blue-400 to-cyan-400';
+    }
+  };
+
+  const getFrameworkIcon = (slug: string) => {
+    switch (slug) {
+      case 'spartan':
+        return <Shield className="w-6 h-6 text-white" />;
+      case 'stoic':
+        return <Brain className="w-6 h-6 text-white" />;
+      case 'bushido':
+        return <Target className="w-6 h-6 text-white" />;
+      case 'monastic':
+        return <Scale className="w-6 h-6 text-white" />;
+      case 'yogic':
+        return <Leaf className="w-6 h-6 text-white" />;
+      case 'indigenous':
+        return <Sun className="w-6 h-6 text-white" />;
+      case 'martial':
+        return <Target className="w-6 h-6 text-white" />;
+      case 'sufi':
+        return <Wind className="w-6 h-6 text-white" />;
+      case 'zen':
+        return <Moon className="w-6 h-6 text-white" />;
+      case 'highperf':
+        return <TrendingUp className="w-6 h-6 text-white" />;
+      default:
+        return <BookOpen className="w-6 h-6 text-white" />;
     }
   };
 
@@ -295,17 +323,18 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             <div className="flex items-center gap-4 mb-6">
               <Link
                 href="/frameworks"
-                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-gray-600 dark:text-gray-300 rounded-lg transition-all duration-200"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                Back to Frameworks
               </Link>
               <div className="flex items-center gap-3">
                 <div className={`w-12 h-12 bg-gradient-to-r ${getToneGradient(framework.tone)} rounded-xl flex items-center justify-center shadow-lg`}>
-                  <span className="text-2xl">{framework.nav.emoji}</span>
+                  {getFrameworkIcon(framework.slug)}
                 </div>
                 <div>
                   <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{framework.name}</h1>
-                  <p className="text-gray-600 dark:text-gray-300">{framework.description}</p>
+                  <p className="text-gray-600 dark:text-gray-300">{framework.teachingChip}</p>
                 </div>
               </div>
             </div>
