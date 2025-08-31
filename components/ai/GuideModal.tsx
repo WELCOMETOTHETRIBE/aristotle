@@ -93,6 +93,20 @@ export function GuideModal({ isOpen, onClose }: GuideModalProps) {
       });
 
       if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        if (response.status === 503 && errorData.fallback) {
+          // AI Guide not configured, show fallback message
+          setMessages(prev => [
+            ...prev,
+            {
+              id: Date.now().toString(),
+              role: 'assistant',
+              content: errorData.fallback,
+              timestamp: new Date(),
+            },
+          ]);
+          return;
+        }
         throw new Error('Failed to get response');
       }
 

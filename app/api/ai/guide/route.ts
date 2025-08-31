@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { z } from 'zod';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Don't initialize OpenAI client at module level to avoid build-time errors
+const getOpenAI = () => {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    throw new Error('OPENAI_API_KEY environment variable is required');
+  }
+  return new OpenAI({ apiKey });
+};
 
 const requestSchema = z.object({
   message: z.string(),
@@ -39,6 +44,20 @@ Always end with a gentle nudge toward the next small step.`;
 
 export async function POST(request: NextRequest) {
   try {
+    // Check if OpenAI API key is available
+    if (!process.env.OPENAI_API_KEY) {
+      return NextResponse.json(
+        { 
+          error: 'AI Guide is not configured. Please set OPENAI_API_KEY environment variable.',
+          fallback: 'Consider taking a moment to reflect on your current situation and what small step you could take next.'
+        },
+        { status: 503 }
+      );
+    }
+
+    // Initialize OpenAI client only when the route is called
+    const openai = getOpenAI();
+    
     const body = await request.json();
     const { message, context } = requestSchema.parse(body);
 
