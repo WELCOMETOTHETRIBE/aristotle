@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { z } from 'zod';
 
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 }) : null;
+
+// Validation schema for transcription request
+const TranscriptionRequestSchema = z.object({
+  audio: z.instanceof(File, { message: 'Audio file is required' })
+});
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,6 +23,18 @@ export async function POST(request: NextRequest) {
     
     const formData = await request.formData();
     const audioFile = formData.get('audio') as File;
+
+    // Validate audio file
+    const validationResult = TranscriptionRequestSchema.safeParse({ audio: audioFile });
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid request format', 
+          details: validationResult.error.errors 
+        },
+        { status: 400 }
+      );
+    }
 
     if (!audioFile) {
       console.error('No audio file provided');

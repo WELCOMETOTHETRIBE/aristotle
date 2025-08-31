@@ -2,10 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
+import { z } from 'zod';
 
 const openai = process.env.OPENAI_API_KEY ? new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 }) : null;
+
+// Validation schema for breathwork audio generation request
+const BreathworkAudioRequestSchema = z.object({
+  regenerate: z.boolean().optional().default(false)
+});
 
 // Simplified audio files for smooth breathwork experience
 const audioFiles = [
@@ -72,6 +78,25 @@ async function generateAudioFile(text: string, filename: string) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Validate request body
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      body = {};
+    }
+    
+    const validationResult = BreathworkAudioRequestSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid request format', 
+          details: validationResult.error.errors 
+        },
+        { status: 400 }
+      );
+    }
+    
     if (!openai) {
       return NextResponse.json(
         { error: 'OpenAI API key not configured' },
@@ -98,35 +123,31 @@ export async function POST(request: NextRequest) {
     // Create the audio mapping
     const audioMapping: {
       instructions: { [key: string]: string };
-      counting: { [key: string]: string };
+      counts: { [key: string]: string };
       session: { [key: string]: string };
     } = {
-      instructions: {
-        inhale: results.find(r => r.filename === 'inhale.mp3')?.url || '',
-        hold: results.find(r => r.filename === 'hold.mp3')?.url || '',
-        exhale: results.find(r => r.filename === 'exhale.mp3')?.url || '',
-        holdEmpty: results.find(r => r.filename === 'hold-empty.mp3')?.url || ''
-      },
-      counting: {},
-      session: {
-        start: results.find(r => r.filename === 'session-start.mp3')?.url || '',
-        complete: results.find(r => r.filename === 'session-complete.mp3')?.url || ''
-      }
+      instructions: {},
+      counts: {},
+      session: {}
     };
 
-    // Add counting numbers
-    for (let i = 1; i <= 15; i++) {
-      const countFile = results.find(r => r.filename === `count-${i}.mp3`);
-      if (countFile) {
-        audioMapping.counting[i.toString()] = countFile.url;
+    // Organize results into mapping
+    results.forEach(result => {
+      if (result.filename.startsWith('count-')) {
+        const number = result.filename.replace('count-', '').replace('.mp3', '');
+        audioMapping.counts[number] = result.url;
+      } else if (result.filename.includes('session')) {
+        audioMapping.session[result.filename.replace('.mp3', '')] = result.url;
+      } else {
+        audioMapping.instructions[result.filename.replace('.mp3', '')] = result.url;
       }
-    }
+    });
 
-    // Save the mapping
+    // Save the mapping to a JSON file
     const mappingPath = join(process.cwd(), 'public', 'audio', 'breathwork', 'audio-mapping.json');
     await writeFile(mappingPath, JSON.stringify(audioMapping, null, 2));
     
-    console.log('🎉 Audio generation complete!');
+    console.log('✅ Audio mapping saved:', mappingPath);
     
     return NextResponse.json(audioMapping);
   } catch (error) {

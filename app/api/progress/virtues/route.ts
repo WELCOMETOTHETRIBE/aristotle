@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { safeParse, zVirtueScore, zId } from '@/lib/validate';
+import { z } from 'zod';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,6 +9,23 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const days = parseInt(searchParams.get('days') || '7');
+    const virtue = searchParams.get('virtue');
+    
+    // If specific virtue is requested, return user progress for that virtue
+    if (virtue) {
+      // For now, return mock data since we don't have real user progress
+      // In production, this would query the database for actual user data
+      const mockProgress = {
+        totalSessions: Math.floor(Math.random() * 50) + 10,
+        currentStreak: Math.floor(Math.random() * 30) + 1,
+        wisdomLevel: getVirtueLevel(virtue),
+        completionRate: Math.floor(Math.random() * 40) + 60,
+        favoritePractice: getFavoritePractice(virtue),
+        lastPractice: new Date(Date.now() - Math.random() * 7 * 24 * 60 * 60 * 1000).toISOString()
+      };
+      
+      return NextResponse.json(mockProgress);
+    }
     
     // Get virtue scores for the last N days
     const endDate = new Date();
@@ -105,4 +123,24 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// Helper functions for mock data
+function getVirtueLevel(virtue: string): string {
+  const levels = ['Apprentice', 'Student', 'Practitioner', 'Guide', 'Master'];
+  const randomIndex = Math.floor(Math.random() * levels.length);
+  return levels[randomIndex];
+}
+
+function getFavoritePractice(virtue: string): string {
+  const practices = {
+    wisdom: ['Socratic Dialogue', 'Contemplative Reading', 'Evening Reflection'],
+    courage: ['Cold Exposure', 'Public Speaking', 'Boundary Setting'],
+    justice: ['Active Listening', 'Fair Decision Making', 'Community Service'],
+    temperance: ['Mindful Breathing', 'Digital Detox', 'Gratitude Practice']
+  };
+  
+  const virtuePractices = practices[virtue as keyof typeof practices] || ['Daily Practice'];
+  const randomIndex = Math.floor(Math.random() * virtuePractices.length);
+  return virtuePractices[randomIndex];
 } 

@@ -1,9 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { generateWithCache, PracticeDetailSchema } from '@/lib/ai';
+import { z } from 'zod';
+import { generateWithCache } from '@/lib/ai';
+
+// Validation schema for virtue insights request
+const VirtueInsightsRequestSchema = z.object({
+  virtue: z.string().min(1, 'Virtue is required'),
+  userLevel: z.string().min(1, 'User level is required'),
+  interests: z.array(z.string()).min(1, 'At least one interest is required')
+});
+
+// Response schema for virtue insights
+const VirtueInsightsResponseSchema = z.object({
+  insights: z.array(z.string().max(100))
+});
 
 export async function POST(request: NextRequest) {
   try {
-    const { virtue, userLevel, interests } = await request.json();
+    const body = await request.json();
+    
+    // Validate request body
+    const validationResult = VirtueInsightsRequestSchema.safeParse(body);
+    if (!validationResult.success) {
+      return NextResponse.json(
+        { 
+          error: 'Invalid request format', 
+          details: validationResult.error.errors 
+        },
+        { status: 400 }
+      );
+    }
+    
+    const { virtue, userLevel, interests } = validationResult.data;
     
     const getVirtuePrompt = (virtue: string) => {
       switch (virtue.toLowerCase()) {
@@ -65,31 +92,49 @@ export async function POST(request: NextRequest) {
 
     const prompt = getVirtuePrompt(virtue);
     
-    const insights = await generateWithCache(
-      'practice_detail',
-      { 
-        virtue,
-        userLevel,
-        interests: interests.join(', ')
-      },
-      PracticeDetailSchema,
-      prompt
-    );
+    try {
+      const insights = await generateWithCache(
+        'practice_detail',
+        { 
+          virtue,
+          userLevel,
+          interests: interests.join(', ')
+        },
+        VirtueInsightsResponseSchema,
+        prompt
+      );
 
-    return NextResponse.json(insights);
+      return NextResponse.json(insights);
+    } catch (aiError) {
+      console.error('AI generation error:', aiError);
+      
+      // Return fallback insights with 200 status
+      const fallbackInsights = {
+        insights: [
+          "Every challenge is an opportunity to grow wiser. Embrace difficulties as teachers.",
+          "True wisdom comes from understanding that you don't know everything.",
+          "Reflect daily on your experiences to extract meaningful lessons."
+        ]
+      };
+      
+      return NextResponse.json(fallbackInsights);
+    }
 
   } catch (error) {
-    console.error('Error generating virtue insights:', error);
+    console.error('Error in virtue insights API:', error);
     
-    // Fallback insights
-    const fallbackInsights = {
-      insights: [
-        "Every challenge is an opportunity to grow wiser. Embrace difficulties as teachers.",
-        "True wisdom comes from understanding that you don't know everything.",
-        "Reflect daily on your experiences to extract meaningful lessons."
-      ]
-    };
+    // Handle JSON parsing errors
+    if (error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: 'Invalid JSON in request body' },
+        { status: 400 }
+      );
+    }
     
-    return NextResponse.json(fallbackInsights);
+    // Handle other errors
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    );
   }
 } 
