@@ -294,22 +294,12 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="animate-pulse">
-              <div className="h-8 bg-white/20 rounded mb-8"></div>
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 space-y-6">
-                  <div className="h-64 bg-white/10 rounded-xl"></div>
-                  <div className="h-48 bg-white/10 rounded-xl"></div>
-                </div>
-                <div className="space-y-6">
-                  <div className="h-48 bg-white/10 rounded-xl"></div>
-                  <div className="h-64 bg-white/10 rounded-xl"></div>
-                </div>
-              </div>
-            </div>
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
+            <h2 className="text-2xl font-bold text-white mb-2">Loading Framework</h2>
+            <p className="text-gray-300">Preparing your philosophical journey...</p>
           </div>
         </div>
       </div>
@@ -318,15 +308,17 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
   if (error || !framework) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
         <div className="container mx-auto px-4 py-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <div className="p-8 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Framework Not Found</h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">{error || 'The requested framework could not be found.'}</p>
-              <Link
+          <div className="text-center">
+            <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-8 max-w-md mx-auto">
+              <h2 className="text-2xl font-bold text-white mb-4">Framework Not Found</h2>
+              <p className="text-gray-300 mb-6">
+                {error || 'The requested framework could not be loaded.'}
+              </p>
+              <Link 
                 href="/frameworks"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-medium transition-all duration-200"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-200"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to Frameworks

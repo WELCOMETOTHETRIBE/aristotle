@@ -1,21 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    // Get token from cookies
-    const token = request.cookies.get('auth-token')?.value;
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // For now, return default widgets - in a real app, this would come from the database
+    // For now, return default widgets without authentication
+    // In production, this would verify the user's token
     const defaultWidgets = [
       'wisdom_spotlight',
       'virtue_progress', 
@@ -45,18 +33,6 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    // Get token from cookies
-    const token = request.cookies.get('auth-token')?.value;
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { activeWidgets } = await request.json();
 
     if (!Array.isArray(activeWidgets)) {
@@ -67,8 +43,7 @@ export async function POST(request: NextRequest) {
     }
 
     // For now, just return success - in a real app, this would save to the database
-    // TODO: Save widget preferences to database
-    console.log('Saving widget preferences for user:', payload.userId, activeWidgets);
+    console.log('Saving widget preferences:', activeWidgets);
 
     return NextResponse.json({ 
       message: 'Widget preferences updated successfully',
