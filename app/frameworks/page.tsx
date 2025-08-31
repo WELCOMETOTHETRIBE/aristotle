@@ -1,311 +1,196 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { getToneGradient, getToneTextColor } from '../../lib/tone';
-import { getAllFrameworks, type FrameworkConfig } from '../../lib/frameworks.config';
-import Link from 'next/link';
-import { 
-  Sparkles, BookOpen, Target, Users, Star, ArrowRight, 
-  Brain, Shield, Scale, Leaf, Flame, Wind, Moon, Sun,
-  TrendingUp, Activity, Award, Compass
-} from 'lucide-react';
+import { useState } from 'react';
+import { Header } from '@/components/nav/Header';
+import { TabBar } from '@/components/nav/TabBar';
+import { GuideFAB } from '@/components/ai/GuideFAB';
+import { Search, BookOpen, Clock, Target } from 'lucide-react';
+import { cn } from '@/lib/utils';
+
+interface Framework {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  timeToLearn: string;
+  virtueTags: string[];
+  tone: string;
+}
+
+const frameworks: Framework[] = [
+  {
+    id: '1',
+    slug: 'stoicism',
+    name: 'Stoicism',
+    description: 'Master the art of living through reason and virtue',
+    timeToLearn: '2-3 weeks',
+    virtueTags: ['wisdom', 'courage', 'temperance'],
+    tone: 'stoic',
+  },
+  {
+    id: '2',
+    slug: 'buddhism',
+    name: 'Buddhism',
+    description: 'Find peace through mindfulness and compassion',
+    timeToLearn: '3-4 weeks',
+    virtueTags: ['wisdom', 'temperance', 'justice'],
+    tone: 'buddhist',
+  },
+  {
+    id: '3',
+    slug: 'aristotelian',
+    name: 'Aristotelian Ethics',
+    description: 'Cultivate excellence through virtuous habits',
+    timeToLearn: '4-5 weeks',
+    virtueTags: ['wisdom', 'justice', 'courage'],
+    tone: 'aristotelian',
+  },
+  {
+    id: '4',
+    slug: 'confucianism',
+    name: 'Confucianism',
+    description: 'Build harmonious relationships and moral character',
+    timeToLearn: '3-4 weeks',
+    virtueTags: ['justice', 'temperance', 'wisdom'],
+    tone: 'confucian',
+  },
+];
+
+const virtueColors = {
+  wisdom: 'bg-primary/20 text-primary border-primary/30',
+  courage: 'bg-courage/20 text-courage border-courage/30',
+  justice: 'bg-justice/20 text-justice border-justice/30',
+  temperance: 'bg-temperance/20 text-temperance border-temperance/30',
+};
 
 export default function FrameworksPage() {
-  const [frameworks, setFrameworks] = useState<FrameworkConfig[]>([]);
-  const [selectedFramework, setSelectedFramework] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedVirtue, setSelectedVirtue] = useState<string | null>(null);
 
-  useEffect(() => {
-    // Load frameworks from config
-    const allFrameworks = getAllFrameworks();
-    setFrameworks(allFrameworks);
-  }, []);
+  const filteredFrameworks = frameworks.filter(framework => {
+    const matchesSearch = framework.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         framework.description.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesVirtue = !selectedVirtue || framework.virtueTags.includes(selectedVirtue);
+    return matchesSearch && matchesVirtue;
+  });
 
-  const getFrameworkIcon = (slug: string) => {
-    switch (slug) {
-      case 'spartan':
-        return <Shield className="w-6 h-6 text-white" />;
-      case 'stoic':
-        return <Brain className="w-6 h-6 text-white" />;
-      case 'bushido':
-        return <Target className="w-6 h-6 text-white" />;
-      case 'monastic':
-        return <Scale className="w-6 h-6 text-white" />;
-      case 'yogic':
-        return <Leaf className="w-6 h-6 text-white" />;
-      case 'indigenous':
-        return <Sun className="w-6 h-6 text-white" />;
-      case 'martial':
-        return <Target className="w-6 h-6 text-white" />;
-      case 'sufi':
-        return <Wind className="w-6 h-6 text-white" />;
-      case 'zen':
-        return <Moon className="w-6 h-6 text-white" />;
-      case 'highperf':
-        return <TrendingUp className="w-6 h-6 text-white" />;
-      default:
-        return <BookOpen className="w-6 h-6 text-white" />;
-    }
-  };
-
-  const getFrameworkEmoji = (slug: string) => {
-    switch (slug) {
-      case 'spartan':
-        return '🛡️';
-      case 'stoic':
-        return '🧱';
-      case 'bushido':
-        return '⚔️';
-      case 'monastic':
-        return '🙏';
-      case 'yogic':
-        return '🧘';
-      case 'indigenous':
-        return '🌿';
-      case 'martial':
-        return '🥋';
-      case 'sufi':
-        return '🕊️';
-      case 'zen':
-        return '☸️';
-      case 'highperf':
-        return '🚀';
-      default:
-        return '📚';
-    }
-  };
-
-  const getFrameworkColor = (slug: string) => {
-    switch (slug) {
-      case 'spartan':
-        return 'from-red-500 to-orange-500';
-      case 'stoic':
-        return 'from-blue-500 to-indigo-500';
-      case 'bushido':
-        return 'from-gray-700 to-gray-900';
-      case 'monastic':
-        return 'from-purple-500 to-violet-500';
-      case 'yogic':
-        return 'from-green-500 to-emerald-500';
-      case 'indigenous':
-        return 'from-amber-500 to-orange-500';
-      case 'martial':
-        return 'from-slate-500 to-gray-500';
-      case 'sufi':
-        return 'from-teal-500 to-cyan-500';
-      case 'zen':
-        return 'from-stone-500 to-neutral-500';
-      case 'highperf':
-        return 'from-blue-500 to-indigo-500';
-      default:
-        return 'from-blue-500 to-indigo-500';
-    }
-  };
-
-  const getFrameworkGradient = (slug: string) => {
-    const color = getFrameworkColor(slug);
-    return `bg-gradient-to-br ${color}/10 border-${color.split('-')[1]}-500/20`;
-  };
-
-  const getFrameworkDescription = (framework: FrameworkConfig) => {
-    const descriptions: Record<string, string> = {
-      spartan: 'Embrace hardship and build unbreakable character through disciplined training and mental fortitude.',
-      stoic: 'Find inner peace through rational thinking, self-control, and acceptance of what you cannot change.',
-      bushido: 'Live with honor, loyalty, and courage. The way of the warrior emphasizes moral character and ethical behavior.',
-      monastic: 'Seek spiritual growth through contemplation, simplicity, and devotion to higher principles.',
-      yogic: 'Achieve harmony of body, mind, and spirit through conscious practice and spiritual awareness.',
-      indigenous: 'Honor the interconnectedness of all life and live in harmony with nature and community.',
-      martial: 'Develop mental and physical discipline through focused training and continuous improvement.',
-      sufi: 'Seek divine love and spiritual transformation through mystical practices and inner awakening.',
-      zen: 'Find enlightenment through meditation, mindfulness, and direct experience of reality.',
-      highperf: 'Optimize your performance through systematic training, biofeedback, and continuous improvement.'
-    };
-    return descriptions[framework.slug] || 'A philosophical framework for personal growth and development.';
-  };
-
-  const getCoreModules = (framework: FrameworkConfig) => {
-    const modules: Record<string, string[]> = {
-      spartan: ['strength', 'discipline', 'courage'],
-      stoic: ['wisdom', 'temperance', 'reflection'],
-      bushido: ['honor', 'loyalty', 'courage'],
-      monastic: ['contemplation', 'simplicity', 'devotion'],
-      yogic: ['balance', 'awareness', 'unity'],
-      indigenous: ['connection', 'stewardship', 'wisdom'],
-      martial: ['focus', 'discipline', 'skill'],
-      sufi: ['love', 'devotion', 'transformation'],
-      zen: ['mindfulness', 'meditation', 'enlightenment'],
-      highperf: ['optimization', 'biofeedback', 'improvement']
-    };
-    return modules[framework.slug] || ['growth', 'development', 'practice'];
-  };
-
-  const getFeaturedPractices = (framework: FrameworkConfig) => {
-    const practices: Record<string, string[]> = {
-      spartan: ['cold_exposure', 'adversity_training'],
-      stoic: ['evening_reflection', 'memento_mori'],
-      bushido: ['meditation', 'martial_arts'],
-      monastic: ['prayer', 'meditation'],
-      yogic: ['yoga', 'pranayama'],
-      indigenous: ['nature_connection', 'ceremony'],
-      martial: ['training', 'meditation'],
-      sufi: ['dhikr', 'meditation'],
-      zen: ['zazen', 'mindfulness'],
-      highperf: ['flow_timer', 'biofeedback']
-    };
-    return practices[framework.slug] || ['meditation', 'reflection'];
-  };
+  const virtues = ['wisdom', 'courage', 'justice', 'temperance'];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          
-          {/* Header */}
-          <motion.div 
-            className="mb-12 text-center"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-                <BookOpen className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-4xl font-bold text-gray-900 dark:text-white">Philosophical Frameworks</h1>
-                <p className="text-xl text-gray-600 dark:text-gray-300">Choose your path to wisdom and growth</p>
-              </div>
-            </div>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-              Explore ancient and modern philosophical traditions that have guided humanity's greatest thinkers and practitioners. 
-              Each framework offers unique insights and practices for personal development.
-            </p>
-          </motion.div>
+    <div className="min-h-screen bg-bg pb-20">
+      <Header />
+      
+      <main className="px-4 py-6 space-y-6">
+        {/* Hero Section */}
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-bold text-text">Frameworks</h1>
+          <p className="text-muted">Choose your path to flourishing</p>
+        </div>
 
-          {/* Frameworks Grid */}
-          <motion.div 
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            {frameworks.map((framework, index) => (
-              <motion.div
-                key={framework.slug}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: 0.3 + index * 0.1 }}
-                whileHover={{ scale: 1.02, y: -5 }}
-                className="group cursor-pointer"
-                onClick={() => setSelectedFramework(selectedFramework === framework.slug ? null : framework.slug)}
+        {/* Search and Filters */}
+        <div className="space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+            <input
+              type="text"
+              placeholder="Search frameworks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+            />
+          </div>
+
+          {/* Virtue Filters */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedVirtue(null)}
+              className={cn(
+                'px-3 py-1 rounded-full border text-sm font-medium transition-colors duration-150',
+                !selectedVirtue
+                  ? 'bg-primary/20 text-primary border-primary/30'
+                  : 'bg-surface-2 border-border text-muted hover:text-text'
+              )}
+            >
+              All
+            </button>
+            {virtues.map((virtue) => (
+              <button
+                key={virtue}
+                onClick={() => setSelectedVirtue(selectedVirtue === virtue ? null : virtue)}
+                className={cn(
+                  'px-3 py-1 rounded-full border text-sm font-medium transition-colors duration-150',
+                  selectedVirtue === virtue
+                    ? virtueColors[virtue as keyof typeof virtueColors]
+                    : 'bg-surface-2 border-border text-muted hover:text-text'
+                )}
               >
-                <div className={`h-full p-6 rounded-2xl ${getFrameworkGradient(framework.slug)} backdrop-blur-sm border transition-all duration-300 group-hover:shadow-xl`}>
-                  
-                  {/* Header */}
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex items-center gap-3">
-                      <div className={`w-12 h-12 bg-gradient-to-r ${getFrameworkColor(framework.slug)} rounded-xl flex items-center justify-center shadow-lg`}>
-                        {getFrameworkIcon(framework.slug)}
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold text-white">{framework.name}</h3>
-                        <div className="flex items-center gap-2">
-                          <span className="text-2xl">{getFrameworkEmoji(framework.slug)}</span>
-                          <span className="text-sm text-gray-300">{framework.teachingChip}</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-xs text-gray-400 uppercase tracking-wide">Framework</div>
-                      <div className="text-sm text-white font-medium">{framework.tone}</div>
-                    </div>
+                {virtue.charAt(0).toUpperCase() + virtue.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Frameworks Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {filteredFrameworks.map((framework) => (
+            <div
+              key={framework.id}
+              className="bg-surface border border-border rounded-lg p-4 hover:shadow-md transition-all duration-150 cursor-pointer"
+            >
+              <div className="flex items-start justify-between mb-3">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                    <BookOpen className="w-4 h-4 text-primary" />
                   </div>
-
-                  {/* Description */}
-                  <p className="text-gray-300 text-sm leading-relaxed mb-6">
-                    {getFrameworkDescription(framework)}
-                  </p>
-
-                  {/* Core Modules */}
-                  <div className="mb-6">
-                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-3">Core Modules</div>
-                    <div className="flex flex-wrap gap-2">
-                      {getCoreModules(framework).map((module) => (
-                        <span
-                          key={module}
-                          className="px-3 py-1 bg-white/10 text-white text-xs rounded-full border border-white/20"
-                        >
-                          {module}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Featured Practices */}
-                  <div className="mb-6">
-                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-3">Featured Practices</div>
-                    <div className="flex flex-wrap gap-2">
-                      {getFeaturedPractices(framework).map((practice) => (
-                        <span
-                          key={practice}
-                          className="px-3 py-1 bg-white/5 text-gray-300 text-xs rounded-full border border-white/10"
-                        >
-                          {practice.replace('_', ' ')}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="flex items-center justify-between">
-                    <Link
-                      href={`/frameworks/${framework.slug}`}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all duration-200 group-hover:scale-105"
-                    >
-                      <BookOpen className="w-4 h-4" />
-                      <span className="text-sm font-medium">Explore</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </Link>
-                    
-                    <div className="flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                      <span className="text-xs text-gray-400">4.8</span>
-                    </div>
+                  <div>
+                    <h3 className="text-sm font-semibold text-text">{framework.name}</h3>
+                    <p className="text-xs text-muted">{framework.tone}</p>
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </motion.div>
-
-          {/* Call to Action */}
-          <motion.div 
-            className="mt-16 text-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
-          >
-            <div className="max-w-2xl mx-auto p-8 rounded-2xl bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 backdrop-blur-sm">
-              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/25">
-                <Sparkles className="w-8 h-8 text-white" />
+                <div className="flex items-center space-x-1 text-xs text-muted">
+                  <Clock className="w-3 h-3" />
+                  <span>{framework.timeToLearn}</span>
+                </div>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-4">
-                Ready to Begin Your Journey?
-              </h2>
-              <p className="text-gray-300 mb-6">
-                Take our personality assessment to discover which framework aligns best with your values and goals.
+
+              <p className="text-sm text-muted mb-3 line-clamp-2">
+                {framework.description}
               </p>
-              <Link
-                href="/onboarding"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl font-semibold shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:scale-105"
-              >
-                <Award className="w-5 h-5" />
-                Start Assessment
-                <ArrowRight className="w-5 h-5" />
-              </Link>
+
+              <div className="flex flex-wrap gap-1 mb-3">
+                {framework.virtueTags.map((virtue) => (
+                  <span
+                    key={virtue}
+                    className={cn(
+                      'px-2 py-1 rounded-full text-xs font-medium border',
+                      virtueColors[virtue as keyof typeof virtueColors]
+                    )}
+                  >
+                    {virtue.charAt(0).toUpperCase() + virtue.slice(1)}
+                  </span>
+                ))}
+              </div>
+
+              <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-primary/10 border border-primary/30 text-primary rounded-lg hover:bg-primary/20 transition-colors duration-150">
+                <Target className="w-4 h-4" />
+                <span className="text-sm font-medium">Explore</span>
+              </button>
             </div>
-          </motion.div>
+          ))}
         </div>
-      </div>
+
+        {filteredFrameworks.length === 0 && (
+          <div className="text-center py-12">
+            <BookOpen className="w-12 h-12 text-muted mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-text mb-2">No frameworks found</h3>
+            <p className="text-muted">Try adjusting your search or filters</p>
+          </div>
+        )}
+      </main>
+
+      <GuideFAB />
+      <TabBar />
     </div>
   );
 } 

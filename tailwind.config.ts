@@ -11,8 +11,10 @@ export default {
   theme: {
     extend: {
       borderRadius: {
+        sm: '6px',
+        lg: '12px',
         xl: 'var(--radius)',
-        '2xl': `calc(var(--radius) + 8px)`,
+        '2xl': '16px',
       },
       colors: {
         bg:        'rgb(var(--bg))',
@@ -28,6 +30,11 @@ export default {
         courage:   'rgb(var(--courage))',
         justice:   'rgb(var(--justice))',
         temperance:'rgb(var(--temperance))',
+        
+        /* Feedback colors */
+        success:   'rgb(var(--success))',
+        warning:   'rgb(var(--warning))',
+        error:     'rgb(var(--error))',
 
         /* Framework chips */
         fw: {
@@ -71,6 +78,10 @@ export default {
       boxShadow: {
         card: 'var(--shadow-1)',
         pop:  'var(--shadow-2)',
+        '1': '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+        '2': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+        '3': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        '4': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
       },
       transitionTimingFunction: {
         soft: 'var(--ease-soft)',
@@ -80,6 +91,8 @@ export default {
         fast: 'var(--dur-fast)',
         med:  'var(--dur-med)',
         slow: 'var(--dur-slow)',
+        '150': '150ms',
+        '250': '250ms',
       },
       backgroundImage: {
         /* Virtue gradients for hero bars and buttons */
@@ -89,7 +102,7 @@ export default {
         'grad-temperance': 'linear-gradient(135deg, rgba(var(--temperance),1), rgba(180,160,255,.18))',
       },
       fontFamily: {
-        display: ['Playfair Display', 'serif'],
+        display: ['Spectral', 'Georgia', 'serif'],
         sans: ['Inter', 'ui-sans-serif', 'system-ui'],
       },
       fontSize: {

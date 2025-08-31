@@ -8,19 +8,19 @@
 
 :root {
   /* Base (dark study) */
-  --bg: 14 16 22;           /* #0e1016 */
-  --surface: 19 22 31;      /* #13161f */
-  --surface-2: 25 28 39;    /* #191c27 */
-  --text: 238 241 246;      /* #eef1f6 */
+  --bg: 15 17 21;           /* #0F1115 */
+  --surface: 21 24 33;      /* #151821 */
+  --surface-2: 27 31 42;    /* #1B1F2A */
+  --text: 230 233 239;      /* #E6E9EF */
   --muted: 152 162 179;     /* #98a2b3 */
   --ring: 171 196 255;      /* focus ring */
-  --border: 40 44 58;
+  --border: 42 47 58;       /* #2A2F3A */
 
   /* Virtues (semantic primaries) */
-  --wisdom: 126 180 255;    /* blue ~ #7eb4ff */
-  --courage: 255 145 92;    /* ember ~ #ff915c */
-  --justice: 90 214 161;    /* verdant ~ #5ad6a1 */
-  --temperance: 180 160 255;/* plum ~ #b4a0ff */
+  --wisdom: 76 91 217;      /* indigo ~ #4C5BD9 */
+  --courage: 217 76 91;     /* crimson ~ #D94C5B */
+  --justice: 47 184 120;    /* emerald ~ #2FB878 */
+  --temperance: 217 164 76; /* ochre ~ #D9A44C */
 
   /* Framework accents (chips/badges) */
   --spartan: 255 173 68;    /* ochre */
@@ -38,6 +38,11 @@
   --radius: 16px;
   --shadow-1: 0 6px 22px rgba(0,0,0,.25),0 1px 0 rgba(255,255,255,.02) inset;
   --shadow-2: 0 12px 42px rgba(0,0,0,.35),0 1px 0 rgba(255,255,255,.03) inset;
+  
+  /* Feedback colors */
+  --success: 47 184 120;    /* #2FB878 */
+  --warning: 217 164 76;    /* #D9A44C */
+  --error: 225 77 77;       /* #E14D4D */
 
   /* Motion */
   --ease-soft: cubic-bezier(.22,.61,.36,1);

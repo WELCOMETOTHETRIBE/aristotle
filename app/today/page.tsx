@@ -1,236 +1,305 @@
-"use client";
-import { useEffect, useState } from "react";
-import Link from "next/link";
+'use client';
 
-interface UserPrefs {
-  framework: string | null;
-  style: string | null;
-  locale: string;
-}
+import { useState, useEffect } from 'react';
+import { Header } from '@/components/nav/Header';
+import { TabBar } from '@/components/nav/TabBar';
+import { GuideFAB } from '@/components/ai/GuideFAB';
+import { TaskCard } from '@/components/cards/TaskCard';
+import { BreathworkCard } from '@/components/cards/BreathworkCard';
+import { LessonCard } from '@/components/cards/LessonCard';
+import { StreakCard } from '@/components/cards/StreakCard';
+import { Sparkles, Target, Heart, Brain, BookOpen } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
-interface HiddenWisdom {
-  insight: string;
-  micro_experiment: string;
-  reflection: string;
-}
-
-interface PracticeDetail {
-  title: string;
-  body: string;
-  bullets: string[];
-  coach_prompts: string[];
-  safety_reminders: string[];
-  est_time_min: number;
-}
-
-interface Framework {
+interface Task {
   id: string;
-  name: string;
-  nav: {
-    tone: string;
-    badge: string;
-    emoji: string;
-  };
-  coreModules: string[];
-  supportModules: string[];
+  title: string;
+  description?: string;
+  priority: 'L' | 'M' | 'H';
+  dueDate?: Date;
+  completed: boolean;
+}
+
+interface Habit {
+  id: string;
+  title: string;
+  streakCount: number;
+  lastActivity: Date;
+  checkedToday: boolean;
 }
 
 export default function TodayPage() {
-  const [userPrefs, setUserPrefs] = useState<UserPrefs | null>(null);
-  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
-  const [practices, setPractices] = useState<PracticeDetail[]>([]);
-  const [framework, setFramework] = useState<Framework | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [focusVirtue, setFocusVirtue] = useState<'wisdom' | 'courage' | 'justice' | 'temperance'>('wisdom');
+  const [mood, setMood] = useState<number | null>(null);
+  const [intention, setIntention] = useState('');
+  const [tasks, setTasks] = useState<Task[]>([
+    {
+      id: '1',
+      title: 'Morning meditation',
+      description: '10 minutes of focused breathing',
+      priority: 'H',
+      completed: false,
+    },
+    {
+      id: '2',
+      title: 'Read philosophy',
+      description: 'Continue with Stoic texts',
+      priority: 'M',
+      completed: false,
+    },
+    {
+      id: '3',
+      title: 'Exercise',
+      description: '30 minutes of movement',
+      priority: 'H',
+      completed: false,
+    },
+  ]);
 
-  useEffect(() => {
-    const loadTodayContent = async () => {
-      try {
-        setLoading(true);
-        
-        // Load user preferences
-        const prefsResponse = await fetch('/api/prefs');
-        const prefs = await prefsResponse.json();
-        setUserPrefs(prefs);
-        
-        // Load hidden wisdom
-        const dateBucket = new Date().toISOString().split('T')[0];
-        const wisdomResponse = await fetch(
-          `/api/generate/hidden-wisdom?dateBucket=${dateBucket}&style=${prefs.style || 'aristotle'}&locale=${prefs.locale || 'en'}`
-        );
-        const wisdom = await wisdomResponse.json();
-        setHiddenWisdom(wisdom);
-        
-        // If user has a framework preference, load framework and practices
-        if (prefs.framework) {
-          const frameworkResponse = await fetch(`/api/frameworks/${prefs.framework}`);
-          const frameworkData = await frameworkResponse.json();
-          setFramework(frameworkData);
-          
-          // Load 2 core + 1 support module practices
-          const moduleIds = [
-            ...frameworkData.coreModules.slice(0, 2),
-            ...frameworkData.supportModules.slice(0, 1)
-          ];
-          
-          const practicePromises = moduleIds.map(moduleId =>
-            fetch(`/api/generate/practice?moduleId=${moduleId}&level=Beginner&style=${prefs.framework}&locale=${prefs.locale || 'en'}`)
-              .then(r => r.json())
-          );
-          
-          const practiceResults = await Promise.all(practicePromises);
-          setPractices(practiceResults);
-        }
-      } catch (error) {
-        console.error('Error loading today content:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const [habits, setHabits] = useState<Habit[]>([
+    {
+      id: '1',
+      title: 'Meditation',
+      streakCount: 7,
+      lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000),
+      checkedToday: true,
+    },
+    {
+      id: '2',
+      title: 'Reading',
+      streakCount: 5,
+      lastActivity: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+      checkedToday: true,
+    },
+    {
+      id: '3',
+      title: 'Exercise',
+      streakCount: 3,
+      lastActivity: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+      checkedToday: false,
+    },
+  ]);
 
-    loadTodayContent();
-  }, []);
+  const currentHour = new Date().getHours();
+  const isMorning = currentHour < 12;
+  const isEvening = currentHour >= 18;
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="animate-pulse">
-            <div className="h-8 bg-white/20 rounded mb-8"></div>
-            <div className="space-y-6">
-              <div className="h-64 bg-white/10 rounded-lg"></div>
-              <div className="h-48 bg-white/10 rounded-lg"></div>
-              <div className="h-48 bg-white/10 rounded-lg"></div>
-            </div>
-          </div>
-        </div>
-      </div>
+  const handleTaskToggle = (taskId: string) => {
+    setTasks(prev => 
+      prev.map(task => 
+        task.id === taskId 
+          ? { ...task, completed: !task.completed }
+          : task
+      )
     );
-  }
+  };
+
+  const handleHabitToggle = (habitId: string) => {
+    setHabits(prev => 
+      prev.map(habit => 
+        habit.id === habitId 
+          ? { ...habit, checkedToday: !habit.checkedToday }
+          : habit
+      )
+    );
+  };
+
+  const handleApplyLesson = () => {
+    // TODO: Implement lesson application
+    console.log('Applying lesson...');
+  };
+
+  const topTasks = tasks.filter(task => !task.completed).slice(0, 3);
+  const completedTasks = tasks.filter(task => task.completed);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">Today's Wisdom</h1>
-          <p className="text-gray-300">
-            {new Date().toLocaleDateString('en-US', { 
-              weekday: 'long', 
-              year: 'numeric', 
-              month: 'long', 
-              day: 'numeric' 
-            })}
-          </p>
+    <div className="min-h-screen bg-bg pb-20">
+      <Header focusVirtue={focusVirtue} />
+      
+      <main className="px-4 py-6 space-y-6">
+        {/* Hero Strip */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6">
+          <div className="flex items-center space-x-3 mb-4">
+            <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
+              <Sparkles className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-text">
+                {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
+              </h1>
+              <p className="text-sm text-muted">Ready to flourish today?</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <div className={cn(
+              'px-3 py-1 rounded-full border text-sm font-medium',
+              'bg-primary/20 text-primary border-primary/30'
+            )}>
+              Focus: {focusVirtue.charAt(0).toUpperCase() + focusVirtue.slice(1)}
+            </div>
+            <p className="text-sm text-muted">
+              {completedTasks.length} of {tasks.length} tasks completed
+            </p>
+          </div>
         </div>
 
-        {/* Hidden Wisdom */}
-        {hiddenWisdom && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6">✨ Hidden Wisdom</h2>
-            <div className="p-6 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-white/20">
-              <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium text-blue-300 mb-2">Micro Experiment</h4>
-                  <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium text-purple-300 mb-2">Reflection</h4>
-                  <p className="text-gray-300">{hiddenWisdom.reflection}</p>
-                </div>
+        {/* Morning Block */}
+        {isMorning && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-text">Morning Intention</h2>
+            
+            {/* Mood Selector */}
+            <div className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="text-sm font-medium text-text mb-3">How are you feeling?</h3>
+              <div className="grid grid-cols-5 gap-2">
+                {[1, 2, 3, 4, 5].map((value) => (
+                  <button
+                    key={value}
+                    onClick={() => setMood(value)}
+                    className={cn(
+                      'p-3 rounded-lg border transition-all duration-150',
+                      mood === value
+                        ? 'bg-primary/20 border-primary/30 text-primary'
+                        : 'bg-surface-2 border-border text-muted hover:text-text hover:border-primary/30'
+                    )}
+                  >
+                    <div className="text-lg">
+                      {value === 1 ? '😞' : value === 2 ? '😐' : value === 3 ? '😊' : value === 4 ? '😄' : '🤩'}
+                    </div>
+                    <div className="text-xs mt-1">{value}</div>
+                  </button>
+                ))}
               </div>
             </div>
-          </section>
+
+            {/* Intention Input */}
+            <div className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="text-sm font-medium text-text mb-3">Today's intention</h3>
+              <input
+                type="text"
+                value={intention}
+                onChange={(e) => setIntention(e.target.value)}
+                placeholder="What will you focus on today?"
+                className="w-full px-4 py-2 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
+              />
+            </div>
+          </div>
         )}
 
-        {/* Personalized Practices */}
-        {framework && practices.length > 0 && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              🎯 {framework.name} Practices
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {practices.map((practice, index) => (
-                <div
-                  key={index}
-                  className="p-6 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors"
-                >
-                  <h3 className="text-xl font-semibold text-white mb-3">{practice.title}</h3>
-                  <p className="text-gray-300 mb-4 line-clamp-3">{practice.body}</p>
-                  
-                  {practice.bullets.length > 0 && (
-                    <div className="mb-4">
-                      <ul className="space-y-1">
-                        {practice.bullets.slice(0, 2).map((bullet, bulletIndex) => (
-                          <li key={bulletIndex} className="text-sm text-gray-300 flex items-start gap-2">
-                            <span className="text-blue-400 mt-1">•</span>
-                            {bullet}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+        {/* Top Tasks */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-text">Top 3 Tasks</h2>
+          <div className="space-y-3">
+            {topTasks.map((task) => (
+              <TaskCard
+                key={task.id}
+                task={task}
+                onToggle={handleTaskToggle}
+              />
+            ))}
+          </div>
+        </div>
+
+        {/* Practice Row */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-text">Practice</h2>
+          
+          {/* Habit Quick Toggles */}
+          <div className="bg-surface border border-border rounded-lg p-4">
+            <h3 className="text-sm font-medium text-text mb-3">Quick Habits</h3>
+            <div className="grid grid-cols-3 gap-2">
+              {habits.map((habit) => (
+                <button
+                  key={habit.id}
+                  onClick={() => handleHabitToggle(habit.id)}
+                  className={cn(
+                    'p-3 rounded-lg border transition-all duration-150',
+                    habit.checkedToday
+                      ? 'bg-success/20 border-success/30 text-success'
+                      : 'bg-surface-2 border-border text-muted hover:text-text hover:border-primary/30'
                   )}
-                  
-                  <div className="flex items-center justify-between text-sm text-gray-400">
-                    <span>⏱️ {practice.est_time_min} min</span>
-                    <span className="text-blue-300">{framework.nav.badge}</span>
-                  </div>
-                </div>
+                >
+                  <div className="text-sm font-medium">{habit.title}</div>
+                  <div className="text-xs opacity-80">{habit.streakCount} day streak</div>
+                </button>
               ))}
             </div>
-          </section>
-        )}
-
-        {/* No Framework Selected */}
-        {!framework && (
-          <section className="mb-12">
-            <h2 className="text-2xl font-bold text-white mb-6">🎯 Choose Your Path</h2>
-            <div className="p-8 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-center">
-              <p className="text-gray-300 mb-4">
-                Select a framework to get personalized practices and wisdom.
-              </p>
-              <Link
-                href="/frameworks"
-                className="inline-flex items-center px-6 py-3 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-              >
-                Explore Frameworks
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {/* Quick Actions */}
-        <section className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">⚡ Quick Actions</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              href="/breath"
-              className="p-4 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors text-center"
-            >
-              <div className="text-2xl mb-2">🫁</div>
-              <h3 className="text-white font-medium">Breathwork</h3>
-              <p className="text-sm text-gray-400">Find your center</p>
-            </Link>
-            
-            <Link
-              href="/coach"
-              className="p-4 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors text-center"
-            >
-              <div className="text-2xl mb-2">🧠</div>
-              <h3 className="text-white font-medium">AI Coach</h3>
-              <p className="text-sm text-gray-400">Get guidance</p>
-            </Link>
-            
-            <Link
-              href="/progress"
-              className="p-4 rounded-lg bg-white/10 backdrop-blur-sm border border-white/20 hover:bg-white/15 transition-colors text-center"
-            >
-              <div className="text-2xl mb-2">📊</div>
-              <h3 className="text-white font-medium">Progress</h3>
-              <p className="text-sm text-gray-400">Track growth</p>
-            </Link>
           </div>
-        </section>
-      </div>
+
+          {/* Breathwork Quick Start */}
+          <BreathworkCard />
+        </div>
+
+        {/* Wisdom Tile */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-text">Wisdom Tile</h2>
+          <LessonCard
+            title="The Stoic Dichotomy of Control"
+            summary="Focus on what you can control and accept what you cannot. This simple principle can transform how you approach daily challenges and reduce unnecessary stress."
+            framework="Stoicism"
+            duration="2 min read"
+            onApply={handleApplyLesson}
+          />
+        </div>
+
+        {/* AI Guide Card */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg p-4">
+          <div className="flex items-center space-x-3 mb-3">
+            <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+              <Sparkles className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-sm font-semibold text-text">AI Guide Suggestion</h3>
+              <p className="text-xs text-muted">Personalized wisdom</p>
+            </div>
+          </div>
+          <p className="text-sm text-text mb-3">
+            "Let's try a 2-minute breathing exercise to center yourself before tackling your next task. This will help you approach it with clarity and calm."
+          </p>
+          <button className="w-full flex items-center justify-center space-x-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-150">
+            <span className="text-sm font-medium">Try this now</span>
+          </button>
+        </div>
+
+        {/* Evening Block */}
+        {isEvening && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-text">Evening Reflection</h2>
+            
+            <div className="bg-surface border border-border rounded-lg p-4">
+              <h3 className="text-sm font-medium text-text mb-3">Reflection Prompt</h3>
+              <p className="text-sm text-muted mb-4">
+                "What was the most meaningful moment of your day? How did you practice your focus virtue?"
+              </p>
+              <textarea
+                placeholder="Share your thoughts..."
+                className="w-full px-4 py-3 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
+                rows={3}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Streaks */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-text">Your Streaks</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {habits.map((habit) => (
+              <StreakCard
+                key={habit.id}
+                title={habit.title}
+                count={habit.streakCount}
+                lastActivity={habit.lastActivity}
+                target={7}
+              />
+            ))}
+          </div>
+        </div>
+      </main>
+
+      <GuideFAB />
+      <TabBar />
     </div>
   );
 } 

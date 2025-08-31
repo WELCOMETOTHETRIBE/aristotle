@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
-import { VirtueNavigation } from "@/components/VirtueNavigation";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
 import ClickToFeedback from "@/components/ClickToFeedback";
@@ -27,7 +26,6 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <div className="min-h-screen bg-bg">
-                <VirtueNavigation />
                 <ClickToFeedback>
                   {children}
                 </ClickToFeedback>
