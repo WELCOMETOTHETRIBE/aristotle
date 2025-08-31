@@ -3,22 +3,25 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  Users, MessageCircle, Heart, Share2, Sparkles, Target, Calendar, MapPin, UserPlus, Award, TrendingUp,
-  ArrowLeft, Bell, BellOff, Plus, Search, Filter, BookOpen, Brain, Shield, Scale, Leaf, Send, ThumbsUp,
-  MessageSquare, Eye, Clock, Star, Zap, Lightbulb, Compass, ChevronRight, ChevronDown, User, Reply,
-  MoreHorizontal, Flag, Bookmark, BookmarkCheck, Loader2, AlertCircle, X
+  MessageCircle, Heart, Share2, Brain, BookOpen, Search, Filter, Send, ThumbsUp,
+  MessageSquare, Eye, Clock, Star, User, Reply, MoreHorizontal, Bookmark, BookmarkCheck, 
+  Loader2, AlertCircle, X, Plus, Users, Sparkles
 } from 'lucide-react';
+import { Header } from '@/components/nav/Header';
+import { TabBar } from '@/components/nav/TabBar';
+import { GuideFAB } from '@/components/ai/GuideFAB';
 
-interface ForumPost {
+interface Thread {
   id: string;
   title: string;
   content: string;
   author: {
     name: string;
     avatar: string;
-    level: string;
+    isAI: boolean;
+    persona?: string;
   };
-  type: 'ai_question' | 'member_discussion' | 'resource_share';
+  type: 'user' | 'ai';
   category: string;
   tags: string[];
   replies: number;
@@ -29,7 +32,6 @@ interface ForumPost {
   createdAt: string;
   lastActivity: string;
   isPinned?: boolean;
-  isAIQuestion?: boolean;
   aiInsights?: string[];
 }
 
@@ -39,7 +41,8 @@ interface Reply {
   author: {
     name: string;
     avatar: string;
-    level: string;
+    isAI: boolean;
+    persona?: string;
   };
   likes: number;
   isLiked: boolean;
@@ -47,253 +50,168 @@ interface Reply {
   parentId?: string;
 }
 
-interface Notification {
-  id: string;
-  type: 'new_reply' | 'new_question' | 'like' | 'mention';
-  title: string;
-  message: string;
-  postId?: string;
-  isRead: boolean;
-  createdAt: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string;
-  level: string;
-}
-
 export default function CommunityPage() {
-  const [activeTab, setActiveTab] = useState<'ai_questions' | 'discussions' | 'resources'>('ai_questions');
-  const [selectedPost, setSelectedPost] = useState<ForumPost | null>(null);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const [activeFilter, setActiveFilter] = useState<'all' | 'user' | 'ai'>('all');
+  const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [showCreatePost, setShowCreatePost] = useState(false);
-  const [posts, setPosts] = useState<ForumPost[]>([]);
+  const [showCreateThread, setShowCreateThread] = useState(false);
+  const [threads, setThreads] = useState<Thread[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [creatingPost, setCreatingPost] = useState(false);
-  const [newPost, setNewPost] = useState({
+  const [creatingThread, setCreatingThread] = useState(false);
+  const [newThread, setNewThread] = useState({
     title: '',
     content: '',
     category: 'Stoicism',
     tags: [] as string[],
-    type: 'member_discussion' as const
   });
 
   const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
 
-  // Fetch current user
+  // Mock data for demonstration
   useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const response = await fetch('/api/auth/me');
-        if (response.ok) {
-          const data = await response.json();
-          setCurrentUser(data.user);
-        } else {
-          console.error('Failed to fetch current user');
-        }
-      } catch (error) {
-        console.error('Error fetching current user:', error);
-      }
-    };
+    const mockThreads: Thread[] = [
+      {
+        id: '1',
+        title: 'How do I practice courage in daily life?',
+        content: 'I find myself avoiding difficult conversations and uncomfortable situations. What are some practical ways to build courage through small daily actions?',
+        author: {
+          name: 'Sarah Chen',
+          avatar: '/avatars/sarah.jpg',
+          isAI: false,
+        },
+        type: 'user',
+        category: 'Courage',
+        tags: ['courage', 'daily-practice', 'conversations'],
+        replies: 8,
+        views: 124,
+        likes: 23,
+        isLiked: false,
+        isBookmarked: false,
+        createdAt: '2024-01-15T10:30:00Z',
+        lastActivity: '2024-01-15T14:20:00Z',
+      },
+      {
+        id: '2',
+        title: 'The Stoic approach to dealing with uncertainty',
+        content: 'In times of uncertainty, Stoicism teaches us to focus on what we can control. Here are three practical exercises to help you navigate uncertainty with wisdom...',
+        author: {
+          name: 'Marcus Aurelius',
+          avatar: '/avatars/marcus.jpg',
+          isAI: true,
+          persona: 'Stoic Philosopher',
+        },
+        type: 'ai',
+        category: 'Wisdom',
+        tags: ['stoicism', 'uncertainty', 'control'],
+        replies: 12,
+        views: 89,
+        likes: 31,
+        isLiked: true,
+        isBookmarked: false,
+        createdAt: '2024-01-15T09:15:00Z',
+        lastActivity: '2024-01-15T16:45:00Z',
+        aiInsights: [
+          'Focus on what you can control',
+          'Practice negative visualization',
+          'Embrace the present moment'
+        ],
+      },
+      {
+        id: '3',
+        title: 'Building sustainable habits for justice',
+        content: 'Justice isn\'t just about big actions - it\'s about the small choices we make every day. How do you practice fairness and service in your daily routine?',
+        author: {
+          name: 'Alex Rodriguez',
+          avatar: '/avatars/alex.jpg',
+          isAI: false,
+        },
+        type: 'user',
+        category: 'Justice',
+        tags: ['justice', 'habits', 'daily-routine'],
+        replies: 5,
+        views: 67,
+        likes: 18,
+        isLiked: false,
+        isBookmarked: true,
+        createdAt: '2024-01-15T08:45:00Z',
+        lastActivity: '2024-01-15T12:30:00Z',
+      },
+    ];
 
-    fetchCurrentUser();
+    // Simulate loading
+    setTimeout(() => {
+      setThreads(mockThreads);
+      setLoading(false);
+    }, 1000);
   }, []);
 
-  // Fetch posts
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        const params = new URLSearchParams();
-        if (activeTab === 'ai_questions') {
-          params.append('type', 'ai_questions');
-        } else if (activeTab === 'discussions') {
-          params.append('type', 'discussions');
-        } else if (activeTab === 'resources') {
-          params.append('type', 'resources');
-        }
-
-        if (selectedCategory !== 'all') {
-          params.append('category', selectedCategory);
-        }
-
-        if (searchQuery) {
-          params.append('search', searchQuery);
-        }
-
-        const response = await fetch(`/api/community?${params.toString()}`);
-        if (response.ok) {
-          const data = await response.json();
-          setPosts(data.posts);
-        } else {
-          setError('Failed to fetch posts');
-        }
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-        setError('Failed to fetch posts');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPosts();
-  }, [activeTab, selectedCategory, searchQuery]);
-
-  // Fetch notifications
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch('/api/notifications?limit=10');
-        if (response.ok) {
-          const data = await response.json();
-          setNotifications(data.notifications);
-          setUnreadCount(data.unreadCount);
-        }
-      } catch (error) {
-        console.error('Error fetching notifications:', error);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
-
-  const markNotificationAsRead = async (notificationId: string) => {
-    try {
-      const response = await fetch('/api/notifications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'mark_read',
-          notificationId
-        })
-      });
-
-      if (response.ok) {
-        setNotifications(prev => 
-          prev.map(notif => 
-            notif.id === notificationId ? { ...notif, isRead: true } : notif
-          )
-        );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-      }
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-    }
+  const toggleLike = async (threadId: string) => {
+    setThreads(prev => 
+      prev.map(thread => 
+        thread.id === threadId 
+          ? { ...thread, isLiked: !thread.isLiked, likes: thread.isLiked ? thread.likes - 1 : thread.likes + 1 }
+          : thread
+      )
+    );
   };
 
-  const markAllAsRead = async () => {
-    try {
-      const response = await fetch('/api/notifications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'mark_all_read'
-        })
-      });
-
-      if (response.ok) {
-        setNotifications(prev => prev.map(notif => ({ ...notif, isRead: true })));
-        setUnreadCount(0);
-      }
-    } catch (error) {
-      console.error('Error marking all notifications as read:', error);
-    }
+  const toggleBookmark = async (threadId: string) => {
+    setThreads(prev => 
+      prev.map(thread => 
+        thread.id === threadId 
+          ? { ...thread, isBookmarked: !thread.isBookmarked }
+          : thread
+      )
+    );
   };
 
-  const toggleLike = async (postId: string) => {
-    try {
-      const response = await fetch('/api/community', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'like_post',
-          postId
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPosts(prev => 
-          prev.map(post => 
-            post.id === postId ? data.post : post
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error toggling like:', error);
-    }
-  };
-
-  const toggleBookmark = async (postId: string) => {
-    try {
-      const response = await fetch('/api/community', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'bookmark_post',
-          postId
-        })
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setPosts(prev => 
-          prev.map(post => 
-            post.id === postId ? data.post : post
-          )
-        );
-      }
-    } catch (error) {
-      console.error('Error toggling bookmark:', error);
-    }
-  };
-
-  const createPost = async () => {
-    if (!newPost.title || !newPost.content || !newPost.category) {
+  const createThread = async () => {
+    if (!newThread.title || !newThread.content || !newThread.category) {
       return;
     }
 
     try {
-      setCreatingPost(true);
-      const response = await fetch('/api/community', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'create_post',
-          ...newPost
-        })
-      });
+      setCreatingThread(true);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const newThreadData: Thread = {
+        id: Date.now().toString(),
+        title: newThread.title,
+        content: newThread.content,
+        author: {
+          name: 'You',
+          avatar: '/avatars/user.jpg',
+          isAI: false,
+        },
+        type: 'user',
+        category: newThread.category,
+        tags: newThread.tags,
+        replies: 0,
+        views: 0,
+        likes: 0,
+        isLiked: false,
+        isBookmarked: false,
+        createdAt: new Date().toISOString(),
+        lastActivity: new Date().toISOString(),
+      };
 
-      if (response.ok) {
-        const data = await response.json();
-        setPosts(prev => [data.post, ...prev]);
-        setShowCreatePost(false);
-        setNewPost({
-          title: '',
-          content: '',
-          category: 'Stoicism',
-          tags: [],
-          type: 'member_discussion'
-        });
-      } else {
-        setError('Failed to create post');
-      }
+      setThreads(prev => [newThreadData, ...prev]);
+      setShowCreateThread(false);
+      setNewThread({
+        title: '',
+        content: '',
+        category: 'Stoicism',
+        tags: [],
+      });
     } catch (error) {
-      console.error('Error creating post:', error);
-      setError('Failed to create post');
+      console.error('Error creating thread:', error);
+      setError('Failed to create thread');
     } finally {
-      setCreatingPost(false);
+      setCreatingThread(false);
     }
   };
 
@@ -308,427 +226,302 @@ export default function CommunityPage() {
     return `${diffInDays}d ago`;
   };
 
-  if (!currentUser) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-7xl mx-auto text-center">
-            <div className="p-8 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
-              <AlertCircle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Authentication Required</h1>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">Please sign in to access the community forum.</p>
+  const filteredThreads = threads.filter(thread => {
+    if (activeFilter === 'user' && thread.type !== 'user') return false;
+    if (activeFilter === 'ai' && thread.type !== 'ai') return false;
+    if (selectedCategory !== 'all' && thread.category !== selectedCategory) return false;
+    if (searchQuery && !thread.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    return true;
+  });
+
+  return (
+    <div className="min-h-screen bg-bg">
+      <Header />
+      
+      <main className="pb-20 pt-4 px-4">
+        {/* Hero Section */}
+        <div className="mb-6">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 bg-gradient-to-r from-primary to-primary/80 rounded-xl flex items-center justify-center">
+              <Users className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-display font-bold text-text">Community</h1>
+              <p className="text-muted text-sm">Connect with fellow seekers</p>
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-violet-50 via-purple-50 to-pink-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          
-          {/* Header */}
-          <motion.div 
-            className="mb-8"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/25">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Community Forum</h1>
-                    <p className="text-gray-600 dark:text-gray-300">Connect, learn, and grow with fellow seekers</p>
-                  </div>
-                </div>
+        {/* Search and Filters */}
+        <div className="mb-6 space-y-4">
+          {/* Search */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted" />
+            <input
+              type="text"
+              placeholder="Search threads..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-text placeholder-muted"
+            />
+          </div>
+
+          {/* Filter Tabs */}
+          <div className="flex gap-1 bg-surface border border-border rounded-xl p-1">
+            <button
+              onClick={() => setActiveFilter('all')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeFilter === 'all'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-muted hover:text-text'
+              }`}
+            >
+              All
+            </button>
+            <button
+              onClick={() => setActiveFilter('user')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeFilter === 'user'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-muted hover:text-text'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <User className="w-3 h-3" />
+                Users
               </div>
-              
-              <div className="flex items-center gap-3">
-                {/* Notifications */}
-                <div className="relative">
+            </button>
+            <button
+              onClick={() => setActiveFilter('ai')}
+              className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeFilter === 'ai'
+                  ? 'bg-primary text-white shadow-sm'
+                  : 'text-muted hover:text-text'
+              }`}
+            >
+              <div className="flex items-center justify-center gap-1">
+                <Brain className="w-3 h-3" />
+                AI
+              </div>
+            </button>
+          </div>
+
+          {/* Category Filter */}
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="w-full px-4 py-3 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-text"
+          >
+            {categories.map(category => (
+              <option key={category} value={category}>
+                {category === 'all' ? 'All Categories' : category}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* Threads List */}
+        <div className="space-y-4">
+          {loading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-6 h-6 animate-spin text-primary" />
+              <span className="ml-2 text-muted">Loading threads...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <AlertCircle className="w-12 h-12 text-error mx-auto mb-4" />
+              <p className="text-muted">{error}</p>
+            </div>
+          ) : filteredThreads.length === 0 ? (
+            <div className="text-center py-12">
+              <MessageCircle className="w-12 h-12 text-muted mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-text mb-2">No threads found</h3>
+              <p className="text-muted">Be the first to start a discussion!</p>
+            </div>
+          ) : (
+            filteredThreads.map((thread) => (
+              <motion.div
+                key={thread.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-surface border border-border rounded-xl p-4 hover:shadow-2 transition-all duration-200 cursor-pointer"
+                onClick={() => setSelectedThread(thread)}
+              >
+                {/* Thread Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-primary to-primary/80 rounded-lg flex items-center justify-center">
+                      {thread.author.isAI ? (
+                        <Brain className="w-4 h-4 text-white" />
+                      ) : (
+                        <User className="w-4 h-4 text-white" />
+                      )}
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-text text-sm">{thread.author.name}</h3>
+                        {thread.author.isAI && (
+                          <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded-full">
+                            AI
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-muted">
+                        <span>{formatTimeAgo(thread.createdAt)}</span>
+                        <span>•</span>
+                        <span>{thread.category}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
                   <button
-                    onClick={() => setShowNotifications(!showNotifications)}
-                    className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 relative"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleBookmark(thread.id);
+                    }}
+                    className="p-1 hover:bg-surface-2 rounded-lg transition-colors"
                   >
-                    <Bell className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    {unreadCount > 0 && (
-                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">
-                        {unreadCount}
-                      </span>
+                    {thread.isBookmarked ? (
+                      <BookmarkCheck className="w-4 h-4 text-primary" />
+                    ) : (
+                      <Bookmark className="w-4 h-4 text-muted" />
                     )}
                   </button>
-                  
-                  <AnimatePresence>
-                    {showNotifications && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        className="absolute right-0 top-12 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-gray-200 dark:border-slate-700 z-50"
-                      >
-                        <div className="p-4 border-b border-gray-200 dark:border-slate-700">
-                          <div className="flex items-center justify-between">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
-                            <button
-                              onClick={markAllAsRead}
-                              className="text-sm text-violet-600 hover:text-violet-700"
-                            >
-                              Mark all read
-                            </button>
-                          </div>
-                        </div>
-                        <div className="max-h-96 overflow-y-auto">
-                          {notifications.length === 0 ? (
-                            <div className="p-4 text-center text-gray-500">
-                              No notifications
-                            </div>
-                          ) : (
-                            notifications.map((notification: Notification) => (
-                              <div
-                                key={notification.id}
-                                className={`p-4 border-b border-gray-100 dark:border-slate-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-slate-700 ${
-                                  !notification.isRead ? 'bg-violet-50 dark:bg-violet-900/20' : ''
-                                }`}
-                                onClick={() => markNotificationAsRead(notification.id)}
-                              >
-                                <div className="flex items-start gap-3">
-                                  <div className={`w-2 h-2 rounded-full mt-2 ${
-                                    !notification.isRead ? 'bg-violet-500' : 'bg-gray-300'
-                                  }`} />
-                                  <div className="flex-1">
-                                    <h4 className="font-medium text-gray-900 dark:text-white text-sm">
-                                      {notification.title}
-                                    </h4>
-                                    <p className="text-gray-600 dark:text-gray-300 text-xs mt-1">
-                                      {notification.message}
-                                    </p>
-                                    <p className="text-gray-400 text-xs mt-2">
-                                      {formatTimeAgo(notification.createdAt)}
-                                    </p>
-                                  </div>
-                                </div>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
 
-                {/* Create Post Button */}
-                <button
-                  onClick={() => setShowCreatePost(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white rounded-lg font-medium transition-all duration-200"
-                >
-                  <Plus className="w-4 h-4" />
-                  New Post
-                </button>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Search and Filters */}
-          <motion.div 
-            className="mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          >
-            <div className="flex flex-col md:flex-row gap-4">
-              <div className="flex-1 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search discussions..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 bg-white/80 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-xl backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                />
-              </div>
-              
-              <div className="flex gap-2">
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  className="px-4 py-3 bg-white/80 dark:bg-slate-800/80 border border-gray-200 dark:border-slate-700 rounded-xl backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
-                >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category === 'all' ? 'All Categories' : category}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Tabs */}
-          <motion.div 
-            className="mb-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-          >
-            <div className="flex gap-1 bg-white/80 dark:bg-slate-800/80 rounded-xl p-1 backdrop-blur-sm border border-gray-200 dark:border-slate-700">
-              <button
-                onClick={() => setActiveTab('ai_questions')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === 'ai_questions'
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <Brain className="w-4 h-4" />
-                  AI Questions
+                {/* Thread Content */}
+                <div className="mb-3">
+                  <h2 className="font-semibold text-text mb-2 line-clamp-2">
+                    {thread.title}
+                  </h2>
+                  <p className="text-muted text-sm line-clamp-3 leading-relaxed">
+                    {thread.content}
+                  </p>
                 </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('discussions')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === 'discussions'
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <MessageCircle className="w-4 h-4" />
-                  Discussions
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab('resources')}
-                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
-                  activeTab === 'resources'
-                    ? 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg'
-                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
-                }`}
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <BookOpen className="w-4 h-4" />
-                  Resources
-                </div>
-              </button>
-            </div>
-          </motion.div>
 
-          {/* Posts Grid */}
-          <motion.div 
-            className="space-y-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            {/* Main Content */}
-            <div className="space-y-6">
-              {loading ? (
-                <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-violet-500" />
-                  <span className="ml-2 text-gray-600 dark:text-gray-300">Loading posts...</span>
-                </div>
-              ) : error ? (
-                <div className="text-center py-12">
-                  <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-                  <p className="text-gray-600 dark:text-gray-300">{error}</p>
-                </div>
-              ) : posts.length === 0 ? (
-                <div className="text-center py-12">
-                  <MessageCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">No posts found</h3>
-                  <p className="text-gray-600 dark:text-gray-300">Be the first to start a discussion!</p>
-                </div>
-              ) : (
-                posts.map((post, index) => (
-                  <motion.div
-                    key={post.id}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                    className="bg-white/80 dark:bg-slate-800/80 rounded-2xl p-6 backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300 cursor-pointer"
-                    onClick={() => setSelectedPost(post)}
-                  >
-                    {/* Post Header */}
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-purple-600 rounded-xl flex items-center justify-center">
-                          {post.isAIQuestion ? (
-                            <Brain className="w-5 h-5 text-white" />
-                          ) : (
-                            <User className="w-5 h-5 text-white" />
-                          )}
-                        </div>
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <h3 className="font-semibold text-gray-900 dark:text-white">{post.author.name}</h3>
-                            {post.isAIQuestion && (
-                              <span className="px-2 py-1 bg-gradient-to-r from-violet-500 to-purple-600 text-white text-xs rounded-full">
-                                AI Academy
-                              </span>
-                            )}
-                          </div>
-                          <div className="flex items-center gap-2 text-sm text-gray-500">
-                            <span>{post.author.level}</span>
-                            <span>•</span>
-                            <span>{formatTimeAgo(post.createdAt)}</span>
-                            {post.isPinned && (
-                              <>
-                                <span>•</span>
-                                <span className="text-violet-600">Pinned</span>
-                              </>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleBookmark(post.id);
-                          }}
-                          className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                        >
-                          {post.isBookmarked ? (
-                            <BookmarkCheck className="w-4 h-4 text-violet-600" />
-                          ) : (
-                            <Bookmark className="w-4 h-4 text-gray-400" />
-                          )}
-                        </button>
-                        <button className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors">
-                          <MoreHorizontal className="w-4 h-4 text-gray-400" />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Post Content */}
-                    <div className="mb-4">
-                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-3">
-                        {post.title}
-                      </h2>
-                      <p className="text-gray-600 dark:text-gray-300 leading-relaxed">
-                        {post.content}
-                      </p>
-                    </div>
-
-                    {/* AI Insights */}
-                    {post.aiInsights && (
-                      <div className="mb-4 p-4 bg-gradient-to-r from-violet-50 to-purple-50 dark:from-violet-900/20 dark:to-purple-900/20 rounded-xl border border-violet-200 dark:border-violet-700">
-                        <h4 className="font-semibold text-violet-700 dark:text-violet-300 mb-2 flex items-center gap-2">
-                          <Lightbulb className="w-4 h-4" />
-                          AI Insights
-                        </h4>
-                        <ul className="space-y-1">
-                          {post.aiInsights.map((insight, idx) => (
-                            <li key={idx} className="text-sm text-violet-600 dark:text-violet-400 flex items-center gap-2">
-                              <div className="w-1.5 h-1.5 bg-violet-500 rounded-full" />
-                              {insight}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-
-                    {/* Tags */}
-                    <div className="flex flex-wrap gap-2 mb-4">
-                      {post.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-xs rounded-full"
-                        >
-                          {tag}
-                        </span>
+                {/* AI Insights */}
+                {thread.aiInsights && (
+                  <div className="mb-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
+                    <h4 className="font-medium text-primary text-xs mb-2 flex items-center gap-1">
+                      <Sparkles className="w-3 h-3" />
+                      AI Insights
+                    </h4>
+                    <ul className="space-y-1">
+                      {thread.aiInsights.map((insight, idx) => (
+                        <li key={idx} className="text-xs text-primary/80 flex items-center gap-2">
+                          <div className="w-1 h-1 bg-primary rounded-full" />
+                          {insight}
+                        </li>
                       ))}
-                    </div>
+                    </ul>
+                  </div>
+                )}
 
-                    {/* Post Stats */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-6 text-sm text-gray-500">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            toggleLike(post.id);
-                          }}
-                          className={`flex items-center gap-1 hover:text-violet-600 transition-colors ${
-                            post.isLiked ? 'text-violet-600' : ''
-                          }`}
-                        >
-                          <ThumbsUp className="w-4 h-4" />
-                          <span>{post.likes}</span>
-                        </button>
-                        <div className="flex items-center gap-1">
-                          <MessageSquare className="w-4 h-4" />
-                          <span>{post.replies}</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Eye className="w-4 h-4" />
-                          <span>{post.views}</span>
-                        </div>
-                      </div>
+                {/* Tags */}
+                <div className="flex flex-wrap gap-1 mb-3">
+                  {thread.tags.slice(0, 3).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2 py-1 bg-surface-2 text-muted text-xs rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {thread.tags.length > 3 && (
+                    <span className="px-2 py-1 bg-surface-2 text-muted text-xs rounded-full">
+                      +{thread.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+
+                {/* Thread Stats */}
+                <div className="flex items-center justify-between text-xs text-muted">
+                  <div className="flex items-center gap-4">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleLike(thread.id);
+                      }}
+                      className={`flex items-center gap-1 hover:text-primary transition-colors ${
+                        thread.isLiked ? 'text-primary' : ''
+                      }`}
+                    >
+                      <ThumbsUp className="w-3 h-3" />
+                      <span>{thread.likes}</span>
+                    </button>
+                    <div className="flex items-center gap-1">
+                      <MessageSquare className="w-3 h-3" />
+                      <span>{thread.replies}</span>
                     </div>
-                  </motion.div>
-                ))
-              )}
-            </div>
-          </motion.div>
+                    <div className="flex items-center gap-1">
+                      <Eye className="w-3 h-3" />
+                      <span>{thread.views}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))
+          )}
         </div>
-      </div>
+      </main>
 
-      {/* Create Post Modal */}
+      {/* Create Thread FAB */}
+      <button
+        onClick={() => setShowCreateThread(true)}
+        className="fixed bottom-24 right-4 w-14 h-14 bg-primary hover:bg-primary/90 text-white rounded-full shadow-4 flex items-center justify-center transition-all duration-200 z-40"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
+
+      {/* Create Thread Modal */}
       <AnimatePresence>
-        {showCreatePost && (
+        {showCreateThread && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowCreatePost(false)}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setShowCreateThread(false)}
           >
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white dark:bg-slate-800 rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-surface border border-border rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Create New Post</h2>
+                <h2 className="text-xl font-display font-bold text-text">New Thread</h2>
                 <button
-                  onClick={() => setShowCreatePost(false)}
-                  className="p-2 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                  onClick={() => setShowCreateThread(false)}
+                  className="p-2 hover:bg-surface-2 rounded-lg transition-colors"
                 >
-                  <X className="w-5 h-5 text-gray-500" />
+                  <X className="w-5 h-5 text-muted" />
                 </button>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text mb-2">
                     Title
                   </label>
                   <input
                     type="text"
-                    value={newPost.title}
-                    onChange={(e) => setNewPost(prev => ({ ...prev, title: e.target.value }))}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
-                    placeholder="Enter your post title..."
+                    value={newThread.title}
+                    onChange={(e) => setNewThread(prev => ({ ...prev, title: e.target.value }))}
+                    className="w-full px-4 py-3 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-text"
+                    placeholder="What would you like to discuss?"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text mb-2">
                     Category
                   </label>
                   <select
-                    value={newPost.category}
-                    onChange={(e) => setNewPost(prev => ({ ...prev, category: e.target.value }))}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500"
+                    value={newThread.category}
+                    onChange={(e) => setNewThread(prev => ({ ...prev, category: e.target.value }))}
+                    className="w-full px-4 py-3 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-text"
                   >
                     {categories.filter(cat => cat !== 'all').map(category => (
                       <option key={category} value={category}>
@@ -739,31 +532,31 @@ export default function CommunityPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                  <label className="block text-sm font-medium text-text mb-2">
                     Content
                   </label>
                   <textarea
-                    value={newPost.content}
-                    onChange={(e) => setNewPost(prev => ({ ...prev, content: e.target.value }))}
-                    rows={6}
-                    className="w-full px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500 resize-none"
+                    value={newThread.content}
+                    onChange={(e) => setNewThread(prev => ({ ...prev, content: e.target.value }))}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-text resize-none"
                     placeholder="Share your thoughts, questions, or insights..."
                   />
                 </div>
 
                 <div className="flex items-center justify-end gap-3 pt-4">
                   <button
-                    onClick={() => setShowCreatePost(false)}
-                    className="px-6 py-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                    onClick={() => setShowCreateThread(false)}
+                    className="px-4 py-2 text-muted hover:bg-surface-2 rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
                   <button
-                    onClick={createPost}
-                    disabled={creatingPost || !newPost.title || !newPost.content}
-                    className="px-6 py-2 bg-gradient-to-r from-violet-500 to-purple-600 hover:from-violet-600 hover:to-purple-700 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    onClick={createThread}
+                    disabled={creatingThread || !newThread.title || !newThread.content}
+                    className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
-                    {creatingPost ? (
+                    {creatingThread ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
                         Creating...
@@ -771,7 +564,7 @@ export default function CommunityPage() {
                     ) : (
                       <>
                         <Send className="w-4 h-4" />
-                        Create Post
+                        Create Thread
                       </>
                     )}
                   </button>
@@ -781,6 +574,9 @@ export default function CommunityPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <TabBar />
+      <GuideFAB />
     </div>
   );
 } 
