@@ -1,9 +1,11 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Sparkles, Mic, Send, Brain, Shield, Scale, Leaf, MessageCircle, Volume2, VolumeX, RotateCcw, Lightbulb, Heart, Zap, ArrowLeft, ChevronDown, BookOpen, Users, Clock, Star, Info } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Sparkles, Mic, Send, Brain, Shield, Scale, Leaf, MessageCircle, Volume2, VolumeX, RotateCcw, Lightbulb, Heart, Zap, ArrowLeft, ChevronDown, BookOpen, Users, Clock, Star, Info, Search, Sparkle, Quote, GraduationCap } from 'lucide-react';
 import Link from 'next/link';
-import PageLayout from '@/components/PageLayout';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAllPhilosophers, getPhilosopher, type Philosopher } from '@/lib/philosophers';
 import { PhilosophicalTerminologyWidget } from '@/components/PhilosophicalTerminologyWidget';
 
@@ -28,6 +30,7 @@ export default function PhilosophersPage() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [showWidgetInfo, setShowWidgetInfo] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'chat' | 'terminology'>('chat');
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -159,260 +162,336 @@ export default function PhilosophersPage() {
   };
 
   return (
-    <PageLayout title="Philosopher's Journey" description="Engage in dialogue with the greatest minds of history">
-      {/* Back to Home Link */}
-      <div className="mb-6">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors">
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-      </div>
-
-      {/* Hero Section */}
-      <div className="bg-gradient-to-br from-indigo-500/20 to-purple-500/20 py-16 -mt-12 mb-8 rounded-xl border border-indigo-500/20">
-        <div className="text-center">
-          <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm mb-4">
-            <span className="text-lg font-medium text-white">
-              Ancient Wisdom
-            </span>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+            >
+              <h1 className="text-5xl font-bold text-white mb-4 font-display">
+                Philosopher's Journey
+              </h1>
+              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+                Engage in dialogue with history's greatest minds and explore timeless wisdom through interactive conversations
+              </p>
+            </motion.div>
           </div>
-          
-          <div className="max-w-2xl mx-auto mb-6">
-            <p className="text-lg text-white opacity-90 leading-relaxed">
-              Explore the timeless wisdom of history's greatest philosophers through interactive dialogue and deep learning.
-            </p>
-          </div>
-        </div>
-      </div>
 
-      {/* Terminology Section */}
-      <div className="page-section">
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="section-title">Philosophical Terminology</h2>
-          <button
-            onClick={() => setShowWidgetInfo(showWidgetInfo === 'terminology' ? null : 'terminology')}
-            className="p-1 text-muted-foreground hover:text-white transition-colors"
+          {/* Stats Overview */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
           >
-            <Info className="h-4 w-4" />
-          </button>
-        </div>
-        <p className="section-description">
-          Explore 25 profound philosophical concepts from various traditions
-        </p>
-        {showWidgetInfo === 'terminology' && (
-          <div className="mb-4 p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-            <p className="text-sm text-indigo-200">
-              This comprehensive terminology guide covers key concepts from Aristotelian, Stoic, Daoist, Confucian, and other philosophical traditions. 
-              Each term includes pronunciation, definition, examples, and significance to deepen your understanding of philosophical wisdom.
-            </p>
-          </div>
-        )}
-        <PhilosophicalTerminologyWidget />
-      </div>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-white mb-2">{philosophers.length}</div>
+                <div className="text-gray-300">Ancient Philosophers</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-white mb-2">25+</div>
+                <div className="text-gray-300">Philosophical Terms</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-white mb-2">∞</div>
+                <div className="text-gray-300">Wisdom Conversations</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-white mb-2">8</div>
+                <div className="text-gray-300">Philosophical Traditions</div>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-      {/* AI Chat Section */}
-      <div className="page-section">
-        <div className="flex items-center gap-2 mb-4">
-          <h2 className="section-title">Philosophical Dialogue</h2>
-          <button
-            onClick={() => setShowWidgetInfo(showWidgetInfo === 'chat' ? null : 'chat')}
-            className="p-1 text-muted-foreground hover:text-white transition-colors"
+          {/* Tab Navigation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            className="mb-8"
           >
-            <Info className="h-4 w-4" />
-          </button>
-        </div>
-        <p className="section-description">
-          Engage in meaningful conversation with history's greatest philosophers
-        </p>
-        {showWidgetInfo === 'chat' && (
-          <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-            <p className="text-sm text-blue-200">
-              Each philosopher has been carefully crafted with unique system prompts that capture their authentic voice, 
-              teaching style, and philosophical approach. Ask questions, seek guidance, or explore their wisdom through interactive dialogue.
-            </p>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Main Chat Area */}
-          <div className="lg:col-span-3">
-            <div className="glass-card shadow-xl h-[600px] flex flex-col">
-              {/* Chat Header */}
-              <div className="border-b border-white/10 p-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${selectedPhilosopher.color} flex items-center justify-center text-2xl`}>
-                      {selectedPhilosopher.avatar}
-                    </div>
-                    <div>
-                      <h3 className="section-title text-xl">{selectedPhilosopher.name}</h3>
-                      <p className="body-text text-gray-400">
-                        {selectedPhilosopher.title} • {selectedPhilosopher.era}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={clearConversation}
-                      className="p-2 text-gray-400 hover:text-white transition-colors"
-                      title="Clear conversation"
-                    >
-                      <RotateCcw className="w-5 h-5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                {messages.map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                  >
-                    <div
-                      className={`max-w-[80%] p-4 rounded-lg ${
-                        message.sender === 'user'
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white/10 text-white'
-                      }`}
-                    >
-                      {message.sender === 'philosopher' && message.philosopher && (
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{message.philosopher.avatar}</span>
-                          <span className="text-sm font-medium text-gray-300">
-                            {message.philosopher.name}
-                          </span>
-                        </div>
-                      )}
-                      <div className="whitespace-pre-wrap">{message.content}</div>
-                      <div className="text-xs text-gray-400 mt-2">
-                        {message.timestamp.toLocaleTimeString()}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-                {isProcessing && (
-                  <div className="flex justify-start">
-                    <div className="bg-white/10 text-white p-4 rounded-lg">
-                      <div className="flex items-center gap-2">
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                        <span>Thinking...</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
-
-              {/* Input Area */}
-              <div className="border-t border-white/10 p-6">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 relative">
-                    <input
-                      ref={inputRef}
-                      type="text"
-                      value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
-                      onKeyPress={handleKeyPress}
-                      placeholder={`Ask ${selectedPhilosopher.name} anything...`}
-                      className="w-full bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      disabled={isProcessing}
-                    />
-                  </div>
-                  <button
-                    onClick={sendMessage}
-                    disabled={!inputValue.trim() || isProcessing}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white p-3 rounded-lg transition-colors"
-                  >
-                    <Send className="w-5 h-5" />
-                  </button>
-                </div>
-              </div>
+            <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
+              <button
+                onClick={() => setActiveTab('chat')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md transition-all ${
+                  activeTab === 'chat'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <MessageCircle className="w-5 h-5" />
+                Philosophical Dialogue
+              </button>
+              <button
+                onClick={() => setActiveTab('terminology')}
+                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md transition-all ${
+                  activeTab === 'terminology'
+                    ? 'bg-blue-600 text-white shadow-lg'
+                    : 'text-gray-300 hover:text-white hover:bg-white/10'
+                }`}
+              >
+                <BookOpen className="w-5 h-5" />
+                Philosophical Terms
+              </button>
             </div>
-          </div>
+          </motion.div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Philosopher Selector */}
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Choose Your Guide</h3>
-              <div className="relative">
-                <button
-                  onClick={() => setShowDropdown(!showDropdown)}
-                  className="w-full flex items-center justify-between p-3 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">{selectedPhilosopher.avatar}</span>
-                    <div className="text-left">
-                      <div className="font-medium">{selectedPhilosopher.name}</div>
-                      <div className="text-sm text-gray-400">{selectedPhilosopher.title}</div>
-                    </div>
-                  </div>
-                  <ChevronDown className={`w-5 h-5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-                </button>
-                
-                {showDropdown && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg z-10 max-h-64 overflow-y-auto">
-                    {philosophers.map((philosopher) => (
-                      <button
-                        key={philosopher.id}
-                        onClick={() => {
-                          setSelectedPhilosopher(philosopher);
-                          setShowDropdown(false);
-                        }}
-                        className="w-full flex items-center gap-3 p-3 hover:bg-white/10 transition-colors text-left"
-                      >
-                        <span className="text-xl">{philosopher.avatar}</span>
+          {/* Content Area */}
+          {activeTab === 'chat' ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="grid grid-cols-1 lg:grid-cols-4 gap-8"
+            >
+              {/* Main Chat Area */}
+              <div className="lg:col-span-3">
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-[600px] flex flex-col">
+                  {/* Chat Header */}
+                  <CardHeader className="border-b border-white/10">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${selectedPhilosopher.color} flex items-center justify-center text-3xl shadow-lg`}>
+                          {selectedPhilosopher.avatar}
+                        </div>
                         <div>
-                          <div className="font-medium text-white">{philosopher.name}</div>
-                          <div className="text-sm text-gray-400">{philosopher.title}</div>
+                          <CardTitle className="text-2xl text-white">{selectedPhilosopher.name}</CardTitle>
+                          <p className="text-gray-300">
+                            {selectedPhilosopher.title} • {selectedPhilosopher.era}
+                          </p>
                         </div>
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Philosopher Info */}
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">About {selectedPhilosopher.name}</h3>
-              <p className="text-gray-300 text-sm mb-4">{selectedPhilosopher.description}</p>
-              
-              <div className="space-y-3">
-                <div>
-                  <h4 className="text-sm font-medium text-white mb-2">Key Teachings</h4>
-                  <div className="space-y-1">
-                    {selectedPhilosopher.keyTeachings.map((teaching, index) => (
-                      <div key={index} className="text-xs text-gray-400 flex items-center gap-2">
-                        <Star className="w-3 h-3 text-yellow-400" />
-                        {teaching}
                       </div>
+                      <Button
+                        onClick={clearConversation}
+                        variant="outline"
+                        size="sm"
+                        className="border-white/30 text-white hover:bg-white/10"
+                      >
+                        <RotateCcw className="w-4 h-4 mr-2" />
+                        New Chat
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  
+                  {/* Messages */}
+                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                    {messages.map((message) => (
+                      <motion.div
+                        key={message.id}
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div
+                          className={`max-w-[80%] p-4 rounded-2xl ${
+                            message.sender === 'user'
+                              ? 'bg-blue-600 text-white shadow-lg'
+                              : 'bg-white/10 text-white border border-white/20'
+                          }`}
+                        >
+                          {message.sender === 'philosopher' && message.philosopher && (
+                            <div className="flex items-center gap-2 mb-3">
+                              <span className="text-xl">{message.philosopher.avatar}</span>
+                              <span className="text-sm font-medium text-gray-300">
+                                {message.philosopher.name}
+                              </span>
+                            </div>
+                          )}
+                          <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
+                          <div className="text-xs text-gray-400 mt-3 flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {message.timestamp.toLocaleTimeString()}
+                          </div>
+                        </div>
+                      </motion.div>
                     ))}
+                    {isProcessing && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex justify-start"
+                      >
+                        <div className="bg-white/10 text-white p-4 rounded-2xl border border-white/20">
+                          <div className="flex items-center gap-3">
+                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                            <span className="text-gray-300">Thinking...</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                    <div ref={messagesEndRef} />
                   </div>
-                </div>
-              </div>
-            </div>
 
-            {/* Example Questions */}
-            <div className="glass-card p-6">
-              <h3 className="text-lg font-semibold text-white mb-4">Start a Conversation</h3>
-              <div className="space-y-2">
-                {selectedPhilosopher.exampleQuestions.map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => askExampleQuestion(question)}
-                    className="w-full text-left p-3 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 hover:text-white transition-colors"
-                  >
-                    {question}
-                  </button>
-                ))}
+                  {/* Input Area */}
+                  <div className="border-t border-white/10 p-6">
+                    <div className="flex items-center gap-3">
+                      <div className="flex-1 relative">
+                        <input
+                          ref={inputRef}
+                          type="text"
+                          value={inputValue}
+                          onChange={(e) => setInputValue(e.target.value)}
+                          onKeyPress={handleKeyPress}
+                          placeholder={`Ask ${selectedPhilosopher.name} anything...`}
+                          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          disabled={isProcessing}
+                        />
+                      </div>
+                      <Button
+                        onClick={sendMessage}
+                        disabled={!inputValue.trim() || isProcessing}
+                        className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl transition-all shadow-lg"
+                      >
+                        <Send className="w-5 h-5" />
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
               </div>
-            </div>
-          </div>
+
+              {/* Sidebar */}
+              <div className="space-y-6">
+                {/* Philosopher Selector */}
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <GraduationCap className="w-5 h-5" />
+                      Choose Your Guide
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowDropdown(!showDropdown)}
+                        className="w-full flex items-center justify-between p-4 bg-white/10 border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all"
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-2xl">{selectedPhilosopher.avatar}</span>
+                          <div className="text-left">
+                            <div className="font-medium">{selectedPhilosopher.name}</div>
+                            <div className="text-sm text-gray-400">{selectedPhilosopher.title}</div>
+                          </div>
+                        </div>
+                        <ChevronDown className={`w-5 h-5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                      </button>
+                      
+                      {showDropdown && (
+                        <motion.div
+                          initial={{ opacity: 0, y: -10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-xl z-10 max-h-64 overflow-y-auto"
+                        >
+                          {philosophers.map((philosopher) => (
+                            <button
+                              key={philosopher.id}
+                              onClick={() => {
+                                setSelectedPhilosopher(philosopher);
+                                setShowDropdown(false);
+                              }}
+                              className="w-full flex items-center gap-3 p-4 hover:bg-white/10 transition-all text-left"
+                            >
+                              <span className="text-xl">{philosopher.avatar}</span>
+                              <div>
+                                <div className="font-medium text-white">{philosopher.name}</div>
+                                <div className="text-sm text-gray-400">{philosopher.title}</div>
+                              </div>
+                            </button>
+                          ))}
+                        </motion.div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Philosopher Info */}
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Info className="w-5 h-5" />
+                      About {selectedPhilosopher.name}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-gray-300 text-sm mb-4 leading-relaxed">{selectedPhilosopher.description}</p>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
+                          <Star className="w-4 h-4 text-yellow-400" />
+                          Key Teachings
+                        </h4>
+                        <div className="space-y-2">
+                          {selectedPhilosopher.keyTeachings.map((teaching, index) => (
+                            <div key={index} className="text-xs text-gray-400 flex items-start gap-2 p-2 bg-white/5 rounded-lg">
+                              <Sparkle className="w-3 h-3 text-yellow-400 mt-0.5 flex-shrink-0" />
+                              <span>{teaching}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Example Questions */}
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardHeader>
+                    <CardTitle className="text-white flex items-center gap-2">
+                      <Lightbulb className="w-5 h-5" />
+                      Start a Conversation
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {selectedPhilosopher.exampleQuestions.map((question, index) => (
+                        <button
+                          key={index}
+                          onClick={() => askExampleQuestion(question)}
+                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 hover:text-white transition-all border border-transparent hover:border-white/20"
+                        >
+                          {question}
+                        </button>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <BookOpen className="w-5 h-5" />
+                    Philosophical Terminology
+                  </CardTitle>
+                  <p className="text-gray-300">
+                    Explore 25 profound philosophical concepts from various traditions
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <PhilosophicalTerminologyWidget />
+                </CardContent>
+              </Card>
+            </motion.div>
+          )}
         </div>
       </div>
-    </PageLayout>
+    </div>
   );
 } 
