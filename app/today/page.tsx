@@ -8,7 +8,9 @@ import { TaskCard } from '@/components/cards/TaskCard';
 import { BreathworkCard } from '@/components/cards/BreathworkCard';
 import { LessonCard } from '@/components/cards/LessonCard';
 import { StreakCard } from '@/components/cards/StreakCard';
-import { Sparkles, Target, Heart, Brain, BookOpen } from 'lucide-react';
+import { MoodTrackerCard } from '@/components/cards/MoodTrackerCard';
+import { HydrationTrackerCard } from '@/components/cards/HydrationTrackerCard';
+import { Sparkles, Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Task {
@@ -80,6 +82,29 @@ export default function TodayPage() {
     },
   ]);
 
+  const [userWidgets, setUserWidgets] = useState<string[]>([]);
+
+  // Load user's added widgets
+  useEffect(() => {
+    const saved = localStorage.getItem('userWidgets');
+    if (saved) {
+      setUserWidgets(JSON.parse(saved));
+    }
+  }, []);
+
+  const renderWidget = (widgetId: string) => {
+    switch (widgetId) {
+      case 'breathwork':
+        return <BreathworkCard key={widgetId} />;
+      case 'mood_tracker':
+        return <MoodTrackerCard key={widgetId} />;
+      case 'hydration':
+        return <HydrationTrackerCard key={widgetId} />;
+      default:
+        return null;
+    }
+  };
+
   const currentHour = new Date().getHours();
   const isMorning = currentHour < 12;
   const isEvening = currentHour >= 18;
@@ -119,16 +144,27 @@ export default function TodayPage() {
       <main className="px-4 py-6 space-y-6">
         {/* Hero Strip */}
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6">
-          <div className="flex items-center space-x-3 mb-4">
-            <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-primary" />
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-text">
+                  {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
+                </h1>
+                <p className="text-sm text-muted">Ready to flourish today?</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-xl font-bold text-text">
-                {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
-              </h1>
-              <p className="text-sm text-muted">Ready to flourish today?</p>
-            </div>
+            
+            {/* Widget Gallery Button */}
+            <button
+              onClick={() => window.location.href = '/tools'}
+              className="flex items-center gap-2 px-3 py-2 bg-surface border border-border rounded-lg hover:bg-surface-2 transition-colors duration-150"
+            >
+              <Grid3X3 className="w-4 h-4 text-muted" />
+              <span className="text-sm font-medium text-text">Widgets</span>
+            </button>
           </div>
           
           <div className="flex items-center space-x-2">
@@ -230,6 +266,16 @@ export default function TodayPage() {
           {/* Breathwork Quick Start */}
           <BreathworkCard />
         </div>
+
+        {/* User Widgets */}
+        {userWidgets.length > 0 && (
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-text">Your Widgets</h2>
+            <div className="space-y-4">
+              {userWidgets.map(widgetId => renderWidget(widgetId))}
+            </div>
+          </div>
+        )}
 
         {/* Wisdom Tile */}
         <div className="space-y-4">

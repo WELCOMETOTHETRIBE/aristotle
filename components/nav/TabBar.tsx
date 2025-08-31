@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Home, BookOpen, Users, TrendingUp, Settings } from 'lucide-react';
+import { Home, BookOpen, Users, TrendingUp, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
@@ -31,9 +31,9 @@ const tabs = [
     activeColor: 'text-primary',
   },
   {
-    name: 'Settings',
-    href: '/settings',
-    icon: Settings,
+    name: 'Tools',
+    href: '/tools',
+    icon: Wrench,
     activeColor: 'text-primary',
   },
 ];
