@@ -69,7 +69,6 @@ export default function CommunityPage() {
 
   const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
 
-  // Mock data for demonstration
   useEffect(() => {
     const mockThreads: Thread[] = [
       {
