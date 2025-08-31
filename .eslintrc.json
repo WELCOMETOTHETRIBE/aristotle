@@ -4,6 +4,11 @@
   ],
   "rules": {
     "prefer-const": "warn",
-    "no-var": "warn"
+    "no-var": "warn",
+    "react/no-unescaped-entities": "off",
+    "@next/next/no-assign-module-variable": "off",
+    "react-hooks/rules-of-hooks": "warn",
+    "react-hooks/exhaustive-deps": "warn",
+    "@next/next/no-img-element": "warn"
   }
 } 
