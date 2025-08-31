@@ -90,6 +90,11 @@ export default function TodayPage() {
     const saved = localStorage.getItem('userWidgets');
     if (saved) {
       setUserWidgets(JSON.parse(saved));
+    } else {
+      // Add some default widgets for demonstration
+      const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer'];
+      setUserWidgets(defaultWidgets);
+      localStorage.setItem('userWidgets', JSON.stringify(defaultWidgets));
     }
   }, []);
 
@@ -265,16 +270,21 @@ export default function TodayPage() {
               ))}
             </div>
           </div>
-
-          {/* Breathwork Quick Start */}
-          <BreathworkCard />
         </div>
 
-        {/* User Widgets */}
+        {/* Enhanced Widgets Section */}
         {userWidgets.length > 0 && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-text">Your Widgets</h2>
-            <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-text">Your Wellness Tools</h2>
+              <button
+                onClick={() => window.location.href = '/tools'}
+                className="text-xs text-primary hover:underline"
+              >
+                Manage Widgets
+              </button>
+            </div>
+            <div className="grid grid-cols-1 gap-4">
               {userWidgets.map(widgetId => renderWidget(widgetId))}
             </div>
           </div>

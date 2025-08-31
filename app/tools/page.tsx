@@ -176,26 +176,29 @@ export default function ToolsPage() {
   }, []);
 
   const toggleWidget = (widgetId: string) => {
-    setWidgets(prev => 
-      prev.map(widget => 
+    setWidgets(prev => {
+      const updatedWidgets = prev.map(widget => 
         widget.id === widgetId 
           ? { ...widget, isAdded: !widget.isAdded }
           : widget
-      )
-    );
-
-    // Save to localStorage
-    const updatedWidgets = widgets.map(widget => 
-      widget.id === widgetId 
-        ? { ...widget, isAdded: !widget.isAdded }
-        : widget
-    );
-    
-    const addedWidgetIds = updatedWidgets
-      .filter(widget => widget.isAdded)
-      .map(widget => widget.id);
-    
-    localStorage.setItem('userWidgets', JSON.stringify(addedWidgetIds));
+      );
+      
+      // Save to localStorage
+      const addedWidgetIds = updatedWidgets
+        .filter(widget => widget.isAdded)
+        .map(widget => widget.id);
+      
+      localStorage.setItem('userWidgets', JSON.stringify(addedWidgetIds));
+      
+      // Show feedback
+      const widget = updatedWidgets.find(w => w.id === widgetId);
+      if (widget) {
+        const action = widget.isAdded ? 'added to' : 'removed from';
+        console.log(`${widget.name} ${action} your homepage`);
+      }
+      
+      return updatedWidgets;
+    });
   };
 
   const filteredWidgets = widgets.filter(widget => {
@@ -244,6 +247,14 @@ export default function ToolsPage() {
                 >
                   {showAddedOnly ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
+                {addedWidgetsCount > 0 && (
+                  <button
+                    onClick={() => window.location.href = '/today'}
+                    className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors text-sm font-medium"
+                  >
+                    View on Homepage
+                  </button>
+                )}
               </div>
             </div>
           </div>
