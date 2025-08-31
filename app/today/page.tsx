@@ -11,6 +11,10 @@ import { StreakCard } from '@/components/cards/StreakCard';
 import { MoodTrackerCard } from '@/components/cards/MoodTrackerCard';
 import { HydrationTrackerCard } from '@/components/cards/HydrationTrackerCard';
 import { FocusTimerCard } from '@/components/cards/FocusTimerCard';
+import { SleepTrackerCard } from '@/components/cards/SleepTrackerCard';
+import { HabitTrackerCard } from '@/components/cards/HabitTrackerCard';
+import { JournalCard } from '@/components/cards/JournalCard';
+import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
 import { Sparkles, Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -108,6 +112,14 @@ export default function TodayPage() {
         return <HydrationTrackerCard key={widgetId} />;
       case 'focus_timer':
         return <FocusTimerCard key={widgetId} />;
+      case 'sleep_tracker':
+        return <SleepTrackerCard key={widgetId} />;
+      case 'habit_tracker':
+        return <HabitTrackerCard key={widgetId} />;
+      case 'journal':
+        return <JournalCard key={widgetId} />;
+      case 'goal_tracker':
+        return <GoalTrackerCard key={widgetId} />;
       default:
         return null;
     }

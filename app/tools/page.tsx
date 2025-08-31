@@ -144,6 +144,26 @@ const availableWidgets: Widget[] = [
     isActive: true,
     isAdded: false,
   },
+  {
+    id: 'journal',
+    name: 'Journal',
+    description: 'Daily reflection and mood tracking with AI insights',
+    icon: BookOpen,
+    category: 'mindfulness',
+    color: 'from-blue-500 to-indigo-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'goal_tracker',
+    name: 'Goal Tracker',
+    description: 'Set and track progress towards your personal goals',
+    icon: Target,
+    category: 'productivity',
+    color: 'from-purple-500 to-violet-500',
+    isActive: true,
+    isAdded: false,
+  },
 ];
 
 const categories = [
