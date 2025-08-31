@@ -280,7 +280,7 @@ export default function DashboardPage() {
             {Array.from({ length: 8 }).map((_, i) => (
               <div
                 key={i}
-                className="waveform-bar w-1"
+                className="waveform-bar w-1 animate-pulse"
                 style={{ animationDelay: `${i * 0.1}s` }}
               />
             ))}
@@ -316,7 +316,7 @@ export default function DashboardPage() {
 
             <Button 
               onClick={() => setShowWidgetGallery(true)}
-              className="flex items-center gap-3 mx-auto rounded-2xl px-8 py-4 font-medium text-lg bg-[rgb(var(--wisdom))] text-black hover:brightness-110 transition duration-fast ease-snap shadow-card"
+              className="btn-primary flex items-center gap-3 mx-auto px-8 py-4 text-lg shadow-card hover-lift"
             >
               <Palette className="h-5 w-5" />
               Customize Your Space
@@ -333,7 +333,7 @@ export default function DashboardPage() {
                 <Button 
                   onClick={() => setShowWidgetGallery(true)}
                   variant="outline"
-                  className="flex items-center gap-2 rounded-xl px-4 py-2 font-medium bg-[rgb(var(--surface))] border border-[rgb(var(--border))] text-[rgb(var(--text))] hover:bg-[rgb(var(--surface-2))] transition duration-fast ease-soft"
+                  className="btn-secondary flex items-center gap-2 px-4 py-2"
                 >
                   <Settings className="h-4 w-4" />
                   Manage
@@ -381,7 +381,7 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('core').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]">
+                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
                       <widget.icon className={`h-5 w-5 ${widget.color}`} />
                       <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
                     </div>
@@ -399,7 +399,7 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('practice').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]">
+                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
                       <widget.icon className={`h-5 w-5 ${widget.color}`} />
                       <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
                     </div>
@@ -417,7 +417,7 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('health').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]">
+                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
                       <widget.icon className={`h-5 w-5 ${widget.color}`} />
                       <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
                     </div>
@@ -435,7 +435,7 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('wisdom').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))]">
+                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
                       <widget.icon className={`h-5 w-5 ${widget.color}`} />
                       <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
                     </div>
@@ -449,11 +449,11 @@ export default function DashboardPage() {
           {activeWidgets.length === 0 && (
             <div className="text-center py-20">
               <div className="max-w-2xl mx-auto">
-                <div className="bg-[rgb(var(--surface-2))] border border-[rgb(var(--border))] rounded-3xl p-12 mb-8 shadow-card">
+                                  <div className="panel-base rounded-3xl p-12 mb-8">
                   <div className="mb-8">
-                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[rgb(var(--wisdom)/0.1)] flex items-center justify-center">
-                      <Sparkles className="h-12 w-12 text-[rgb(var(--wisdom))]" />
-                    </div>
+                                      <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[rgb(var(--wisdom)/0.1)] flex items-center justify-center animate-breathe">
+                    <Sparkles className="h-12 w-12 text-[rgb(var(--wisdom))] animate-pulse-glow" />
+                  </div>
                     <h3 className="text-3xl font-semibold text-[rgb(var(--text))] mb-4 font-display">
                       Begin Your Journey
                     </h3>
@@ -465,14 +465,14 @@ export default function DashboardPage() {
                   <div className="flex flex-col sm:flex-row gap-4 justify-center">
                     <Button 
                       onClick={() => setShowWidgetGallery(true)}
-                      className="flex items-center gap-3 rounded-2xl px-8 py-4 font-medium text-lg bg-[rgb(var(--wisdom))] text-black hover:brightness-110 transition duration-fast ease-snap"
+                      className="btn-primary flex items-center gap-3 px-8 py-4 text-lg hover-lift"
                     >
                       <Compass className="h-5 w-5" />
                       Explore Practices
                     </Button>
                     <Button 
                       variant="outline"
-                      className="flex items-center gap-3 rounded-2xl px-8 py-4 font-medium text-lg bg-[rgb(var(--surface))] border border-[rgb(var(--border))] text-[rgb(var(--text))] hover:bg-[rgb(var(--surface-2))] transition duration-fast ease-soft"
+                      className="btn-secondary flex items-center gap-3 px-8 py-4 text-lg"
                     >
                       <BookOpen className="h-5 w-5" />
                       Learn More
