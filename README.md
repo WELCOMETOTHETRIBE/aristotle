@@ -1,6 +1,11 @@
-# Aion - Aristotle-Inspired Life Coach
+# Aristotle - Ancient Wisdom Wellness System
 
-A voice-first personal assistant for flourishing, wellness, and intentional living, built on ancient wisdom and modern AI.
+A comprehensive wellness system based on ancient philosophical wisdom and modern science.
+
+## 🚀 Latest Update
+- Framework pages now work without authentication
+- Dashboard has compact widget view with interactive modals
+- All pages accessible for development
 
 ## 🌟 Features
 
