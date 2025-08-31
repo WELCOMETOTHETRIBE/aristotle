@@ -57,6 +57,8 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
 
         // Load framework config
         const frameworkConfig = getFrameworkBySlug(params.slug);
+        console.log('Framework config result:', frameworkConfig);
+        
         if (!frameworkConfig) {
           throw new Error(`Framework not found: ${params.slug}`);
         }
@@ -100,6 +102,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         console.error('Error loading framework data:', err);
         setError(err instanceof Error ? err.message : 'Failed to load framework');
       } finally {
+        console.log('Setting loading to false');
         setLoading(false);
       }
     };
