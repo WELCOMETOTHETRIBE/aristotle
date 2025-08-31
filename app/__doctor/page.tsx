@@ -76,8 +76,8 @@ export default function DoctorPage() {
     fetchHealth();
     
     // Get client-side errors
-    if (typeof window !== 'undefined' && window.__doctorErrors) {
-      setClientErrors(window.__doctorErrors);
+    if (typeof window !== 'undefined' && (window as any).__doctorErrors) {
+      setClientErrors((window as any).__doctorErrors);
     }
   }, []);
 
