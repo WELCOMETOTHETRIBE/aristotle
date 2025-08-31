@@ -1,55 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
-
-interface Notification {
-  id: string;
-  type: 'new_reply' | 'new_question' | 'like' | 'mention';
-  title: string;
-  message: string;
-  postId?: string;
-  isRead: boolean;
-  createdAt: string;
-}
-
-// Notifications data
-const mockNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'new_reply',
-    title: 'New reply to your comment',
-    message: 'Sarah M. replied to your comment on "How do you apply Stoic principles when facing workplace adversity?"',
-    postId: '1',
-    isRead: false,
-    createdAt: '2024-01-15T14:30:00Z'
-  },
-  {
-    id: '2',
-    type: 'new_question',
-    title: 'New AI Academy Question',
-    message: 'The AI Academy has posted a new question: "What does Aristotle\'s concept of eudaimonia mean in your daily life?"',
-    postId: '2',
-    isRead: false,
-    createdAt: '2024-01-14T09:00:00Z'
-  },
-  {
-    id: '3',
-    type: 'like',
-    title: 'Someone liked your post',
-    message: 'Michael R. liked your discussion about morning meditation',
-    postId: '4',
-    isRead: true,
-    createdAt: '2024-01-15T12:15:00Z'
-  },
-  {
-    id: '4',
-    type: 'mention',
-    title: 'You were mentioned in a post',
-    message: 'Emma L. mentioned you in their post about justice in relationships',
-    postId: '5',
-    isRead: false,
-    createdAt: '2024-01-15T10:45:00Z'
-  }
-];
+import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -69,23 +20,51 @@ export async function GET(request: NextRequest) {
     const unreadOnly = searchParams.get('unread') === 'true';
     const limit = parseInt(searchParams.get('limit') || '50');
 
-    let filteredNotifications = mockNotifications;
-
-    // Filter by unread status
+    // Build where clause
+    const where: any = { userId: payload.userId };
+    
     if (unreadOnly) {
-      filteredNotifications = filteredNotifications.filter(notification => !notification.isRead);
+      where.isRead = false;
     }
 
-    // Apply limit
-    filteredNotifications = filteredNotifications.slice(0, limit);
+    // Fetch notifications
+    const notifications = await prisma.communityNotification.findMany({
+      where,
+      include: {
+        post: {
+          select: {
+            id: true,
+            title: true
+          }
+        }
+      },
+      orderBy: { createdAt: 'desc' },
+      take: limit
+    });
 
     // Count unread notifications
-    const unreadCount = mockNotifications.filter(notification => !notification.isRead).length;
+    const unreadCount = await prisma.communityNotification.count({
+      where: {
+        userId: payload.userId,
+        isRead: false
+      }
+    });
+
+    // Format notifications
+    const formattedNotifications = notifications.map(notification => ({
+      id: notification.id,
+      type: notification.type,
+      title: notification.title,
+      message: notification.message,
+      postId: notification.postId,
+      isRead: notification.isRead,
+      createdAt: notification.createdAt.toISOString()
+    }));
 
     return NextResponse.json({
-      notifications: filteredNotifications,
+      notifications: formattedNotifications,
       unreadCount,
-      total: mockNotifications.length
+      total: notifications.length
     });
 
   } catch (error) {
@@ -123,7 +102,13 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const notification = mockNotifications.find(n => n.id === notificationId);
+        const notification = await prisma.communityNotification.findFirst({
+          where: {
+            id: notificationId,
+            userId: payload.userId
+          }
+        });
+
         if (!notification) {
           return NextResponse.json(
             { error: 'Notification not found' },
@@ -131,16 +116,24 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        notification.isRead = true;
+        await prisma.communityNotification.update({
+          where: { id: notificationId },
+          data: { isRead: true }
+        });
 
         return NextResponse.json({
           success: true,
-          notification,
           message: 'Notification marked as read'
         });
 
       case 'mark_all_read':
-        mockNotifications.forEach(n => n.isRead = true);
+        await prisma.communityNotification.updateMany({
+          where: {
+            userId: payload.userId,
+            isRead: false
+          },
+          data: { isRead: true }
+        });
 
         return NextResponse.json({
           success: true,
@@ -155,15 +148,23 @@ export async function POST(request: NextRequest) {
           );
         }
 
-        const index = mockNotifications.findIndex(n => n.id === notificationId);
-        if (index === -1) {
+        const notificationToDelete = await prisma.communityNotification.findFirst({
+          where: {
+            id: notificationId,
+            userId: payload.userId
+          }
+        });
+
+        if (!notificationToDelete) {
           return NextResponse.json(
             { error: 'Notification not found' },
             { status: 404 }
           );
         }
 
-        mockNotifications.splice(index, 1);
+        await prisma.communityNotification.delete({
+          where: { id: notificationId }
+        });
 
         return NextResponse.json({
           success: true,

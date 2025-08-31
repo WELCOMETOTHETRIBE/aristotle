@@ -241,6 +241,13 @@ model User {
   hydrationLogs HydrationLog[]
   moodLogs    MoodLog[]
   timerSessions TimerSession[]
+  
+  // Community relations
+  posts       CommunityPost[]
+  replies     CommunityReply[]
+  likes       CommunityLike[]
+  bookmarks   CommunityBookmark[]
+  notifications CommunityNotification[]
 }
 
 model Session {
@@ -450,4 +457,77 @@ model TimerSession {
   endedAt   DateTime?
   meta      Json?
   user      User      @relation(fields: [userId], references: [id])
+}
+
+// Community Forum Models
+model CommunityPost {
+  id            String   @id @default(cuid())
+  title         String
+  content       String
+  authorId      Int
+  author        User     @relation(fields: [authorId], references: [id])
+  type          String   // ai_question, member_discussion, resource_share
+  category      String
+  tags          String[] // Array of tags
+  isPinned      Boolean  @default(false)
+  isAIQuestion  Boolean  @default(false)
+  aiInsights    String[] // Array of AI insights
+  views         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  replies       CommunityReply[]
+  likes         CommunityLike[]
+  bookmarks     CommunityBookmark[]
+  notifications CommunityNotification[]
+}
+
+model CommunityReply {
+  id        String   @id @default(cuid())
+  content   String
+  authorId  Int
+  author    User     @relation(fields: [authorId], references: [id])
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  parentId  String?  // For nested replies
+  parent    CommunityReply? @relation("ReplyReplies", fields: [parentId], references: [id])
+  replies   CommunityReply[] @relation("ReplyReplies")
+  likes     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model CommunityLike {
+  id        String   @id @default(cuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model CommunityBookmark {
+  id        String   @id @default(cuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  postId    String
+  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, postId])
+}
+
+model CommunityNotification {
+  id        String   @id @default(cuid())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  type      String   // new_reply, new_question, like, mention
+  title     String
+  message   String
+  postId    String?
+  post      CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
 } 
