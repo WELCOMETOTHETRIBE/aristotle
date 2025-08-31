@@ -243,8 +243,17 @@ export default function DashboardPage() {
   };
 
   const handleAddWidget = async (widgetId: string) => {
+    if (activeWidgets.includes(widgetId)) return; // Prevent duplicate adds
+    
     const newActiveWidgets = [...activeWidgets, widgetId];
     setActiveWidgets(newActiveWidgets);
+    
+    // Add visual feedback
+    const button = document.querySelector(`[data-widget-id="${widgetId}"]`);
+    if (button) {
+      button.classList.add('animate-pulse');
+      setTimeout(() => button.classList.remove('animate-pulse'), 1000);
+    }
     
     try {
       await fetch('/api/widgets', {
@@ -354,18 +363,28 @@ export default function DashboardPage() {
                   if (!widgetInfo) return null;
 
                   return (
-                    <WidgetRenderer
-                      key={widgetId}
-                      widgetId={widgetId}
-                      title={widgetInfo.title}
-                      description={widgetInfo.description}
-                      icon={widgetInfo.icon}
-                      category={widgetInfo.category}
-                      color={widgetInfo.color}
-                      showInfo={false}
-                      onInfoToggle={() => {}}
-                      frameworkTone="stoic"
-                    />
+                    <div key={widgetId} className="relative group">
+                      <WidgetRenderer
+                        widgetId={widgetId}
+                        title={widgetInfo.title}
+                        description={widgetInfo.description}
+                        icon={widgetInfo.icon}
+                        category={widgetInfo.category}
+                        color={widgetInfo.color}
+                        showInfo={false}
+                        onInfoToggle={() => {}}
+                        frameworkTone="stoic"
+                      />
+                      <button
+                        onClick={() => handleRemoveWidget(widgetId)}
+                        className="absolute top-2 right-2 p-1.5 rounded-full bg-red-500/20 text-red-400 hover:bg-red-500/30 hover:text-red-300 transition-all duration-200 opacity-0 group-hover:opacity-100 z-10"
+                        title="Remove widget"
+                      >
+                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
                   );
                 })}
               </div>
@@ -389,10 +408,31 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('core').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
-                      <widget.icon className={`h-5 w-5 ${widget.color}`} />
-                      <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
-                    </div>
+                    <button
+                      key={widget.id}
+                      data-widget-id={widget.id}
+                      onClick={() => handleAddWidget(widget.id)}
+                      disabled={activeWidgets.includes(widget.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--wisdom)/0.2)] border-[rgb(var(--wisdom)/0.3)] text-[rgb(var(--wisdom))] cursor-not-allowed'
+                          : 'bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--wisdom)/0.1)] hover:border-[rgb(var(--wisdom)/0.3)] hover:scale-[1.02] hover:shadow-lg'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg transition-all duration-200 ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--wisdom)/0.2)]'
+                          : 'bg-[rgb(var(--wisdom)/0.1)] group-hover:bg-[rgb(var(--wisdom)/0.2)]'
+                      }`}>
+                        <widget.icon className={`h-4 w-4 ${widget.color}`} />
+                      </div>
+                      <span className="text-sm font-medium text-left flex-1">{widget.title}</span>
+                      {activeWidgets.includes(widget.id) ? (
+                        <CheckCircle className="h-4 w-4 text-[rgb(var(--wisdom))]" />
+                      ) : (
+                        <Plus className="h-4 w-4 text-[rgb(var(--muted))] group-hover:text-[rgb(var(--wisdom))] transition-colors" />
+                      )}
+                    </button>
                   ))}
                 </div>
               </AcademyCard>
@@ -407,10 +447,31 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('practice').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
-                      <widget.icon className={`h-5 w-5 ${widget.color}`} />
-                      <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
-                    </div>
+                    <button
+                      key={widget.id}
+                      data-widget-id={widget.id}
+                      onClick={() => handleAddWidget(widget.id)}
+                      disabled={activeWidgets.includes(widget.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--courage)/0.2)] border-[rgb(var(--courage)/0.3)] text-[rgb(var(--courage))] cursor-not-allowed'
+                          : 'bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--courage)/0.1)] hover:border-[rgb(var(--courage)/0.3)] hover:scale-[1.02] hover:shadow-lg'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg transition-all duration-200 ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--courage)/0.2)]'
+                          : 'bg-[rgb(var(--courage)/0.1)] group-hover:bg-[rgb(var(--courage)/0.2)]'
+                      }`}>
+                        <widget.icon className={`h-4 w-4 ${widget.color}`} />
+                      </div>
+                      <span className="text-sm font-medium text-left flex-1">{widget.title}</span>
+                      {activeWidgets.includes(widget.id) ? (
+                        <CheckCircle className="h-4 w-4 text-[rgb(var(--courage))]" />
+                      ) : (
+                        <Plus className="h-4 w-4 text-[rgb(var(--muted))] group-hover:text-[rgb(var(--courage))] transition-colors" />
+                      )}
+                    </button>
                   ))}
                 </div>
               </AcademyCard>
@@ -425,10 +486,31 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('health').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
-                      <widget.icon className={`h-5 w-5 ${widget.color}`} />
-                      <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
-                    </div>
+                    <button
+                      key={widget.id}
+                      data-widget-id={widget.id}
+                      onClick={() => handleAddWidget(widget.id)}
+                      disabled={activeWidgets.includes(widget.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--justice)/0.2)] border-[rgb(var(--justice)/0.3)] text-[rgb(var(--justice))] cursor-not-allowed'
+                          : 'bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--justice)/0.1)] hover:border-[rgb(var(--justice)/0.3)] hover:scale-[1.02] hover:shadow-lg'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg transition-all duration-200 ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--justice)/0.2)]'
+                          : 'bg-[rgb(var(--justice)/0.1)] group-hover:bg-[rgb(var(--justice)/0.2)]'
+                      }`}>
+                        <widget.icon className={`h-4 w-4 ${widget.color}`} />
+                      </div>
+                      <span className="text-sm font-medium text-left flex-1">{widget.title}</span>
+                      {activeWidgets.includes(widget.id) ? (
+                        <CheckCircle className="h-4 w-4 text-[rgb(var(--justice))]" />
+                      ) : (
+                        <Plus className="h-4 w-4 text-[rgb(var(--muted))] group-hover:text-[rgb(var(--justice))] transition-colors" />
+                      )}
+                    </button>
                   ))}
                 </div>
               </AcademyCard>
@@ -443,10 +525,31 @@ export default function DashboardPage() {
               >
                 <div className="space-y-3">
                   {getCategoryWidgets('wisdom').map((widget) => (
-                    <div key={widget.id} className="flex items-center gap-3 p-3 rounded-xl bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover-lift">
-                      <widget.icon className={`h-5 w-5 ${widget.color}`} />
-                      <span className="text-sm text-[rgb(var(--text))] font-medium">{widget.title}</span>
-                    </div>
+                    <button
+                      key={widget.id}
+                      data-widget-id={widget.id}
+                      onClick={() => handleAddWidget(widget.id)}
+                      disabled={activeWidgets.includes(widget.id)}
+                      className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all duration-200 group ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--temperance)/0.2)] border-[rgb(var(--temperance)/0.3)] text-[rgb(var(--temperance))] cursor-not-allowed'
+                          : 'bg-[rgb(var(--surface))] border border-[rgb(var(--border))] hover:bg-[rgb(var(--temperance)/0.1)] hover:border-[rgb(var(--temperance)/0.3)] hover:scale-[1.02] hover:shadow-lg'
+                      }`}
+                    >
+                      <div className={`p-2 rounded-lg transition-all duration-200 ${
+                        activeWidgets.includes(widget.id)
+                          ? 'bg-[rgb(var(--temperance)/0.2)]'
+                          : 'bg-[rgb(var(--temperance)/0.1)] group-hover:bg-[rgb(var(--temperance)/0.2)]'
+                      }`}>
+                        <widget.icon className={`h-4 w-4 ${widget.color}`} />
+                      </div>
+                      <span className="text-sm font-medium text-left flex-1">{widget.title}</span>
+                      {activeWidgets.includes(widget.id) ? (
+                        <CheckCircle className="h-4 w-4 text-[rgb(var(--temperance))]" />
+                      ) : (
+                        <Plus className="h-4 w-4 text-[rgb(var(--muted))] group-hover:text-[rgb(var(--temperance))] transition-colors" />
+                      )}
+                    </button>
                   ))}
                 </div>
               </AcademyCard>
@@ -457,11 +560,11 @@ export default function DashboardPage() {
           {activeWidgets.length === 0 && (
             <div className="text-center py-20">
               <div className="max-w-2xl mx-auto">
-                                  <div className="panel-base rounded-3xl p-12 mb-8">
+                <div className="panel-base rounded-3xl p-12 mb-8">
                   <div className="mb-8">
-                                      <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[rgb(var(--wisdom)/0.1)] flex items-center justify-center animate-breathe">
-                    <Sparkles className="h-12 w-12 text-[rgb(var(--wisdom))] animate-pulse-glow" />
-                  </div>
+                    <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-[rgb(var(--wisdom)/0.1)] flex items-center justify-center animate-breathe">
+                      <Sparkles className="h-12 w-12 text-[rgb(var(--wisdom))] animate-pulse-glow" />
+                    </div>
                     <h3 className="text-3xl font-semibold text-[rgb(var(--text))] mb-4 font-display">
                       Begin Your Journey
                     </h3>
