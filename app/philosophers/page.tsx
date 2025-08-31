@@ -162,335 +162,309 @@ export default function PhilosophersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6 }}
-            >
-              <h1 className="text-5xl font-bold text-white mb-4 font-display">
-                Philosopher's Journey
-              </h1>
-              <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Engage in dialogue with history's greatest minds and explore timeless wisdom through interactive conversations
-              </p>
-            </motion.div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h1 className="text-4xl font-bold text-white mb-3 font-display">
+              Philosopher's Journey
+            </h1>
+            <p className="text-lg text-gray-300 max-w-2xl mx-auto">
+              Engage in dialogue with history's greatest minds and explore timeless wisdom
+            </p>
+          </motion.div>
+        </div>
+
+        {/* Stats Overview */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+        >
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-white mb-1">{philosophers.length}</div>
+            <div className="text-sm text-gray-300">Philosophers</div>
           </div>
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-white mb-1">25+</div>
+            <div className="text-sm text-gray-300">Terms</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-white mb-1">∞</div>
+            <div className="text-sm text-gray-300">Conversations</div>
+          </div>
+          <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4 text-center">
+            <div className="text-2xl font-bold text-white mb-1">8</div>
+            <div className="text-sm text-gray-300">Traditions</div>
+          </div>
+        </motion.div>
 
-          {/* Stats Overview */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12"
-          >
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">{philosophers.length}</div>
-                <div className="text-gray-300">Ancient Philosophers</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">25+</div>
-                <div className="text-gray-300">Philosophical Terms</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">∞</div>
-                <div className="text-gray-300">Wisdom Conversations</div>
-              </CardContent>
-            </Card>
-            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">8</div>
-                <div className="text-gray-300">Philosophical Traditions</div>
-              </CardContent>
-            </Card>
-          </motion.div>
-
-          {/* Tab Navigation */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mb-8"
-          >
-            <div className="flex space-x-1 bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
-              <button
-                onClick={() => setActiveTab('chat')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md transition-all ${
-                  activeTab === 'chat'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <MessageCircle className="w-5 h-5" />
-                Philosophical Dialogue
-              </button>
-              <button
-                onClick={() => setActiveTab('terminology')}
-                className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-md transition-all ${
-                  activeTab === 'terminology'
-                    ? 'bg-blue-600 text-white shadow-lg'
-                    : 'text-gray-300 hover:text-white hover:bg-white/10'
-                }`}
-              >
-                <BookOpen className="w-5 h-5" />
-                Philosophical Terms
-              </button>
-            </div>
-          </motion.div>
-
-          {/* Content Area */}
-          {activeTab === 'chat' ? (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="grid grid-cols-1 lg:grid-cols-4 gap-8"
+        {/* Tab Navigation */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          className="mb-6"
+        >
+          <div className="flex bg-white/10 backdrop-blur-sm rounded-lg p-1 border border-white/20">
+            <button
+              onClick={() => setActiveTab('chat')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all ${
+                activeTab === 'chat'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+              }`}
             >
-              {/* Main Chat Area */}
-              <div className="lg:col-span-3">
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20 h-[600px] flex flex-col">
-                  {/* Chat Header */}
-                  <CardHeader className="border-b border-white/10">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-4">
-                        <div className={`w-16 h-16 rounded-full bg-gradient-to-r ${selectedPhilosopher.color} flex items-center justify-center text-3xl shadow-lg`}>
-                          {selectedPhilosopher.avatar}
-                        </div>
-                        <div>
-                          <CardTitle className="text-2xl text-white">{selectedPhilosopher.name}</CardTitle>
-                          <p className="text-gray-300">
-                            {selectedPhilosopher.title} • {selectedPhilosopher.era}
-                          </p>
-                        </div>
-                      </div>
-                      <Button
-                        onClick={clearConversation}
-                        variant="outline"
-                        size="sm"
-                        className="border-white/30 text-white hover:bg-white/10"
-                      >
-                        <RotateCcw className="w-4 h-4 mr-2" />
-                        New Chat
-                      </Button>
-                    </div>
-                  </CardHeader>
-                  
-                  {/* Messages */}
-                  <div className="flex-1 overflow-y-auto p-6 space-y-4">
-                    {messages.map((message) => (
-                      <motion.div
-                        key={message.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
-                        <div
-                          className={`max-w-[80%] p-4 rounded-2xl ${
-                            message.sender === 'user'
-                              ? 'bg-blue-600 text-white shadow-lg'
-                              : 'bg-white/10 text-white border border-white/20'
-                          }`}
-                        >
-                          {message.sender === 'philosopher' && message.philosopher && (
-                            <div className="flex items-center gap-2 mb-3">
-                              <span className="text-xl">{message.philosopher.avatar}</span>
-                              <span className="text-sm font-medium text-gray-300">
-                                {message.philosopher.name}
-                              </span>
-                            </div>
-                          )}
-                          <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
-                          <div className="text-xs text-gray-400 mt-3 flex items-center gap-1">
-                            <Clock className="w-3 h-3" />
-                            {message.timestamp.toLocaleTimeString()}
-                          </div>
-                        </div>
-                      </motion.div>
-                    ))}
-                    {isProcessing && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="flex justify-start"
-                      >
-                        <div className="bg-white/10 text-white p-4 rounded-2xl border border-white/20">
-                          <div className="flex items-center gap-3">
-                            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                            <span className="text-gray-300">Thinking...</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                    <div ref={messagesEndRef} />
-                  </div>
+              <MessageCircle className="w-4 h-4" />
+              Dialogue
+            </button>
+            <button
+              onClick={() => setActiveTab('terminology')}
+              className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all ${
+                activeTab === 'terminology'
+                  ? 'bg-blue-600 text-white shadow-lg'
+                  : 'text-gray-300 hover:text-white hover:bg-white/10'
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              Terms
+            </button>
+          </div>
+        </motion.div>
 
-                  {/* Input Area */}
-                  <div className="border-t border-white/10 p-6">
+        {/* Content Area */}
+        {activeTab === 'chat' ? (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="grid grid-cols-1 lg:grid-cols-4 gap-6"
+          >
+            {/* Main Chat Area */}
+            <div className="lg:col-span-3">
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl h-[600px] flex flex-col">
+                {/* Chat Header */}
+                <div className="border-b border-white/10 p-4">
+                  <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="flex-1 relative">
-                        <input
-                          ref={inputRef}
-                          type="text"
-                          value={inputValue}
-                          onChange={(e) => setInputValue(e.target.value)}
-                          onKeyPress={handleKeyPress}
-                          placeholder={`Ask ${selectedPhilosopher.name} anything...`}
-                          className="w-full bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          disabled={isProcessing}
-                        />
+                      <div className={`w-12 h-12 rounded-full bg-gradient-to-r ${selectedPhilosopher.color} flex items-center justify-center text-2xl shadow-lg`}>
+                        {selectedPhilosopher.avatar}
                       </div>
-                      <Button
-                        onClick={sendMessage}
-                        disabled={!inputValue.trim() || isProcessing}
-                        className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-6 py-3 rounded-xl transition-all shadow-lg"
-                      >
-                        <Send className="w-5 h-5" />
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              </div>
-
-              {/* Sidebar */}
-              <div className="space-y-6">
-                {/* Philosopher Selector */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <GraduationCap className="w-5 h-5" />
-                      Choose Your Guide
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="relative">
-                      <button
-                        onClick={() => setShowDropdown(!showDropdown)}
-                        className="w-full flex items-center justify-between p-4 bg-white/10 border border-white/20 rounded-xl text-white hover:bg-white/20 transition-all"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-2xl">{selectedPhilosopher.avatar}</span>
-                          <div className="text-left">
-                            <div className="font-medium">{selectedPhilosopher.name}</div>
-                            <div className="text-sm text-gray-400">{selectedPhilosopher.title}</div>
-                          </div>
-                        </div>
-                        <ChevronDown className={`w-5 h-5 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
-                      </button>
-                      
-                      {showDropdown && (
-                        <motion.div
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-xl z-10 max-h-64 overflow-y-auto"
-                        >
-                          {philosophers.map((philosopher) => (
-                            <button
-                              key={philosopher.id}
-                              onClick={() => {
-                                setSelectedPhilosopher(philosopher);
-                                setShowDropdown(false);
-                              }}
-                              className="w-full flex items-center gap-3 p-4 hover:bg-white/10 transition-all text-left"
-                            >
-                              <span className="text-xl">{philosopher.avatar}</span>
-                              <div>
-                                <div className="font-medium text-white">{philosopher.name}</div>
-                                <div className="text-sm text-gray-400">{philosopher.title}</div>
-                              </div>
-                            </button>
-                          ))}
-                        </motion.div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Philosopher Info */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Info className="w-5 h-5" />
-                      About {selectedPhilosopher.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-300 text-sm mb-4 leading-relaxed">{selectedPhilosopher.description}</p>
-                    
-                    <div className="space-y-4">
                       <div>
-                        <h4 className="text-sm font-medium text-white mb-3 flex items-center gap-2">
-                          <Star className="w-4 h-4 text-yellow-400" />
-                          Key Teachings
-                        </h4>
-                        <div className="space-y-2">
-                          {selectedPhilosopher.keyTeachings.map((teaching, index) => (
-                            <div key={index} className="text-xs text-gray-400 flex items-start gap-2 p-2 bg-white/5 rounded-lg">
-                              <Sparkle className="w-3 h-3 text-yellow-400 mt-0.5 flex-shrink-0" />
-                              <span>{teaching}</span>
-                            </div>
-                          ))}
-                        </div>
+                        <h3 className="text-xl font-bold text-white">{selectedPhilosopher.name}</h3>
+                        <p className="text-sm text-gray-300">
+                          {selectedPhilosopher.title} • {selectedPhilosopher.era}
+                        </p>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
+                    <Button
+                      onClick={clearConversation}
+                      variant="outline"
+                      size="sm"
+                      className="border-white/30 text-white hover:bg-white/10"
+                    >
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      New Chat
+                    </Button>
+                  </div>
+                </div>
+                
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                  {messages.map((message) => (
+                    <motion.div
+                      key={message.id}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div
+                        className={`max-w-[80%] p-3 rounded-xl ${
+                          message.sender === 'user'
+                            ? 'bg-blue-600 text-white shadow-lg'
+                            : 'bg-white/10 text-white border border-white/20'
+                        }`}
+                      >
+                        {message.sender === 'philosopher' && message.philosopher && (
+                          <div className="flex items-center gap-2 mb-2">
+                            <span className="text-lg">{message.philosopher.avatar}</span>
+                            <span className="text-sm font-medium text-gray-300">
+                              {message.philosopher.name}
+                            </span>
+                          </div>
+                        )}
+                        <div className="whitespace-pre-wrap leading-relaxed text-sm">{message.content}</div>
+                        <div className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {message.timestamp.toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))}
+                  {isProcessing && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="flex justify-start"
+                    >
+                      <div className="bg-white/10 text-white p-3 rounded-xl border border-white/20">
+                        <div className="flex items-center gap-2">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                          <span className="text-sm text-gray-300">Thinking...</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
 
-                {/* Example Questions */}
-                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                  <CardHeader>
-                    <CardTitle className="text-white flex items-center gap-2">
-                      <Lightbulb className="w-5 h-5" />
-                      Start a Conversation
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {selectedPhilosopher.exampleQuestions.map((question, index) => (
+                {/* Input Area */}
+                <div className="border-t border-white/10 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1">
+                      <input
+                        ref={inputRef}
+                        type="text"
+                        value={inputValue}
+                        onChange={(e) => setInputValue(e.target.value)}
+                        onKeyPress={handleKeyPress}
+                        placeholder={`Ask ${selectedPhilosopher.name} anything...`}
+                        className="w-full bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                        disabled={isProcessing}
+                      />
+                    </div>
+                    <Button
+                      onClick={sendMessage}
+                      disabled={!inputValue.trim() || isProcessing}
+                      className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-lg transition-all shadow-lg"
+                    >
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-4">
+              {/* Philosopher Selector */}
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <GraduationCap className="w-4 h-4" />
+                  Choose Your Guide
+                </h3>
+                <div className="relative">
+                  <button
+                    onClick={() => setShowDropdown(!showDropdown)}
+                    className="w-full flex items-center justify-between p-3 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-all"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">{selectedPhilosopher.avatar}</span>
+                      <div className="text-left">
+                        <div className="font-medium text-sm">{selectedPhilosopher.name}</div>
+                        <div className="text-xs text-gray-400">{selectedPhilosopher.title}</div>
+                      </div>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${showDropdown ? 'rotate-180' : ''}`} />
+                  </button>
+                  
+                  {showDropdown && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg z-10 max-h-48 overflow-y-auto"
+                    >
+                      {philosophers.map((philosopher) => (
                         <button
-                          key={index}
-                          onClick={() => askExampleQuestion(question)}
-                          className="w-full text-left p-3 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-300 hover:text-white transition-all border border-transparent hover:border-white/20"
+                          key={philosopher.id}
+                          onClick={() => {
+                            setSelectedPhilosopher(philosopher);
+                            setShowDropdown(false);
+                          }}
+                          className="w-full flex items-center gap-2 p-3 hover:bg-white/10 transition-all text-left"
                         >
-                          {question}
+                          <span className="text-lg">{philosopher.avatar}</span>
+                          <div>
+                            <div className="font-medium text-white text-sm">{philosopher.name}</div>
+                            <div className="text-xs text-gray-400">{philosopher.title}</div>
+                          </div>
                         </button>
                       ))}
-                    </div>
-                  </CardContent>
-                </Card>
+                    </motion.div>
+                  )}
+                </div>
               </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-            >
-              <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" />
-                    Philosophical Terminology
-                  </CardTitle>
-                  <p className="text-gray-300">
-                    Explore 25 profound philosophical concepts from various traditions
-                  </p>
-                </CardHeader>
-                <CardContent>
-                  <PhilosophicalTerminologyWidget />
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </div>
+
+              {/* Philosopher Info */}
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <Info className="w-4 h-4" />
+                  About {selectedPhilosopher.name}
+                </h3>
+                <p className="text-gray-300 text-sm mb-3 leading-relaxed">{selectedPhilosopher.description}</p>
+                
+                <div className="space-y-3">
+                  <div>
+                    <h4 className="text-sm font-medium text-white mb-2 flex items-center gap-2">
+                      <Star className="w-3 h-3 text-yellow-400" />
+                      Key Teachings
+                    </h4>
+                    <div className="space-y-1">
+                      {selectedPhilosopher.keyTeachings.map((teaching, index) => (
+                        <div key={index} className="text-xs text-gray-400 flex items-start gap-2 p-2 bg-white/5 rounded">
+                          <Sparkle className="w-3 h-3 text-yellow-400 mt-0.5 flex-shrink-0" />
+                          <span>{teaching}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Example Questions */}
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-4">
+                <h3 className="text-white font-semibold mb-3 flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4" />
+                  Start a Conversation
+                </h3>
+                <div className="space-y-2">
+                  {selectedPhilosopher.exampleQuestions.map((question, index) => (
+                    <button
+                      key={index}
+                      onClick={() => askExampleQuestion(question)}
+                      className="w-full text-left p-2 bg-white/5 hover:bg-white/10 rounded text-xs text-gray-300 hover:text-white transition-all border border-transparent hover:border-white/20"
+                    >
+                      {question}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl p-6">
+              <h2 className="text-white font-bold text-xl mb-2 flex items-center gap-2">
+                <BookOpen className="w-5 h-5" />
+                Philosophical Terminology
+              </h2>
+              <p className="text-gray-300 mb-4">
+                Explore 25 profound philosophical concepts from various traditions
+              </p>
+              <PhilosophicalTerminologyWidget />
+            </div>
+          </motion.div>
+        )}
       </div>
     </div>
   );

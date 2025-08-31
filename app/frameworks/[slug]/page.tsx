@@ -334,32 +334,31 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="max-w-7xl mx-auto">
           
           {/* Header */}
           <motion.div 
-            className="mb-8"
+            className="mb-6"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
           >
-            <div className="flex items-center gap-4 mb-6">
+            <div className="flex items-center gap-4 mb-4">
               <Link
                 href="/frameworks"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 text-gray-600 dark:text-gray-300 rounded-lg transition-all duration-200"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-white/10 hover:bg-white/20 text-gray-300 rounded-lg transition-all duration-200"
               >
-                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                <ArrowLeft className="w-4 h-4" />
                 Back to Frameworks
               </Link>
               <div className="flex items-center gap-3">
-                <div className={`w-12 h-12 bg-gradient-to-r ${getToneGradient(framework.tone)} rounded-xl flex items-center justify-center shadow-lg`}>
+                <div className={`w-10 h-10 bg-gradient-to-r ${getToneGradient(framework.tone)} rounded-xl flex items-center justify-center shadow-lg`}>
                   {getFrameworkIcon(framework.slug)}
                 </div>
                 <div>
-                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{framework.name}</h1>
-                  <p className="text-gray-600 dark:text-gray-300">{framework.teachingChip}</p>
+                  <h1 className="text-2xl font-bold text-white">{framework.name}</h1>
+                  <p className="text-gray-300 text-sm">{framework.teachingChip}</p>
                 </div>
               </div>
             </div>
