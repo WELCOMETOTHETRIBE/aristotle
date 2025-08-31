@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
@@ -210,13 +211,20 @@ const WIDGET_INFO: WidgetInfo[] = [
 ];
 
 export default function DashboardPage() {
+  const searchParams = useSearchParams();
   const [activeWidgets, setActiveWidgets] = useState<string[]>([]);
   const [showWidgetGallery, setShowWidgetGallery] = useState(false);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchWidgetPreferences();
-  }, []);
+    
+    // Check if we should open the widget gallery from URL parameter
+    const openGallery = searchParams.get('openGallery');
+    if (openGallery === 'true') {
+      setShowWidgetGallery(true);
+    }
+  }, [searchParams]);
 
   const fetchWidgetPreferences = async () => {
     try {

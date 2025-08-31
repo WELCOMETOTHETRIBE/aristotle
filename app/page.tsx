@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale, Sparkles, ArrowRight } from 'lucide-react';
+import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale, Sparkles, ArrowRight, Settings } from 'lucide-react';
 
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
@@ -1111,6 +1111,12 @@ export default function DashboardPage() {
                       <a href="/frameworks">
                         <Trophy className="h-4 w-4 mr-2" />
                         Explore Frameworks
+                      </a>
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start" asChild>
+                      <a href="/dashboard?openGallery=true">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Customize Dashboard
                       </a>
                     </Button>
                   </div>
