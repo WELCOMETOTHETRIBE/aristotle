@@ -133,8 +133,17 @@ export function JournalCard({ className }: JournalCardProps) {
             }
           }
           
-          // Parse insights from AI response
-          const insights = content.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
+          // Clean markdown formatting and parse insights from AI response
+          const cleanContent = content
+            .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+            .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+            .replace(/`(.*?)`/g, '$1') // Remove code formatting
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+            .replace(/^#+\s*/gm, '') // Remove markdown headers
+            .replace(/^\s*[-*+]\s*/gm, '') // Remove markdown list markers
+            .replace(/^\s*\d+\.\s*/gm, ''); // Remove numbered list markers
+          
+          const insights = cleanContent.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
           return insights.length > 0 ? insights : [
             'Your writing shows thoughtful reflection',
             'Consider exploring this topic further',

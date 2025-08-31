@@ -139,10 +139,20 @@ export function GuideModal({ isOpen, onClose }: GuideModalProps) {
             try {
               const parsed = JSON.parse(data);
               if (parsed.content) {
+                // Clean markdown formatting from the content
+                const cleanContent = parsed.content
+                  .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+                  .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+                  .replace(/`(.*?)`/g, '$1') // Remove code formatting
+                  .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+                  .replace(/^#+\s*/gm, '') // Remove markdown headers
+                  .replace(/^\s*[-*+]\s*/gm, '') // Remove markdown list markers
+                  .replace(/^\s*\d+\.\s*/gm, ''); // Remove numbered list markers
+                
                 setMessages(prev => 
                   prev.map(msg => 
                     msg.id === assistantMessage.id 
-                      ? { ...msg, content: msg.content + parsed.content }
+                      ? { ...msg, content: msg.content + cleanContent }
                       : msg
                   )
                 );

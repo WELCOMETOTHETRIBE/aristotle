@@ -153,8 +153,17 @@ export function HydrationTrackerCard({ className }: HydrationTrackerCardProps) {
             }
           }
           
-          // Parse recommendations from AI response
-          const recommendations = content.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
+          // Clean markdown formatting and parse recommendations from AI response
+          const cleanContent = content
+            .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
+            .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
+            .replace(/`(.*?)`/g, '$1') // Remove code formatting
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
+            .replace(/^#+\s*/gm, '') // Remove markdown headers
+            .replace(/^\s*[-*+]\s*/gm, '') // Remove markdown list markers
+            .replace(/^\s*\d+\.\s*/gm, ''); // Remove numbered list markers
+          
+          const recommendations = cleanContent.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
           setAiRecommendations(recommendations.length > 0 ? recommendations : [
             'Consider drinking water first thing in the morning to rehydrate',
             'Try setting reminders every 2 hours to maintain consistent hydration',
