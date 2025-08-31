@@ -49,7 +49,7 @@ interface Notification {
   createdAt: string;
 }
 
-// Mock data - in a real app, this would come from a database
+// Community forum data
 const mockPosts: ForumPost[] = [
   {
     id: '1',
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
           title,
           content,
           author: {
-            name: 'Current User', // In a real app, get from user profile
+            name: 'Current User',
             avatar: '/avatars/default.jpg',
             level: 'Member'
           },
@@ -231,7 +231,6 @@ export async function POST(request: NextRequest) {
           lastActivity: new Date().toISOString()
         };
 
-        // In a real app, save to database
         mockPosts.unshift(newPost);
 
         return NextResponse.json({

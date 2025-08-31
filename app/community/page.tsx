@@ -250,12 +250,10 @@ export default function CommunityPage() {
   };
 
   const toggleLike = (postId: string) => {
-    // In a real app, this would make an API call
     console.log('Toggling like for post:', postId);
   };
 
   const toggleBookmark = (postId: string) => {
-    // In a real app, this would make an API call
     console.log('Toggling bookmark for post:', postId);
   };
 

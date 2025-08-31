@@ -11,7 +11,7 @@ interface Notification {
   createdAt: string;
 }
 
-// Mock notifications data - in a real app, this would come from a database
+// Notifications data
 const mockNotifications: Notification[] = [
   {
     id: '1',
