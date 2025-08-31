@@ -16,7 +16,8 @@ import { HabitTrackerCard } from '@/components/cards/HabitTrackerCard';
 import { JournalCard } from '@/components/cards/JournalCard';
 import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
 import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
-import { Sparkles, Target, Heart, Brain, BookOpen, Grid3X3, MessageSquare } from 'lucide-react';
+import AcademyLogo from '@/components/AcademyLogo';
+import { Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Task {
@@ -180,7 +181,7 @@ export default function TodayPage() {
               <div className="flex items-center space-x-4">
                 <div className="relative">
                   <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg">
-                    <Sparkles className="w-7 h-7 text-primary" />
+                    <AcademyLogo className="w-7 h-7 text-primary" />
                   </div>
                   <div className="absolute -top-1 -right-1 w-6 h-6 bg-courage/20 rounded-full flex items-center justify-center">
                     <div className="w-2 h-2 bg-courage rounded-full animate-pulse"></div>
@@ -196,13 +197,6 @@ export default function TodayPage() {
               
               {/* Quick Actions */}
               <div className="flex items-center space-x-2">
-                <button
-                  onClick={() => window.location.href = '/academy'}
-                  className="flex items-center gap-2 px-4 py-2 bg-surface/80 backdrop-blur-sm border border-border rounded-xl hover:bg-surface transition-all duration-200 hover:scale-105"
-                >
-                  <MessageSquare className="w-4 h-4 text-primary" />
-                  <span className="text-sm font-medium text-text">Chat with Philosophers</span>
-                </button>
                 <button
                   onClick={() => window.location.href = '/tools'}
                   className="flex items-center gap-2 px-4 py-2 bg-surface/80 backdrop-blur-sm border border-border rounded-xl hover:bg-surface transition-all duration-200 hover:scale-105"
