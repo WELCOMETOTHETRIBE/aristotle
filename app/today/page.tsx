@@ -16,7 +16,7 @@ import { HabitTrackerCard } from '@/components/cards/HabitTrackerCard';
 import { JournalCard } from '@/components/cards/JournalCard';
 import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
 import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
-import { Sparkles, Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
+import { Sparkles, Target, Heart, Brain, BookOpen, Grid3X3, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface Task {
@@ -166,83 +166,185 @@ export default function TodayPage() {
       <Header focusVirtue={focusVirtue} />
       
       <main className="px-4 py-6 space-y-6">
-        {/* Hero Strip */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-primary" />
+        {/* Enhanced Hero Section */}
+        <div className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-5">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary rounded-full blur-3xl"></div>
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-courage rounded-full blur-2xl"></div>
+          </div>
+          
+          <div className="relative z-10">
+            {/* Header Row */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center space-x-4">
+                <div className="relative">
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg">
+                    <Sparkles className="w-7 h-7 text-primary" />
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-courage/20 rounded-full flex items-center justify-center">
+                    <div className="w-2 h-2 bg-courage rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-text mb-1">
+                    {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
+                  </h1>
+                  <p className="text-muted font-medium">Ready to flourish today?</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-text">
-                  {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
-                </h1>
-                <p className="text-sm text-muted">Ready to flourish today?</p>
+              
+              {/* Quick Actions */}
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => window.location.href = '/academy'}
+                  className="flex items-center gap-2 px-4 py-2 bg-surface/80 backdrop-blur-sm border border-border rounded-xl hover:bg-surface transition-all duration-200 hover:scale-105"
+                >
+                  <MessageSquare className="w-4 h-4 text-primary" />
+                  <span className="text-sm font-medium text-text">Chat with Philosophers</span>
+                </button>
+                <button
+                  onClick={() => window.location.href = '/tools'}
+                  className="flex items-center gap-2 px-4 py-2 bg-surface/80 backdrop-blur-sm border border-border rounded-xl hover:bg-surface transition-all duration-200 hover:scale-105"
+                >
+                  <Grid3X3 className="w-4 h-4 text-muted" />
+                  <span className="text-sm font-medium text-text">Widgets</span>
+                </button>
               </div>
             </div>
             
-            {/* Widget Gallery Button */}
-            <button
-              onClick={() => window.location.href = '/tools'}
-              className="flex items-center gap-2 px-3 py-2 bg-surface border border-border rounded-lg hover:bg-surface-2 transition-colors duration-150"
-            >
-              <Grid3X3 className="w-4 h-4 text-muted" />
-              <span className="text-sm font-medium text-text">Widgets</span>
-            </button>
-          </div>
-          
-          <div className="flex items-center space-x-2">
-            <div className={cn(
-              'px-3 py-1 rounded-full border text-sm font-medium',
-              'bg-primary/20 text-primary border-primary/30'
-            )}>
-              Focus: {focusVirtue.charAt(0).toUpperCase() + focusVirtue.slice(1)}
+            {/* Stats Row */}
+            <div className="grid grid-cols-3 gap-4 mb-6">
+              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-primary mb-1">{completedTasks.length}</div>
+                <div className="text-xs text-muted">Tasks Done</div>
+              </div>
+              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-courage mb-1">
+                  {habits.filter(h => h.checkedToday).length}
+                </div>
+                <div className="text-xs text-muted">Habits Today</div>
+              </div>
+              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
+                <div className="text-2xl font-bold text-justice mb-1">
+                  {userWidgets.length}
+                </div>
+                <div className="text-xs text-muted">Active Tools</div>
+              </div>
             </div>
-            <p className="text-sm text-muted">
-              {completedTasks.length} of {tasks.length} tasks completed
-            </p>
+            
+            {/* Focus & Progress */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className={cn(
+                  'px-4 py-2 rounded-xl border text-sm font-semibold shadow-sm',
+                  'bg-primary/20 text-primary border-primary/30'
+                )}>
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    Focus: {focusVirtue.charAt(0).toUpperCase() + focusVirtue.slice(1)}
+                  </div>
+                </div>
+                <div className="text-sm text-muted">
+                  {Math.round((completedTasks.length / tasks.length) * 100) || 0}% complete
+                </div>
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="flex-1 max-w-xs ml-4">
+                <div className="w-full bg-surface/40 rounded-full h-2">
+                  <div 
+                    className="bg-gradient-to-r from-primary to-courage h-2 rounded-full transition-all duration-500"
+                    style={{ width: `${Math.round((completedTasks.length / tasks.length) * 100) || 0}%` }}
+                  ></div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Morning Block */}
+        {/* Enhanced Morning Intention */}
         {isMorning && (
           <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-text">Morning Intention</h2>
-            
-            {/* Mood Selector */}
-            <div className="bg-surface border border-border rounded-lg p-4">
-              <h3 className="text-sm font-medium text-text mb-3">How are you feeling?</h3>
-              <div className="grid grid-cols-5 gap-2">
-                {[1, 2, 3, 4, 5].map((value) => (
-                  <button
-                    key={value}
-                    onClick={() => setMood(value)}
-                    className={cn(
-                      'p-3 rounded-lg border transition-all duration-150',
-                      mood === value
-                        ? 'bg-primary/20 border-primary/30 text-primary'
-                        : 'bg-surface-2 border-border text-muted hover:text-text hover:border-primary/30'
-                    )}
-                  >
-                    <div className="text-lg">
-                      {value === 1 ? '😞' : value === 2 ? '😐' : value === 3 ? '😊' : value === 4 ? '😄' : '🤩'}
-                    </div>
-                    <div className="text-xs mt-1">{value}</div>
-                  </button>
-                ))}
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-text">Morning Intention</h2>
+              <div className="text-xs text-muted">
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
             </div>
+            
+            {/* Mood & Intention Card */}
+            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Mood Selector */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-courage/20 rounded-lg flex items-center justify-center">
+                      <Heart className="w-4 h-4 text-courage" />
+                    </div>
+                    <h3 className="font-semibold text-text">How are you feeling?</h3>
+                  </div>
+                  <div className="grid grid-cols-5 gap-3">
+                    {[
+                      { value: 1, emoji: '😞', label: 'Struggling' },
+                      { value: 2, emoji: '😐', label: 'Neutral' },
+                      { value: 3, emoji: '😊', label: 'Good' },
+                      { value: 4, emoji: '😄', label: 'Great' },
+                      { value: 5, emoji: '🤩', label: 'Amazing' }
+                    ].map(({ value, emoji, label }) => (
+                      <button
+                        key={value}
+                        onClick={() => setMood(value)}
+                        className={cn(
+                          'p-4 rounded-xl border transition-all duration-200 hover:scale-105',
+                          mood === value
+                            ? 'bg-courage/20 border-courage/30 text-courage shadow-lg'
+                            : 'bg-surface-2 border-border text-muted hover:text-text hover:border-courage/30 hover:bg-courage/5'
+                        )}
+                      >
+                        <div className="text-2xl mb-1">{emoji}</div>
+                        <div className="text-xs font-medium">{label}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
 
-            {/* Intention Input */}
-            <div className="bg-surface border border-border rounded-lg p-4">
-              <h3 className="text-sm font-medium text-text mb-3">Today's intention</h3>
-              <input
-                type="text"
-                value={intention}
-                onChange={(e) => setIntention(e.target.value)}
-                placeholder="What will you focus on today?"
-                className="w-full px-4 py-2 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-              />
+                {/* Intention Input */}
+                <div>
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                      <Target className="w-4 h-4 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-text">Today's intention</h3>
+                  </div>
+                  <div className="space-y-3">
+                    <input
+                      type="text"
+                      value={intention}
+                      onChange={(e) => setIntention(e.target.value)}
+                      placeholder="What will you focus on today?"
+                      className="w-full px-4 py-3 bg-surface-2 border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                    />
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        'Practice patience',
+                        'Show kindness',
+                        'Learn something new',
+                        'Stay present',
+                        'Be grateful'
+                      ].map((suggestion) => (
+                        <button
+                          key={suggestion}
+                          onClick={() => setIntention(suggestion)}
+                          className="px-3 py-1 bg-surface-2 border border-border rounded-full text-xs text-muted hover:text-text hover:border-primary/30 transition-colors duration-150"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
