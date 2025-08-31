@@ -15,6 +15,7 @@ import { SleepTrackerCard } from '@/components/cards/SleepTrackerCard';
 import { HabitTrackerCard } from '@/components/cards/HabitTrackerCard';
 import { JournalCard } from '@/components/cards/JournalCard';
 import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
+import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
 import { Sparkles, Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -96,7 +97,7 @@ export default function TodayPage() {
       setUserWidgets(JSON.parse(saved));
     } else {
       // Add some default widgets for demonstration
-      const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer'];
+      const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
       setUserWidgets(defaultWidgets);
       localStorage.setItem('userWidgets', JSON.stringify(defaultWidgets));
     }
@@ -120,6 +121,8 @@ export default function TodayPage() {
         return <JournalCard key={widgetId} />;
       case 'goal_tracker':
         return <GoalTrackerCard key={widgetId} />;
+      case 'wisdom_spotlight':
+        return <WisdomSpotlightCard key={widgetId} />;
       default:
         return null;
     }

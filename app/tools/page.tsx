@@ -164,6 +164,16 @@ const availableWidgets: Widget[] = [
     isActive: true,
     isAdded: false,
   },
+  {
+    id: 'wisdom_spotlight',
+    name: 'Wisdom Spotlight',
+    description: 'AI-powered philosophical insights and conversations',
+    icon: Sparkles,
+    category: 'learning',
+    color: 'from-purple-500 to-violet-500',
+    isActive: true,
+    isAdded: false,
+  },
 ];
 
 const categories = [
