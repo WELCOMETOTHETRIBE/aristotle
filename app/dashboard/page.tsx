@@ -604,10 +604,10 @@ export default function DashboardPage() {
       {/* Widget Detail Modal */}
       {selectedWidget && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
-          <div className="bg-[rgb(var(--surface))] rounded-2xl shadow-pop max-w-2xl w-full max-h-[90vh] overflow-hidden border border-[rgb(var(--border))]">
-            <div className="flex items-center justify-between p-6 border-b border-[rgb(var(--border))] bg-[rgb(var(--surface-2))]">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden border border-gray-200 dark:border-gray-700">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
               <div>
-                <h2 className="text-2xl font-bold font-display text-[rgb(var(--text))] flex items-center gap-3">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
                   {(() => {
                     const widgetInfo = getWidgetInfo(selectedWidget);
                     const IconComponent = widgetInfo?.icon;
@@ -619,7 +619,7 @@ export default function DashboardPage() {
                     );
                   })()}
                 </h2>
-                <p className="text-[rgb(var(--muted))] mt-1">
+                <p className="text-gray-600 dark:text-gray-400 mt-1">
                   {getWidgetInfo(selectedWidget)?.description}
                 </p>
               </div>
@@ -627,7 +627,7 @@ export default function DashboardPage() {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setSelectedWidget(null)}
-                className="hover:bg-[rgb(var(--surface))] rounded-full p-2 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))]"
+                className="hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full p-2 text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
               >
                 <X className="h-5 w-5" />
               </Button>

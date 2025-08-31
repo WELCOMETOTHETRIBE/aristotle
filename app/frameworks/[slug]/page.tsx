@@ -646,12 +646,12 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
                     <span className="text-sm font-medium text-gray-900 dark:text-white">{framework.tone}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Badge:</span>
-                    <span className="text-sm font-medium text-gray-900 dark:text-white">{framework.nav.badge}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Primary Virtue:</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{framework.virtuePrimary}</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Emoji:</span>
-                    <span className="text-2xl">{framework.nav.emoji}</span>
+                    <span className="text-sm text-gray-600 dark:text-gray-400">Slug:</span>
+                    <span className="text-sm font-medium text-gray-900 dark:text-white">{framework.slug}</span>
                   </div>
                 </div>
               </div>
