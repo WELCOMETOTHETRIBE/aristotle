@@ -180,8 +180,8 @@ export default function TodayPage() {
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center space-x-4">
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg">
-                    <AcademyLogo className="w-7 h-7 text-primary" />
+                  <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg p-2">
+                    <AcademyLogo className="w-full h-full text-primary" />
                   </div>
                   <div className="absolute -top-1 -right-1 w-6 h-6 bg-courage/20 rounded-full flex items-center justify-center">
                     <div className="w-2 h-2 bg-courage rounded-full animate-pulse"></div>

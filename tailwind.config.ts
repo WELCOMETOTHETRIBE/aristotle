@@ -17,26 +17,26 @@ export default {
         '2xl': '16px',
       },
       colors: {
-        /* Core surfaces & text */
-        bg:        'rgb(14, 16, 22)',        // Midnight Ink
-        surface:   'rgb(19, 22, 31)',        // Night Surface
-        'surface-2':'rgb(25, 28, 39)',       // Deep Surface
-        text:      'rgb(238, 241, 246)',     // Bone White
-        muted:     'rgb(152, 162, 179)',     // Slate Mist
+        /* Core surfaces & text - WCAG AAA compliant */
+        bg:        'rgb(8, 9, 12)',          // Darker background for better contrast
+        surface:   'rgb(15, 17, 23)',        // Adjusted surface
+        'surface-2':'rgb(22, 25, 33)',       // Adjusted surface-2
+        text:      'rgb(255, 255, 255)',     // Pure white for maximum contrast
+        muted:     'rgb(180, 190, 210)',     // Lighter muted for better contrast
         ring:      'rgb(171, 196, 255)',     // Focus Ring
-        border:    'rgb(40, 44, 58)',        // Soft Border
+        border:    'rgb(45, 50, 65)',        // Slightly lighter border
 
-        /* Virtue accents (semantic) */
-        primary:   'rgb(126, 180, 255)',     // Wisdom Blue
-        courage:   'rgb(255, 145, 92)',      // Courage Ember
-        justice:   'rgb(90, 214, 161)',      // Justice Verdant
-        temperance:'rgb(180, 160, 255)',     // Temperance Plum
+        /* Virtue accents (semantic) - WCAG AA compliant */
+        primary:   'rgb(140, 200, 255)',     // Brighter Wisdom Blue
+        courage:   'rgb(255, 160, 100)',     // Brighter Courage Ember
+        justice:   'rgb(100, 230, 170)',     // Brighter Justice Verdant
+        temperance:'rgb(200, 180, 255)',     // Brighter Temperance Plum
         
-        /* Status colors */
-        success:   'rgb(53, 196, 141)',      // Success
-        warning:   'rgb(242, 179, 76)',      // Warning
-        error:     'rgb(249, 112, 112)',     // Danger
-        info:      'rgb(94, 161, 255)',      // Info
+        /* Status colors - WCAG AA compliant */
+        success:   'rgb(60, 210, 150)',      // Brighter Success
+        warning:   'rgb(255, 190, 85)',      // Brighter Warning
+        error:     'rgb(255, 120, 120)',     // Brighter Danger
+        info:      'rgb(110, 170, 255)',     // Brighter Info
 
         /* Framework chips */
         fw: {
@@ -97,11 +97,11 @@ export default {
         '250': '250ms',
       },
       backgroundImage: {
-        /* Virtue gradients for hero bars and buttons */
-        'grad-wisdom':     'linear-gradient(135deg, rgb(126, 180, 255), rgba(126, 180, 255, 0.18))',
-        'grad-courage':    'linear-gradient(135deg, rgb(255, 145, 92), rgba(255, 145, 92, 0.18))',
-        'grad-justice':    'linear-gradient(135deg, rgb(90, 214, 161), rgba(90, 214, 161, 0.18))',
-        'grad-temperance': 'linear-gradient(135deg, rgb(180, 160, 255), rgba(180, 160, 255, 0.18))',
+        /* Virtue gradients for hero bars and buttons - Updated with brighter colors */
+        'grad-wisdom':     'linear-gradient(135deg, rgb(140, 200, 255), rgba(140, 200, 255, 0.18))',
+        'grad-courage':    'linear-gradient(135deg, rgb(255, 160, 100), rgba(255, 160, 100, 0.18))',
+        'grad-justice':    'linear-gradient(135deg, rgb(100, 230, 170), rgba(100, 230, 170, 0.18))',
+        'grad-temperance': 'linear-gradient(135deg, rgb(200, 180, 255), rgba(200, 180, 255, 0.18))',
       },
       fontFamily: {
         display: ['Spectral', 'Georgia', 'serif'],
