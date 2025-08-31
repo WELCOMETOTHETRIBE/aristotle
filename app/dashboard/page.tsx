@@ -315,9 +315,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[rgb(var(--bg))]">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="max-w-7xl mx-auto">
           {/* Hero Section */}
           <div className="text-center mb-12">
             <div className="mb-6">
