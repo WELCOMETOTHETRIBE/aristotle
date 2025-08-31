@@ -662,26 +662,26 @@ export default function DashboardPage() {
 
 
               {/* Today's Tasks */}
-              <Card className="glass-effect">
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
+                    <Target className="h-5 w-5 text-justice" />
                     Today's Actions
                     <button
                       onClick={() => setShowWidgetInfo(showWidgetInfo === 'task_manager' ? null : 'task_manager')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                     >
                       <Info className="h-4 w-4" />
                     </button>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[rgb(var(--muted))]">
                     {dueTasks.length} tasks due today
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'task_manager' && (
-                    <div className="mb-4 p-3 bg-green-500/10 rounded-lg border border-green-500/20">
-                      <p className="text-sm text-green-200">{getWidgetInfo('task_manager')?.description}</p>
+                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--justice)/0.1)] border border-[rgb(var(--justice)/0.2)]">
+                      <p className="text-sm text-[rgb(var(--justice))]">{getWidgetInfo('task_manager')?.description}</p>
                     </div>
                   )}
                   {dueTasks.length === 0 ? (
@@ -826,34 +826,34 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
 
-              {/* Additional Practice Widgets */}
-              <Card className="glass-effect">
+              {/* Practice Tools Section */}
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
+                    <Zap className="h-5 w-5 text-courage" />
                     Practice Tools
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[rgb(var(--muted))]">
                     Quick access to essential practice widgets
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Focus Timer */}
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="panel-base p-4 hover-lift">
                       <div className="flex items-center gap-2 mb-3">
-                        <Timer className="h-4 w-4 text-blue-400" />
-                        <h4 className="font-medium text-sm">Focus Timer</h4>
+                        <Timer className="h-4 w-4 text-courage" />
+                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Focus Timer</h4>
                         <button
                           onClick={() => setShowWidgetInfo(showWidgetInfo === 'focus_timer' ? null : 'focus_timer')}
-                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                         >
                           <Info className="h-3 w-3" />
                         </button>
                       </div>
                       {showWidgetInfo === 'focus_timer' && (
-                        <div className="mb-3 p-2 bg-blue-500/10 rounded border border-blue-500/20">
-                          <p className="text-xs text-blue-200">{getWidgetInfo('focus_timer')?.description}</p>
+                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--courage)/0.1)] border border-[rgb(var(--courage)/0.2)]">
+                          <p className="text-xs text-[rgb(var(--courage))]">{getWidgetInfo('focus_timer')?.description}</p>
                         </div>
                       )}
                       <TimerCard 
@@ -865,47 +865,47 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Gratitude Journal */}
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="panel-base p-4 hover-lift">
                       <div className="flex items-center gap-2 mb-3">
-                        <Heart className="h-4 w-4 text-red-400" />
-                        <h4 className="font-medium text-sm">Gratitude Journal</h4>
+                        <Heart className="h-4 w-4 text-justice" />
+                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Gratitude Journal</h4>
                         <button
                           onClick={() => setShowWidgetInfo(showWidgetInfo === 'gratitude_journal' ? null : 'gratitude_journal')}
-                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                         >
                           <Info className="h-3 w-3" />
                         </button>
                       </div>
                       {showWidgetInfo === 'gratitude_journal' && (
-                        <div className="mb-3 p-2 bg-red-500/10 rounded border border-red-500/20">
-                          <p className="text-xs text-red-200">{getWidgetInfo('gratitude_journal')?.description}</p>
+                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--justice)/0.1)] border border-[rgb(var(--justice)/0.2)]">
+                          <p className="text-xs text-[rgb(var(--justice))]">{getWidgetInfo('gratitude_journal')?.description}</p>
                         </div>
                       )}
                       <div className="space-y-3">
                         <textarea 
-                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-sm"
+                          className="input-base text-sm"
                           placeholder="What are you grateful for today?"
                           rows={3}
                         />
-                        <Button size="sm" className="w-full">Save Gratitude</Button>
+                        <Button size="sm" className="btn-primary w-full">Save Gratitude</Button>
                       </div>
                     </div>
 
                     {/* Meditation Timer */}
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="panel-base p-4 hover-lift">
                       <div className="flex items-center gap-2 mb-3">
-                        <Leaf className="h-4 w-4 text-green-400" />
-                        <h4 className="font-medium text-sm">Meditation Timer</h4>
+                        <Leaf className="h-4 w-4 text-temperance" />
+                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Meditation Timer</h4>
                         <button
                           onClick={() => setShowWidgetInfo(showWidgetInfo === 'meditation_timer' ? null : 'meditation_timer')}
-                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                         >
                           <Info className="h-3 w-3" />
                         </button>
                       </div>
                       {showWidgetInfo === 'meditation_timer' && (
-                        <div className="mb-3 p-2 bg-green-500/10 rounded border border-green-500/20">
-                          <p className="text-xs text-green-200">{getWidgetInfo('meditation_timer')?.description}</p>
+                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--temperance)/0.1)] border border-[rgb(var(--temperance)/0.2)]">
+                          <p className="text-xs text-[rgb(var(--temperance))]">{getWidgetInfo('meditation_timer')?.description}</p>
                         </div>
                       )}
                       <TimerCard 
@@ -917,20 +917,20 @@ export default function DashboardPage() {
                     </div>
 
                     {/* Strength Counter */}
-                    <div className="p-4 bg-muted/50 rounded-lg">
+                    <div className="panel-base p-4 hover-lift">
                       <div className="flex items-center gap-2 mb-3">
-                        <Shield className="h-4 w-4 text-orange-400" />
-                        <h4 className="font-medium text-sm">Strength Counter</h4>
+                        <Shield className="h-4 w-4 text-courage" />
+                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Strength Counter</h4>
                         <button
                           onClick={() => setShowWidgetInfo(showWidgetInfo === 'strength_counter' ? null : 'strength_counter')}
-                          className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                         >
                           <Info className="h-3 w-3" />
                         </button>
                       </div>
                       {showWidgetInfo === 'strength_counter' && (
-                        <div className="mb-3 p-2 bg-orange-500/10 rounded border border-orange-500/20">
-                          <p className="text-xs text-orange-200">{getWidgetInfo('strength_counter')?.description}</p>
+                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--courage)/0.1)] border border-[rgb(var(--courage)/0.2)]">
+                          <p className="text-xs text-[rgb(var(--courage))]">{getWidgetInfo('strength_counter')?.description}</p>
                         </div>
                       )}
                       <CounterCard 
@@ -948,26 +948,26 @@ export default function DashboardPage() {
             {/* Sidebar */}
             <div className="space-y-6">
               {/* Breathwork Timer - Special Widget */}
-              <Card className="glass-effect bg-gradient-to-br from-cyan-500/10 to-blue-500/10 border-cyan-500/20">
+              <Card className="card-base bg-grad-wisdom border-[rgb(var(--wisdom)/0.2)]">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-cyan-400" />
+                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
+                    <Zap className="h-5 w-5 text-[rgb(var(--wisdom))]" />
                     Breathwork Practice
                     <button
                       onClick={() => setShowWidgetInfo(showWidgetInfo === 'breathwork_timer' ? null : 'breathwork_timer')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                     >
                       <Info className="h-4 w-4" />
                     </button>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[rgb(var(--muted))]">
                     Master your breath with guided patterns
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'breathwork_timer' && (
-                    <div className="mb-4 p-3 bg-cyan-500/10 rounded-lg border border-cyan-500/20">
-                      <p className="text-sm text-cyan-200">{getWidgetInfo('breathwork_timer')?.description}</p>
+                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--wisdom)/0.1)] border border-[rgb(var(--wisdom)/0.2)]">
+                      <p className="text-sm text-[rgb(var(--wisdom))]">{getWidgetInfo('breathwork_timer')?.description}</p>
                     </div>
                   )}
                   <BreathworkWidgetNew frameworkTone="stoic" />
@@ -975,26 +975,26 @@ export default function DashboardPage() {
               </Card>
 
               {/* Hydration Tracker */}
-              <Card className="glass-effect">
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Droplets className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
+                    <Droplets className="h-5 w-5 text-[rgb(var(--wisdom))]" />
                     Hydration
                     <button
                       onClick={() => setShowWidgetInfo(showWidgetInfo === 'hydration_tracker' ? null : 'hydration_tracker')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                     >
                       <Info className="h-4 w-4" />
                     </button>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[rgb(var(--muted))]">
                     Track your daily water intake
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'hydration_tracker' && (
-                    <div className="mb-4 p-3 bg-blue-500/10 rounded-lg border border-blue-500/20">
-                      <p className="text-sm text-blue-200">{getWidgetInfo('hydration_tracker')?.description}</p>
+                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--wisdom)/0.1)] border border-[rgb(var(--wisdom)/0.2)]">
+                      <p className="text-sm text-[rgb(var(--wisdom))]">{getWidgetInfo('hydration_tracker')?.description}</p>
                     </div>
                   )}
                   <HydrationWidget frameworkTone="stoic" />
@@ -1002,26 +1002,26 @@ export default function DashboardPage() {
               </Card>
 
               {/* Mood Tracker */}
-              <Card className="glass-effect">
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Smile className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
+                    <Smile className="h-5 w-5 text-justice" />
                     Today's Mood
                     <button
                       onClick={() => setShowWidgetInfo(showWidgetInfo === 'mood_tracker' ? null : 'mood_tracker')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                     >
                       <Info className="h-4 w-4" />
                     </button>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[rgb(var(--muted))]">
                     Track your emotional well-being and patterns
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'mood_tracker' && (
-                    <div className="mb-4 p-3 bg-yellow-500/10 rounded-lg border border-yellow-500/20">
-                      <p className="text-sm text-yellow-200">Track your daily mood with detailed notes, activity tags, and energy/stress levels. View patterns and trends over time to better understand your emotional well-being.</p>
+                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--justice)/0.1)] border border-[rgb(var(--justice)/0.2)]">
+                      <p className="text-sm text-[rgb(var(--justice))]">Track your daily mood with detailed notes, activity tags, and energy/stress levels. View patterns and trends over time to better understand your emotional well-being.</p>
                     </div>
                   )}
                   <MoodTrackerWidget frameworkTone="stoic" />
@@ -1029,26 +1029,26 @@ export default function DashboardPage() {
               </Card>
 
               {/* Hedonic Awareness */}
-              <Card className="glass-effect">
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Heart className="h-5 w-5 text-primary" />
+                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
+                    <Heart className="h-5 w-5 text-temperance" />
                     Hedonic Awareness
                     <button
                       onClick={() => setShowWidgetInfo(showWidgetInfo === 'hedonic_awareness' ? null : 'hedonic_awareness')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
+                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
                     >
                       <Info className="h-4 w-4" />
                     </button>
                   </CardTitle>
-                  <CardDescription>
+                  <CardDescription className="text-[rgb(var(--muted))]">
                     Monitor your patterns and triggers
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {showWidgetInfo === 'hedonic_awareness' && (
-                    <div className="mb-4 p-3 bg-purple-500/10 rounded-lg border border-purple-500/20">
-                      <p className="text-sm text-purple-200">Analyze your thoughts and activities to identify hedonic treadmill patterns. Get personalized insights and counter-moves to break negative cycles.</p>
+                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--temperance)/0.1)] border border-[rgb(var(--temperance)/0.2)]">
+                      <p className="text-sm text-[rgb(var(--temperance))]">Analyze your thoughts and activities to identify hedonic treadmill patterns. Get personalized insights and counter-moves to break negative cycles.</p>
                     </div>
                   )}
                   <HedonicAwarenessWidget frameworkTone="stoic" />
@@ -1056,31 +1056,31 @@ export default function DashboardPage() {
               </Card>
 
               {/* Quick Stats */}
-              <Card className="glass-effect">
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle>Quick Stats</CardTitle>
+                  <CardTitle className="text-[rgb(var(--text))]">Quick Stats</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Tasks Completed</span>
-                      <span className="font-medium">{completedTasks.length}</span>
+                      <span className="text-sm text-[rgb(var(--muted))]">Tasks Completed</span>
+                      <span className="font-medium text-[rgb(var(--text))]">{completedTasks.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Active Goals</span>
-                      <span className="font-medium">{activeGoals.length}</span>
+                      <span className="text-sm text-[rgb(var(--muted))]">Active Goals</span>
+                      <span className="font-medium text-[rgb(var(--text))]">{activeGoals.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Habits Tracked</span>
-                      <span className="font-medium">{habits.length}</span>
+                      <span className="text-sm text-[rgb(var(--muted))]">Habits Tracked</span>
+                      <span className="font-medium text-[rgb(var(--text))]">{habits.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Habits Done Today</span>
-                      <span className="font-medium">{checkedHabits.length}</span>
+                      <span className="text-sm text-[rgb(var(--muted))]">Habits Done Today</span>
+                      <span className="font-medium text-[rgb(var(--text))]">{checkedHabits.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm">Total Streak Days</span>
-                      <span className="font-medium">
+                      <span className="text-sm text-[rgb(var(--muted))]">Total Streak Days</span>
+                      <span className="font-medium text-[rgb(var(--text))]">
                         {habits.reduce((sum, habit) => sum + habit.streakCount, 0)}
                       </span>
                     </div>
@@ -1089,31 +1089,31 @@ export default function DashboardPage() {
               </Card>
 
               {/* Quick Actions */}
-              <Card className="glass-effect">
+              <Card className="card-base">
                 <CardHeader>
-                  <CardTitle>Quick Actions</CardTitle>
+                  <CardTitle className="text-[rgb(var(--text))]">Quick Actions</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
-                    <Button variant="outline" className="w-full justify-start" asChild>
+                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
                       <a href="/philosophers">
                         <Brain className="h-4 w-4 mr-2" />
                         Chat with Ancient Philosophers
                       </a>
                     </Button>
-                    <Button variant="outline" className="w-full justify-start" asChild>
+                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
                       <a href="/breath">
                         <Calendar className="h-4 w-4 mr-2" />
                         Start Breathwork
                       </a>
                     </Button>
-                    <Button variant="outline" className="w-full justify-start" asChild>
+                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
                       <a href="/frameworks">
                         <Trophy className="h-4 w-4 mr-2" />
                         Explore Frameworks
                       </a>
                     </Button>
-                    <Button variant="outline" className="w-full justify-start" asChild>
+                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
                       <a href="/dashboard?openGallery=true">
                         <Settings className="h-4 w-4 mr-2" />
                         Customize Dashboard
