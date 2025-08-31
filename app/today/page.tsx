@@ -94,7 +94,11 @@ export default function TodayPage() {
   useEffect(() => {
     const saved = localStorage.getItem('userWidgets');
     if (saved) {
-      setUserWidgets(JSON.parse(saved));
+      const parsedWidgets = JSON.parse(saved);
+      // Remove duplicates and ensure wisdom_spotlight only appears once
+      const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
+      setUserWidgets(uniqueWidgets);
+      localStorage.setItem('userWidgets', JSON.stringify(uniqueWidgets));
     } else {
       // Add some default widgets for demonstration
       const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];

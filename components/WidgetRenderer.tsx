@@ -1020,7 +1020,9 @@ export default function WidgetRenderer({
         return <VirtueProgressWidget />;
       
       case 'wisdom_spotlight':
-        return <WisdomSpotlightWidget />;
+        return <div className="p-4 bg-white/5 border border-white/10 rounded-lg text-center">
+          <p className="text-sm text-gray-400">Wisdom Spotlight moved to Today page</p>
+        </div>;
       
       case 'breathwork_timer':
         return <BreathworkWidgetNew frameworkTone={frameworkTone} />;
