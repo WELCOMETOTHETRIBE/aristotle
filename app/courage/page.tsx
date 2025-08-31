@@ -1,534 +1,513 @@
 'use client';
 
-import AuroraBackground from "@/components/AuroraBackground";
-import { GlassCard } from "@/components/GlassCard";
-import { Shield, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, Flame, Zap, Mountain, RefreshCw } from "lucide-react";
+import { Shield, Target, TrendingUp, BookOpen, Zap, Lightbulb, ArrowLeft, Users, Star, Clock, Activity, BarChart3, Compass, Play, MessageSquare, Brain, Scale, Leaf, ArrowRight, Heart, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from 'react';
-import PageLayout from '@/components/PageLayout';
-import PracticeSessionModal from '@/components/PracticeSessionModal';
-import { usePracticeSession } from '@/lib/hooks/usePracticeSession';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface HiddenWisdom {
-  insight: string;
-  micro_experiment: string;
-  reflection: string;
-}
+// Import enhanced widgets
+import { HedonicAwarenessWidget } from '../../components/HedonicAwarenessWidget';
+import { MoodTrackerWidget } from '../../components/MoodTrackerWidget';
+import { BreathworkWidgetNew } from '../../components/BreathworkWidgetNew';
+import { HydrationWidget } from '../../components/ModuleWidgets';
 
-interface PracticeDetail {
+interface CouragePractice {
+  id: string;
   title: string;
-  body: string;
-  bullets: string[];
-  coach_prompts: string[];
-  safety_reminders: string[];
-  est_time_min: number;
+  description: string;
+  duration: number;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  benefits: string[];
+  category: string;
+  instructions: string[];
+  aiEnhanced: boolean;
+  interactiveElements: string[];
+  progressTracking: boolean;
+  communityFeatures: boolean;
 }
 
-interface DailyWisdom {
-  quote: string;
-  author: string;
-  framework: string;
-  reflection: string;
-}
-
-const staticPractices = [
+const couragePractices: CouragePractice[] = [
   {
     id: "1",
-    title: "Cold Exposure",
-    description: "Build mental resilience through controlled exposure to discomfort, starting with cold showers and progressing to ice baths.",
-    duration: 5,
-    difficulty: "beginner",
-    benefits: ["Mental toughness", "Stress resilience", "Improved focus"],
-    category: "Physical Challenge",
-    culturalContext: "Ancient Spartan warriors used cold exposure to build discipline and mental fortitude.",
-    scientificValidation: "Cold exposure increases norepinephrine and reduces inflammation, improving mental clarity and resilience.",
+    title: "Fear Exposure Training",
+    description: "Systematically face your fears through guided exposure exercises designed to build resilience and confidence.",
+    duration: 15,
+    difficulty: "intermediate",
+    benefits: ["Reduced anxiety", "Increased confidence", "Emotional resilience", "Mental strength"],
+    category: "Exposure Therapy",
     instructions: [
-      "Start with 30 seconds of cold water at the end of your shower",
-      "Gradually increase duration to 2-3 minutes",
-      "Focus on steady breathing throughout",
-      "Embrace the discomfort as a mental challenge",
-      "Reflect on your growing resilience"
+      "Identify a specific fear or anxiety",
+      "Start with small, manageable exposures",
+      "Gradually increase difficulty",
+      "Practice mindfulness during exposure",
+      "Reflect on your progress"
     ],
-    moduleId: "cold_heat"
+    aiEnhanced: true,
+    interactiveElements: ["Guided exposure", "Progress tracking", "Personalized challenges", "Community support"],
+    progressTracking: true,
+    communityFeatures: true
   },
   {
     id: "2",
-    title: "Public Speaking Practice",
-    description: "Develop confidence and overcome fear through structured public speaking exercises.",
+    title: "Adversity Simulation",
+    description: "Practice handling difficult situations through realistic simulations that prepare you for real-world challenges.",
     duration: 20,
-    difficulty: "intermediate",
-    benefits: ["Confidence", "Communication skills", "Fear management"],
-    category: "Social Challenge",
-    culturalContext: "Ancient Greek philosophers emphasized rhetoric and public speaking as essential skills for leadership.",
-    scientificValidation: "Public speaking practice reduces anxiety and improves self-confidence through systematic desensitization.",
+    difficulty: "advanced",
+    benefits: ["Mental preparation", "Stress management", "Decision making", "Crisis handling"],
+    category: "Mental Training",
     instructions: [
-      "Choose a topic you're passionate about",
-      "Practice in front of a mirror first",
-      "Record yourself and review",
-      "Present to a small group of friends",
-      "Gradually increase audience size"
+      "Choose a challenging scenario",
+      "Visualize the situation in detail",
+      "Practice your response",
+      "Review and refine your approach",
+      "Apply lessons to real life"
     ],
-    moduleId: "focus_deepwork"
+    aiEnhanced: true,
+    interactiveElements: ["Scenario generation", "Response coaching", "Performance analysis", "Adaptive difficulty"],
+    progressTracking: true,
+    communityFeatures: false
   },
   {
     id: "3",
-    title: "Boundary Setting",
-    description: "Practice asserting your needs and setting healthy boundaries in relationships and work.",
-    duration: 15,
+    title: "Boundary Setting Practice",
+    description: "Learn to set and maintain healthy boundaries through guided exercises and real-world applications.",
+    duration: 10,
     difficulty: "beginner",
-    benefits: ["Self-respect", "Better relationships", "Reduced stress"],
-    category: "Social Practice",
-    culturalContext: "Stoic philosophy teaches the importance of knowing what you can and cannot control.",
-    scientificValidation: "Setting boundaries improves mental health and relationship satisfaction.",
+    benefits: ["Self-respect", "Better relationships", "Reduced stress", "Personal empowerment"],
+    category: "Interpersonal Skills",
     instructions: [
-      "Identify areas where you need boundaries",
-      "Practice saying 'no' to small requests",
-      "Use 'I' statements to express needs",
-      "Stay firm but respectful",
-      "Reflect on how it feels to assert yourself"
+      "Identify areas where boundaries are needed",
+      "Practice clear communication",
+      "Learn to say no gracefully",
+      "Maintain consistency",
+      "Evaluate and adjust"
     ],
-    moduleId: "mood_regulation"
-  },
-  {
-    id: "4",
-    title: "Fear Journaling",
-    description: "Confront and analyze your fears through structured reflection and planning.",
-    duration: 25,
-    difficulty: "intermediate",
-    benefits: ["Self-awareness", "Fear management", "Personal growth"],
-    category: "Mental Practice",
-    culturalContext: "Ancient warriors used fear as a teacher rather than an enemy.",
-    scientificValidation: "Writing about fears reduces their power and helps develop coping strategies.",
-    instructions: [
-      "Write down your biggest fears",
-      "Analyze what triggers each fear",
-      "Consider the worst-case scenario",
-      "Plan how you would handle it",
-      "Reflect on past fears you've overcome"
-    ],
-    moduleId: "visualization"
+    aiEnhanced: true,
+    interactiveElements: ["Role-playing", "Communication coaching", "Boundary tracking", "Relationship insights"],
+    progressTracking: true,
+    communityFeatures: true
   }
 ];
 
 export default function CouragePage() {
-  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
-  const [dailyWisdom, setDailyWisdom] = useState<DailyWisdom | null>(null);
-  const [generatedPractice, setGeneratedPractice] = useState<PracticeDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  
-  const { isModalOpen, currentPractice, startPractice, closeModal } = usePracticeSession();
+  const [courageStats, setCourageStats] = useState({
+    totalSessions: 0,
+    totalMinutes: 0,
+    currentStreak: 0,
+    averageScore: 0
+  });
+  const [activeTab, setActiveTab] = useState<'overview' | 'practices' | 'challenges' | 'progress'>('overview');
 
   useEffect(() => {
-    loadCourageContent();
+    loadCourageStats();
   }, []);
 
-  const loadCourageContent = async () => {
-    try {
-      setLoading(true);
-      
-      // Load hidden wisdom
-      const dateBucket = new Date().toISOString().split('T')[0];
-      const wisdomResponse = await fetch(
-        `/api/generate/hidden-wisdom?dateBucket=${dateBucket}&style=spartan&locale=en`
-      );
-      if (wisdomResponse.ok) {
-        const wisdom = await wisdomResponse.json();
-        setHiddenWisdom(wisdom);
-      }
+  const loadCourageStats = async () => {
+    // Mock stats for now
+    setCourageStats({
+      totalSessions: 34,
+      totalMinutes: 890,
+      currentStreak: 8,
+      averageScore: 7.8
+    });
+  };
 
-      // Load daily wisdom
-      const dailyResponse = await fetch('/api/generate/daily-wisdom', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ framework: 'spartan' })
-      });
-      if (dailyResponse.ok) {
-        const daily = await dailyResponse.json();
-        setDailyWisdom(daily);
-      }
-
-      // Load generated practice
-      const practiceResponse = await fetch(
-        `/api/generate/practice?moduleId=courage&level=Beginner&style=spartan&locale=en`
-      );
-      if (practiceResponse.ok) {
-        const practice = await practiceResponse.json();
-        setGeneratedPractice(practice);
-      }
-    } catch (error) {
-      console.error('Error loading courage content:', error);
-    } finally {
-      setLoading(false);
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'from-green-500 to-emerald-500';
+      case 'intermediate': return 'from-yellow-500 to-orange-500';
+      case 'advanced': return 'from-red-500 to-pink-500';
+      default: return 'from-gray-500 to-slate-500';
     }
   };
 
-  const refreshContent = async () => {
-    setRefreshing(true);
-    await loadCourageContent();
-    setRefreshing(false);
-  };
-
-  const handleStartPractice = (practice: any) => {
-    // Convert practice to the format expected by the modal
-    const practiceData = {
-      id: practice.id,
-      title: practice.title,
-      description: practice.description,
-      duration: practice.duration,
-      difficulty: practice.difficulty,
-      benefits: practice.benefits,
-      instructions: practice.instructions,
-      moduleId: practice.moduleId || 'strength',
-      frameworkId: 'spartan'
-    };
-    startPractice(practiceData);
-  };
-
-  const handleStartGeneratedPractice = () => {
-    if (generatedPractice) {
-      const practiceData = {
-        id: 'ai-generated-courage',
-        title: generatedPractice.title,
-        description: generatedPractice.body,
-        duration: Math.ceil(generatedPractice.est_time_min / 5) * 5, // Round to nearest 5 minutes
-        difficulty: 'beginner',
-        benefits: ['AI-generated courage', 'Personalized practice', 'Daily growth'],
-        instructions: generatedPractice.bullets,
-        moduleId: 'strength',
-        frameworkId: 'spartan'
-      };
-      startPractice(practiceData);
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'Beginner';
+      case 'intermediate': return 'Intermediate';
+      case 'advanced': return 'Advanced';
+      default: return 'Unknown';
     }
   };
-
-  if (loading) {
-    return (
-      <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
-        <div className="page-section">
-          <div className="animate-pulse">
-            <div className="h-8 bg-white/20 rounded mb-8"></div>
-            <div className="space-y-6">
-              <div className="h-64 bg-white/10 rounded-lg"></div>
-              <div className="h-48 bg-white/10 rounded-lg"></div>
-              <div className="h-48 bg-white/10 rounded-lg"></div>
-            </div>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
-    <PageLayout title="Courage" description="The Virtue of Bravery & Strength">
-      {/* Header */}
-      <div className="page-section">
-        <Link href="/academy" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
-          <ArrowLeft size={16} />
-          Back to Academy
-        </Link>
-        
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-red-400 to-orange-400 rounded-2xl flex items-center justify-center shadow-lg">
-            <Shield size={32} className="text-white drop-shadow-sm" />
-          </div>
-          <div>
-            <h1 className="headline">Courage</h1>
-            <p className="subheadline mt-2">
-              The Virtue of Bravery & Strength
-            </p>
-            <p className="body-text mt-2">
-              The virtue of facing fear, adversity, and challenges with bravery
-            </p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">4</div>
-            <div className="text-sm text-gray-400">Practices</div>
-          </div>
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">68%</div>
-            <div className="text-sm text-gray-400">Progress</div>
-          </div>
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">12</div>
-            <div className="text-sm text-gray-400">Day Streak</div>
-          </div>
-        </div>
-      </div>
-
-      {/* AI-Generated Hidden Wisdom */}
-      {hiddenWisdom && (
-        <div className="page-section">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="section-title">⚔️ Today's Warrior Wisdom</h2>
-            <button 
-              onClick={refreshContent}
-              disabled={refreshing}
-              className="btn-secondary text-sm px-3 py-1 flex items-center gap-2"
-            >
-              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-              Refresh
-            </button>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-orange-50 to-amber-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
           
-          <div className="card-base bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-400/30">
-            <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-red-300 mb-2">Challenge</h4>
-                <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-orange-300 mb-2">Reflection</h4>
-                <p className="text-gray-300">{hiddenWisdom.reflection}</p>
+          {/* Header */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <Link
+                href="/"
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </Link>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/25">
+                  <Shield className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Courage</h1>
+                  <p className="text-gray-600 dark:text-gray-300">The strength to face fear and adversity</p>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
 
-      {/* AI-Generated Practice */}
-      {generatedPractice && (
-        <div className="page-section">
-          <h2 className="section-title">🎯 AI-Generated Courage Practice</h2>
-          <div className="card-base">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-white text-lg">{generatedPractice.title}</h3>
-              <div className="flex items-center gap-2">
-                <Clock size={14} className="text-gray-400" />
-                <span className="text-xs text-gray-400">{generatedPractice.est_time_min}m</span>
+          {/* Stats Overview */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <div className="p-6 bg-gradient-to-br from-red-500/10 to-orange-500/10 border border-red-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-red-600 dark:text-red-400">{courageStats.totalSessions}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Sessions</div>
+                </div>
               </div>
             </div>
-            
-            <p className="body-text mb-4">{generatedPractice.body}</p>
-            
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold text-white mb-2">Steps</h4>
-                <ul className="space-y-2">
-                  {generatedPractice.bullets.map((bullet, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-300">
-                      <span className="text-red-300 mt-1">•</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
 
-              {generatedPractice.coach_prompts.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Coach Prompts</h4>
-                  <ul className="space-y-2">
-                    {generatedPractice.coach_prompts.map((prompt, index) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-300">
-                        <span className="text-orange-300 mt-1">💭</span>
-                        <span>{prompt}</span>
-                      </li>
-                    ))}
-                  </ul>
+            <div className="p-6 bg-gradient-to-br from-orange-500/10 to-amber-500/10 border border-orange-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-orange-500 to-amber-600 rounded-xl flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
                 </div>
-              )}
-
-              {generatedPractice.safety_reminders.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-white mb-2">Safety Reminders</h4>
-                  <ul className="space-y-2">
-                    {generatedPractice.safety_reminders.map((reminder, index) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-300">
-                        <span className="text-yellow-300 mt-1">⚠️</span>
-                        <span>{reminder}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="text-2xl font-bold text-orange-600 dark:text-orange-400">{courageStats.totalMinutes}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Minutes Practiced</div>
                 </div>
-              )}
-
-              <div className="flex items-center justify-between pt-2">
-                <button 
-                  className="btn-primary text-sm px-3 py-1"
-                  onClick={handleStartGeneratedPractice}
-                >
-                  <Play size={14} className="mr-1" />
-                  Start Practice
-                </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
 
-      {/* Static Practices Grid */}
-      <div className="page-section">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="section-title">Courage Practices</h2>
-          <div className="flex gap-2">
-            <button className="btn-secondary text-sm px-3 py-1">All</button>
-            <button className="btn-secondary text-sm px-3 py-1">Beginner</button>
-            <button className="btn-secondary text-sm px-3 py-1">Advanced</button>
-          </div>
-        </div>
-
-        <div className="page-grid page-grid-cols-2">
-          {staticPractices.map((practice) => (
-            <div
-              key={practice.id}
-              className="card-base hover-lift cursor-pointer"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white text-lg">{practice.title}</h3>
-                <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-gray-400" />
-                  <span className="text-xs text-gray-400">{practice.duration}m</span>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    practice.difficulty === 'beginner' ? 'bg-green-500/30 text-green-300 border border-green-400/30' :
-                    practice.difficulty === 'intermediate' ? 'bg-yellow-500/30 text-yellow-300 border border-yellow-400/30' :
-                    'bg-red-500/30 text-red-300 border border-red-400/30'
-                  }`}>
-                    {practice.difficulty}
-                  </div>
+            <div className="p-6 bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-yellow-600 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-amber-600 dark:text-amber-400">{courageStats.currentStreak}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Day Streak</div>
                 </div>
               </div>
-              
-              <p className="body-text mb-4">{practice.description}</p>
-              
-              <div className="space-y-4">
-                {/* Benefits */}
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Benefits</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {practice.benefits.map((benefit) => (
-                      <span
-                        key={benefit}
-                        className="px-2 py-1 bg-red-500/30 text-red-300 text-xs rounded-full border border-red-400/30 font-medium"
-                      >
-                        {benefit}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+            </div>
 
-                {/* Cultural Context */}
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Cultural Context</h4>
-                  <p className="body-text line-clamp-2">
-                    {practice.culturalContext}
-                  </p>
+            <div className="p-6 bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-orange-600 rounded-xl flex items-center justify-center">
+                  <Star className="w-5 h-5 text-white" />
                 </div>
+                <div>
+                  <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">{courageStats.averageScore}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Avg Score</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
 
-                {/* Action */}
-                <div className="flex items-center justify-between pt-2">
-                  <button 
-                    className="btn-primary text-sm px-3 py-1"
-                    onClick={() => handleStartPractice(practice)}
+          {/* Tabs */}
+          <motion.div 
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="flex gap-1 bg-white/80 dark:bg-slate-800/80 rounded-xl p-1 backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'overview'
+                    ? 'bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Compass className="w-4 h-4" />
+                  Overview
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('practices')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'practices'
+                    ? 'bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Practices
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('challenges')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'challenges'
+                    ? 'bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Challenges
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('progress')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'progress'
+                    ? 'bg-gradient-to-r from-red-500 to-orange-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Progress
+                </div>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              <AnimatePresence mode="wait">
+                {activeTab === 'overview' && (
+                  <motion.div
+                    key="overview"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
                   >
-                    <Play size={14} className="mr-1" />
-                    Start Practice
+                    {/* Courage Quote */}
+                    <div className="p-8 bg-gradient-to-br from-red-500/10 via-orange-500/10 to-amber-500/10 border border-red-500/20 rounded-2xl backdrop-blur-sm">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-600 rounded-xl flex items-center justify-center shadow-lg shadow-red-500/25">
+                          <Lightbulb className="w-6 h-6 text-white" />
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Daily Courage</h2>
+                          <p className="text-gray-600 dark:text-gray-300">Today's inspiration for bravery</p>
+                        </div>
+                      </div>
+
+                      <blockquote className="text-xl md:text-2xl font-serif italic text-gray-900 dark:text-white leading-relaxed border-l-4 border-red-500 pl-6 mb-6">
+                        "Courage is not the absence of fear, but the triumph over it."
+                      </blockquote>
+
+                      <div className="flex items-center justify-between mb-6">
+                        <cite className="text-red-600 dark:text-red-400 font-medium">— Nelson Mandela</cite>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-red-400 rounded-full animate-pulse"></div>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Daily inspiration</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-red-500/10 to-orange-500/10 rounded-xl p-4 border border-red-500/20">
+                        <h4 className="text-sm font-semibold text-red-700 dark:text-red-300 mb-2 flex items-center gap-2">
+                          <Compass className="w-4 h-4" />
+                          Courage Challenge
+                        </h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                          Today, identify one small fear you can face. It doesn't have to be big - even making an uncomfortable phone call or trying something new counts as an act of courage.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Enhanced Widgets */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <BreathworkWidgetNew frameworkTone="spartan" />
+                      <MoodTrackerWidget frameworkTone="spartan" />
+                      <HedonicAwarenessWidget frameworkTone="spartan" />
+                      <HydrationWidget frameworkTone="spartan" />
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'practices' && (
+                  <motion.div
+                    key="practices"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Courage Practices */}
+                    <div className="grid grid-cols-1 gap-6">
+                      {couragePractices.map((practice, index) => (
+                        <motion.div
+                          key={practice.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: index * 0.1 }}
+                          className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-gradient-to-r from-red-500 to-orange-600 rounded-xl flex items-center justify-center">
+                                <Shield className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{practice.title}</h3>
+                                <p className="text-gray-600 dark:text-gray-300">{practice.description}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-1 bg-gradient-to-r ${getDifficultyColor(practice.difficulty)} text-white text-xs rounded-full font-medium`}>
+                                {getDifficultyLabel(practice.difficulty)}
+                              </span>
+                              <div className="flex items-center gap-1 text-sm text-gray-500">
+                                <Clock className="w-4 h-4" />
+                                <span>{practice.duration}m</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Benefits</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {practice.benefits.map((benefit, idx) => (
+                                  <span key={idx} className="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 text-xs rounded-full">
+                                    {benefit}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Features</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {practice.interactiveElements.map((element, idx) => (
+                                  <span key={idx} className="px-2 py-1 bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs rounded-full">
+                                    {element}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {practice.aiEnhanced && (
+                                <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs rounded-full">
+                                  AI Enhanced
+                                </span>
+                              )}
+                              {practice.communityFeatures && (
+                                <span className="px-2 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs rounded-full">
+                                  Community
+                                </span>
+                              )}
+                            </div>
+                            <button className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-lg font-medium transition-all duration-200">
+                              <Play className="w-4 h-4" />
+                              Start Practice
+                            </button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'challenges' && (
+                  <motion.div
+                    key="challenges"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Courage Challenges */}
+                    <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Daily Courage Challenges</h2>
+                      <p className="text-gray-600 dark:text-gray-300">Face your fears one step at a time.</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'progress' && (
+                  <motion.div
+                    key="progress"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Progress tracking and analytics would go here */}
+                    <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Progress Overview</h2>
+                      <p className="text-gray-600 dark:text-gray-300">Detailed progress tracking and analytics coming soon.</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-600" />
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
+                  <button className="w-full text-left p-3 bg-gradient-to-r from-red-500 to-orange-600 hover:from-red-600 hover:to-orange-700 text-white rounded-xl font-medium transition-all duration-200">
+                    <div className="flex items-center gap-2">
+                      <Shield className="w-4 h-4" />
+                      Start Fear Exposure
+                    </div>
                   </button>
-                  <button className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10">
-                    <BookOpen size={14} />
+                  <button className="w-full text-left p-3 bg-white/10 hover:bg-white/20 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200">
+                    <div className="flex items-center gap-2">
+                      <Target className="w-4 h-4" />
+                      Take Challenge
+                    </div>
+                  </button>
+                  <button className="w-full text-left p-3 bg-white/10 hover:bg-white/20 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      Share Victory
+                    </div>
                   </button>
                 </div>
               </div>
+
+              {/* Quote */}
+              <div className="bg-gradient-to-r from-red-500 to-orange-600 rounded-2xl p-6 text-white">
+                <blockquote className="text-lg italic mb-4">
+                  "The only thing we have to fear is fear itself."
+                </blockquote>
+                <cite className="text-sm opacity-90">— Franklin D. Roosevelt</cite>
+              </div>
             </div>
-          ))}
+          </motion.div>
         </div>
       </div>
-
-      {/* AI-Generated Daily Wisdom Quote */}
-      {dailyWisdom && (
-        <div className="page-section">
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Daily Courage Quote</h3>
-            <p className="body-text mb-4">AI-generated wisdom for modern bravery</p>
-            
-            <div className="text-center space-y-4">
-              <blockquote className="text-xl text-white italic">
-                "{dailyWisdom.quote}"
-              </blockquote>
-              <cite className="text-red-300 font-medium">— {dailyWisdom.author}</cite>
-              <p className="body-text max-w-2xl mx-auto">
-                {dailyWisdom.reflection}
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Related Resources */}
-      <div className="page-section">
-        <h2 className="section-title">Related Resources</h2>
-        <div className="page-grid page-grid-cols-3">
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Books</h3>
-            <p className="body-text mb-4">Essential readings</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"The Art of War" by Sun Tzu</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"Gates of Fire" by Steven Pressfield</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-red-300" />
-                <span className="text-white">"The Warrior Ethos" by Steven Pressfield</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Teachers</h3>
-            <p className="body-text mb-4">Courage guides</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-red-300" />
-                <span className="text-white">Leonidas of Sparta</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-red-300" />
-                <span className="text-white">Sun Tzu</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-red-300" />
-                <span className="text-white">Marcus Aurelius</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Progress</h3>
-            <p className="body-text mb-4">Your courage journey</p>
-            <div className="space-y-4">
-              <div className="text-center">
-                <div className="text-2xl font-semibold text-white">68%</div>
-                <div className="text-sm text-gray-400">Overall Progress</div>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    size={16}
-                    className={star <= 3 ? "text-yellow-400 fill-current" : "text-gray-600"}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Practice Session Modal */}
-      {currentPractice && (
-        <PracticeSessionModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          practice={currentPractice}
-        />
-      )}
-    </PageLayout>
+    </div>
   );
 } 

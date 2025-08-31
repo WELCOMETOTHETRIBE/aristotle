@@ -1,510 +1,513 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
-import { Play, Pause, RotateCcw, Heart, Timer, Target, Sparkles, ChevronDown, ChevronUp, Volume2, VolumeX, Leaf, Brain, Shield, Scale, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
-import PageLayout from '@/components/PageLayout';
+import { Leaf, Target, TrendingUp, BookOpen, Zap, Lightbulb, ArrowLeft, Users, Star, Clock, Activity, BarChart3, Compass, Play, MessageSquare, Brain, Shield, Scale, ArrowRight, Heart, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-interface VirtueBreathPattern {
-  name: string;
+// Import enhanced widgets
+import { HedonicAwarenessWidget } from '../../components/HedonicAwarenessWidget';
+import { MoodTrackerWidget } from '../../components/MoodTrackerWidget';
+import { BreathworkWidgetNew } from '../../components/BreathworkWidgetNew';
+import { HydrationWidget } from '../../components/ModuleWidgets';
+
+interface TemperancePractice {
+  id: string;
+  title: string;
   description: string;
-  philosophicalContext: string;
-  pattern: {
-    inhale: number;
-    hold: number;
-    exhale: number;
-    hold2: number;
-    cycles: number;
-  };
+  duration: number;
+  difficulty: "beginner" | "intermediate" | "advanced";
   benefits: string[];
-  virtueAlignment: string;
-  color: string;
-  icon: React.ComponentType<{ className?: string }>;
+  category: string;
+  instructions: string[];
+  aiEnhanced: boolean;
+  interactiveElements: string[];
+  progressTracking: boolean;
+  communityFeatures: boolean;
 }
 
-const temperanceBreathPatterns: VirtueBreathPattern[] = [
+const temperancePractices: TemperancePractice[] = [
   {
-    name: 'Box Breathing (Temperance)',
-    description: 'Equal duration for each phase to cultivate balance and self-control',
-    philosophicalContext: 'Aristotle taught that temperance is the virtue of moderation. This breathing pattern embodies that principle through its balanced, measured approach.',
-    pattern: { inhale: 4, hold: 4, exhale: 4, hold2: 4, cycles: 10 },
-    benefits: ['Cultivates self-control', 'Promotes emotional balance', 'Enhances mental clarity', 'Strengthens willpower'],
-    virtueAlignment: 'Temperance - The virtue of moderation and self-control',
-    color: 'from-purple-500 to-pink-500',
-    icon: Leaf,
+    id: "1",
+    title: "Mindful Consumption",
+    description: "Practice awareness and moderation in all areas of consumption - food, media, shopping, and more.",
+    duration: 10,
+    difficulty: "beginner",
+    benefits: ["Reduced stress", "Better health", "Financial savings", "Mental clarity"],
+    category: "Mindfulness Practice",
+    instructions: [
+      "Pause before consuming anything",
+      "Ask if this truly serves you",
+      "Practice gratitude for what you have",
+      "Set clear boundaries",
+      "Reflect on the impact"
+    ],
+    aiEnhanced: true,
+    interactiveElements: ["Consumption tracking", "Mindfulness prompts", "Boundary setting", "Impact analysis"],
+    progressTracking: true,
+    communityFeatures: true
   },
   {
-    name: 'Ocean Breath (Harmony)',
-    description: 'Gentle breathing with soft sound to cultivate inner peace',
-    philosophicalContext: 'Like the ocean\'s steady rhythm, this practice teaches us to find harmony within ourselves and with the world around us.',
-    pattern: { inhale: 4, hold: 2, exhale: 6, hold2: 0, cycles: 8 },
-    benefits: ['Soothes the nervous system', 'Promotes inner harmony', 'Reduces stress and tension', 'Enhances mindfulness'],
-    virtueAlignment: 'Temperance - Finding balance in all things',
-    color: 'from-teal-500 to-cyan-500',
-    icon: Leaf,
+    id: "2",
+    title: "Emotional Regulation",
+    description: "Learn to manage emotions with balance and wisdom, avoiding extremes of excess or suppression.",
+    duration: 15,
+    difficulty: "intermediate",
+    benefits: ["Emotional stability", "Better relationships", "Reduced reactivity", "Inner peace"],
+    category: "Emotional Practice",
+    instructions: [
+      "Recognize emotional triggers",
+      "Pause and breathe deeply",
+      "Observe without judgment",
+      "Choose balanced responses",
+      "Practice self-compassion"
+    ],
+    aiEnhanced: true,
+    interactiveElements: ["Emotion tracking", "Breathing guidance", "Response coaching", "Pattern recognition"],
+    progressTracking: true,
+    communityFeatures: true
   },
   {
-    name: 'Coherent Breathing (Balance)',
-    description: 'Slow, rhythmic breathing at 5-6 breaths per minute for optimal balance',
-    philosophicalContext: 'This pattern aligns with our natural respiratory rhythm, teaching us to work with nature rather than against it.',
-    pattern: { inhale: 5, hold: 0, exhale: 5, hold2: 0, cycles: 12 },
-    benefits: ['Balances nervous system', 'Optimizes heart rate variability', 'Promotes emotional stability', 'Enhances focus'],
-    virtueAlignment: 'Temperance - Working in harmony with natural rhythms',
-    color: 'from-emerald-500 to-green-500',
-    icon: Leaf,
-  },
-  {
-    name: 'Triangle Breathing (Simplicity)',
-    description: 'Equal inhale and exhale for simplicity and clarity',
-    philosophicalContext: 'Sometimes the most profound wisdom comes from simplicity. This practice teaches us to find beauty in the basic.',
-    pattern: { inhale: 6, hold: 0, exhale: 6, hold2: 0, cycles: 10 },
-    benefits: ['Simplifies the mind', 'Reduces complexity', 'Promotes clarity', 'Enhances presence'],
-    virtueAlignment: 'Temperance - Finding contentment in simplicity',
-    color: 'from-indigo-500 to-blue-500',
-    icon: Leaf,
-  },
+    id: "3",
+    title: "Digital Wellness",
+    description: "Create healthy boundaries with technology and digital media consumption.",
+    duration: 20,
+    difficulty: "intermediate",
+    benefits: ["Better focus", "Improved sleep", "Real connections", "Mental clarity"],
+    category: "Digital Practice",
+    instructions: [
+      "Audit your digital habits",
+      "Set specific time limits",
+      "Create tech-free zones",
+      "Practice intentional use",
+      "Monitor your well-being"
+    ],
+    aiEnhanced: true,
+    interactiveElements: ["Usage tracking", "Boundary reminders", "Wellness monitoring", "Habit coaching"],
+    progressTracking: true,
+    communityFeatures: false
+  }
 ];
 
 export default function TemperancePage() {
-  const [selectedPattern, setSelectedPattern] = useState<VirtueBreathPattern>(temperanceBreathPatterns[0]);
-  const [isActive, setIsActive] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'hold2'>('inhale');
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [currentCycle, setCurrentCycle] = useState(1);
-  const [totalCycles, setTotalCycles] = useState(selectedPattern.pattern.cycles);
-  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
-  const [sessionDuration, setSessionDuration] = useState(0);
-  const [breathScale, setBreathScale] = useState(1);
-  const [audioEnabled, setAudioEnabled] = useState(false);
-  const [audioInitialized, setAudioInitialized] = useState(false);
-  const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
-  const [audioMapping, setAudioMapping] = useState<any>(null);
-  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
-  const [virtueProgress, setVirtueProgress] = useState(0);
-  
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const sessionIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const [temperanceStats, setTemperanceStats] = useState({
+    totalSessions: 0,
+    totalMinutes: 0,
+    currentStreak: 0,
+    averageScore: 0
+  });
+  const [activeTab, setActiveTab] = useState<'overview' | 'practices' | 'balance' | 'progress'>('overview');
 
-  // Load audio mapping on component mount
   useEffect(() => {
-    const loadAudioMapping = async () => {
-      try {
-        console.log('Loading audio mapping...');
-        const response = await fetch('/audio/breathwork/audio-mapping.json');
-        if (response.ok) {
-          const mapping = await response.json();
-          setAudioMapping(mapping);
-          console.log('Audio mapping loaded successfully');
-        } else {
-          console.log('Audio mapping not found, attempting to generate...');
-        }
-      } catch (error) {
-        console.error('Error loading audio mapping:', error);
-      }
-    };
-
-    loadAudioMapping();
+    loadTemperanceStats();
   }, []);
 
-  // Initialize audio context
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !audioInitialized) {
-      const initAudio = async () => {
-        try {
-          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-          setAudioInitialized(true);
-          console.log('Audio context initialized');
-        } catch (error) {
-          console.error('Error initializing audio context:', error);
-        }
-      };
-
-      initAudio();
-    }
-  }, [audioInitialized]);
-
-  // Timer logic
-  useEffect(() => {
-    if (isActive && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            // Move to next phase
-            const phases: ('inhale' | 'hold' | 'exhale' | 'hold2')[] = ['inhale', 'hold', 'exhale', 'hold2'];
-            const currentIndex = phases.indexOf(currentPhase);
-            const nextIndex = (currentIndex + 1) % phases.length;
-            const nextPhase = phases[nextIndex];
-            
-            setCurrentPhase(nextPhase);
-            
-            // Update cycle count
-            if (nextPhase === 'inhale' && currentPhase === 'hold2') {
-              setCurrentCycle((prev) => {
-                if (prev >= totalCycles) {
-                  // Session complete
-                  setIsActive(false);
-                  return prev;
-                }
-                return prev + 1;
-              });
-            }
-            
-            // Set time for next phase
-            const pattern = selectedPattern.pattern;
-            switch (nextPhase) {
-              case 'inhale': return pattern.inhale;
-              case 'hold': return pattern.hold;
-              case 'exhale': return pattern.exhale;
-              case 'hold2': return pattern.hold2;
-              default: return 0;
-            }
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
-    };
-  }, [isActive, timeLeft, currentPhase, selectedPattern, totalCycles, currentCycle]);
-
-  // Session timer
-  useEffect(() => {
-    if (isActive && sessionStartTime) {
-      sessionIntervalRef.current = setInterval(() => {
-        const now = new Date();
-        const duration = Math.floor((now.getTime() - sessionStartTime.getTime()) / 1000);
-        setSessionDuration(duration);
-      }, 1000);
-    }
-
-    return () => {
-      if (sessionIntervalRef.current) {
-        clearInterval(sessionIntervalRef.current);
-      }
-    };
-  }, [isActive, sessionStartTime]);
-
-  // Breath animation
-  useEffect(() => {
-    if (isActive) {
-      const phase = currentPhase;
-      if (phase === 'inhale') {
-        setBreathScale(1.2);
-      } else if (phase === 'exhale') {
-        setBreathScale(0.8);
-      } else {
-        setBreathScale(1);
-      }
-    } else {
-      setBreathScale(1);
-    }
-  }, [currentPhase, isActive]);
-
-  const startSession = () => {
-    setIsActive(true);
-    setCurrentPhase('inhale');
-    setTimeLeft(selectedPattern.pattern.inhale);
-    setCurrentCycle(1);
-    setSessionStartTime(new Date());
-    setSessionDuration(0);
+  const loadTemperanceStats = async () => {
+    // Mock stats for now
+    setTemperanceStats({
+      totalSessions: 42,
+      totalMinutes: 980,
+      currentStreak: 15,
+      averageScore: 8.7
+    });
   };
 
-  const pauseSession = () => {
-    setIsActive(false);
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'from-green-500 to-emerald-500';
+      case 'intermediate': return 'from-yellow-500 to-orange-500';
+      case 'advanced': return 'from-red-500 to-pink-500';
+      default: return 'from-gray-500 to-slate-500';
+    }
   };
 
-  const resetSession = () => {
-    setIsActive(false);
-    setCurrentPhase('inhale');
-    setTimeLeft(selectedPattern.pattern.inhale);
-    setCurrentCycle(1);
-    setSessionStartTime(null);
-    setSessionDuration(0);
-  };
-
-  const toggleAudio = () => {
-    setAudioEnabled(!audioEnabled);
-  };
-
-  const togglePatternExpansion = (patternName: string) => {
-    setExpandedPattern(expandedPattern === patternName ? null : patternName);
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'Beginner';
+      case 'intermediate': return 'Intermediate';
+      case 'advanced': return 'Advanced';
+      default: return 'Unknown';
+    }
   };
 
   return (
-    <PageLayout title="Temperance" description="The Virtue of Moderation & Self-Control">
-      {/* Header */}
-      <section className="page-section">
-        <Link href="/" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
-          <ArrowLeft size={16} />
-          Back to Home
-        </Link>
-        
-        <div className="text-center">
-          <div className="flex items-center justify-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center mr-6 shadow-lg">
-              <Leaf className="w-10 h-10 text-white" />
-            </div>
-            <div>
-              <h1 className="headline bg-gradient-to-r from-purple-400 to-pink-500 bg-clip-text text-transparent">
-                Temperance
-              </h1>
-              <p className="subheadline mt-2">
-                The Virtue of Moderation & Self-Control
-              </p>
-            </div>
-          </div>
-          <p className="body-text max-w-2xl mx-auto">
-            Cultivate balance, self-control, and inner harmony through mindful breathing practices.
-          </p>
-        </div>
-      </section>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main Content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Breath Timer */}
-          <section className="page-section">
-            <div className="glass-card p-8 text-center">
-              <div className="flex items-center justify-center gap-3 mb-6">
-                <Timer className="w-6 h-6 text-purple-400" />
-                <h2 className="section-title">Breath Timer</h2>
-              </div>
-              
-              {/* Visual Breath Indicator */}
-              <div className="flex justify-center mb-8">
-                <div 
-                  className="w-32 h-32 rounded-full border-4 border-purple-400/30 flex items-center justify-center transition-all duration-1000 ease-in-out"
-                  style={{ 
-                    transform: `scale(${breathScale})`,
-                    backgroundColor: isActive ? 'rgba(168, 85, 247, 0.1)' : 'transparent'
-                  }}
-                >
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-white mb-2">
-                      {isActive ? timeLeft : selectedPattern.pattern.inhale}
-                    </div>
-                    <div className="text-sm text-gray-400 uppercase tracking-wide">
-                      {isActive ? currentPhase : 'Ready'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Controls */}
-              <div className="flex items-center justify-center gap-4 mb-6">
-                {!isActive ? (
-                  <button onClick={startSession} className="btn-primary">
-                    <Play className="w-5 h-5 mr-2" />
-                    Start Session
-                  </button>
-                ) : (
-                  <>
-                    <button onClick={pauseSession} className="btn-secondary">
-                      <Pause className="w-5 h-5 mr-2" />
-                      Pause
-                    </button>
-                    <button onClick={resetSession} className="btn-secondary">
-                      <RotateCcw className="w-5 h-5 mr-2" />
-                      Reset
-                    </button>
-                  </>
-                )}
-              </div>
-
-              {/* Session Info */}
-              <div className="grid grid-cols-3 gap-4 text-center">
-                <div>
-                  <div className="text-2xl font-bold text-white">{currentCycle}</div>
-                  <div className="text-sm text-gray-400">Cycle</div>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-violet-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
+          
+          {/* Header */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center gap-4 mb-6">
+              <Link
+                href="/"
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </Link>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+                  <Leaf className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-white">{totalCycles}</div>
-                  <div className="text-sm text-gray-400">Total</div>
-                </div>
-                <div>
-                  <div className="text-2xl font-bold text-white">
-                    {Math.floor(sessionDuration / 60)}:{(sessionDuration % 60).toString().padStart(2, '0')}
-                  </div>
-                  <div className="text-sm text-gray-400">Duration</div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Temperance</h1>
+                  <p className="text-gray-600 dark:text-gray-300">The virtue of balance and moderation</p>
                 </div>
               </div>
             </div>
-          </section>
+          </motion.div>
 
-          {/* Breath Patterns */}
-          <section className="page-section">
-            <div className="glass-card">
-              <div className="flex items-center gap-3 mb-6">
-                <Target className="w-6 h-6 text-purple-400" />
-                <h2 className="section-title">Breath Patterns</h2>
+          {/* Stats Overview */}
+          <motion.div 
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <div className="p-6 bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{temperanceStats.totalSessions}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Sessions</div>
+                </div>
               </div>
-              
-              <div className="space-y-4">
-                {temperanceBreathPatterns.map((pattern) => {
-                  const IconComponent = pattern.icon;
-                  const isExpanded = expandedPattern === pattern.name;
-                  const isSelected = selectedPattern.name === pattern.name;
-                  
-                  return (
-                    <div
-                      key={pattern.name}
-                      className={`p-6 rounded-xl border transition-all duration-300 cursor-pointer ${
-                        isSelected
-                          ? 'bg-gradient-to-r ' + pattern.color + ' text-white border-transparent'
-                          : 'bg-white/5 text-white hover:bg-white/10 border-white/20'
-                      }`}
-                      onClick={() => setSelectedPattern(pattern)}
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <div className="flex items-center gap-3">
-                          <IconComponent className="w-6 h-6" />
-                          <h3 className="text-lg font-semibold">{pattern.name}</h3>
+            </div>
+
+            <div className="p-6 bg-gradient-to-br from-violet-500/10 to-indigo-500/10 border border-violet-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-violet-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-violet-600 dark:text-violet-400">{temperanceStats.totalMinutes}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Minutes Practiced</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gradient-to-br from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{temperanceStats.currentStreak}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Day Streak</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="p-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <Star className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{temperanceStats.averageScore}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Avg Score</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Tabs */}
+          <motion.div 
+            className="mb-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="flex gap-1 bg-white/80 dark:bg-slate-800/80 rounded-xl p-1 backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+              <button
+                onClick={() => setActiveTab('overview')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'overview'
+                    ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Compass className="w-4 h-4" />
+                  Overview
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('practices')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'practices'
+                    ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Practices
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('balance')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'balance'
+                    ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <Leaf className="w-4 h-4" />
+                  Balance
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab('progress')}
+                className={`flex-1 px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                  activeTab === 'progress'
+                    ? 'bg-gradient-to-r from-purple-500 to-violet-600 text-white shadow-lg'
+                    : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white'
+                }`}
+              >
+                <div className="flex items-center justify-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Progress
+                </div>
+              </button>
+            </div>
+          </motion.div>
+
+          {/* Content */}
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-3 gap-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              <AnimatePresence mode="wait">
+                {activeTab === 'overview' && (
+                  <motion.div
+                    key="overview"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Temperance Quote */}
+                    <div className="p-8 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-indigo-500/10 border border-purple-500/20 rounded-2xl backdrop-blur-sm">
+                      <div className="flex items-center gap-3 mb-6">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+                          <Lightbulb className="w-6 h-6 text-white" />
                         </div>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            togglePatternExpansion(pattern.name);
-                          }}
-                          className="text-gray-400 hover:text-white transition-colors"
-                        >
-                          {isExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
-                        </button>
+                        <div>
+                          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Daily Temperance</h2>
+                          <p className="text-gray-600 dark:text-gray-300">Today's reflection on balance</p>
+                        </div>
                       </div>
-                      
-                      <p className="body-text mb-4">
-                        {pattern.description}
-                      </p>
-                      
-                      {isExpanded && (
-                        <div className="mt-4 space-y-4">
-                          <div>
-                            <h4 className="text-sm font-semibold mb-2">Philosophical Context</h4>
-                            <p className="body-text">{pattern.philosophicalContext}</p>
-                          </div>
-                          
-                          <div>
-                            <h4 className="text-sm font-semibold mb-2">Benefits</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {pattern.benefits.map((benefit) => (
-                                <span
-                                  key={benefit}
-                                  className="px-2 py-1 bg-white/20 text-xs rounded-full border border-white/30"
-                                >
-                                  {benefit}
-                                </span>
-                              ))}
-                            </div>
-                          </div>
-                          
-                          <div>
-                            <h4 className="text-sm font-semibold mb-2">Pattern</h4>
-                            <div className="grid grid-cols-4 gap-2 text-sm">
-                              <div className="text-center">
-                                <div className="font-bold">{pattern.pattern.inhale}s</div>
-                                <div className="text-xs opacity-70">Inhale</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="font-bold">{pattern.pattern.hold}s</div>
-                                <div className="text-xs opacity-70">Hold</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="font-bold">{pattern.pattern.exhale}s</div>
-                                <div className="text-xs opacity-70">Exhale</div>
-                              </div>
-                              <div className="text-center">
-                                <div className="font-bold">{pattern.pattern.hold2}s</div>
-                                <div className="text-xs opacity-70">Hold</div>
-                              </div>
-                            </div>
-                          </div>
+
+                      <blockquote className="text-xl md:text-2xl font-serif italic text-gray-900 dark:text-white leading-relaxed border-l-4 border-purple-500 pl-6 mb-6">
+                        "Moderation in all things, including moderation."
+                      </blockquote>
+
+                      <div className="flex items-center justify-between mb-6">
+                        <cite className="text-purple-600 dark:text-purple-400 font-medium">— Ralph Waldo Emerson</cite>
+                        <div className="flex items-center gap-2">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                          <span className="text-sm text-gray-500 dark:text-gray-400">Daily reflection</span>
                         </div>
-                      )}
+                      </div>
+
+                      <div className="bg-gradient-to-r from-purple-500/10 to-violet-500/10 rounded-xl p-4 border border-purple-500/20">
+                        <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2">
+                          <Compass className="w-4 h-4" />
+                          Temperance Challenge
+                        </h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                          Today, identify one area where you tend to overindulge and practice moderation. Whether it's food, screen time, or emotions, find the middle way.
+                        </p>
+                      </div>
                     </div>
-                  );
-                })}
-              </div>
-            </div>
-          </section>
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Current Pattern Info */}
-          <div className="glass-card">
-            <div className="flex items-center gap-3 mb-4">
-              <Sparkles className="w-5 h-5 text-purple-400" />
-              <h2 className="section-title">Current Pattern</h2>
-            </div>
-            
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold mb-2">{selectedPattern.name}</h3>
-                <p className="body-text">{selectedPattern.description}</p>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Total Time:</span>
-                  <span className="text-white">
-                    {Math.floor((selectedPattern.pattern.inhale + selectedPattern.pattern.hold + selectedPattern.pattern.exhale + selectedPattern.pattern.hold2) * selectedPattern.pattern.cycles / 60)}m
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Cycles:</span>
-                  <span className="text-white">{selectedPattern.pattern.cycles}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Virtue:</span>
-                  <span className="text-white">Temperance</span>
-                </div>
-              </div>
-            </div>
-          </div>
+                    {/* Enhanced Widgets */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <BreathworkWidgetNew frameworkTone="stoic" />
+                      <MoodTrackerWidget frameworkTone="stoic" />
+                      <HedonicAwarenessWidget frameworkTone="stoic" />
+                      <HydrationWidget frameworkTone="stoic" />
+                    </div>
+                  </motion.div>
+                )}
 
-          {/* Temperance Quote */}
-          <div className="glass-card bg-gradient-to-r from-purple-500/20 to-pink-600/20">
-            <blockquote className="text-lg italic text-white mb-4 leading-relaxed">
-              "Temperance is the virtue that moderates the attraction of pleasures and provides balance in the use of created goods."
-            </blockquote>
-            <cite className="text-sm text-purple-300">— Thomas Aquinas</cite>
-          </div>
+                {activeTab === 'practices' && (
+                  <motion.div
+                    key="practices"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Temperance Practices */}
+                    <div className="grid grid-cols-1 gap-6">
+                      {temperancePractices.map((practice, index) => (
+                        <motion.div
+                          key={practice.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.6, delay: index * 0.1 }}
+                          className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700 hover:shadow-xl transition-all duration-300"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+                                <Leaf className="w-6 h-6 text-white" />
+                              </div>
+                              <div>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white">{practice.title}</h3>
+                                <p className="text-gray-600 dark:text-gray-300">{practice.description}</p>
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`px-3 py-1 bg-gradient-to-r ${getDifficultyColor(practice.difficulty)} text-white text-xs rounded-full font-medium`}>
+                                {getDifficultyLabel(practice.difficulty)}
+                              </span>
+                              <div className="flex items-center gap-1 text-sm text-gray-500">
+                                <Clock className="w-4 h-4" />
+                                <span>{practice.duration}m</span>
+                              </div>
+                            </div>
+                          </div>
 
-          {/* Progress Stats */}
-          <div className="glass-card">
-            <div className="flex items-center gap-3 mb-4">
-              <Heart className="w-5 h-5 text-purple-400" />
-              <h2 className="section-title">Your Progress</h2>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Benefits</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {practice.benefits.map((benefit, idx) => (
+                                  <span key={idx} className="px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 text-xs rounded-full">
+                                    {benefit}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                            <div>
+                              <h4 className="font-semibold text-gray-900 dark:text-white mb-2">Features</h4>
+                              <div className="flex flex-wrap gap-2">
+                                {practice.interactiveElements.map((element, idx) => (
+                                  <span key={idx} className="px-2 py-1 bg-violet-100 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-xs rounded-full">
+                                    {element}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              {practice.aiEnhanced && (
+                                <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs rounded-full">
+                                  AI Enhanced
+                                </span>
+                              )}
+                              {practice.communityFeatures && (
+                                <span className="px-2 py-1 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs rounded-full">
+                                  Community
+                                </span>
+                              )}
+                            </div>
+                            <button className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white rounded-lg font-medium transition-all duration-200">
+                              <Play className="w-4 h-4" />
+                              Start Practice
+                            </button>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'balance' && (
+                  <motion.div
+                    key="balance"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Balance Principles */}
+                    <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Principles of Balance</h2>
+                      <p className="text-gray-600 dark:text-gray-300">Understanding the foundations of moderation and harmony.</p>
+                    </div>
+                  </motion.div>
+                )}
+
+                {activeTab === 'progress' && (
+                  <motion.div
+                    key="progress"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 20 }}
+                    transition={{ duration: 0.3 }}
+                    className="space-y-6"
+                  >
+                    {/* Progress tracking and analytics would go here */}
+                    <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+                      <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">Progress Overview</h2>
+                      <p className="text-gray-600 dark:text-gray-300">Detailed progress tracking and analytics coming soon.</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
-            
-            <div className="space-y-4">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white">82%</div>
-                <div className="text-sm text-gray-400">Overall Temperance Score</div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Quick Actions */}
+              <div className="p-6 bg-white/80 dark:bg-slate-800/80 rounded-2xl backdrop-blur-sm border border-gray-200 dark:border-slate-700">
+                <h3 className="font-semibold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
+                  <Zap className="w-5 h-5 text-yellow-600" />
+                  Quick Actions
+                </h3>
+                <div className="space-y-3">
+                  <button className="w-full text-left p-3 bg-gradient-to-r from-purple-500 to-violet-600 hover:from-purple-600 hover:to-violet-700 text-white rounded-xl font-medium transition-all duration-200">
+                    <div className="flex items-center gap-2">
+                      <Leaf className="w-4 h-4" />
+                      Mindful Consumption
+                    </div>
+                  </button>
+                  <button className="w-full text-left p-3 bg-white/10 hover:bg-white/20 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200">
+                    <div className="flex items-center gap-2">
+                      <Target className="w-4 h-4" />
+                      Emotional Balance
+                    </div>
+                  </button>
+                  <button className="w-full text-left p-3 bg-white/10 hover:bg-white/20 text-gray-700 dark:text-gray-300 rounded-xl font-medium transition-all duration-200">
+                    <div className="flex items-center gap-2">
+                      <MessageSquare className="w-4 h-4" />
+                      Digital Wellness
+                    </div>
+                  </button>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Sessions Completed</span>
-                  <span className="text-white">24/30</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Streak</span>
-                  <span className="text-white">15 days</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Inner Balance</span>
-                  <span className="text-white">High</span>
-                </div>
+
+              {/* Quote */}
+              <div className="bg-gradient-to-r from-purple-500 to-violet-600 rounded-2xl p-6 text-white">
+                <blockquote className="text-lg italic mb-4">
+                  "The greatest wealth is to live content with little."
+                </blockquote>
+                <cite className="text-sm opacity-90">— Plato</cite>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
-    </PageLayout>
+    </div>
   );
 } 
