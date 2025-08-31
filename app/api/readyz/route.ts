@@ -1,26 +1,26 @@
 import { NextResponse } from "next/server";
-import { logger } from "@/lib/logger";
-import { appConfig } from "@/lib/config/app";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 
 export async function GET() {
   try {
     // Check database connectivity
     let dbStatus = "unknown";
     try {
-      await prisma.$queryRaw`SELECT 1`;
-      dbStatus = "connected";
+      if (process.env.DATABASE_URL) {
+        const { PrismaClient } = await import("@prisma/client");
+        const prisma = new PrismaClient();
+        await prisma.$queryRaw`SELECT 1`;
+        dbStatus = "connected";
+      } else {
+        dbStatus = "no_database_url";
+      }
     } catch (dbError) {
       dbStatus = "disconnected";
-      logger.error("Database connectivity check failed");
     }
 
     const readinessCheck = {
       ok: dbStatus === "connected",
       timestamp: new Date().toISOString(),
-      version: appConfig.version,
+      version: process.env.npm_package_version || '0.1.0',
       environment: process.env.NODE_ENV,
       services: {
         database: dbStatus,
@@ -28,17 +28,13 @@ export async function GET() {
       commitSha: process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || null,
     };
 
-    logger.info("Readiness check requested");
-    
-    return NextResponse.json(readinessCheck, { 
-      status: readinessCheck.ok ? 200 : 503 
+    return NextResponse.json(readinessCheck, {
+      status: readinessCheck.ok ? 200 : 503
     });
   } catch (error) {
-    logger.error("Readiness check failed");
-    
     return NextResponse.json(
-      { 
-        ok: false, 
+      {
+        ok: false,
         error: "Readiness check failed",
         timestamp: new Date().toISOString(),
       },

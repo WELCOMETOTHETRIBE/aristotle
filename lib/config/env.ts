@@ -3,7 +3,7 @@ import { z } from "zod";
 export const env = z.object({
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
   DATABASE_URL: z.string().url().optional(),
-  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters"),
+  JWT_SECRET: z.string().min(32, "JWT_SECRET must be at least 32 characters").optional(),
   OPENAI_API_KEY: z.string().optional(),
   RAILWAY_TOKEN: z.string().optional(),
   RAILWAY_PROJECT_ID: z.string().optional(),
@@ -22,12 +22,12 @@ export const isProd = env.NODE_ENV === "production";
 export const isDev = env.NODE_ENV === "development";
 export const isTest = env.NODE_ENV === "test";
 
-// Validate required environment variables
-if (isProd && !env.DATABASE_URL) {
+// Validate required environment variables at runtime only
+if (typeof window === 'undefined' && isProd && !env.DATABASE_URL) {
   throw new Error("DATABASE_URL is required in production");
 }
 
-if (isProd && !env.JWT_SECRET) {
+if (typeof window === 'undefined' && isProd && !env.JWT_SECRET) {
   throw new Error("JWT_SECRET is required in production");
 }
 
