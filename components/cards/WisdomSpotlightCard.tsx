@@ -160,7 +160,17 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `Generate a ${category || 'reflection'} insight for ${difficulty || settings.preferredDifficulty} level. Make it practical, thought-provoking, and actionable. Include a title, main content, and suggest which philosophical framework it relates to.`,
+          message: `Generate a ${category || 'reflection'} insight for ${difficulty || settings.preferredDifficulty} level. 
+
+IMPORTANT: Structure your response exactly as follows:
+TITLE: [A concise, compelling title - max 60 characters]
+CONTENT: [The main insight content - 2-3 sentences, practical and actionable]
+PHILOSOPHER: [One philosopher name from: Marcus Aurelius, Seneca, Epictetus, Aristotle, Confucius, Lao Tzu, Buddha, Socrates, Plato, Epicurus, Diogenes, Zhuangzi, Mencius, Xunzi, Heraclitus, Parmenides, Plotinus, Augustine, Aquinas, Spinoza, Nietzsche, Kierkegaard, Sartre, Camus, Foucault, Derrida, or other classical philosophers]
+FRAMEWORK: [One framework from: Stoicism, Buddhism, Confucianism, Taoism, Aristotelian Ethics, Epicureanism, Cynicism, Platonism, Existentialism, Pragmatism, Virtue Ethics, or other classical frameworks]
+CATEGORY: [${category || 'reflection'}]
+DIFFICULTY: [${difficulty || settings.preferredDifficulty}]
+
+Make the content practical, thought-provoking, and immediately applicable. Keep it concise and focused.`,
           context: {
             page: 'wisdom_spotlight',
             focusVirtue: 'wisdom',
@@ -197,19 +207,22 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
             }
           }
           
-          // Parse the AI response into structured insight
-          const lines = content.split('\n').filter(line => line.trim());
-          const title = lines[0]?.replace(/^#\s*/, '') || 'Daily Wisdom';
-          const mainContent = lines.slice(1).join('\n') || content;
+          // Parse the structured AI response
+          const titleMatch = content.match(/TITLE:\s*(.+?)(?=\n|$)/i);
+          const contentMatch = content.match(/CONTENT:\s*(.+?)(?=\n|$)/i);
+          const philosopherMatch = content.match(/PHILOSOPHER:\s*(.+?)(?=\n|$)/i);
+          const frameworkMatch = content.match(/FRAMEWORK:\s*(.+?)(?=\n|$)/i);
+          const categoryMatch = content.match(/CATEGORY:\s*(.+?)(?=\n|$)/i);
+          const difficultyMatch = content.match(/DIFFICULTY:\s*(.+?)(?=\n|$)/i);
           
           const insight: WisdomInsight = {
             id: Date.now().toString(),
-            title,
-            content: mainContent,
-            philosopher: philosophicalFrameworks[Math.floor(Math.random() * philosophicalFrameworks.length)],
-            framework: philosophicalFrameworks[Math.floor(Math.random() * philosophicalFrameworks.length)],
-            category: (category as any) || 'reflection',
-            difficulty: (difficulty as any) || settings.preferredDifficulty,
+            title: titleMatch?.[1]?.trim() || 'Daily Wisdom',
+            content: contentMatch?.[1]?.trim() || content,
+            philosopher: philosopherMatch?.[1]?.trim() || philosophicalFrameworks[Math.floor(Math.random() * philosophicalFrameworks.length)],
+            framework: frameworkMatch?.[1]?.trim() || philosophicalFrameworks[Math.floor(Math.random() * philosophicalFrameworks.length)],
+            category: (categoryMatch?.[1]?.trim() as any) || (category as any) || 'reflection',
+            difficulty: (difficultyMatch?.[1]?.trim() as any) || (difficulty as any) || settings.preferredDifficulty,
             tags: ['ai-generated', 'daily'],
             timestamp: new Date(),
           };
@@ -276,7 +289,11 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          message: `You are a wise philosophical guide. Respond to this question or reflection: "${userInput.trim()}". Provide thoughtful, practical wisdom that draws from various philosophical traditions. Keep your response conversational and encouraging.`,
+          message: `You are a wise philosophical guide. Respond to this question or reflection: "${userInput.trim()}".
+
+IMPORTANT: Keep your response concise (2-3 sentences max) and conversational. Focus on practical wisdom that the user can immediately apply. Avoid verbose explanations or philosophical jargon. Be encouraging and actionable.
+
+Respond in a warm, conversational tone as if you're having a thoughtful chat with a friend.`,
           context: {
             page: 'wisdom_spotlight',
             focusVirtue: 'wisdom',
@@ -313,10 +330,25 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
             }
           }
           
+          // Clean up the response content
+          const cleanContent = content
+            .replace(/^Here's my response:/i, '')
+            .replace(/^Response:/i, '')
+            .replace(/^Answer:/i, '')
+            .replace(/^Here's what I think:/i, '')
+            .replace(/^My thoughts:/i, '')
+            .replace(/^I would say:/i, '')
+            .replace(/^Let me share:/i, '')
+            .replace(/^Consider this:/i, '')
+            .replace(/^Here's a perspective:/i, '')
+            .replace(/^From a philosophical standpoint:/i, '')
+            .replace(/^In terms of wisdom:/i, '')
+            .trim();
+          
           const aiMessage: ConversationMessage = {
             id: (Date.now() + 2).toString(),
             role: 'assistant',
-            content: content || 'I appreciate your question. Let me reflect on this with you...',
+            content: cleanContent || 'I appreciate your question. Let me reflect on this with you...',
             timestamp: new Date(),
           };
 
@@ -779,7 +811,7 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
                           </div>
                         </div>
                       ) : (
-                        <div className="whitespace-pre-wrap">{message.content}</div>
+                        <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
                       )}
                     </div>
                     {message.role === 'user' && (
