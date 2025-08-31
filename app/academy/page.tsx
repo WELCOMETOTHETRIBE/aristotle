@@ -3,219 +3,251 @@
 import { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
-import { MessageSquare, Send, Bot, User, Sparkles, BookOpen, Brain, Shield, Scale, Leaf } from 'lucide-react';
+import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-  isTyping?: boolean;
-}
-
-interface Philosopher {
+interface VirtueSpotlight {
   id: string;
   name: string;
-  era: string;
-  school: string;
   description: string;
   icon: any;
   color: string;
-  specialties: string[];
+  gradient: string;
+  lessons: Lesson[];
+  completed: boolean;
+  progress: number;
 }
 
-const philosophers: Philosopher[] = [
+interface Lesson {
+  id: string;
+  title: string;
+  teaching: string;
+  question: string;
+  response?: string;
+  completed: boolean;
+}
+
+const virtueSpotlights: VirtueSpotlight[] = [
   {
-    id: 'socrates',
-    name: 'Socrates',
-    era: '470-399 BCE',
-    school: 'Classical Greek',
-    description: 'The father of Western philosophy, known for the Socratic method and questioning everything.',
+    id: 'wisdom',
+    name: 'Wisdom',
+    description: 'The virtue of knowledge, understanding, and sound judgment',
     icon: Brain,
     color: 'bg-primary/20 text-primary border-primary/30',
-    specialties: ['Ethics', 'Knowledge', 'Self-examination', 'Dialogue']
+    gradient: 'from-primary/20 to-primary/5',
+    progress: 0,
+    completed: false,
+    lessons: [
+      {
+        id: 'wisdom-1',
+        title: 'The Socratic Method',
+        teaching: 'Socrates taught that true wisdom begins with recognizing what we do not know. The Socratic method involves asking probing questions to examine our beliefs and assumptions. This practice helps us develop critical thinking and avoid intellectual arrogance.',
+        question: 'What is one belief or assumption you hold that you could examine more deeply through questioning?',
+        completed: false
+      },
+      {
+        id: 'wisdom-2',
+        title: 'The Golden Mean',
+        teaching: 'Aristotle\'s concept of the Golden Mean teaches that virtue lies between excess and deficiency. For example, courage is the mean between cowardice (deficiency) and recklessness (excess). This principle helps us find balance in our actions and decisions.',
+        question: 'In what area of your life could you apply the Golden Mean to find better balance?',
+        completed: false
+      },
+      {
+        id: 'wisdom-3',
+        title: 'Contemplative Practice',
+        teaching: 'Ancient philosophers emphasized the importance of regular contemplation and reflection. This practice allows us to examine our experiences, learn from them, and develop deeper understanding of ourselves and the world.',
+        question: 'How could you incorporate more contemplative time into your daily routine?',
+        completed: false
+      }
+    ]
   },
   {
-    id: 'plato',
-    name: 'Plato',
-    era: '428-348 BCE',
-    school: 'Platonism',
-    description: 'Student of Socrates, founder of the Academy, and author of philosophical dialogues.',
-    icon: BookOpen,
-    color: 'bg-courage/20 text-courage border-courage/30',
-    specialties: ['Metaphysics', 'Justice', 'Education', 'Forms']
-  },
-  {
-    id: 'aristotle',
-    name: 'Aristotle',
-    era: '384-322 BCE',
-    school: 'Aristotelianism',
-    description: 'Student of Plato, founder of logic, and systematic philosopher of nature and ethics.',
-    icon: Shield,
-    color: 'bg-justice/20 text-justice border-justice/30',
-    specialties: ['Virtue Ethics', 'Logic', 'Politics', 'Natural Science']
-  },
-  {
-    id: 'marcus-aurelius',
-    name: 'Marcus Aurelius',
-    era: '121-180 CE',
-    school: 'Stoicism',
-    description: 'Roman Emperor and Stoic philosopher, author of Meditations.',
+    id: 'justice',
+    name: 'Justice',
+    description: 'The virtue of fairness, right relationships, and social harmony',
     icon: Scale,
-    color: 'bg-temperance/20 text-temperance border-temperance/30',
-    specialties: ['Stoicism', 'Self-control', 'Leadership', 'Resilience']
+    color: 'bg-justice/20 text-justice border-justice/30',
+    gradient: 'from-justice/20 to-justice/5',
+    progress: 0,
+    completed: false,
+    lessons: [
+      {
+        id: 'justice-1',
+        title: 'Fairness in Relationships',
+        teaching: 'Justice in relationships means treating others with fairness, respect, and dignity. It involves listening to different perspectives, considering others\' needs, and acting with integrity in our interactions.',
+        question: 'How can you practice greater fairness in your relationships with others?',
+        completed: false
+      },
+      {
+        id: 'justice-2',
+        title: 'Social Responsibility',
+        teaching: 'Justice extends beyond individual relationships to our role in society. It calls us to contribute to the common good, stand up for what is right, and work toward a more just and harmonious community.',
+        question: 'What is one way you could contribute to creating more justice in your community?',
+        completed: false
+      },
+      {
+        id: 'justice-3',
+        title: 'Balanced Judgment',
+        teaching: 'Just judgment requires us to consider multiple perspectives, examine evidence carefully, and make decisions based on principles rather than personal bias. This practice helps us act with wisdom and fairness.',
+        question: 'When making decisions, how could you better consider multiple perspectives?',
+        completed: false
+      }
+    ]
   },
   {
-    id: 'epictetus',
-    name: 'Epictetus',
-    era: '50-135 CE',
-    school: 'Stoicism',
-    description: 'Former slave turned Stoic philosopher, teacher of practical wisdom.',
-    icon: Leaf,
-    color: 'bg-primary/20 text-primary border-primary/30',
-    specialties: ['Freedom', 'Acceptance', 'Inner peace', 'Practical wisdom']
-  },
-  {
-    id: 'seneca',
-    name: 'Seneca',
-    era: '4 BCE-65 CE',
-    school: 'Stoicism',
-    description: 'Roman statesman and Stoic philosopher, author of Letters and Essays.',
-    icon: Brain,
+    id: 'courage',
+    name: 'Courage',
+    description: 'The virtue of facing challenges with strength and determination',
+    icon: Shield,
     color: 'bg-courage/20 text-courage border-courage/30',
-    specialties: ['Virtue', 'Time', 'Anger', 'Friendship']
+    gradient: 'from-courage/20 to-courage/5',
+    progress: 0,
+    completed: false,
+    lessons: [
+      {
+        id: 'courage-1',
+        title: 'Facing Fear',
+        teaching: 'Courage is not the absence of fear, but the ability to act despite it. Ancient philosophers taught that true courage involves facing our fears with wisdom and determination, rather than avoiding difficult situations.',
+        question: 'What fear are you currently facing that requires courage to overcome?',
+        completed: false
+      },
+      {
+        id: 'courage-2',
+        title: 'Moral Courage',
+        teaching: 'Moral courage is the strength to stand up for what is right, even when it is difficult or unpopular. This includes speaking truth to power, defending others, and maintaining our integrity in challenging circumstances.',
+        question: 'When have you needed moral courage to stand up for what you believe is right?',
+        completed: false
+      },
+      {
+        id: 'courage-3',
+        title: 'Perseverance',
+        teaching: 'Courage also involves perseverance—the ability to persist through difficulties and setbacks. This virtue helps us maintain our commitment to our goals and values even when progress is slow or obstacles arise.',
+        question: 'What goal or value are you committed to that requires perseverance?',
+        completed: false
+      }
+    ]
+  },
+  {
+    id: 'temperance',
+    name: 'Temperance',
+    description: 'The virtue of self-control, moderation, and inner harmony',
+    icon: Leaf,
+    color: 'bg-temperance/20 text-temperance border-temperance/30',
+    gradient: 'from-temperance/20 to-temperance/5',
+    progress: 0,
+    completed: false,
+    lessons: [
+      {
+        id: 'temperance-1',
+        title: 'Self-Control',
+        teaching: 'Temperance involves mastering our desires and impulses through self-discipline. This virtue helps us make choices that align with our long-term well-being rather than giving in to immediate gratification.',
+        question: 'What area of your life could benefit from greater self-control?',
+        completed: false
+      },
+      {
+        id: 'temperance-2',
+        title: 'Moderation',
+        teaching: 'The principle of moderation teaches us to find balance in all things—work and rest, activity and reflection, giving and receiving. This balance helps us maintain harmony in our lives and relationships.',
+        question: 'Where in your life could you practice greater moderation?',
+        completed: false
+      },
+      {
+        id: 'temperance-3',
+        title: 'Inner Harmony',
+        teaching: 'Temperance leads to inner harmony—a state of peace and balance within ourselves. This involves managing our emotions, thoughts, and actions in ways that promote our well-being and the well-being of others.',
+        question: 'What practices help you maintain inner harmony and peace?',
+        completed: false
+      }
+    ]
   }
 ];
 
 export default function AcademyPage() {
-  const [selectedPhilosopher, setSelectedPhilosopher] = useState<Philosopher | null>(null);
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [userInput, setUserInput] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [selectedVirtue, setSelectedVirtue] = useState<VirtueSpotlight | null>(null);
+  const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
+  const [userResponse, setUserResponse] = useState('');
+  const [spotlights, setSpotlights] = useState<VirtueSpotlight[]>(virtueSpotlights);
 
+  // Load saved progress
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+    const savedSpotlights = localStorage.getItem('academySpotlights');
+    if (savedSpotlights) {
+      setSpotlights(JSON.parse(savedSpotlights));
+    }
+  }, []);
 
-  const startConversation = (philosopher: Philosopher) => {
-    setSelectedPhilosopher(philosopher);
-    const welcomeMessage: Message = {
-      id: Date.now().toString(),
-      role: 'assistant',
-      content: `Greetings, seeker of wisdom. I am ${philosopher.name}, and I welcome you to our philosophical dialogue. What questions do you bring to our conversation today?`,
-      timestamp: new Date(),
-    };
-    setMessages([welcomeMessage]);
+  // Save progress
+  const saveProgress = (updatedSpotlights: VirtueSpotlight[]) => {
+    setSpotlights(updatedSpotlights);
+    localStorage.setItem('academySpotlights', JSON.stringify(updatedSpotlights));
   };
 
-  const sendMessage = async () => {
-    if (!userInput.trim() || !selectedPhilosopher) return;
+  const startVirtueJourney = (virtue: VirtueSpotlight) => {
+    setSelectedVirtue(virtue);
+    const firstLesson = virtue.lessons.find(lesson => !lesson.completed) || virtue.lessons[0];
+    setCurrentLesson(firstLesson);
+  };
 
-    const userMessage: Message = {
+  const submitResponse = () => {
+    if (!userResponse.trim() || !currentLesson || !selectedVirtue) return;
+
+    // Update lesson with response
+    const updatedVirtue = {
+      ...selectedVirtue,
+      lessons: selectedVirtue.lessons.map(lesson =>
+        lesson.id === currentLesson.id
+          ? { ...lesson, response: userResponse.trim(), completed: true }
+          : lesson
+      )
+    };
+
+    // Calculate progress
+    const completedLessons = updatedVirtue.lessons.filter(lesson => lesson.completed).length;
+    const progress = Math.round((completedLessons / updatedVirtue.lessons.length) * 100);
+    updatedVirtue.progress = progress;
+    updatedVirtue.completed = progress === 100;
+
+    // Update spotlights
+    const updatedSpotlights = spotlights.map(spotlight =>
+      spotlight.id === selectedVirtue.id ? updatedVirtue : spotlight
+    );
+    saveProgress(updatedSpotlights);
+
+    // Store response for journal integration
+    const journalEntry = {
       id: Date.now().toString(),
-      role: 'user',
-      content: userInput.trim(),
+      title: `${selectedVirtue.name} Spotlight: ${currentLesson.title}`,
+      content: `Teaching: ${currentLesson.teaching}\n\nQuestion: ${currentLesson.question}\n\nMy Response: ${userResponse.trim()}`,
       timestamp: new Date(),
+      tags: ['academy', selectedVirtue.id.toLowerCase(), 'virtue-learning'],
+      virtue: selectedVirtue.id
     };
 
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
-    setUserInput('');
-    setIsGenerating(true);
+    const existingEntries = localStorage.getItem('journalEntries') || '[]';
+    const entries = JSON.parse(existingEntries);
+    entries.unshift(journalEntry);
+    localStorage.setItem('journalEntries', JSON.stringify(entries));
 
-    // Add typing indicator
-    const typingMessage: Message = {
-      id: (Date.now() + 1).toString(),
-      role: 'assistant',
-      content: '',
-      timestamp: new Date(),
-      isTyping: true,
-    };
-
-    setMessages([...updatedMessages, typingMessage]);
-
-    try {
-      const response = await fetch('/api/ai/guide', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `You are ${selectedPhilosopher.name}, a ${selectedPhilosopher.school} philosopher from ${selectedPhilosopher.era}. Respond to this question or reflection in your authentic philosophical voice: "${userInput.trim()}".
-
-IMPORTANT: Respond as ${selectedPhilosopher.name} would, using their philosophical perspective and style. Keep your response concise (2-3 sentences max) and conversational. Focus on practical wisdom that the user can immediately apply.`,
-          context: {
-            page: 'academy',
-            focusVirtue: 'wisdom',
-            timeOfDay: new Date().getHours(),
-          },
-        }),
-      });
-
-      if (response.ok) {
-        const reader = response.body?.getReader();
-        if (reader) {
-          let content = '';
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = new TextDecoder().decode(value);
-            const lines = chunk.split('\n');
-            
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') break;
-                
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.content) {
-                    content += parsed.content;
-                  }
-                } catch (e) {
-                  // Ignore parsing errors
-                }
-              }
-            }
-          }
-          
-          // Clean markdown from response
-          const cleanContent = content
-            .replace(/\*\*(.*?)\*\*/g, '$1')
-            .replace(/\*(.*?)\*/g, '$1')
-            .replace(/`(.*?)`/g, '$1')
-            .replace(/\[(.*?)\]\(.*?\)/g, '$1')
-            .replace(/^#+\s*/gm, '')
-            .replace(/^\s*[-*+]\s*/gm, '')
-            .replace(/^\s*\d+\.\s*/gm, '')
-            .trim();
-          
-          const aiMessage: Message = {
-            id: (Date.now() + 2).toString(),
-            role: 'assistant',
-            content: cleanContent || 'I appreciate your question. Let me reflect on this with you...',
-            timestamp: new Date(),
-          };
-
-          const finalMessages = [...updatedMessages, aiMessage];
-          setMessages(finalMessages);
-        }
-      }
-    } catch (error) {
-      console.error('Failed to get AI response:', error);
-      const errorMessage: Message = {
-        id: (Date.now() + 2).toString(),
-        role: 'assistant',
-        content: 'I apologize, but I\'m having trouble connecting right now. Please try again in a moment.',
-        timestamp: new Date(),
-      };
-
-      const finalMessages = [...updatedMessages, errorMessage];
-      setMessages(finalMessages);
-    }
+    setUserResponse('');
     
-    setIsGenerating(false);
+    // Move to next lesson or complete virtue
+    const nextLesson = updatedVirtue.lessons.find(lesson => !lesson.completed);
+    if (nextLesson) {
+      setCurrentLesson(nextLesson);
+    } else {
+      setCurrentLesson(null);
+      setSelectedVirtue(null);
+    }
+  };
+
+  const getVirtueIcon = (virtueId: string) => {
+    switch (virtueId) {
+      case 'wisdom': return Brain;
+      case 'justice': return Scale;
+      case 'courage': return Shield;
+      case 'temperance': return Leaf;
+      default: return Sparkles;
+    }
   };
 
   return (
@@ -225,42 +257,84 @@ IMPORTANT: Respond as ${selectedPhilosopher.name} would, using their philosophic
       <main className="px-4 py-6 space-y-6">
         {/* Header */}
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-text mb-2">AI Academy</h1>
-          <p className="text-muted">Chat with ancient philosophers and learn timeless wisdom</p>
+          <h1 className="text-2xl font-bold text-text mb-2">Academy</h1>
+          <p className="text-muted">Master the four cardinal virtues through guided learning journeys</p>
         </div>
 
-        {!selectedPhilosopher ? (
-          /* Philosopher Selection */
-          <div className="space-y-4">
-            <h2 className="text-lg font-semibold text-text">Choose Your Philosopher</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {philosophers.map((philosopher) => {
-                const IconComponent = philosopher.icon;
+        {!selectedVirtue ? (
+          /* Virtue Selection */
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {spotlights.map((virtue) => {
+                const IconComponent = virtue.icon;
                 return (
                   <button
-                    key={philosopher.id}
-                    onClick={() => startConversation(philosopher)}
-                    className="p-4 bg-surface border border-border rounded-lg hover:bg-surface-2 transition-colors duration-150 text-left"
+                    key={virtue.id}
+                    onClick={() => startVirtueJourney(virtue)}
+                    className="p-6 bg-surface border border-border rounded-2xl hover:bg-surface-2 transition-all duration-200 hover:scale-105 text-left group"
                   >
-                    <div className="flex items-start space-x-3">
-                      <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', philosopher.color)}>
-                        <IconComponent className="w-5 h-5" />
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center shadow-lg', virtue.color)}>
+                        <IconComponent className="w-6 h-6" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-semibold text-text">{philosopher.name}</h3>
-                        <p className="text-xs text-muted mb-1">{philosopher.era} • {philosopher.school}</p>
-                        <p className="text-sm text-muted mb-2">{philosopher.description}</p>
-                        <div className="flex flex-wrap gap-1">
-                          {philosopher.specialties.slice(0, 3).map((specialty) => (
-                            <span
-                              key={specialty}
-                              className="px-2 py-1 bg-surface-2 text-xs text-muted rounded-full"
-                            >
-                              {specialty}
-                            </span>
-                          ))}
-                        </div>
+                        <h3 className="text-xl font-bold text-text mb-1">{virtue.name}</h3>
+                        <p className="text-sm text-muted">{virtue.description}</p>
                       </div>
+                      {virtue.completed && (
+                        <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
+                          <Star className="w-4 h-4 text-success" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progress */}
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted">Progress</span>
+                        <span className="font-medium text-text">{virtue.progress}%</span>
+                      </div>
+                      <div className="w-full bg-surface-2 rounded-full h-2">
+                        <div 
+                          className={cn(
+                            'h-2 rounded-full transition-all duration-500',
+                            virtue.id === 'wisdom' ? 'bg-primary' :
+                            virtue.id === 'justice' ? 'bg-justice' :
+                            virtue.id === 'courage' ? 'bg-courage' :
+                            'bg-temperance'
+                          )}
+                          style={{ width: `${virtue.progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Lesson Preview */}
+                    <div className="mt-4 space-y-2">
+                      {virtue.lessons.map((lesson, index) => (
+                        <div key={lesson.id} className="flex items-center space-x-2">
+                          <div className={cn(
+                            'w-6 h-6 rounded-full flex items-center justify-center text-xs',
+                            lesson.completed 
+                              ? 'bg-success/20 text-success' 
+                              : 'bg-surface-2 text-muted'
+                          )}>
+                            {lesson.completed ? '✓' : index + 1}
+                          </div>
+                          <span className={cn(
+                            'text-sm',
+                            lesson.completed ? 'text-success' : 'text-muted'
+                          )}>
+                            {lesson.title}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-xs text-muted">
+                        {virtue.lessons.filter(l => l.completed).length} of {virtue.lessons.length} lessons
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-muted group-hover:text-text transition-colors" />
                     </div>
                   </button>
                 );
@@ -268,104 +342,81 @@ IMPORTANT: Respond as ${selectedPhilosopher.name} would, using their philosophic
             </div>
           </div>
         ) : (
-          /* Chat Interface */
-          <div className="space-y-4">
-            {/* Philosopher Header */}
-            <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-lg">
-              <div className="flex items-center space-x-3">
-                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center', selectedPhilosopher.color)}>
-                  <selectedPhilosopher.icon className="w-5 h-5" />
+          /* Lesson Interface */
+          <div className="space-y-6">
+            {/* Virtue Header */}
+            <div className="flex items-center justify-between p-6 bg-surface border border-border rounded-2xl">
+              <div className="flex items-center space-x-4">
+                <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center shadow-lg', selectedVirtue.color)}>
+                  <selectedVirtue.icon className="w-6 h-6" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-text">{selectedPhilosopher.name}</h3>
-                  <p className="text-xs text-muted">{selectedPhilosopher.era} • {selectedPhilosopher.school}</p>
+                  <h2 className="text-xl font-bold text-text">{selectedVirtue.name} Spotlight</h2>
+                  <p className="text-sm text-muted">{selectedVirtue.description}</p>
                 </div>
               </div>
               <button
                 onClick={() => {
-                  setSelectedPhilosopher(null);
-                  setMessages([]);
+                  setSelectedVirtue(null);
+                  setCurrentLesson(null);
                 }}
                 className="text-sm text-muted hover:text-text transition-colors"
               >
-                Choose Another
+                Back to Virtues
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="bg-surface border border-border rounded-lg p-4 h-96 overflow-y-auto">
-              {messages.length === 0 ? (
-                <div className="text-center py-8">
-                  <MessageSquare className="w-8 h-8 text-muted mx-auto mb-2" />
-                  <p className="text-sm text-muted">Start a conversation with {selectedPhilosopher.name}</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {messages.map((message) => (
-                    <div
-                      key={message.id}
-                      className={cn(
-                        'flex gap-3',
-                        message.role === 'user' ? 'justify-end' : 'justify-start'
-                      )}
-                    >
-                      {message.role === 'assistant' && (
-                        <div className={cn('w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0', selectedPhilosopher.color)}>
-                          <selectedPhilosopher.icon className="w-4 h-4" />
-                        </div>
-                      )}
-                      <div
-                        className={cn(
-                          'max-w-[80%] p-3 rounded-lg text-sm',
-                          message.role === 'user'
-                            ? 'bg-primary text-white'
-                            : 'bg-surface-2 border border-border text-text'
-                        )}
-                      >
-                        {message.isTyping ? (
-                          <div className="flex items-center gap-1">
-                            <div className="animate-pulse">Thinking</div>
-                            <div className="flex gap-1">
-                              <div className="w-1 h-1 bg-muted rounded-full animate-bounce"></div>
-                              <div className="w-1 h-1 bg-muted rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                              <div className="w-1 h-1 bg-muted rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="whitespace-pre-wrap leading-relaxed">{message.content}</div>
-                        )}
-                      </div>
-                      {message.role === 'user' && (
-                        <div className="w-8 h-8 bg-surface-2 rounded-full flex items-center justify-center flex-shrink-0">
-                          <User className="w-4 h-4 text-muted" />
-                        </div>
-                      )}
+            {currentLesson && (
+              <div className="space-y-6">
+                {/* Lesson Content */}
+                <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-primary" />
                     </div>
-                  ))}
-                  <div ref={messagesEndRef} />
+                    <h3 className="text-lg font-semibold text-text">{currentLesson.title}</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div className="bg-surface-2 border border-border rounded-xl p-4">
+                      <h4 className="font-medium text-text mb-2">Teaching</h4>
+                      <p className="text-sm text-muted leading-relaxed">{currentLesson.teaching}</p>
+                    </div>
+                    
+                    <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
+                      <h4 className="font-medium text-primary mb-2">Reflection Question</h4>
+                      <p className="text-sm text-text leading-relaxed">{currentLesson.question}</p>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </div>
 
-            {/* Input */}
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={userInput}
-                onChange={(e) => setUserInput(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                placeholder={`Ask ${selectedPhilosopher.name} about wisdom, philosophy, or life...`}
-                className="flex-1 px-4 py-3 bg-surface border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-                disabled={isGenerating}
-              />
-              <button
-                onClick={sendMessage}
-                disabled={!userInput.trim() || isGenerating}
-                className="px-4 py-3 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
+                {/* Response Input */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 bg-courage/20 rounded-lg flex items-center justify-center">
+                      <Target className="w-4 h-4 text-courage" />
+                    </div>
+                    <h3 className="font-semibold text-text">Your Response</h3>
+                  </div>
+                  
+                  <textarea
+                    value={userResponse}
+                    onChange={(e) => setUserResponse(e.target.value)}
+                    placeholder="Share your thoughts and reflections..."
+                    className="w-full p-4 bg-surface border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
+                    rows={4}
+                  />
+                  
+                  <button
+                    onClick={submitResponse}
+                    disabled={!userResponse.trim()}
+                    className="w-full px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                  >
+                    Continue Journey
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </main>

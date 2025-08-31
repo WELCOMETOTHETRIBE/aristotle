@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils';
 
 const tabs = [
   {
-    name: 'AI Academy',
+    name: 'Academy',
     href: '/academy',
     icon: MessageSquare,
     activeColor: 'text-primary',
