@@ -5,7 +5,7 @@ import {
   Sparkles, Brain, Lightbulb, BookOpen, Heart, Target, 
   MessageSquare, Share2, Bookmark, Play, Pause, RotateCcw,
   ChevronLeft, ChevronRight, Info, Settings, Volume2, VolumeX,
-  Send, User, Bot, Clock, Star, TrendingUp, Quote, Zap
+  Send, User, Bot, Clock, Star, TrendingUp, Quote, Zap, X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -47,6 +47,35 @@ interface ConversationMessage {
   isTyping?: boolean;
 }
 
+interface QuestionnaireResponse {
+  id: string;
+  framework: string;
+  philosopher: string;
+  questions: QuestionResponse[];
+  timestamp: Date;
+  eudaimoniaScore: number;
+  insights: string[];
+}
+
+interface QuestionResponse {
+  question: string;
+  answer: string;
+  reflection: string;
+  practice: string;
+}
+
+interface MindfulPractice {
+  id: string;
+  framework: string;
+  philosopher: string;
+  title: string;
+  description: string;
+  questions: string[];
+  practices: string[];
+  difficulty: 'beginner' | 'intermediate' | 'advanced';
+  category: 'meditation' | 'reflection' | 'action' | 'contemplation';
+}
+
 const wisdomCategories = [
   'reflection', 'practice', 'principle', 'story', 'question'
 ];
@@ -60,6 +89,149 @@ const difficultyLevels = [
 const philosophicalFrameworks = [
   'Stoicism', 'Buddhism', 'Aristotelian', 'Confucianism', 'Taoism', 
   'Existentialism', 'Pragmatism', 'Virtue Ethics', 'Epicureanism', 'Cynicism'
+];
+
+const mindfulPractices: MindfulPractice[] = [
+  {
+    id: 'stoic_reflection',
+    framework: 'Stoicism',
+    philosopher: 'Marcus Aurelius',
+    title: 'Evening Reflection Practice',
+    description: 'Examine your day through the lens of Stoic wisdom, identifying what you can control and what you cannot.',
+    questions: [
+      'What events today were within your control?',
+      'How did you respond to challenges outside your control?',
+      'What virtues did you practice today?',
+      'What would you do differently tomorrow?'
+    ],
+    practices: [
+      'Write down three things you can control tomorrow',
+      'Practice the view from above meditation',
+      'Reflect on your mortality to prioritize what matters'
+    ],
+    difficulty: 'intermediate',
+    category: 'reflection'
+  },
+  {
+    id: 'buddhist_mindfulness',
+    framework: 'Buddhism',
+    philosopher: 'Buddha',
+    title: 'Mindful Awareness Practice',
+    description: 'Cultivate present-moment awareness and observe the nature of your thoughts and emotions.',
+    questions: [
+      'How often did you notice your breath today?',
+      'What thoughts or emotions arose most frequently?',
+      'When did you feel most present or distracted?',
+      'What would help you be more mindful tomorrow?'
+    ],
+    practices: [
+      'Practice mindful breathing for 5 minutes',
+      'Observe thoughts without judgment',
+      'Practice loving-kindness meditation'
+    ],
+    difficulty: 'beginner',
+    category: 'meditation'
+  },
+  {
+    id: 'aristotelian_virtue',
+    framework: 'Aristotelian',
+    philosopher: 'Aristotle',
+    title: 'Virtue Cultivation Practice',
+    description: 'Examine your character development and identify areas for virtuous growth.',
+    questions: [
+      'Which virtues did you express most today?',
+      'Where did you fall short of your ideal character?',
+      'What habits are you building toward excellence?',
+      'How can you better align actions with your values?'
+    ],
+    practices: [
+      'Choose one virtue to focus on this week',
+      'Practice the golden mean in daily decisions',
+      'Reflect on your telos (purpose)'
+    ],
+    difficulty: 'intermediate',
+    category: 'reflection'
+  },
+  {
+    id: 'confucian_harmony',
+    framework: 'Confucianism',
+    philosopher: 'Confucius',
+    title: 'Relational Harmony Practice',
+    description: 'Examine your relationships and how you contribute to social harmony.',
+    questions: [
+      'How did you show respect to others today?',
+      'What relationships need more attention?',
+      'How did you practice filial piety or loyalty?',
+      'What would improve your social harmony?'
+    ],
+    practices: [
+      'Practice active listening in conversations',
+      'Show respect through proper etiquette',
+      'Strengthen family and community bonds'
+    ],
+    difficulty: 'beginner',
+    category: 'action'
+  },
+  {
+    id: 'taoist_flow',
+    framework: 'Taoism',
+    philosopher: 'Lao Tzu',
+    title: 'Wu Wei (Effortless Action) Practice',
+    description: 'Learn to act in harmony with the natural flow of life.',
+    questions: [
+      'When did you feel most in flow today?',
+      'What resistance did you encounter?',
+      'How did you practice non-attachment?',
+      'What would help you be more spontaneous?'
+    ],
+    practices: [
+      'Practice walking meditation in nature',
+      'Let go of rigid plans and expectations',
+      'Embrace simplicity and minimalism'
+    ],
+    difficulty: 'advanced',
+    category: 'contemplation'
+  },
+  {
+    id: 'existential_authenticity',
+    framework: 'Existentialism',
+    philosopher: 'Sartre',
+    title: 'Authentic Choice Practice',
+    description: 'Examine your choices and their alignment with your authentic self.',
+    questions: [
+      'What choices did you make from fear vs. authenticity?',
+      'How did you take responsibility for your actions?',
+      'What would your authentic self do differently?',
+      'How are you creating meaning in your life?'
+    ],
+    practices: [
+      'Make one authentic choice each day',
+      'Practice radical responsibility',
+      'Create your own meaning and purpose'
+    ],
+    difficulty: 'advanced',
+    category: 'reflection'
+  },
+  {
+    id: 'epicurean_pleasure',
+    framework: 'Epicureanism',
+    philosopher: 'Epicurus',
+    title: 'Simple Pleasures Practice',
+    description: 'Identify and cultivate the simple pleasures that lead to true happiness.',
+    questions: [
+      'What simple pleasures did you enjoy today?',
+      'What unnecessary desires did you notice?',
+      'How did you practice gratitude?',
+      'What would bring you more lasting joy?'
+    ],
+    practices: [
+      'Savor simple pleasures mindfully',
+      'Practice gratitude for basic needs met',
+      'Cultivate friendships and community'
+    ],
+    difficulty: 'beginner',
+    category: 'action'
+  }
 ];
 
 export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
@@ -85,6 +257,11 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
   });
   const [dailyInsightsCount, setDailyInsightsCount] = useState(0);
   const [showInsightHistory, setShowInsightHistory] = useState(false);
+  const [showQuestionnaire, setShowQuestionnaire] = useState(false);
+  const [selectedPractice, setSelectedPractice] = useState<MindfulPractice | null>(null);
+  const [questionnaireResponses, setQuestionnaireResponses] = useState<QuestionnaireResponse[]>([]);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [questionAnswers, setQuestionAnswers] = useState<string[]>([]);
   const conversationEndRef = useRef<HTMLDivElement>(null);
 
   // Load saved data
@@ -123,6 +300,16 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
     } else if (savedDailyCount) {
       setDailyInsightsCount(parseInt(savedDailyCount));
     }
+
+    // Load questionnaire responses
+    const savedQuestionnaireResponses = localStorage.getItem('wisdomSpotlightQuestionnaireResponses');
+    if (savedQuestionnaireResponses) {
+      const parsed = JSON.parse(savedQuestionnaireResponses);
+      setQuestionnaireResponses(parsed.map((response: any) => ({
+        ...response,
+        timestamp: new Date(response.timestamp)
+      })));
+    }
   }, []);
 
   // Save data
@@ -139,6 +326,11 @@ export function WisdomSpotlightCard({ className }: WisdomSpotlightCardProps) {
   const saveConversation = (newConversation: ConversationMessage[]) => {
     setConversation(newConversation);
     localStorage.setItem('wisdomSpotlightConversation', JSON.stringify(newConversation));
+  };
+
+  const saveQuestionnaireResponses = (newResponses: QuestionnaireResponse[]) => {
+    setQuestionnaireResponses(newResponses);
+    localStorage.setItem('wisdomSpotlightQuestionnaireResponses', JSON.stringify(newResponses));
   };
 
   const updateDailyCount = (count: number) => {
@@ -463,6 +655,218 @@ Respond in a warm, conversational tone as if you're having a thoughtful chat wit
     return colors[difficulty as keyof typeof colors] || 'text-gray-500 bg-gray-100';
   };
 
+  // Questionnaire functions
+  const startQuestionnaire = (practice: MindfulPractice) => {
+    setSelectedPractice(practice);
+    setCurrentQuestionIndex(0);
+    setQuestionAnswers(new Array(practice.questions.length).fill(''));
+    setShowQuestionnaire(true);
+  };
+
+  const handleQuestionAnswer = (answer: string) => {
+    const newAnswers = [...questionAnswers];
+    newAnswers[currentQuestionIndex] = answer;
+    setQuestionAnswers(newAnswers);
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestionIndex < (selectedPractice?.questions.length || 0) - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      completeQuestionnaire();
+    }
+  };
+
+  const completeQuestionnaire = async () => {
+    if (!selectedPractice) return;
+
+    const questionResponses: QuestionResponse[] = selectedPractice.questions.map((question, index) => ({
+      question,
+      answer: questionAnswers[index] || '',
+      reflection: '',
+      practice: selectedPractice.practices[index] || ''
+    }));
+
+    // Generate AI insights for the questionnaire
+    const insights = await generateQuestionnaireInsights(selectedPractice, questionResponses);
+    
+    // Calculate eudaimonia score (simple scoring based on response length and engagement)
+    const eudaimoniaScore = Math.min(100, Math.max(0, 
+      questionResponses.reduce((score, response) => {
+        return score + Math.min(25, response.answer.length / 10);
+      }, 0)
+    ));
+
+    const response: QuestionnaireResponse = {
+      id: Date.now().toString(),
+      framework: selectedPractice.framework,
+      philosopher: selectedPractice.philosopher,
+      questions: questionResponses,
+      timestamp: new Date(),
+      eudaimoniaScore,
+      insights
+    };
+
+    const updatedResponses = [response, ...questionnaireResponses];
+    saveQuestionnaireResponses(updatedResponses);
+    
+    // Generate journal entry based on questionnaire
+    await generateJournalEntry(response);
+    
+    setShowQuestionnaire(false);
+    setSelectedPractice(null);
+    setCurrentQuestionIndex(0);
+    setQuestionAnswers([]);
+  };
+
+  const generateQuestionnaireInsights = async (practice: MindfulPractice, responses: QuestionResponse[]): Promise<string[]> => {
+    try {
+      const response = await fetch('/api/ai/guide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Analyze these questionnaire responses for ${practice.framework} practice and provide 3 actionable insights for progress toward Eudaimonia:
+
+Practice: ${practice.title}
+Framework: ${practice.framework}
+Philosopher: ${practice.philosopher}
+
+Responses:
+${responses.map((r, i) => `${i + 1}. ${r.question}: ${r.answer}`).join('\n')}
+
+Provide 3 concise, actionable insights (max 1 sentence each) for continued growth.`,
+          context: {
+            page: 'wisdom_spotlight',
+            focusVirtue: 'wisdom',
+            timeOfDay: new Date().getHours(),
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let content = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') break;
+                
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.content) {
+                    content += parsed.content;
+                  }
+                } catch (e) {
+                  // Ignore parsing errors
+                }
+              }
+            }
+          }
+          
+          // Parse insights from response
+          const insights = content.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
+          return insights.length > 0 ? insights : [
+            'Continue reflecting on your daily practices',
+            'Focus on one virtue or practice at a time',
+            'Build consistent habits for lasting growth'
+          ];
+        }
+      }
+    } catch (error) {
+      console.error('Failed to generate questionnaire insights:', error);
+    }
+    
+    return [
+      'Continue reflecting on your daily practices',
+      'Focus on one virtue or practice at a time', 
+      'Build consistent habits for lasting growth'
+    ];
+  };
+
+  const generateJournalEntry = async (questionnaireResponse: QuestionnaireResponse) => {
+    try {
+      const response = await fetch('/api/ai/guide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Create a journal entry based on this questionnaire response for tracking progress toward Eudaimonia:
+
+Framework: ${questionnaireResponse.framework}
+Philosopher: ${questionnaireResponse.philosopher}
+Eudaimonia Score: ${questionnaireResponse.eudaimoniaScore}/100
+
+Responses:
+${questionnaireResponse.questions.map((q, i) => `${i + 1}. ${q.question}: ${q.answer}`).join('\n')}
+
+Insights:
+${questionnaireResponse.insights.join('\n')}
+
+Create a 2-3 sentence journal entry that reflects on this practice session and progress toward flourishing.`,
+          context: {
+            page: 'wisdom_spotlight',
+            focusVirtue: 'wisdom',
+            timeOfDay: new Date().getHours(),
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let content = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') break;
+                
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.content) {
+                    content += parsed.content;
+                  }
+                } catch (e) {
+                  // Ignore parsing errors
+                }
+              }
+            }
+          }
+          
+          // Save journal entry to localStorage for integration with journal widget
+          const journalEntry = {
+            id: Date.now().toString(),
+            title: `${questionnaireResponse.framework} Practice Reflection`,
+            content: content.trim(),
+            timestamp: new Date(),
+            tags: ['wisdom-spotlight', questionnaireResponse.framework.toLowerCase(), 'eudaimonia'],
+            eudaimoniaScore: questionnaireResponse.eudaimoniaScore
+          };
+          
+          const existingEntries = localStorage.getItem('journalEntries') || '[]';
+          const entries = JSON.parse(existingEntries);
+          entries.unshift(journalEntry);
+          localStorage.setItem('journalEntries', JSON.stringify(entries));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to generate journal entry:', error);
+    }
+  };
+
   return (
     <div className={cn('bg-surface border border-border rounded-lg p-4', className)}>
       {/* Header with Info and Settings */}
@@ -708,6 +1112,81 @@ Respond in a warm, conversational tone as if you're having a thoughtful chat wit
             </button>
           </div>
 
+          {/* Mindful Practices Questionnaire */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <div className="text-xs text-muted font-medium">Mindful Practices</div>
+              <button
+                onClick={() => setShowQuestionnaire(!showQuestionnaire)}
+                className="text-xs text-primary hover:underline"
+              >
+                {showQuestionnaire ? 'Hide' : 'Explore'} Practices
+              </button>
+            </div>
+            
+            {showQuestionnaire && (
+              <div className="space-y-3">
+                <div className="text-xs text-muted">
+                  Explore mindful practices from ancient wisdom traditions and track your progress toward Eudaimonia.
+                </div>
+                
+                <div className="grid grid-cols-1 gap-2 max-h-48 overflow-y-auto">
+                  {mindfulPractices.map(practice => (
+                    <div
+                      key={practice.id}
+                      className="p-3 bg-surface-2 border border-border rounded-lg hover:bg-surface transition-colors cursor-pointer"
+                      onClick={() => startQuestionnaire(practice)}
+                    >
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <h4 className="text-sm font-medium text-text">{practice.title}</h4>
+                          <p className="text-xs text-muted mt-1">{practice.description}</p>
+                        </div>
+                        <span className={cn('px-2 py-1 rounded-full text-xs', getDifficultyColor(practice.difficulty))}>
+                          {practice.difficulty}
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-muted">
+                        <span>{practice.framework} • {practice.philosopher}</span>
+                        <span className="capitalize">{practice.category}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Recent Questionnaire Responses */}
+                {questionnaireResponses.length > 0 && (
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted font-medium">Recent Practice Sessions</div>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {questionnaireResponses.slice(0, 3).map(response => (
+                        <div key={response.id} className="p-2 bg-surface-2 border border-border rounded-lg">
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-xs font-medium text-text">{response.framework}</span>
+                            <span className="text-xs text-muted">{response.timestamp.toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted">{response.philosopher}</span>
+                            <div className="flex items-center gap-1">
+                              <span className="text-xs text-muted">Eudaimonia:</span>
+                              <span className={cn(
+                                'text-xs font-medium',
+                                response.eudaimoniaScore >= 80 ? 'text-green-500' :
+                                response.eudaimoniaScore >= 60 ? 'text-yellow-500' : 'text-red-500'
+                              )}>
+                                {response.eudaimoniaScore}/100
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* Quick Generate Options */}
           <div className="space-y-2">
             <div className="text-xs text-muted font-medium">Quick Generate</div>
@@ -843,6 +1322,100 @@ Respond in a warm, conversational tone as if you're having a thoughtful chat wit
             >
               <Send className="w-4 h-4" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Questionnaire Modal */}
+      {showQuestionnaire && selectedPractice && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-surface border border-border rounded-lg max-w-md w-full max-h-[80vh] overflow-y-auto">
+            {/* Header */}
+            <div className="p-4 border-b border-border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-lg font-semibold text-text">{selectedPractice.title}</h3>
+                  <p className="text-sm text-muted">{selectedPractice.framework} • {selectedPractice.philosopher}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowQuestionnaire(false);
+                    setSelectedPractice(null);
+                    setCurrentQuestionIndex(0);
+                    setQuestionAnswers([]);
+                  }}
+                  className="p-1 hover:bg-surface-2 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-muted" />
+                </button>
+              </div>
+            </div>
+
+            {/* Progress */}
+            <div className="px-4 py-2 bg-surface-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted">Question {currentQuestionIndex + 1} of {selectedPractice.questions.length}</span>
+                <span className="text-primary font-medium">
+                  {Math.round(((currentQuestionIndex + 1) / selectedPractice.questions.length) * 100)}%
+                </span>
+              </div>
+              <div className="w-full bg-border rounded-full h-1 mt-2">
+                <div 
+                  className="bg-primary h-1 rounded-full transition-all duration-300"
+                  style={{ width: `${((currentQuestionIndex + 1) / selectedPractice.questions.length) * 100}%` }}
+                />
+              </div>
+            </div>
+
+            {/* Question */}
+            <div className="p-4">
+              <div className="mb-4">
+                <h4 className="text-lg font-medium text-text mb-2">
+                  {selectedPractice.questions[currentQuestionIndex]}
+                </h4>
+                <p className="text-sm text-muted">
+                  Take a moment to reflect deeply on this question from {selectedPractice.philosopher}'s perspective.
+                </p>
+              </div>
+
+              <textarea
+                value={questionAnswers[currentQuestionIndex] || ''}
+                onChange={(e) => handleQuestionAnswer(e.target.value)}
+                placeholder="Share your thoughts and reflections..."
+                className="w-full p-3 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
+                rows={4}
+              />
+
+              {/* Suggested Practice */}
+              {selectedPractice.practices[currentQuestionIndex] && (
+                <div className="mt-3 p-3 bg-primary/5 border border-primary/20 rounded-lg">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Lightbulb className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium text-text">Suggested Practice</span>
+                  </div>
+                  <p className="text-sm text-muted">{selectedPractice.practices[currentQuestionIndex]}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Navigation */}
+            <div className="p-4 border-t border-border flex justify-between">
+              <button
+                onClick={() => setCurrentQuestionIndex(Math.max(0, currentQuestionIndex - 1))}
+                disabled={currentQuestionIndex === 0}
+                className="px-4 py-2 text-muted hover:text-text disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Previous
+              </button>
+              
+              <button
+                onClick={nextQuestion}
+                disabled={!questionAnswers[currentQuestionIndex]?.trim()}
+                className="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {currentQuestionIndex === selectedPractice.questions.length - 1 ? 'Complete' : 'Next'}
+              </button>
+            </div>
           </div>
         </div>
       )}
