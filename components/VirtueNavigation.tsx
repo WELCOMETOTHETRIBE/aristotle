@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Brain, Shield, Scale, Leaf, Search, User, Home, Bell, LogOut, Target, Settings, MessageSquare, TestTube } from "lucide-react";
+import { Brain, Shield, Scale, Leaf, Search, User, Home, Bell, LogOut, Target, Settings, MessageSquare, TestTube, Users } from "lucide-react";
 import GraduationCapIcon from "./GraduationCapIcon";
 import { motion } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
@@ -122,6 +122,9 @@ export function VirtueNavigation() {
               </Link>
               <Link href="/philosophers" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Philosopher's Journey">
                 <Brain size={12} />
+              </Link>
+              <Link href="/community" className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Community Forum">
+                <Users size={12} />
               </Link>
               <button className="p-1 text-white/70 hover:text-white transition-colors interactive rounded hover:bg-white/10" title="Notifications">
                 <Bell size={12} />
