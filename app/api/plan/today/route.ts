@@ -3,6 +3,8 @@ import { generateDailyQuests } from '@/lib/quest-engine';
 import { getFrameworkBySlug } from '@/lib/frameworks.config';
 import { VirtueTotals } from '@/lib/virtue';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

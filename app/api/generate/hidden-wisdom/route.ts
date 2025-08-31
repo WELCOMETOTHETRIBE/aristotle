@@ -3,6 +3,8 @@ import { generateWithCache, HiddenWisdomSchema } from "@/lib/ai";
 import { hiddenWisdomPrompt } from "@/lib/prompts";
 import { formatISO } from "date-fns";
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);

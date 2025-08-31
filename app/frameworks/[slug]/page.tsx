@@ -63,8 +63,38 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
         console.log('Framework config loaded:', frameworkConfig);
         setFramework(frameworkConfig);
 
-        // For now, skip API calls to test basic loading
-        console.log('Skipping API calls for now to test basic loading');
+        // Load quests (optional - don't fail if this fails)
+        try {
+          const questResponse = await fetch(`/api/plan/today?frameworkSlug=${params.slug}`);
+          if (questResponse.ok) {
+            const questData = await questResponse.json();
+            console.log('Quest data loaded:', questData);
+            setQuests(questData.quests || []);
+            if (questData.userVirtues) {
+              setVirtueTotals(questData.userVirtues);
+            }
+          } else {
+            console.warn('Failed to load quests, using defaults');
+          }
+        } catch (questError) {
+          console.warn('Error loading quests:', questError);
+        }
+
+        // Load progress summary (optional - don't fail if this fails)
+        try {
+          const progressResponse = await fetch(`/api/progress/summary?frameworkSlug=${params.slug}`);
+          if (progressResponse.ok) {
+            const progressData = await progressResponse.json();
+            console.log('Progress data loaded:', progressData);
+            if (progressData.virtueTotals) {
+              setVirtueTotals(progressData.virtueTotals);
+            }
+          } else {
+            console.warn('Failed to load progress, using defaults');
+          }
+        } catch (progressError) {
+          console.warn('Error loading progress:', progressError);
+        }
 
       } catch (err) {
         console.error('Error loading framework data:', err);

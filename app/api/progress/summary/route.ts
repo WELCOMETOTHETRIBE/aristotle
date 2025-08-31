@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { VirtueTotals } from '@/lib/virtue';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const frameworkSlug = searchParams.get('frameworkSlug');
+    const url = new URL(request.url);
+    const frameworkSlug = url.searchParams.get('frameworkSlug');
     const userId = 'user-1'; // Mock user ID
 
     // Mock virtue totals (in real app, calculate from checkins)

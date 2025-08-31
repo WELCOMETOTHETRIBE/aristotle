@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
@@ -54,6 +56,7 @@ export async function GET(request: NextRequest) {
             author: 'Marcus Aurelius',
             type: 'book',
             estMinutes: 45,
+            keyIdeas: ['Stoic philosophy', 'Daily reflection', 'Virtue ethics'],
             bullets: [
               'Daily reflections on virtue and resilience',
               'Practical wisdom for modern challenges',
@@ -66,6 +69,7 @@ export async function GET(request: NextRequest) {
             author: 'Seneca',
             type: 'book',
             estMinutes: 30,
+            keyIdeas: ['Stoic letters', 'Personal guidance', 'Practical wisdom'],
             bullets: [
               'Personal guidance on living well',
               'Advice on handling adversity',
@@ -80,6 +84,7 @@ export async function GET(request: NextRequest) {
             author: 'Ancient Sources',
             type: 'article',
             estMinutes: 20,
+            keyIdeas: ['Spartan discipline', 'Physical training', 'Mental toughness'],
             bullets: [
               'Physical and mental discipline',
               'Endurance through adversity',
@@ -94,6 +99,7 @@ export async function GET(request: NextRequest) {
             author: 'Inazo Nitobe',
             type: 'book',
             estMinutes: 40,
+            keyIdeas: ['Bushido code', 'Samurai virtues', 'Honor ethics'],
             bullets: [
               'The seven virtues of the samurai',
               'Honor and ethical conduct',
