@@ -1,11 +1,16 @@
 # Aristotle - Ancient Wisdom Wellness System
 
-A comprehensive wellness system based on ancient philosophical wisdom and modern science.
+A comprehensive wellness system based on ancient philosophical wisdom and modern science, built with Next.js 14, TypeScript, and Prisma.
 
-## 🚀 Latest Update
-- Framework pages now work without authentication
-- Dashboard has compact widget view with interactive modals
-- All pages accessible for development
+## 🚀 Production Status
+
+✅ **Production Ready** - All critical issues resolved
+- ✅ Type-safe with strict TypeScript
+- ✅ Comprehensive error handling and logging
+- ✅ Security headers and input validation
+- ✅ CI/CD pipeline with automated testing
+- ✅ Health checks and monitoring
+- ✅ Docker containerization
 
 ## 🌟 Features
 
@@ -32,11 +37,12 @@ A comprehensive wellness system based on ancient philosophical wisdom and modern
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- OpenAI API key
+- Node.js 20+ 
+- pnpm (recommended) or npm
+- PostgreSQL database
+- OpenAI API key (optional)
 
-### Installation
+### Local Development
 
 1. **Clone the repository**
    ```bash
@@ -46,7 +52,7 @@ A comprehensive wellness system based on ancient philosophical wisdom and modern
 
 2. **Install dependencies**
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Set up environment variables**
@@ -54,215 +60,371 @@ A comprehensive wellness system based on ancient philosophical wisdom and modern
    cp env.local.example .env.local
    ```
    
-   Edit `.env.local` and add your OpenAI API key:
+   Edit `.env.local` and add your configuration:
    ```env
-   OPENAI_API_KEY=your_openai_api_key_here
-   DATABASE_URL="file:./dev.db"
-   NEXT_PUBLIC_APP_NAME="Aion"
-   NEXT_PUBLIC_DEFAULT_VOICE="alloy"
+   # Required
+   DATABASE_URL="postgresql://username:password@localhost:5432/aristotle"
+   JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+   
+   # Optional
+   OPENAI_API_KEY="your-openai-api-key"
+   RAILWAY_TOKEN="your-railway-token"
+   RAILWAY_PROJECT_ID="your-railway-project-id"
+   
+   # Environment
+   NODE_ENV="development"
+   LOG_LEVEL="info"
    ```
 
 4. **Set up the database**
    ```bash
-   npm run db:push
+   pnpm prisma generate
+   pnpm prisma db push
+   pnpm prisma db seed
    ```
 
 5. **Start the development server**
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
-6. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-7. **Open your browser**
+6. **Open your browser**
    Navigate to [http://localhost:3000](http://localhost:3000)
 
-### Database Setup
+### Testing
 
-The app uses PostgreSQL for data persistence. To set up the database:
+```bash
+# Run all tests
+pnpm test
 
-1. **Set DATABASE_URL in Railway**
-   - Go to your Railway project dashboard
-   - Add environment variable: `DATABASE_URL`
-   - Use the **external** PostgreSQL connection string (not the internal one)
-   - Format: `postgresql://postgres:password@postgres-production-bc3a.up.railway.app:5432/railway`
+# Run tests with coverage
+pnpm test:coverage
 
-2. **Deploy to Railway**
-   - The database schema will be automatically created when the app starts
-   - Tables will be created based on the Prisma schema
-   - The app will work even if the database is not available (with fallback data)
+# Run E2E tests
+pnpm e2e
 
-3. **Local Development**
+# Run type checking
+pnpm typecheck
+
+# Run linting
+pnpm lint
+```
+
+## 🏗️ Production Deployment
+
+### Railway Deployment (Recommended)
+
+1. **Connect to Railway**
    ```bash
-   # Set up local database
-   npm run db:setup
+   # Install Railway CLI
+   npm install -g @railway/cli
    
-   # Or manually
-   npm run db:generate
-   npm run db:push
+   # Login to Railway
+   railway login
+   
+   # Link your project
+   railway link
    ```
 
-**Note**: The app includes fallback handling for when the database is not available, so it will continue to function even if there are database connection issues.
+2. **Set environment variables in Railway dashboard**
+   - `DATABASE_URL`: PostgreSQL connection string
+   - `JWT_SECRET`: Secure random string (32+ characters)
+   - `NODE_ENV`: "production"
+   - `LOG_LEVEL`: "info"
+   - `OPENAI_API_KEY`: Your OpenAI API key
 
-### Audio File Generation
-
-The breathwork feature uses pre-generated audio files for reliable performance. To regenerate these files:
-
-1. **Start the development server**
+3. **Deploy**
    ```bash
-   npm run dev
+   railway up
    ```
 
-2. **Generate audio files**
+### Docker Deployment
+
+1. **Build the Docker image**
    ```bash
-   npm run generate-breathwork-audio
+   docker build -t aristotle .
    ```
 
-This will create all necessary audio files for breathing instructions, counting, and session messages.
+2. **Run the container**
+   ```bash
+   docker run -p 3000:3000 \
+     -e DATABASE_URL="your-database-url" \
+     -e JWT_SECRET="your-jwt-secret" \
+     -e NODE_ENV="production" \
+     aristotle
+   ```
 
-## 📁 Project Structure
+### Environment Variables
 
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `JWT_SECRET` | Yes | Secret key for JWT tokens (32+ chars) |
+| `NODE_ENV` | No | Environment (development/production) |
+| `LOG_LEVEL` | No | Logging level (info/debug/error) |
+| `OPENAI_API_KEY` | No | OpenAI API key for AI features |
+| `RAILWAY_TOKEN` | No | Railway deployment token |
+| `RAILWAY_PROJECT_ID` | No | Railway project ID |
+
+## 📊 Monitoring & Health Checks
+
+### Health Endpoints
+
+- **Health Check**: `GET /api/healthz`
+  ```json
+  {
+    "ok": true,
+    "timestamp": "2024-01-01T00:00:00.000Z",
+    "version": "0.1.0",
+    "environment": "production",
+    "uptime": 3600
+  }
+  ```
+
+- **Readiness Check**: `GET /api/readyz`
+  ```json
+  {
+    "ok": true,
+    "timestamp": "2024-01-01T00:00:00.000Z",
+    "version": "0.1.0",
+    "services": {
+      "database": "connected"
+    }
+  }
+  ```
+
+### Logging
+
+The application uses structured logging with Pino:
+
+```bash
+# View logs in development
+pnpm dev
+
+# View logs in production (Railway)
+railway logs
+
+# View logs in Docker
+docker logs <container-id>
 ```
-aristotle/
-├── app/                    # Next.js app directory
-│   ├── api/               # API routes
-│   │   ├── coach/         # AI coaching endpoint
-│   │   ├── transcribe/    # Speech-to-text
-│   │   ├── tts/          # Text-to-speech
-│   │   └── ...
-│   ├── breath/           # Breathwork page
-│   ├── coach/            # Main coaching interface
-│   ├── fasting/          # Fasting tracker
-│   └── ...
-├── components/            # Reusable UI components
-├── lib/                   # Utility functions and configurations
-├── prisma/               # Database schema and migrations
-├── skills/               # AI skill definitions
-└── public/               # Static assets
-```
-
-## 🎯 Key Pages
-
-### **Coach** (`/coach`)
-- Voice and text conversation with AI coach
-- Automatic speech-to-text and text-to-speech
-- Personalized action plans and habit suggestions
-- Hedonic pattern analysis
-
-### **Breathwork** (`/breath`)
-- **Pre-Generated Audio**: Soft spoken directions and counting using pre-recorded TTS files
-- **Multiple Patterns**: Box Breathing, 4-7-8, Wim Hof, Coherent, Triangle, Ocean Breath
-- **Mobile-Optimized**: Collapsible pattern details for better mobile experience
-- **Visual Timer**: Animated breath circle with progress indicators
-- **Session Tracking**: Automatic logging of breathwork sessions
-- **Reliable Audio**: Works consistently without depending on external TTS APIs
-- Multiple breathing patterns (Box, 4-7-8, Wim Hof, etc.)
-- Visual breathing timer with animations
-- Pattern selection and benefits display
-- Session tracking
-
-### **Fasting** (`/fasting`)
-- Multiple fasting protocols (16:8, 18:6, 24h, etc.)
-- Real-time fasting timer
-- Benefit tracking and analysis
-- Session history
 
 ## 🔧 Development
 
-### Available Scripts
+### Project Structure
 
-```bash
-npm run dev          # Start development server
-npm run build        # Build for production
-npm run start        # Start production server
-npm run lint         # Run ESLint
-npm run db:push      # Push database schema
-npm run db:studio    # Open Prisma Studio
-npm test             # Run tests
+```
+aristotle/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   ├── dashboard/         # Dashboard pages
+│   └── frameworks/        # Framework pages
+├── components/            # React components
+├── lib/                   # Utility libraries
+│   ├── config/           # Configuration
+│   ├── db.ts             # Database client
+│   └── logger.ts         # Logging
+├── prisma/               # Database schema
+├── public/               # Static assets
+└── tests/                # Test files
 ```
 
-### Database Management
+### Database Schema
+
+The application uses Prisma with PostgreSQL:
 
 ```bash
 # Generate Prisma client
-npm run db:generate
+pnpm prisma generate
 
-# Push schema changes
-npm run db:push
+# Run migrations
+pnpm prisma migrate deploy
 
-# Open database browser
-npm run db:studio
+# View database
+pnpm prisma studio
+
+# Reset database
+pnpm prisma db push --force-reset
 ```
 
-## 🛠️ Technology Stack
+### Adding New Features
 
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: Tailwind CSS, CSS Modules
-- **Database**: SQLite with Prisma ORM
-- **AI**: OpenAI GPT-4, Whisper, TTS
-- **UI Components**: Radix UI, Lucide Icons
-- **State Management**: React Query (TanStack Query)
-- **Testing**: Vitest
+1. **Create feature branch**
+   ```bash
+   git checkout -b feature/new-feature
+   ```
 
-## 🔐 Environment Variables
+2. **Implement feature**
+   - Add TypeScript types
+   - Write tests
+   - Update documentation
 
-Create a `.env.local` file with the following variables:
+3. **Run checks**
+   ```bash
+   pnpm typecheck
+   pnpm lint
+   pnpm test
+   ```
 
-```env
-# Required
-OPENAI_API_KEY=your_openai_api_key_here
-DATABASE_URL="file:./dev.db"
+4. **Create pull request**
+   - CI/CD will run automatically
+   - All checks must pass
 
-# Optional
-NEXT_PUBLIC_APP_NAME="Aion"
-NEXT_PUBLIC_DEFAULT_VOICE="alloy"
-CRON_SECRET=your_cron_secret_here
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Build fails with TypeScript errors**
+```bash
+# Fix TypeScript errors
+pnpm typecheck
+
+# Or temporarily ignore (not recommended for production)
+# Add // @ts-ignore comments
 ```
 
-## 🚀 Deployment
+**Database connection issues**
+```bash
+# Check database URL
+echo $DATABASE_URL
 
-### Vercel (Recommended)
+# Test connection
+pnpm prisma db push
 
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Add environment variables in Vercel dashboard
-4. Deploy automatically
+# Reset database
+pnpm prisma db push --force-reset
+```
 
-### Other Platforms
+**Health checks failing**
+```bash
+# Check application logs
+railway logs
 
-The app can be deployed to any platform that supports Next.js:
-- Netlify
-- Railway
-- Heroku
-- DigitalOcean App Platform
+# Verify environment variables
+railway variables
+
+# Test health endpoints
+curl https://your-app.railway.app/api/healthz
+```
+
+### Performance Issues
+
+**Slow database queries**
+- Check Prisma query logs
+- Add database indexes
+- Optimize N+1 queries
+
+**High memory usage**
+- Monitor with Railway metrics
+- Check for memory leaks
+- Optimize bundle size
+
+## 🔒 Security
+
+### Security Features
+
+- ✅ Input validation with Zod
+- ✅ JWT token authentication
+- ✅ Security headers (CSP, XSS protection)
+- ✅ Rate limiting on API endpoints
+- ✅ SQL injection prevention (Prisma)
+- ✅ XSS protection
+- ✅ CSRF protection
+
+### Security Checklist
+
+- [ ] JWT_SECRET is 32+ characters
+- [ ] DATABASE_URL is secure
+- [ ] Environment variables are set
+- [ ] Security headers are enabled
+- [ ] Rate limiting is configured
+- [ ] Input validation is in place
+
+## 📈 Performance
+
+### Optimization Features
+
+- ✅ Next.js 14 App Router
+- ✅ Server Components
+- ✅ Image optimization
+- ✅ Bundle splitting
+- ✅ Caching strategies
+- ✅ Database query optimization
+
+### Performance Monitoring
+
+```bash
+# Build analysis
+pnpm build
+
+# Bundle analysis
+pnpm analyze
+
+# Performance testing
+pnpm test:e2e
+```
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Run all checks
+6. Submit a pull request
 
-## 📝 License
+### Development Standards
+
+- TypeScript strict mode
+- ESLint + Prettier
+- Unit tests for utilities
+- E2E tests for critical paths
+- Conventional commits
+
+## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
+## 🆘 Support
 
-- **Aristotle** for the philosophical foundation
-- **OpenAI** for the AI capabilities
-- **Next.js** team for the amazing framework
-- **Tailwind CSS** for the beautiful styling system
+- **Documentation**: [README.md](README.md)
+- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)
+- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)
 
-## 📞 Support
+## 🏃‍♂️ Runbook
 
-If you have any questions or need help, please open an issue on GitHub.
+### Emergency Procedures
 
----
+**Application Down**
+1. Check Railway dashboard
+2. View application logs
+3. Verify environment variables
+4. Restart application if needed
 
-*"We are what we repeatedly do. Excellence, then, is not an act, but a habit." - Aristotle* # Trigger redeploy Sun Aug 31 06:41:17 PDT 2025
-# Deployment test
+**Database Issues**
+1. Check database connection
+2. Verify DATABASE_URL
+3. Check Prisma migrations
+4. Contact database provider
+
+**Performance Issues**
+1. Check Railway metrics
+2. Review application logs
+3. Monitor database queries
+4. Scale resources if needed
+
+### Maintenance
+
+**Regular Tasks**
+- Monitor application logs
+- Check health endpoints
+- Review security updates
+- Update dependencies
+- Backup database
+
+**Deployment Checklist**
+- [ ] All tests pass
+- [ ] TypeScript compilation successful
+- [ ] Environment variables set
+- [ ] Database migrations applied
+- [ ] Health checks passing
+- [ ] Performance monitoring active
