@@ -23,6 +23,22 @@ export default function FrameworksDropdown() {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
+  const getFrameworkIcon = (slug: string) => {
+    const iconMap: { [key: string]: string } = {
+      stoic: "🧘",
+      spartan: "🛡️",
+      bushido: "⚔️",
+      yogic: "🧘‍♀️",
+      taoist: "☯️",
+      buddhist: "🕉️",
+      confucian: "📚",
+      epicurean: "🍇",
+      cynic: "🐕",
+      skeptic: "❓"
+    };
+    return iconMap[slug] || "✨";
+  };
+
   return (
     <div ref={ref} className="relative">
       <button
@@ -45,13 +61,13 @@ export default function FrameworksDropdown() {
             {items.map((f: any) => (
               <li key={f.id}>
                 <Link
-                  href={`/frameworks/${f.id}`}
+                  href={`/frameworks/${f.slug}`}
                   className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-white/5"
                   onClick={() => setOpen(false)}
                 >
-                  <span className="text-lg">{f.nav?.emoji ?? "✨"}</span>
+                  <span className="text-lg">{getFrameworkIcon(f.slug)}</span>
                   <span className="truncate">{f.name}</span>
-                  <span className="ml-auto text-[10px] opacity-70">{f.nav?.badge}</span>
+                  <span className="ml-auto text-[10px] opacity-70">{f.virtuePrimary}</span>
                 </Link>
               </li>
             ))}

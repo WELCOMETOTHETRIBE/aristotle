@@ -22,6 +22,7 @@ import { getAllFrameworks } from '@/lib/frameworks.config';
 import MilestonesDropdown from '@/components/MilestonesDropdown';
 import VirtueRadar from '@/components/VirtueRadar';
 import { useOnboardingStatus } from '@/lib/hooks/useOnboardingStatus';
+import Link from 'next/link';
 
 interface VirtueScores {
   wisdom: number;
@@ -385,95 +386,107 @@ export default function DashboardPage() {
 
               {/* Quick Actions Grid */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-blue-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
-                        <Timer className="w-6 h-6 text-white" />
+                <Link href="/focus-timer">
+                  <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-blue-500/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                          <Timer className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">Focus Timer</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Deep work sessions</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Focus Timer</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Deep work sessions</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                        <Target className="w-6 h-6 text-white" />
+                <Link href="/task-manager">
+                  <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                          <Target className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">Task Manager</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Organize priorities</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Task Manager</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Organize priorities</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-purple-500/5 to-violet-500/5 border-purple-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
-                        <BookOpen className="w-6 h-6 text-white" />
+                <Link href="/journal">
+                  <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-purple-500/5 to-violet-500/5 border-purple-500/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+                          <BookOpen className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">Journal</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Reflect & grow</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Journal</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Reflect & grow</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-orange-500/5 to-red-500/5 border-orange-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
-                        <TrendingUp className="w-6 h-6 text-white" />
+                <Link href="/habit-tracker">
+                  <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-orange-500/5 to-red-500/5 border-orange-500/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                          <TrendingUp className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">Habit Tracker</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Build consistency</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Habit Tracker</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Build consistency</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center">
-                        <Users className="w-6 h-6 text-white" />
+                <Link href="/community">
+                  <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center">
+                          <Users className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">Community</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Connect & learn</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Community</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Connect & learn</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
 
-                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-teal-500/5 to-cyan-500/5 border-teal-500/20">
-                  <CardContent className="p-6">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
-                        <Compass className="w-6 h-6 text-white" />
+                <Link href="/frameworks">
+                  <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-teal-500/5 to-cyan-500/5 border-teal-500/20">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                          <Compass className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-gray-900 dark:text-white">Frameworks</h3>
+                          <p className="text-sm text-gray-600 dark:text-gray-400">Explore wisdom</p>
+                        </div>
+                        <ChevronRight className="w-5 h-5 text-gray-400" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 dark:text-white">Frameworks</h3>
-                        <p className="text-sm text-gray-600 dark:text-gray-400">Explore wisdom</p>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-gray-400" />
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                </Link>
               </div>
 
               {/* Recent Activity */}
