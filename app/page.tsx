@@ -3,7 +3,13 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale, Sparkles, ArrowRight, Settings } from 'lucide-react';
+import { 
+  Target, CheckCircle, Clock, TrendingUp, Heart, Brain, Calendar, Droplets, 
+  Smile, Zap, Trophy, Info, BookOpen, Timer, Hash, Camera, Mic, CheckSquare, 
+  FileText, Sliders, RotateCcw, Users, Star, Leaf, Shield, Scale, Sparkles, 
+  ArrowRight, Settings, Activity, BarChart3, Target as TargetIcon, 
+  Lightbulb, Compass, Award, ChevronRight, Play, Pause, SkipForward
+} from 'lucide-react';
 
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
@@ -65,66 +71,6 @@ interface Goal {
   createdAt: string;
 }
 
-interface WidgetInfo {
-  id: string;
-  title: string;
-  description: string;
-  icon: any;
-  category: string;
-}
-
-const WIDGET_INFO: WidgetInfo[] = [
-  {
-    id: 'breathwork_timer',
-    title: 'Breathwork Practice',
-    description: 'Master your breath with guided breathing patterns. Choose from Stoic, Spartan, or other framework-specific patterns.',
-    icon: Zap,
-    category: 'practice'
-  },
-  {
-    id: 'hydration_tracker',
-    title: 'Hydration Tracker',
-    description: 'Track your daily water intake. Use the quick-add buttons to log your consumption throughout the day.',
-    icon: Droplets,
-    category: 'health'
-  },
-  {
-    id: 'mood_tracker',
-    title: 'Mood Tracker',
-    description: 'Rate your daily mood on a 1-5 scale. Your mood data helps track patterns and emotional well-being.',
-    icon: Smile,
-    category: 'health'
-  },
-  {
-    id: 'habit_manager',
-    title: 'Habit Manager',
-    description: 'Track your daily habits and build streaks. Check in daily to maintain momentum and see your progress.',
-    icon: TrendingUp,
-    category: 'productivity'
-  },
-  {
-    id: 'task_manager',
-    title: 'Task Manager',
-    description: 'Organize and prioritize your daily tasks. Mark them complete to track your productivity and progress.',
-    icon: Target,
-    category: 'productivity'
-  },
-  {
-    id: 'wisdom_spotlight',
-    title: 'Wisdom Spotlight',
-    description: 'Daily wisdom quotes from ancient philosophical traditions, personalized to your framework and enhanced with AI-generated reflections and insights.',
-    icon: Brain,
-    category: 'wisdom'
-  },
-  {
-    id: 'voice_notes',
-    title: 'Voice Notes',
-    description: 'Record audio reflections and insights. Capture thoughts and ideas through voice.',
-    icon: Mic,
-    category: 'practice'
-  }
-];
-
 export default function DashboardPage() {
   const [virtueScores, setVirtueScores] = useState<VirtueScores>({ wisdom: 0, courage: 0, justice: 0, temperance: 0 });
   const [hydrationData, setHydrationData] = useState<HydrationData>({ current: 0, target: 2000, percentage: 0 });
@@ -133,14 +79,17 @@ export default function DashboardPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
-  const [hedonicScore, setHedonicScore] = useState(50);
-  const [showWidgetInfo, setShowWidgetInfo] = useState<string | null>(null);
-  const [frameworks, setFrameworks] = useState<any[]>([]);
+  const [todayWisdom, setTodayWisdom] = useState({
+    quote: "The unexamined life is not worth living.",
+    author: "Socrates",
+    framework: "Stoic",
+    reflection: "What aspect of your life needs deeper examination today?"
+  });
   const { isComplete, shouldShowPrompt } = useOnboardingStatus();
 
   useEffect(() => {
     fetchDashboardData();
-    setFrameworks(getAllFrameworks());
+    loadDailyWisdom();
   }, []);
 
   const fetchDashboardData = async () => {
@@ -197,153 +146,35 @@ export default function DashboardPage() {
     }
   };
 
-  const handleVirtueUpdate = async (virtue: keyof VirtueScores, value: number) => {
+  const loadDailyWisdom = async () => {
     try {
-      const updatedScores = { ...virtueScores, [virtue]: value };
-      const response = await fetch('/api/progress/virtues', {
+      const frameworks = ['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic'];
+      const randomFramework = frameworks[Math.floor(Math.random() * frameworks.length)];
+      
+      const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedScores)
+        body: JSON.stringify({
+          framework: randomFramework,
+          date: new Date().toISOString().split('T')[0]
+        }),
       });
 
       if (response.ok) {
-        setVirtueScores(updatedScores);
+        const wisdom = await response.json();
+        setTodayWisdom(wisdom);
       }
     } catch (error) {
-      console.error('Error updating virtue scores:', error);
+      console.error('Error loading daily wisdom:', error);
     }
-  };
-
-  const handleHydrationAdd = async (ml: number) => {
-    try {
-      const response = await fetch('/api/hydration', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ml, source: 'manual' })
-      });
-
-      if (response.ok) {
-        fetchDashboardData(); // Refresh hydration data
-      }
-    } catch (error) {
-      console.error('Error adding hydration:', error);
-    }
-  };
-
-  const handleMoodUpdate = async (mood: number, note?: string) => {
-    try {
-      const response = await fetch('/api/mood', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ mood, note })
-      });
-
-      if (response.ok) {
-        fetchDashboardData(); // Refresh mood data
-      }
-    } catch (error) {
-      console.error('Error updating mood:', error);
-    }
-  };
-
-  const handleHabitCheckin = async (habitId: string) => {
-    try {
-      const response = await fetch('/api/habits', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ habitId, done: true })
-      });
-
-      if (response.ok) {
-        fetchDashboardData(); // Refresh habits data
-      }
-    } catch (error) {
-      console.error('Error checking in habit:', error);
-    }
-  };
-
-  const handleTaskComplete = async (taskId: string, completed: boolean) => {
-    try {
-      const response = await fetch('/api/tasks', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: taskId, completed }),
-      });
-
-      if (response.ok) {
-        fetchDashboardData(); // Refresh data
-      }
-    } catch (error) {
-      console.error('Error updating task:', error);
-    }
-  };
-
-  const getHedonicColor = (score: number) => {
-    if (score <= 30) return 'text-green-600 bg-green-100';
-    if (score <= 70) return 'text-yellow-600 bg-yellow-100';
-    return 'text-red-600 bg-red-100';
-  };
-
-  const getHedonicLabel = (score: number) => {
-    if (score <= 30) return 'Low Risk';
-    if (score <= 70) return 'Medium Risk';
-    return 'High Risk';
-  };
-
-  const getMoodEmoji = (mood: number) => {
-    if (mood >= 4) return '😊';
-    if (mood >= 3) return '😐';
-    if (mood >= 2) return '😕';
-    return '😢';
-  };
-
-  const getWidgetInfo = (widgetId: string) => {
-    return WIDGET_INFO.find(info => info.id === widgetId);
   };
 
   const dueTasks = tasks.filter(task => !task.completedAt && task.dueAt);
   const completedTasks = tasks.filter(task => task.completedAt);
   const activeGoals = goals.filter(goal => goal.status === 'active');
   const checkedHabits = habits.filter(habit => habit.checkedToday);
-
-  // Daily wisdom quotes - will be replaced with AI-generated content
-  const [todayWisdom, setTodayWisdom] = useState({
-    quote: "The unexamined life is not worth living.",
-    author: "Socrates",
-    framework: "Stoic",
-    reflection: "What aspect of your life needs deeper examination today?"
-  });
-
-  // Load dynamic daily wisdom
-  useEffect(() => {
-    const loadDailyWisdom = async () => {
-      try {
-        const frameworks = ['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic'];
-        const randomFramework = frameworks[Math.floor(Math.random() * frameworks.length)];
-        
-        const response = await fetch('/api/generate/daily-wisdom', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            framework: randomFramework,
-            date: new Date().toISOString().split('T')[0]
-          }),
-        });
-
-        if (response.ok) {
-          const wisdom = await response.json();
-          setTodayWisdom(wisdom);
-        }
-      } catch (error) {
-        console.error('Error loading daily wisdom:', error);
-        // Keep the default wisdom if API fails
-      }
-    };
-
-    loadDailyWisdom();
-  }, []);
+  const totalVirtueScore = Object.values(virtueScores).reduce((a, b) => a + b, 0);
+  const averageVirtueScore = Math.round(totalVirtueScore / 4);
 
   if (loading) {
     return (
@@ -359,7 +190,7 @@ export default function DashboardPage() {
                 />
               ))}
             </div>
-            <p>Loading your dashboard...</p>
+            <p className="text-lg font-medium text-gray-600 dark:text-gray-300">Loading your journey...</p>
           </div>
         </div>
       </div>
@@ -367,45 +198,346 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto">
-          {/* Sleek Header with Integrated Virtue Visualization */}
-          <div className="mb-8">
-            <Card className="glass-effect bg-gradient-to-br from-blue-500/10 to-purple-500/10 border-blue-500/20 overflow-hidden">
-              <div className="p-6">
-                {/* Top Row - Title and Milestones */}
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h1 className="text-3xl font-bold text-white mb-1">Your Dashboard</h1>
-                    <p className="text-gray-300 text-sm">
-                      Track your progress toward flourishing and intentional living
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="container mx-auto px-4 py-6">
+        <div className="max-w-7xl mx-auto space-y-8">
+          
+          {/* Hero Section with Onboarding */}
+          {shouldShowPrompt && (
+            <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 backdrop-blur-sm">
+              <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5 opacity-50"></div>
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl transform translate-x-16 -translate-y-16"></div>
+              
+              <div className="relative p-8">
+                <div className="flex flex-col lg:flex-row items-start lg:items-center gap-8">
+                  <div className="flex-shrink-0">
+                    <div className="w-20 h-20 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25">
+                      <Sparkles className="w-10 h-10 text-white" />
+                    </div>
+                  </div>
+                  
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 dark:text-white mb-4">
+                      Begin Your Philosophical Journey
+                    </h2>
+                    <p className="text-gray-600 dark:text-gray-300 text-lg leading-relaxed mb-6">
+                      Discover your ideal philosophical framework and unlock personalized practices for intentional living
+                    </p>
+                    
+                    <div className="flex flex-wrap gap-3 mb-6">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-full">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span className="text-sm text-green-700 dark:text-green-300 font-medium">3-5 minutes</span>
+                      </div>
+                      <div className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 border border-blue-500/30 rounded-full">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span className="text-sm text-blue-700 dark:text-blue-300 font-medium">AI-powered matching</span>
+                      </div>
+                      <div className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 rounded-full">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                        <span className="text-sm text-purple-700 dark:text-purple-300 font-medium">100% private</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex flex-col items-center gap-4 lg:items-end">
+                    <Button
+                      onClick={() => window.location.href = '/onboarding'}
+                      size="lg"
+                      className="bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 text-lg font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:scale-105"
+                    >
+                      Start Assessment
+                      <ArrowRight className="ml-2 h-5 w-5" />
+                    </Button>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 text-center">
+                      Get your personalized framework recommendation
                     </p>
                   </div>
-                  <div className="flex items-center gap-4">
-                    {/* Quick Stats */}
-                    <div className="hidden md:flex items-center gap-6 text-sm">
-                      <div className="text-center">
-                        <div className="text-white font-semibold">{Object.values(virtueScores).reduce((a, b) => a + b, 0)}</div>
-                        <div className="text-gray-400 text-xs">Total Virtue XP</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-white font-semibold">{Math.round(Object.values(virtueScores).reduce((a, b) => a + b, 0) / 4)}</div>
-                        <div className="text-gray-400 text-xs">Avg Score</div>
-                      </div>
-                      <MilestonesDropdown virtueTotals={virtueScores} />
-                    </div>
-
-                  </div>
                 </div>
+              </div>
+            </div>
+          )}
 
-                {/* Bottom Row - Virtue Visualization */}
-                <div className="flex items-center justify-center">
-                  <div className="w-full max-w-md">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Trophy className="h-5 w-5 text-blue-400" />
-                      <h3 className="text-lg font-semibold text-white">Your Virtue Balance</h3>
+          {/* Main Dashboard Grid */}
+          <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
+            
+            {/* Left Column - Main Content */}
+            <div className="xl:col-span-3 space-y-8">
+              
+              {/* Virtue Progress Overview */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <Card className="card-base bg-gradient-to-br from-blue-500/5 to-indigo-500/5 border-blue-500/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                      <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                        <Trophy className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-xl font-bold">Virtue Progress</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Your journey to excellence</div>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Total Score</span>
+                        <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">{totalVirtueScore}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-gray-600 dark:text-gray-400">Average</span>
+                        <span className="text-xl font-semibold text-gray-900 dark:text-white">{averageVirtueScore}/25</span>
+                      </div>
+                      <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                        <div 
+                          className="bg-gradient-to-r from-blue-500 to-indigo-600 h-2 rounded-full transition-all duration-500"
+                          style={{ width: `${(averageVirtueScore / 25) * 100}%` }}
+                        ></div>
+                      </div>
                     </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-base bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                      <div className="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                        <Activity className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <div className="text-xl font-bold">Today's Progress</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Daily achievements</div>
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{completedTasks.length}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Tasks Done</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{checkedHabits.length}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Habits Checked</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{activeGoals.length}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Active Goals</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-2xl font-bold text-green-600 dark:text-green-400">{habits.length}</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Total Habits</div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Daily Wisdom Spotlight */}
+              <Card className="card-base bg-gradient-to-br from-purple-500/5 via-blue-500/5 to-indigo-500/5 border-purple-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center">
+                      <Brain className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold">Daily Wisdom</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">{todayWisdom.framework} tradition</div>
+                    </div>
+                    <div className="ml-auto flex items-center gap-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={loadDailyWisdom}
+                        className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-6">
+                    <blockquote className="text-xl md:text-2xl font-serif italic text-gray-900 dark:text-white leading-relaxed border-l-4 border-purple-500 pl-6">
+                      "{todayWisdom.quote}"
+                    </blockquote>
+                    <div className="flex items-center justify-between">
+                      <cite className="text-purple-600 dark:text-purple-400 font-medium">— {todayWisdom.author}</cite>
+                      <div className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-gray-500 dark:text-gray-400">Live</span>
+                      </div>
+                    </div>
+                    {todayWisdom.reflection && (
+                      <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-4 border border-purple-500/20">
+                        <h4 className="text-sm font-semibold text-purple-700 dark:text-purple-300 mb-2 flex items-center gap-2">
+                          <Lightbulb className="w-4 h-4" />
+                          Reflection Prompt
+                        </h4>
+                        <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                          {todayWisdom.reflection}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Quick Actions Grid */}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-blue-500/5 to-cyan-500/5 border-blue-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                        <Timer className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Focus Timer</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Deep work sessions</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-green-500/5 to-emerald-500/5 border-green-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
+                        <Target className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Task Manager</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Organize priorities</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-purple-500/5 to-violet-500/5 border-purple-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
+                        <BookOpen className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Journal</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Reflect & grow</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-orange-500/5 to-red-500/5 border-orange-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-600 rounded-xl flex items-center justify-center">
+                        <TrendingUp className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Habit Tracker</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Build consistency</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-indigo-500/5 to-blue-500/5 border-indigo-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center">
+                        <Users className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Community</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Connect & learn</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card className="card-base hover-lift cursor-pointer bg-gradient-to-br from-teal-500/5 to-cyan-500/5 border-teal-500/20">
+                  <CardContent className="p-6">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-cyan-600 rounded-xl flex items-center justify-center">
+                        <Compass className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 dark:text-white">Frameworks</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">Explore wisdom</p>
+                      </div>
+                      <ChevronRight className="w-5 h-5 text-gray-400" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Recent Activity */}
+              <Card className="card-base">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div className="w-10 h-10 bg-gradient-to-r from-gray-500 to-gray-600 rounded-xl flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-xl font-bold">Recent Activity</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Your latest progress</div>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {completedTasks.length > 0 ? (
+                      completedTasks.slice(0, 3).map((task) => (
+                        <div key={task.id} className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
+                          <div className="w-8 h-8 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
+                            <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="font-medium text-gray-900 dark:text-white">{task.title}</p>
+                            <p className="text-sm text-gray-600 dark:text-gray-400">Task completed</p>
+                          </div>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
+                            {new Date(task.completedAt!).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-center py-8">
+                        <div className="w-16 h-16 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <Target className="w-8 h-8 text-gray-400" />
+                        </div>
+                        <p className="text-gray-600 dark:text-gray-400">No recent activity</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-500">Start your journey by completing your first task</p>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Right Column - Sidebar */}
+            <div className="space-y-6">
+              
+              {/* Virtue Radar Chart */}
+              <Card className="card-base bg-gradient-to-br from-slate-500/5 to-gray-500/5 border-slate-500/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-gray-600 rounded-xl flex items-center justify-center">
+                      <BarChart3 className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">Virtue Balance</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Your character strengths</div>
+                    </div>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-center">
                     <VirtueRadar data={[
                       { virtue: 'Wisdom', score: virtueScores.wisdom },
                       { virtue: 'Courage', score: virtueScores.courage },
@@ -413,712 +545,92 @@ export default function DashboardPage() {
                       { virtue: 'Temperance', score: virtueScores.temperance }
                     ]} />
                   </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-
-          {/* Onboarding Call-to-Action */}
-          {shouldShowPrompt && (
-            <div className="mb-8">
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-red-500/10 border border-amber-500/20 backdrop-blur-sm">
-                {/* Background Pattern */}
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/5 to-orange-500/5 opacity-50"></div>
-                <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-amber-500/10 to-orange-500/10 rounded-full blur-3xl transform translate-x-16 -translate-y-16"></div>
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-orange-500/10 to-red-500/10 rounded-full blur-2xl transform -translate-x-12 translate-y-12"></div>
-                
-                <div className="relative p-6 md:p-8">
-                  {/* Header Section */}
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-6">
-                    <div className="relative flex-shrink-0">
-                      <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/25">
-                        <Sparkles className="w-8 h-8 text-white" />
-                      </div>
-                      <div className="absolute -top-1 -right-1 w-6 h-6 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                        <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-xl md:text-2xl font-bold text-white mb-3">Unlock Your Personalized Path</h3>
-                      <p className="text-gray-300 text-base leading-relaxed mb-4">
-                        Complete a quick assessment to get matched with your ideal philosophical framework and practices tailored to your unique personality
-                      </p>
-                      
-                      {/* Feature Pills */}
-                      <div className="flex flex-wrap gap-3">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-green-500/20 border border-green-500/30 rounded-full">
-                          <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                          <span className="text-sm text-green-300 font-medium">3-5 minutes</span>
-                        </div>
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-500/20 border border-blue-500/30 rounded-full">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                          <span className="text-sm text-blue-300 font-medium">AI-powered matching</span>
-                        </div>
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 rounded-full">
-                          <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                          <span className="text-sm text-purple-300 font-medium">100% private</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Action Section */}
-                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-400 mb-2">What you'll get:</p>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-gray-300">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
-                          <span>Personalized framework recommendation</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
-                          <span>Custom practice suggestions</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
-                          <span>Progress tracking setup</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className="w-1.5 h-1.5 bg-amber-400 rounded-full"></div>
-                          <span>Daily wisdom insights</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex flex-col items-center gap-3 sm:items-end">
-                      <Button
-                        onClick={() => window.location.href = '/onboarding'}
-                        size="lg"
-                        className="w-full sm:w-auto bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white px-8 py-4 text-base font-semibold shadow-lg shadow-amber-500/25 hover:shadow-xl hover:shadow-amber-500/30 transition-all duration-300 transform hover:scale-105"
-                      >
-                        Start Assessment
-                        <ArrowRight className="ml-2 h-5 w-5" />
-                      </Button>
-                      <p className="text-xs text-gray-400 text-center">
-                        Get your personalized framework recommendation
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Wisdom Spotlight - Fully Mature & Interactive */}
-              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-purple-900/20 via-blue-900/15 to-indigo-900/20 border border-purple-500/30 backdrop-blur-sm">
-                {/* Animated Background Elements */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 opacity-30"></div>
-                <div className="absolute top-0 right-0 w-40 h-40 bg-gradient-to-br from-purple-500/10 to-blue-500/10 rounded-full blur-3xl transform translate-x-20 -translate-y-20 animate-pulse"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-gradient-to-tr from-blue-500/10 to-indigo-500/10 rounded-full blur-2xl transform -translate-x-16 translate-y-16 animate-pulse" style={{animationDelay: '1s'}}></div>
-                
-                <div className="relative p-8">
-                  {/* Header with Interactive Elements */}
-                  <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
-                          <Brain className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full flex items-center justify-center">
-                          <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                        </div>
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-white">Wisdom Spotlight</h2>
-                        <p className="text-purple-300 text-sm">Daily insights from ancient traditions</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 text-purple-300 hover:text-white transition-colors rounded-lg hover:bg-purple-500/20">
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 text-purple-300 hover:text-white transition-colors rounded-lg hover:bg-purple-500/20">
-                        <BookOpen className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Main Wisdom Content */}
-                  <div className="space-y-6">
-                    {/* Quote Section */}
-                    <div className="relative">
-                      <div className="absolute top-0 left-0 w-8 h-8 text-purple-400/30 text-4xl">"</div>
-                      <div className="pl-8">
-                        <blockquote className="text-xl md:text-2xl font-serif italic text-white leading-relaxed mb-4">
-                          {todayWisdom.quote}
-                        </blockquote>
-                        <div className="flex items-center justify-between">
-                          <cite className="text-purple-300 font-medium">— {todayWisdom.author}</cite>
-                          <div className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
-                            <span className="text-xs text-purple-400">Live</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Framework Badge & Reflection */}
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-gradient-to-r from-purple-500/20 to-blue-500/20 text-purple-300 text-sm font-medium border border-purple-500/30">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          {todayWisdom.framework} Tradition
-                        </span>
-                        <div className="flex items-center gap-1 text-yellow-400">
-                          {[1, 2, 3, 4, 5].map((star) => (
-                            <Star key={star} size={12} className="fill-current" />
-                          ))}
-                        </div>
-                      </div>
-                      <div className="text-xs text-purple-400">
-                        {new Date().toLocaleDateString('en-US', { 
-                          weekday: 'long', 
-                          month: 'long', 
-                          day: 'numeric' 
-                        })}
-                      </div>
-                    </div>
-
-                    {/* Reflection Section */}
-                    {todayWisdom.reflection && (
-                      <div className="bg-gradient-to-r from-purple-500/10 to-blue-500/10 rounded-xl p-4 border border-purple-500/20">
-                        <h4 className="text-sm font-semibold text-purple-300 mb-2 flex items-center gap-2">
-                          <Brain className="w-4 h-4" />
-                          Reflection Prompt
-                        </h4>
-                        <p className="text-purple-200 text-sm leading-relaxed">
-                          {todayWisdom.reflection}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Interactive Actions */}
-                    <div className="grid grid-cols-2 gap-3">
-                      <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-purple-500/20 to-blue-500/20 hover:from-purple-500/30 hover:to-blue-500/30 text-purple-300 rounded-lg border border-purple-500/30 transition-all duration-200 hover:scale-105">
-                        <BookOpen className="w-4 h-4" />
-                        <span className="text-sm font-medium">Learn More</span>
-                      </button>
-                      <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 hover:from-blue-500/30 hover:to-indigo-500/30 text-blue-300 rounded-lg border border-blue-500/30 transition-all duration-200 hover:scale-105">
-                        <Users className="w-4 h-4" />
-                        <span className="text-sm font-medium">Share Wisdom</span>
-                      </button>
-                    </div>
-
-                    {/* Wisdom Stats */}
-                    <div className="grid grid-cols-3 gap-4 pt-4 border-t border-purple-500/20">
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-white">247</div>
-                        <div className="text-xs text-purple-400">Days of Wisdom</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-white">12</div>
-                        <div className="text-xs text-purple-400">Traditions</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg font-bold text-white">89%</div>
-                        <div className="text-xs text-purple-400">Engagement</div>
-                      </div>
-                    </div>
-
-                    {/* Related Wisdom Preview */}
-                    <div className="bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-xl p-4 border border-purple-500/20">
-                      <h4 className="text-sm font-semibold text-purple-300 mb-3 flex items-center gap-2">
-                        <Sparkles className="w-4 h-4" />
-                        Related Wisdom
-                      </h4>
-                      <div className="space-y-2">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-purple-300">"The only true wisdom is in knowing you know nothing."</span>
-                          <span className="text-purple-400">Socrates</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-purple-300">"Wisdom begins in wonder."</span>
-                          <span className="text-purple-400">Plato</span>
-                        </div>
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-purple-300">"Knowledge speaks, but wisdom listens."</span>
-                          <span className="text-purple-400">Jimi Hendrix</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Call to Action */}
-                    <div className="text-center">
-                      <button className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-blue-600 hover:from-purple-600 hover:to-blue-700 text-white rounded-lg font-semibold shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/30 transition-all duration-300 transform hover:scale-105">
-                        <Brain className="w-4 h-4" />
-                        Explore Wisdom Practices
-                        <ArrowRight className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-
-
-              {/* Today's Tasks */}
-              <Card className="card-base">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
-                    <Target className="h-5 w-5 text-justice" />
-                    Today's Actions
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'task_manager' ? null : 'task_manager')}
-                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </CardTitle>
-                  <CardDescription className="text-[rgb(var(--muted))]">
-                    {dueTasks.length} tasks due today
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {showWidgetInfo === 'task_manager' && (
-                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--justice)/0.1)] border border-[rgb(var(--justice)/0.2)]">
-                      <p className="text-sm text-[rgb(var(--justice))]">{getWidgetInfo('task_manager')?.description}</p>
-                    </div>
-                  )}
-                  {dueTasks.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">
-                      No tasks due today. Great job staying on top of things!
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {dueTasks.map((task) => (
-                        <div key={task.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleTaskComplete(task.id, true)}
-                            className="h-6 w-6 p-0"
-                          >
-                            <CheckCircle className="h-4 w-4" />
-                          </Button>
-                          <div className="flex-1">
-                            <h4 className="font-medium text-sm">{task.title}</h4>
-                            {task.description && (
-                              <p className="text-xs text-muted-foreground mt-1">
-                                {task.description}
-                              </p>
-                            )}
-                            <div className="flex gap-2 mt-2">
-                              {task.tag && (
-                                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                                  {task.tag}
-                                </span>
-                              )}
-                              <span className="text-xs bg-secondary px-2 py-1 rounded">
-                                {task.priority}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </CardContent>
               </Card>
 
-              {/* Habits */}
-              <Card className="glass-effect">
+              {/* Breathwork Widget */}
+              <Card className="card-base bg-gradient-to-br from-cyan-500/5 to-blue-500/5 border-cyan-500/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-primary" />
-                    Habit Streaks
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'habit_manager' ? null : 'habit_manager')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
+                  <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div className="w-10 h-10 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center">
+                      <Zap className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">Breathwork</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Master your breath</div>
+                    </div>
                   </CardTitle>
-                  <CardDescription>
-                    Keep building momentum with your daily habits
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {showWidgetInfo === 'habit_manager' && (
-                    <div className="mb-4 p-3 bg-orange-500/10 rounded-lg border border-orange-500/20">
-                      <p className="text-sm text-orange-200">{getWidgetInfo('habit_manager')?.description}</p>
-                    </div>
-                  )}
-                  {habits.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">
-                      No habits set up yet. Start building positive routines!
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {habits.map((habit) => (
-                        <div key={habit.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                          <div>
-                            <h4 className="font-medium text-sm">{habit.name}</h4>
-                            <p className="text-xs text-muted-foreground">
-                              {habit.streakCount} day streak
-                            </p>
-                          </div>
-                          <Button
-                            variant={habit.checkedToday ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => handleHabitCheckin(habit.id)}
-                            disabled={habit.checkedToday}
-                          >
-                            {habit.checkedToday ? "✓ Done" : "Check In"}
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Active Goals */}
-              <Card className="glass-effect">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="h-5 w-5 text-primary" />
-                    Active Goals
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'goal_tracker' ? null : 'goal_tracker')}
-                      className="ml-auto p-1 text-muted-foreground hover:text-white transition-colors"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </CardTitle>
-                  <CardDescription>
-                    Your current objectives and aspirations
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {showWidgetInfo === 'goal_tracker' && (
-                    <div className="mb-4 p-3 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-                      <p className="text-sm text-indigo-200">{getWidgetInfo('goal_tracker')?.description}</p>
-                    </div>
-                  )}
-                  {activeGoals.length === 0 ? (
-                    <p className="text-muted-foreground text-center py-4">
-                      No active goals. Set some meaningful objectives to work toward!
-                    </p>
-                  ) : (
-                    <div className="space-y-3">
-                      {activeGoals.map((goal) => (
-                        <div key={goal.id} className="p-3 bg-muted/50 rounded-lg">
-                          <h4 className="font-medium text-sm">{goal.title}</h4>
-                          {goal.description && (
-                            <p className="text-xs text-muted-foreground mt-1">
-                              {goal.description}
-                            </p>
-                          )}
-                          <div className="flex gap-2 mt-2">
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                              {goal.category}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Practice Tools Section */}
-              <Card className="card-base">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
-                    <Zap className="h-5 w-5 text-courage" />
-                    Practice Tools
-                  </CardTitle>
-                  <CardDescription className="text-[rgb(var(--muted))]">
-                    Quick access to essential practice widgets
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Focus Timer */}
-                    <div className="panel-base p-4 hover-lift">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Timer className="h-4 w-4 text-courage" />
-                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Focus Timer</h4>
-                        <button
-                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'focus_timer' ? null : 'focus_timer')}
-                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                        >
-                          <Info className="h-3 w-3" />
-                        </button>
-                      </div>
-                      {showWidgetInfo === 'focus_timer' && (
-                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--courage)/0.1)] border border-[rgb(var(--courage)/0.2)]">
-                          <p className="text-xs text-[rgb(var(--courage))]">{getWidgetInfo('focus_timer')?.description}</p>
-                        </div>
-                      )}
-                      <TimerCard 
-                        title="Deep Work Session"
-                        config={{ duration: 1500, includeRPE: false, teaching: "Focus is the new superpower" }}
-                        onComplete={() => console.log('Focus session completed')}
-                        virtueGrantPerCompletion={{ wisdom: 2 }}
-                      />
-                    </div>
-
-                    {/* Gratitude Journal */}
-                    <div className="panel-base p-4 hover-lift">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Heart className="h-4 w-4 text-justice" />
-                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Gratitude Journal</h4>
-                        <button
-                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'gratitude_journal' ? null : 'gratitude_journal')}
-                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                        >
-                          <Info className="h-3 w-3" />
-                        </button>
-                      </div>
-                      {showWidgetInfo === 'gratitude_journal' && (
-                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--justice)/0.1)] border border-[rgb(var(--justice)/0.2)]">
-                          <p className="text-xs text-[rgb(var(--justice))]">{getWidgetInfo('gratitude_journal')?.description}</p>
-                        </div>
-                      )}
-                      <div className="space-y-3">
-                        <textarea 
-                          className="input-base text-sm"
-                          placeholder="What are you grateful for today?"
-                          rows={3}
-                        />
-                        <Button size="sm" className="btn-primary w-full">Save Gratitude</Button>
-                      </div>
-                    </div>
-
-                    {/* Meditation Timer */}
-                    <div className="panel-base p-4 hover-lift">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Leaf className="h-4 w-4 text-temperance" />
-                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Meditation Timer</h4>
-                        <button
-                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'meditation_timer' ? null : 'meditation_timer')}
-                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                        >
-                          <Info className="h-3 w-3" />
-                        </button>
-                      </div>
-                      {showWidgetInfo === 'meditation_timer' && (
-                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--temperance)/0.1)] border border-[rgb(var(--temperance)/0.2)]">
-                          <p className="text-xs text-[rgb(var(--temperance))]">{getWidgetInfo('meditation_timer')?.description}</p>
-                        </div>
-                      )}
-                      <TimerCard 
-                        title="Mindfulness Session"
-                        config={{ duration: 600, includeRPE: false, teaching: "Stillness reveals the warrior within" }}
-                        onComplete={() => console.log('Meditation completed')}
-                        virtueGrantPerCompletion={{ wisdom: 1, temperance: 1 }}
-                      />
-                    </div>
-
-                    {/* Strength Counter */}
-                    <div className="panel-base p-4 hover-lift">
-                      <div className="flex items-center gap-2 mb-3">
-                        <Shield className="h-4 w-4 text-courage" />
-                        <h4 className="font-medium text-sm text-[rgb(var(--text))]">Strength Counter</h4>
-                        <button
-                          onClick={() => setShowWidgetInfo(showWidgetInfo === 'strength_counter' ? null : 'strength_counter')}
-                          className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                        >
-                          <Info className="h-3 w-3" />
-                        </button>
-                      </div>
-                      {showWidgetInfo === 'strength_counter' && (
-                        <div className="mb-3 p-3 rounded-xl bg-[rgb(var(--courage)/0.1)] border border-[rgb(var(--courage)/0.2)]">
-                          <p className="text-xs text-[rgb(var(--courage))]">{getWidgetInfo('strength_counter')?.description}</p>
-                        </div>
-                      )}
-                      <CounterCard 
-                        title="Push-ups"
-                        config={{ target: 20, unit: "reps", exercises: ["push-ups", "squats", "pull-ups"], teaching: "Perfect practice makes perfect" }}
-                        onComplete={() => console.log('Strength training completed')}
-                        virtueGrantPerCompletion={{ courage: 2 }}
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Breathwork Timer - Special Widget */}
-              <Card className="card-base bg-grad-wisdom border-[rgb(var(--wisdom)/0.2)]">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
-                    <Zap className="h-5 w-5 text-[rgb(var(--wisdom))]" />
-                    Breathwork Practice
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'breathwork_timer' ? null : 'breathwork_timer')}
-                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </CardTitle>
-                  <CardDescription className="text-[rgb(var(--muted))]">
-                    Master your breath with guided patterns
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {showWidgetInfo === 'breathwork_timer' && (
-                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--wisdom)/0.1)] border border-[rgb(var(--wisdom)/0.2)]">
-                      <p className="text-sm text-[rgb(var(--wisdom))]">{getWidgetInfo('breathwork_timer')?.description}</p>
-                    </div>
-                  )}
                   <BreathworkWidgetNew frameworkTone="stoic" />
                 </CardContent>
               </Card>
 
               {/* Hydration Tracker */}
-              <Card className="card-base">
+              <Card className="card-base bg-gradient-to-br from-blue-500/5 to-indigo-500/5 border-blue-500/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
-                    <Droplets className="h-5 w-5 text-[rgb(var(--wisdom))]" />
-                    Hydration
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'hydration_tracker' ? null : 'hydration_tracker')}
-                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
+                  <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                      <Droplets className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">Hydration</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Stay hydrated</div>
+                    </div>
                   </CardTitle>
-                  <CardDescription className="text-[rgb(var(--muted))]">
-                    Track your daily water intake
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {showWidgetInfo === 'hydration_tracker' && (
-                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--wisdom)/0.1)] border border-[rgb(var(--wisdom)/0.2)]">
-                      <p className="text-sm text-[rgb(var(--wisdom))]">{getWidgetInfo('hydration_tracker')?.description}</p>
-                    </div>
-                  )}
                   <HydrationWidget frameworkTone="stoic" />
                 </CardContent>
               </Card>
 
               {/* Mood Tracker */}
-              <Card className="card-base">
+              <Card className="card-base bg-gradient-to-br from-pink-500/5 to-rose-500/5 border-pink-500/20">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
-                    <Smile className="h-5 w-5 text-justice" />
-                    Today's Mood
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'mood_tracker' ? null : 'mood_tracker')}
-                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
+                  <CardTitle className="flex items-center gap-3 text-gray-900 dark:text-white">
+                    <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-600 rounded-xl flex items-center justify-center">
+                      <Smile className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <div className="text-lg font-bold">Mood</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Track your feelings</div>
+                    </div>
                   </CardTitle>
-                  <CardDescription className="text-[rgb(var(--muted))]">
-                    Track your emotional well-being and patterns
-                  </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  {showWidgetInfo === 'mood_tracker' && (
-                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--justice)/0.1)] border border-[rgb(var(--justice)/0.2)]">
-                      <p className="text-sm text-[rgb(var(--justice))]">Track your daily mood with detailed notes, activity tags, and energy/stress levels. View patterns and trends over time to better understand your emotional well-being.</p>
-                    </div>
-                  )}
                   <MoodTrackerWidget frameworkTone="stoic" />
-                </CardContent>
-              </Card>
-
-              {/* Hedonic Awareness */}
-              <Card className="card-base">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-[rgb(var(--text))]">
-                    <Heart className="h-5 w-5 text-temperance" />
-                    Hedonic Awareness
-                    <button
-                      onClick={() => setShowWidgetInfo(showWidgetInfo === 'hedonic_awareness' ? null : 'hedonic_awareness')}
-                      className="ml-auto p-1 text-[rgb(var(--muted))] hover:text-[rgb(var(--text))] transition duration-fast ease-soft"
-                    >
-                      <Info className="h-4 w-4" />
-                    </button>
-                  </CardTitle>
-                  <CardDescription className="text-[rgb(var(--muted))]">
-                    Monitor your patterns and triggers
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  {showWidgetInfo === 'hedonic_awareness' && (
-                    <div className="mb-4 p-3 rounded-xl bg-[rgb(var(--temperance)/0.1)] border border-[rgb(var(--temperance)/0.2)]">
-                      <p className="text-sm text-[rgb(var(--temperance))]">Analyze your thoughts and activities to identify hedonic treadmill patterns. Get personalized insights and counter-moves to break negative cycles.</p>
-                    </div>
-                  )}
-                  <HedonicAwarenessWidget frameworkTone="stoic" />
                 </CardContent>
               </Card>
 
               {/* Quick Stats */}
               <Card className="card-base">
                 <CardHeader>
-                  <CardTitle className="text-[rgb(var(--text))]">Quick Stats</CardTitle>
+                  <CardTitle className="text-gray-900 dark:text-white">Quick Stats</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[rgb(var(--muted))]">Tasks Completed</span>
-                      <span className="font-medium text-[rgb(var(--text))]">{completedTasks.length}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Tasks Completed</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{completedTasks.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[rgb(var(--muted))]">Active Goals</span>
-                      <span className="font-medium text-[rgb(var(--text))]">{activeGoals.length}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Active Goals</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{activeGoals.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[rgb(var(--muted))]">Habits Tracked</span>
-                      <span className="font-medium text-[rgb(var(--text))]">{habits.length}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Habits Tracked</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{habits.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[rgb(var(--muted))]">Habits Done Today</span>
-                      <span className="font-medium text-[rgb(var(--text))]">{checkedHabits.length}</span>
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Habits Done Today</span>
+                      <span className="font-medium text-gray-900 dark:text-white">{checkedHabits.length}</span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-[rgb(var(--muted))]">Total Streak Days</span>
-                      <span className="font-medium text-[rgb(var(--text))]">
+                      <span className="text-sm text-gray-600 dark:text-gray-400">Total Streak Days</span>
+                      <span className="font-medium text-gray-900 dark:text-white">
                         {habits.reduce((sum, habit) => sum + habit.streakCount, 0)}
                       </span>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Quick Actions */}
-              <Card className="card-base">
-                <CardHeader>
-                  <CardTitle className="text-[rgb(var(--text))]">Quick Actions</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
-                      <a href="/philosophers">
-                        <Brain className="h-4 w-4 mr-2" />
-                        Chat with Ancient Philosophers
-                      </a>
-                    </Button>
-                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
-                      <a href="/breath">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        Start Breathwork
-                      </a>
-                    </Button>
-                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
-                      <a href="/frameworks">
-                        <Trophy className="h-4 w-4 mr-2" />
-                        Explore Frameworks
-                      </a>
-                    </Button>
-                    <Button variant="outline" className="btn-secondary w-full justify-start" asChild>
-                      <a href="/dashboard?openGallery=true">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Customize Dashboard
-                      </a>
-                    </Button>
                   </div>
                 </CardContent>
               </Card>

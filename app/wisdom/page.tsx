@@ -1,11 +1,8 @@
 'use client';
 
-import { Brain, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, RefreshCw, Sparkles, Zap, Lightbulb, TrendingUp, Award, MessageSquare, CheckCircle, Eye, Heart, Shield, Leaf } from "lucide-react";
+import { Brain, BookOpen, Target, Users, ArrowLeft, Play, Clock, Star, RefreshCw, Sparkles, Zap, Lightbulb, TrendingUp, Award, MessageSquare, CheckCircle, Eye, Heart, Shield, Leaf, ArrowRight, Activity, BarChart3, Compass } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from 'react';
-import PageLayout from '@/components/PageLayout';
-import PracticeSessionModal from '@/components/PracticeSessionModal';
-import { usePracticeSession } from '@/lib/hooks/usePracticeSession';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface HiddenWisdom {
@@ -100,680 +97,400 @@ const enhancedWisdomPractices: WisdomPractice[] = [
   },
   {
     id: "3",
-    title: "Intelligent Evening Reflection",
-    description: "AI-powered daily reflection that learns from your patterns, provides personalized insights, and tracks your wisdom development over time.",
-    duration: 15,
-    difficulty: "beginner",
-    benefits: ["Self-improvement", "Learning from experience", "Better decision-making", "Pattern recognition"],
-    category: "Daily Practice",
-    culturalContext: "Marcus Aurelius practiced daily reflection. AI enhances this by identifying patterns and providing personalized insights.",
-    scientificValidation: "AI-enhanced reflection improves learning retention by 60% and personal development speed by 45%.",
-    instructions: [
-      "AI guides you through structured reflection questions",
-      "Identify patterns in your thoughts and behaviors",
-      "Receive personalized insights and growth suggestions",
-      "Track your wisdom development over time",
-      "Plan actionable steps for tomorrow"
-    ],
-    moduleId: "meditation",
-    aiEnhanced: true,
-    interactiveElements: ["Pattern recognition", "Personalized insights", "Progress visualization", "Goal setting"],
-    progressTracking: true,
-    communityFeatures: false,
-    personalizationLevel: "ai-driven"
-  },
-  {
-    id: "4",
-    title: "Cross-Cultural Wisdom Explorer",
-    description: "AI-curated journey through wisdom traditions from different cultures, with interactive comparisons and personalized learning paths.",
-    duration: 60,
-    difficulty: "advanced",
-    benefits: ["Cultural understanding", "Broader perspective", "Comparative wisdom", "Global insights"],
-    category: "Study Practice",
-    culturalContext: "Ancient wisdom traditions from Greece, China, India, and beyond offer complementary insights. AI helps synthesize these perspectives.",
-    scientificValidation: "Cross-cultural learning with AI assistance enhances cognitive flexibility by 55% and reduces bias by 40%.",
-    instructions: [
-      "AI analyzes your current knowledge and interests",
-      "Explore curated wisdom traditions and texts",
-      "Compare philosophical concepts across cultures",
-      "Identify universal principles and unique insights",
-      "Create a personalized wisdom synthesis"
-    ],
-    moduleId: "resource_library",
-    aiEnhanced: true,
-    interactiveElements: ["Cultural comparison", "Personalized learning paths", "Interactive discussions", "Knowledge synthesis"],
-    progressTracking: true,
-    communityFeatures: true,
-    personalizationLevel: "ai-driven"
-  },
-  {
-    id: "5",
-    title: "Wisdom Challenge Generator",
-    description: "AI creates personalized wisdom challenges based on your current level, interests, and areas for growth.",
+    title: "Wisdom Synthesis Journal",
+    description: "Create a personalized wisdom journal that AI helps you synthesize insights from various sources and track your intellectual growth over time.",
     duration: 30,
-    difficulty: "intermediate",
-    benefits: ["Personalized growth", "Skill development", "Challenge adaptation", "Continuous learning"],
-    category: "Interactive Practice",
-    culturalContext: "Ancient philosophers used challenges to test and develop wisdom. AI creates modern, personalized versions.",
-    scientificValidation: "Personalized challenges improve skill development by 70% compared to generic exercises.",
+    difficulty: "beginner",
+    benefits: ["Knowledge integration", "Personal growth tracking", "Insight synthesis", "Long-term wisdom building"],
+    category: "Reflection Practice",
+    culturalContext: "Ancient wisdom traditions emphasized the importance of recording and reflecting on insights. AI enhances this with pattern recognition and synthesis.",
+    scientificValidation: "Regular journaling with AI assistance improves knowledge retention by 60% and insight generation by 45%.",
     instructions: [
-      "AI assesses your current wisdom level and interests",
-      "Receive personalized challenges and exercises",
-      "Complete interactive wisdom tests and scenarios",
-      "Get detailed feedback and improvement suggestions",
-      "Track your progress and celebrate achievements"
+      "Record daily insights and observations",
+      "AI helps identify patterns and connections",
+      "Synthesize insights from multiple sources",
+      "Track your wisdom journey over time",
+      "Share insights with the community"
     ],
     moduleId: "philosophy_capsules",
     aiEnhanced: true,
-    interactiveElements: ["Personalized challenges", "Interactive scenarios", "Real-time feedback", "Progress tracking"],
+    interactiveElements: ["Pattern recognition", "Insight synthesis", "Progress visualization", "Community sharing"],
     progressTracking: true,
     communityFeatures: true,
     personalizationLevel: "ai-driven"
-  },
-  {
-    id: "6",
-    title: "Wisdom Community Dialogue",
-    description: "Engage in AI-moderated discussions with other wisdom seekers, sharing insights and learning from diverse perspectives.",
-    duration: 40,
-    difficulty: "intermediate",
-    benefits: ["Community learning", "Diverse perspectives", "Collaborative wisdom", "Social intelligence"],
-    category: "Community Practice",
-    culturalContext: "Ancient philosophers gathered in communities to discuss wisdom. AI facilitates modern, global wisdom communities.",
-    scientificValidation: "Community learning improves understanding by 45% and retention by 60% compared to individual study.",
-    instructions: [
-      "Join AI-moderated wisdom discussions",
-      "Share your insights and learn from others",
-      "Engage in respectful debate and dialogue",
-      "Collaborate on wisdom projects and challenges",
-      "Build lasting connections with fellow seekers"
-    ],
-    moduleId: "community",
-    aiEnhanced: true,
-    interactiveElements: ["AI moderation", "Community discussions", "Collaborative projects", "Peer learning"],
-    progressTracking: true,
-    communityFeatures: true,
-    personalizationLevel: "adaptive"
   }
 ];
 
 export default function WisdomPage() {
-  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
-  const [dailyWisdom, setDailyWisdom] = useState<DailyWisdom | null>(null);
-  const [generatedPractice, setGeneratedPractice] = useState<PracticeDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-  const [selectedPractice, setSelectedPractice] = useState<WisdomPractice | null>(null);
-  const [showPracticeDetails, setShowPracticeDetails] = useState(false);
-  const [userProgress, setUserProgress] = useState({
-    totalSessions: 0,
-    currentStreak: 0,
-    wisdomLevel: "Apprentice",
-    completionRate: 0,
-    favoritePractice: "",
-    lastPractice: null as Date | null
+  const [dailyWisdom, setDailyWisdom] = useState<DailyWisdom>({
+    quote: "The unexamined life is not worth living.",
+    author: "Socrates",
+    framework: "Stoic",
+    reflection: "What aspect of your life needs deeper examination today?"
   });
-  const [aiInsights, setAiInsights] = useState<string[]>([]);
-  
-  const { isModalOpen, currentPractice, startPractice, closeModal } = usePracticeSession();
+  const [hiddenWisdom, setHiddenWisdom] = useState<HiddenWisdom | null>(null);
+  const [selectedPractice, setSelectedPractice] = useState<WisdomPractice | null>(null);
+  const [showPracticeModal, setShowPracticeModal] = useState(false);
+  const [wisdomStats, setWisdomStats] = useState({
+    totalSessions: 0,
+    totalMinutes: 0,
+    currentStreak: 0,
+    averageScore: 0
+  });
 
   useEffect(() => {
-    loadWisdomContent();
-    loadUserProgress();
-    generateAIInsights();
+    loadDailyWisdom();
+    loadHiddenWisdom();
+    loadWisdomStats();
   }, []);
 
-  const loadWisdomContent = async () => {
+  const loadDailyWisdom = async () => {
     try {
-      setLoading(true);
-      
-      // Load hidden wisdom
-      const dateBucket = new Date().toISOString().split('T')[0];
-      const wisdomResponse = await fetch(
-        `/api/generate/hidden-wisdom?dateBucket=${dateBucket}&style=stoic&locale=en`
-      );
-      if (wisdomResponse.ok) {
-        const wisdom = await wisdomResponse.json();
+      const response = await fetch('/api/generate/daily-wisdom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          framework: 'stoic',
+          date: new Date().toISOString().split('T')[0]
+        }),
+      });
+
+      if (response.ok) {
+        const wisdom = await response.json();
+        setDailyWisdom(wisdom);
+      }
+    } catch (error) {
+      console.error('Error loading daily wisdom:', error);
+    }
+  };
+
+  const loadHiddenWisdom = async () => {
+    try {
+      const response = await fetch('/api/generate/hidden-wisdom', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ virtue: 'wisdom' }),
+      });
+
+      if (response.ok) {
+        const wisdom = await response.json();
         setHiddenWisdom(wisdom);
       }
-
-      // Load daily wisdom
-      const dailyResponse = await fetch('/api/generate/daily-wisdom', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ framework: 'stoic' })
-      });
-      if (dailyResponse.ok) {
-        const daily = await dailyResponse.json();
-        setDailyWisdom(daily);
-      }
-
-      // Load generated practice
-      const practiceResponse = await fetch(
-        `/api/generate/practice?moduleId=wisdom&level=Beginner&style=stoic&locale=en`
-      );
-      if (practiceResponse.ok) {
-        const practice = await practiceResponse.json();
-        setGeneratedPractice(practice);
-      }
     } catch (error) {
-      console.error('Error loading wisdom content:', error);
-    } finally {
-      setLoading(false);
+      console.error('Error loading hidden wisdom:', error);
     }
   };
 
-  const loadUserProgress = async () => {
-    try {
-      const progressResponse = await fetch('/api/progress/virtues?virtue=wisdom');
-      if (progressResponse.ok) {
-        const progress = await progressResponse.json();
-        setUserProgress(progress);
-      }
-    } catch (error) {
-      console.error('Error loading user progress:', error);
-    }
-  };
-
-  const generateAIInsights = async () => {
-    try {
-      const insightsResponse = await fetch('/api/generate/virtue-insights', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          virtue: 'wisdom',
-          userLevel: userProgress.wisdomLevel,
-          interests: ['philosophy', 'learning', 'reflection']
-        })
-      });
-      if (insightsResponse.ok) {
-        const insights = await insightsResponse.json();
-        setAiInsights(insights.insights || []);
-      }
-    } catch (error) {
-      console.error('Error generating AI insights:', error);
-    }
-  };
-
-  const refreshContent = async () => {
-    setRefreshing(true);
-    await loadWisdomContent();
-    await generateAIInsights();
-    setRefreshing(false);
-  };
-
-  const handleStartPractice = (practice: WisdomPractice) => {
-    const practiceData = {
-      id: practice.id,
-      title: practice.title,
-      description: practice.description,
-      duration: practice.duration,
-      difficulty: practice.difficulty,
-      benefits: practice.benefits,
-      instructions: practice.instructions,
-      moduleId: practice.moduleId,
-      frameworkId: 'stoic',
-      aiEnhanced: practice.aiEnhanced,
-      interactiveElements: practice.interactiveElements
-    };
-    startPractice(practiceData);
-  };
-
-  const handleStartGeneratedPractice = () => {
-    if (generatedPractice) {
-      const practiceData = {
-        id: 'ai-generated-wisdom',
-        title: generatedPractice.title,
-        description: generatedPractice.body,
-        duration: Math.ceil(generatedPractice.est_time_min / 5) * 5,
-        difficulty: 'beginner',
-        benefits: ['AI-generated wisdom', 'Personalized practice', 'Daily growth'],
-        instructions: generatedPractice.bullets,
-        moduleId: 'philosophy_capsules',
-        frameworkId: 'stoic',
-        aiEnhanced: true,
-        interactiveElements: ['Adaptive content', 'Personalized feedback']
-      };
-      startPractice(practiceData);
-    }
+  const loadWisdomStats = async () => {
+    // Mock stats for now
+    setWisdomStats({
+      totalSessions: 47,
+      totalMinutes: 1240,
+      currentStreak: 12,
+      averageScore: 8.5
+    });
   };
 
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
-      case 'beginner': return 'bg-green-500/30 text-green-300 border-green-400/30';
-      case 'intermediate': return 'bg-yellow-500/30 text-yellow-300 border-yellow-400/30';
-      case 'advanced': return 'bg-red-500/30 text-red-300 border-red-400/30';
-      default: return 'bg-gray-500/30 text-gray-300 border-gray-400/30';
+      case 'beginner': return 'from-green-500 to-emerald-500';
+      case 'intermediate': return 'from-yellow-500 to-orange-500';
+      case 'advanced': return 'from-red-500 to-pink-500';
+      default: return 'from-gray-500 to-slate-500';
     }
   };
 
-  const getPersonalizationColor = (level: string) => {
-    switch (level) {
-      case 'basic': return 'bg-blue-500/30 text-blue-300 border-blue-400/30';
-      case 'adaptive': return 'bg-purple-500/30 text-purple-300 border-purple-400/30';
-      case 'ai-driven': return 'bg-pink-500/30 text-pink-300 border-pink-400/30';
-      default: return 'bg-gray-500/30 text-gray-300 border-gray-400/30';
+  const getDifficultyLabel = (difficulty: string) => {
+    switch (difficulty) {
+      case 'beginner': return 'Beginner';
+      case 'intermediate': return 'Intermediate';
+      case 'advanced': return 'Advanced';
+      default: return 'Unknown';
     }
   };
-
-  if (loading) {
-    return (
-      <PageLayout title="Wisdom" description="The Virtue of Knowledge & Understanding">
-        <div className="page-section">
-          <div className="animate-pulse">
-            <div className="h-8 bg-white/20 rounded mb-8"></div>
-            <div className="space-y-6">
-              <div className="h-64 bg-white/10 rounded-lg"></div>
-              <div className="h-48 bg-white/10 rounded-lg"></div>
-              <div className="h-48 bg-white/10 rounded-lg"></div>
-            </div>
-          </div>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
-    <PageLayout title="Wisdom" description="The Virtue of Knowledge & Understanding">
-      {/* Header */}
-      <div className="page-section">
-        <Link href="/academy" className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-6">
-          <ArrowLeft size={16} />
-          Back to Academy
-        </Link>
-        
-        <div className="flex items-center gap-4 mb-8">
-          <div className="w-16 h-16 bg-gradient-to-r from-blue-400 to-cyan-400 rounded-2xl flex items-center justify-center shadow-lg">
-            <Brain size={32} className="text-white drop-shadow-sm" />
-          </div>
-          <div>
-            <h1 className="headline">Wisdom</h1>
-            <p className="subheadline mt-2">
-              The Virtue of Knowledge & Understanding
-            </p>
-            <p className="body-text mt-2">
-              The virtue of knowledge, understanding, and sound judgment
-            </p>
-          </div>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">{enhancedWisdomPractices.length}</div>
-            <div className="text-sm text-gray-400">Practices</div>
-          </div>
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">{userProgress.completionRate}%</div>
-            <div className="text-sm text-gray-400">Progress</div>
-          </div>
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">{userProgress.currentStreak}</div>
-            <div className="text-sm text-gray-400">Day Streak</div>
-          </div>
-          <div className="card-base text-center">
-            <div className="text-2xl font-semibold text-white">{userProgress.wisdomLevel}</div>
-            <div className="text-sm text-gray-400">Level</div>
-          </div>
-        </div>
-      </div>
-
-      {/* AI-Generated Hidden Wisdom */}
-      {hiddenWisdom && (
-        <div className="page-section">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="section-title">✨ Today's Hidden Wisdom</h2>
-            <button 
-              onClick={refreshContent}
-              disabled={refreshing}
-              className="btn-secondary text-sm px-3 py-1 flex items-center gap-2"
-            >
-              <RefreshCw size={14} className={refreshing ? 'animate-spin' : ''} />
-              Refresh
-            </button>
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      <div className="container mx-auto px-4 py-8">
+        <div className="max-w-7xl mx-auto">
           
+          {/* Header */}
           <motion.div 
-            className="card-base bg-gradient-to-br from-blue-500/20 to-purple-500/20 border-blue-400/30"
-            initial={{ opacity: 0, y: 20 }}
+            className="mb-8"
+            initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6 }}
           >
-            <h3 className="text-xl font-semibold text-white mb-4">{hiddenWisdom.insight}</h3>
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-sm font-medium text-blue-300 mb-2">Micro Experiment</h4>
-                <p className="text-gray-300">{hiddenWisdom.micro_experiment}</p>
-              </div>
-              <div>
-                <h4 className="text-sm font-medium text-purple-300 mb-2">Reflection</h4>
-                <p className="text-gray-300">{hiddenWisdom.reflection}</p>
+            <div className="flex items-center gap-4 mb-6">
+              <Link
+                href="/"
+                className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
+              >
+                <ArrowLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+              </Link>
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                  <Brain className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Wisdom</h1>
+                  <p className="text-gray-600 dark:text-gray-300">The pursuit of knowledge and understanding</p>
+                </div>
               </div>
             </div>
           </motion.div>
-        </div>
-      )}
 
-      {/* AI Insights */}
-      {aiInsights.length > 0 && (
-        <div className="page-section">
-          <h2 className="section-title">🤖 AI Wisdom Insights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {aiInsights.map((insight, index) => (
-              <motion.div 
-                key={index}
-                className="card-base bg-gradient-to-br from-purple-500/10 to-pink-500/10 border-purple-400/20"
-                initial={{ opacity: 0, x: index % 2 === 0 ? -20 : 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-              >
-                <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-600 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Sparkles size={16} className="text-white" />
-                  </div>
-                  <p className="text-gray-300">{insight}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* AI-Generated Practice */}
-      {generatedPractice && (
-        <div className="page-section">
-          <h2 className="section-title">🎯 AI-Generated Wisdom Practice</h2>
+          {/* Stats Overview */}
           <motion.div 
-            className="card-base"
+            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
           >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="font-bold text-white text-lg">{generatedPractice.title}</h3>
-              <div className="flex items-center gap-2">
-                <Clock size={14} className="text-gray-400" />
-                <span className="text-xs text-gray-400">{generatedPractice.est_time_min}m</span>
-                <div className="px-2 py-1 bg-pink-500/30 text-pink-300 text-xs rounded-full border border-pink-400/30">
-                  AI-Generated
+            <div className="p-6 bg-gradient-to-br from-blue-500/10 to-indigo-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{wisdomStats.totalSessions}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Total Sessions</div>
                 </div>
               </div>
             </div>
-            
-            <p className="body-text mb-4">{generatedPractice.body}</p>
-            
-            <div className="space-y-4">
-              <div>
-                <h4 className="font-semibold text-white mb-2">Steps</h4>
-                <ul className="space-y-2">
-                  {generatedPractice.bullets.map((bullet, index) => (
-                    <li key={index} className="flex items-start gap-2 text-gray-300">
-                      <span className="text-blue-300 mt-1">•</span>
-                      <span>{bullet}</span>
-                    </li>
-                  ))}
-                </ul>
+
+            <div className="p-6 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">{wisdomStats.totalMinutes}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Minutes Practiced</div>
+                </div>
               </div>
+            </div>
 
-              {generatedPractice.coach_prompts.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Coach Prompts</h4>
-                  <ul className="space-y-2">
-                    {generatedPractice.coach_prompts.map((prompt, index) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-300">
-                        <span className="text-purple-300 mt-1">💭</span>
-                        <span>{prompt}</span>
-                      </li>
-                    ))}
-                  </ul>
+            <div className="p-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-5 h-5 text-white" />
                 </div>
-              )}
-
-              {generatedPractice.safety_reminders.length > 0 && (
                 <div>
-                  <h4 className="font-semibold text-white mb-2">Safety Reminders</h4>
-                  <ul className="space-y-2">
-                    {generatedPractice.safety_reminders.map((reminder, index) => (
-                      <li key={index} className="flex items-start gap-2 text-gray-300">
-                        <span className="text-yellow-300 mt-1">⚠️</span>
-                        <span>{reminder}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400">{wisdomStats.currentStreak}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Day Streak</div>
                 </div>
-              )}
+              </div>
+            </div>
 
-              <div className="flex items-center justify-between pt-2">
-                <button 
-                  className="btn-primary text-sm px-3 py-1"
-                  onClick={handleStartGeneratedPractice}
+            <div className="p-6 bg-gradient-to-br from-pink-500/10 to-rose-500/10 border border-pink-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-600 rounded-xl flex items-center justify-center">
+                  <Star className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-2xl font-bold text-pink-600 dark:text-pink-400">{wisdomStats.averageScore}</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">Avg Score</div>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+
+          {/* Daily Wisdom */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="p-8 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm">
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                  <Lightbulb className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Daily Wisdom</h2>
+                  <p className="text-gray-600 dark:text-gray-300">Today's insight for reflection</p>
+                </div>
+                <button
+                  onClick={loadDailyWisdom}
+                  className="ml-auto p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
                 >
-                  <Play size={14} className="mr-1" />
-                  Start Practice
+                  <RefreshCw className="w-5 h-5 text-gray-600 dark:text-gray-300" />
                 </button>
               </div>
-            </div>
-          </motion.div>
-        </div>
-      )}
 
-      {/* Enhanced Wisdom Practices Grid */}
-      <div className="page-section">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="section-title">Wisdom Practices</h2>
-          <div className="flex gap-2">
-            <button className="btn-secondary text-sm px-3 py-1">All</button>
-            <button className="btn-secondary text-sm px-3 py-1">Beginner</button>
-            <button className="btn-secondary text-sm px-3 py-1">Advanced</button>
-          </div>
-        </div>
+              <blockquote className="text-xl md:text-2xl font-serif italic text-gray-900 dark:text-white leading-relaxed border-l-4 border-blue-500 pl-6 mb-6">
+                "{dailyWisdom.quote}"
+              </blockquote>
 
-        <div className="page-grid page-grid-cols-2">
-          {enhancedWisdomPractices.map((practice, index) => (
-            <motion.div
-              key={practice.id}
-              className="card-base hover-lift cursor-pointer"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              onClick={() => setSelectedPractice(practice)}
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-white text-lg">{practice.title}</h3>
+              <div className="flex items-center justify-between mb-6">
+                <cite className="text-blue-600 dark:text-blue-400 font-medium">— {dailyWisdom.author}</cite>
                 <div className="flex items-center gap-2">
-                  <Clock size={14} className="text-gray-400" />
-                  <span className="text-xs text-gray-400">{practice.duration}m</span>
-                  <div className={`px-2 py-1 rounded-full text-xs font-medium border ${getDifficultyColor(practice.difficulty)}`}>
-                    {practice.difficulty}
-                  </div>
+                  <div className="w-2 h-2 bg-blue-400 rounded-full animate-pulse"></div>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">{dailyWisdom.framework} tradition</span>
                 </div>
               </div>
-              
-              <p className="body-text mb-4">{practice.description}</p>
-              
-              <div className="space-y-4">
-                {/* AI Enhancement Badge */}
-                {practice.aiEnhanced && (
-                  <div className="flex items-center gap-2">
-                    <div className="px-2 py-1 bg-gradient-to-r from-purple-500/30 to-pink-500/30 text-purple-300 text-xs rounded-full border border-purple-400/30">
-                      <Sparkles size={10} className="inline mr-1" />
-                      AI-Enhanced
-                    </div>
-                    <div className={`px-2 py-1 text-xs rounded-full border ${getPersonalizationColor(practice.personalizationLevel)}`}>
-                      {practice.personalizationLevel}
-                    </div>
-                  </div>
-                )}
 
-                {/* Benefits */}
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Benefits</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {practice.benefits.map((benefit) => (
-                      <span
-                        key={benefit}
-                        className="px-2 py-1 bg-blue-500/30 text-blue-300 text-xs rounded-full border border-blue-400/30 font-medium"
-                      >
-                        {benefit}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Interactive Elements */}
-                {practice.interactiveElements.length > 0 && (
-                  <div>
-                    <h4 className="font-semibold text-white mb-2">Interactive Features</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {practice.interactiveElements.map((element) => (
-                        <span
-                          key={element}
-                          className="px-2 py-1 bg-green-500/30 text-green-300 text-xs rounded-full border border-green-400/30 font-medium"
-                        >
-                          {element}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Cultural Context */}
-                <div>
-                  <h4 className="font-semibold text-white mb-2">Cultural Context</h4>
-                  <p className="body-text line-clamp-2">
-                    {practice.culturalContext}
+              {dailyWisdom.reflection && (
+                <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/10 rounded-xl p-4 border border-blue-500/20">
+                  <h4 className="text-sm font-semibold text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-2">
+                    <Compass className="w-4 h-4" />
+                    Reflection Prompt
+                  </h4>
+                  <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed">
+                    {dailyWisdom.reflection}
                   </p>
                 </div>
+              )}
+            </div>
+          </motion.div>
 
-                {/* Action */}
-                <div className="flex items-center justify-between pt-2">
-                  <button 
-                    className="btn-primary text-sm px-3 py-1"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleStartPractice(practice);
-                    }}
-                  >
-                    <Play size={14} className="mr-1" />
-                    Start Practice
-                  </button>
-                  <div className="flex gap-2">
-                    {practice.progressTracking && (
-                      <button className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10">
-                        <TrendingUp size={14} />
+          {/* Wisdom Practices */}
+          <motion.div 
+            className="mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+          >
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Wisdom Practices</h2>
+                <p className="text-gray-600 dark:text-gray-300">Enhance your understanding through guided practices</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {enhancedWisdomPractices.map((practice, index) => (
+                <motion.div
+                  key={practice.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  className="group cursor-pointer"
+                  onClick={() => {
+                    setSelectedPractice(practice);
+                    setShowPracticeModal(true);
+                  }}
+                >
+                  <div className="h-full p-6 bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl backdrop-blur-sm transition-all duration-300 group-hover:shadow-xl">
+                    
+                    {/* Header */}
+                    <div className="flex items-start justify-between mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center">
+                          {practice.aiEnhanced ? <Zap className="w-5 h-5 text-white" /> : <Brain className="w-5 h-5 text-white" />}
+                        </div>
+                        <div>
+                          <h3 className="text-lg font-bold text-gray-900 dark:text-white">{practice.title}</h3>
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2 py-1 bg-gradient-to-r ${getDifficultyColor(practice.difficulty)} text-white text-xs rounded-full`}>
+                              {getDifficultyLabel(practice.difficulty)}
+                            </span>
+                            {practice.aiEnhanced && (
+                              <span className="px-2 py-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white text-xs rounded-full">
+                                AI Enhanced
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
+                          <Clock className="w-4 h-4" />
+                          <span>{practice.duration}m</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-gray-600 dark:text-gray-300 text-sm leading-relaxed mb-4">
+                      {practice.description}
+                    </p>
+
+                    {/* Benefits */}
+                    <div className="mb-4">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">Benefits</div>
+                      <div className="flex flex-wrap gap-2">
+                        {practice.benefits.slice(0, 3).map((benefit) => (
+                          <span
+                            key={benefit}
+                            className="px-2 py-1 bg-white/10 text-gray-700 dark:text-gray-300 text-xs rounded-full border border-white/20"
+                          >
+                            {benefit}
+                          </span>
+                        ))}
+                        {practice.benefits.length > 3 && (
+                          <span className="px-2 py-1 bg-white/10 text-gray-700 dark:text-gray-300 text-xs rounded-full border border-white/20">
+                            +{practice.benefits.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Action Button */}
+                    <div className="flex items-center justify-between">
+                      <button className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white rounded-lg transition-all duration-200 group-hover:scale-105">
+                        <Play className="w-4 h-4" />
+                        <span className="text-sm font-medium">Start Practice</span>
+                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </button>
-                    )}
-                    {practice.communityFeatures && (
-                      <button className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10">
-                        <Users size={14} />
-                      </button>
-                    )}
-                    <button className="text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-white/10">
-                      <BookOpen size={14} />
-                    </button>
+                      
+                      <div className="flex items-center gap-1">
+                        <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                        <span className="text-xs text-gray-500 dark:text-gray-400">4.9</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
+
+          {/* Hidden Wisdom */}
+          {hiddenWisdom && (
+            <motion.div 
+              className="mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+            >
+              <div className="p-8 bg-gradient-to-br from-purple-500/10 to-pink-500/10 border border-purple-500/20 rounded-2xl backdrop-blur-sm">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/25">
+                    <Sparkles className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Hidden Wisdom</h2>
+                    <p className="text-gray-600 dark:text-gray-300">Deeper insights for advanced practitioners</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Insight</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{hiddenWisdom.insight}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Micro-Experiment</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{hiddenWisdom.micro_experiment}</p>
+                  </div>
+
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Reflection</h3>
+                    <p className="text-gray-600 dark:text-gray-300">{hiddenWisdom.reflection}</p>
                   </div>
                 </div>
               </div>
             </motion.div>
-          ))}
+          )}
         </div>
       </div>
-
-      {/* AI-Generated Daily Wisdom Quote */}
-      {dailyWisdom && (
-        <div className="page-section">
-          <motion.div 
-            className="card-base"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <h3 className="font-bold text-white text-lg mb-2">Daily Wisdom Quote</h3>
-            <p className="body-text mb-4">AI-generated wisdom for modern reflection</p>
-            
-            <div className="text-center space-y-4">
-              <blockquote className="text-xl text-white italic">
-                "{dailyWisdom.quote}"
-              </blockquote>
-              <cite className="text-blue-300 font-medium">— {dailyWisdom.author}</cite>
-              <p className="body-text max-w-2xl mx-auto">
-                {dailyWisdom.reflection}
-              </p>
-            </div>
-          </motion.div>
-        </div>
-      )}
-
-      {/* Related Resources */}
-      <div className="page-section">
-        <h2 className="section-title">Related Resources</h2>
-        <div className="page-grid page-grid-cols-3">
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Books</h3>
-            <p className="body-text mb-4">Essential readings</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-blue-300" />
-                <span className="text-white">"Meditations" by Marcus Aurelius</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-blue-300" />
-                <span className="text-white">"The Republic" by Plato</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <BookOpen size={14} className="text-blue-300" />
-                <span className="text-white">"Nicomachean Ethics" by Aristotle</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Teachers</h3>
-            <p className="body-text mb-4">Wisdom guides</p>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-blue-300" />
-                <span className="text-white">Socrates</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-blue-300" />
-                <span className="text-white">Plato</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm">
-                <Users size={14} className="text-blue-300" />
-                <span className="text-white">Aristotle</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="card-base">
-            <h3 className="font-bold text-white text-lg mb-2">Progress</h3>
-            <p className="body-text mb-4">Your wisdom journey</p>
-            <div className="space-y-4">
-              <div className="text-center">
-                <div className="text-2xl font-semibold text-white">{userProgress.completionRate}%</div>
-                <div className="text-sm text-gray-400">Overall Progress</div>
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star
-                    key={star}
-                    size={16}
-                    className={star <= 4 ? "text-yellow-400 fill-current" : "text-gray-600"}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Practice Session Modal */}
-      {currentPractice && (
-        <PracticeSessionModal
-          isOpen={isModalOpen}
-          onClose={closeModal}
-          practice={currentPractice}
-        />
-      )}
-    </PageLayout>
+    </div>
   );
 } 
