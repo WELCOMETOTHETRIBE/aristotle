@@ -179,8 +179,8 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
-        <div className="container mx-auto px-4 py-8">
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center">
             <div className="waveform justify-center mb-4">
               {Array.from({ length: 8 }).map((_, i) => (
@@ -191,7 +191,7 @@ export default function DashboardPage() {
                 />
               ))}
             </div>
-            <p className="text-lg font-medium text-gray-600 dark:text-gray-300">Loading your journey...</p>
+            <p className="text-lg font-medium text-gray-300">Loading your journey...</p>
           </div>
         </div>
       </div>
@@ -199,9 +199,8 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
-      <div className="container mx-auto px-4 py-6">
-        <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
+      <div className="max-w-7xl mx-auto space-y-6">
           
           {/* Hero Section with Onboarding */}
           {shouldShowPrompt && (
