@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Search, Filter, Star, Globe, Brain, Heart, Shield, Scale, Leaf, Sparkles, Quote, Info } from 'lucide-react';
+import { BookOpen, Star, Sparkles, Quote, ArrowRight } from 'lucide-react';
 
 interface PhilosophicalTerm {
   id: string;
@@ -349,18 +349,12 @@ const PHILOSOPHICAL_TERMS: PhilosophicalTerm[] = [
 const TRADITIONS = ['All', 'Aristotelian', 'Stoic', 'Daoist', 'Confucian', 'Socratic', 'Buddhist', 'Classical Greek', 'Christian'];
 
 export function PhilosophicalTerminologyWidget() {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedTradition, setSelectedTradition] = useState('All');
-  const [selectedTerm, setSelectedTerm] = useState<PhilosophicalTerm | null>(null);
-  const [showTraditionFilter, setShowTraditionFilter] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const term = PHILOSOPHICAL_TERMS[currentIndex % PHILOSOPHICAL_TERMS.length];
 
-  const filteredTerms = PHILOSOPHICAL_TERMS.filter(term => {
-    const matchesSearch = term.term.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         term.definition.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         term.origin.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTradition = selectedTradition === 'All' || term.tradition === selectedTradition;
-    return matchesSearch && matchesTradition;
-  });
+  const nextTerm = () => {
+    setCurrentIndex((prev) => (prev + 1) % PHILOSOPHICAL_TERMS.length);
+  };
 
   const getTraditionColor = (tradition: string) => {
     const colors: Record<string, string> = {
@@ -398,190 +392,58 @@ export function PhilosophicalTerminologyWidget() {
           </motion.div>
           <div>
             <h3 className="font-bold text-white text-lg">Philosophical Terminology</h3>
-            <p className="text-sm text-gray-400">Explore 25 profound philosophical concepts</p>
+            <p className="text-sm text-gray-400">1 / {PHILOSOPHICAL_TERMS.length} shown at a time</p>
           </div>
         </div>
         <div className="text-right">
           <div className="text-2xl font-bold text-indigo-400">
-            {filteredTerms.length}
+            {PHILOSOPHICAL_TERMS.length}
           </div>
           <div className="text-xs text-gray-400">Terms</div>
         </div>
       </div>
 
-      {/* Search and Filter */}
-      <div className="mb-6 space-y-3">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search philosophical terms..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-          />
-        </div>
-        
-        <div className="relative">
-          <button
-            onClick={() => setShowTraditionFilter(!showTraditionFilter)}
-            className="w-full flex items-center justify-between p-3 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <Filter className="w-4 h-4" />
-              <span>Tradition: {selectedTradition}</span>
+      {/* Single Term Card */}
+      <div className="p-5 bg-white/5 border border-white/10 rounded-xl">
+        <div className="flex items-start gap-4">
+          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${term.color} flex items-center justify-center text-2xl`}>
+            {term.icon}
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <h4 className="font-semibold text-white text-lg">{term.term}</h4>
+              {term.pronunciation && (
+                <span className="text-sm text-gray-400">({term.pronunciation})</span>
+              )}
             </div>
-            <Globe className="w-4 h-4" />
-          </button>
-          
-          {showTraditionFilter && (
-            <div className="absolute top-full left-0 right-0 mt-2 bg-black/90 backdrop-blur-sm border border-white/20 rounded-lg z-10">
-              {TRADITIONS.map((tradition) => (
-                <button
-                  key={tradition}
-                  onClick={() => {
-                    setSelectedTradition(tradition);
-                    setShowTraditionFilter(false);
-                  }}
-                  className="w-full text-left p-3 hover:bg-white/10 transition-colors text-white"
-                >
-                  {tradition}
-                </button>
-              ))}
+            <div className="flex items-center gap-2 mb-3 text-xs">
+              <span className={`px-2 py-1 rounded-full bg-gradient-to-r ${getTraditionColor(term.tradition)} text-white`}>
+                {term.tradition}
+              </span>
+              <span className="text-gray-400">{term.origin}</span>
             </div>
-          )}
+            <div className="space-y-3">
+              <div>
+                <h5 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+                  <Sparkles className="w-4 h-4" /> Definition
+                </h5>
+                <p className="text-sm text-gray-300 leading-relaxed">{term.definition}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Terms Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-        {filteredTerms.map((term) => (
-          <motion.button
-            key={term.id}
-            onClick={() => setSelectedTerm(term)}
-            className="p-4 bg-white/5 border border-white/10 rounded-lg text-left hover:bg-white/10 transition-all group"
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-          >
-            <div className="flex items-start gap-3">
-              <div className={`w-10 h-10 rounded-lg bg-gradient-to-r ${term.color} flex items-center justify-center text-lg`}>
-                {term.icon}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <h4 className="font-semibold text-white group-hover:text-indigo-300 transition-colors">
-                    {term.term}
-                  </h4>
-                  {term.pronunciation && (
-                    <span className="text-xs text-gray-400">({term.pronunciation})</span>
-                  )}
-                </div>
-                <p className="text-sm text-gray-300 line-clamp-2 mb-2">
-                  {term.definition}
-                </p>
-                <div className="flex items-center gap-2 text-xs">
-                  <span className={`px-2 py-1 rounded-full bg-gradient-to-r ${getTraditionColor(term.tradition)} text-white`}>
-                    {term.tradition}
-                  </span>
-                  <span className="text-gray-400">{term.origin}</span>
-                </div>
-              </div>
-            </div>
-          </motion.button>
-        ))}
+      {/* Controls */}
+      <div className="mt-4 flex items-center justify-end">
+        <button
+          onClick={nextTerm}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/30 transition-colors"
+        >
+          Next
+          <ArrowRight className="w-4 h-4" />
+        </button>
       </div>
-
-      {/* Term Detail Modal */}
-      <AnimatePresence>
-        {selectedTerm && (
-          <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setSelectedTerm(null)}
-          >
-            <motion.div
-              className="bg-black/90 backdrop-blur-sm border border-white/20 rounded-xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Header */}
-              <div className="flex items-center gap-4 mb-6">
-                <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${selectedTerm.color} flex items-center justify-center text-3xl`}>
-                  {selectedTerm.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-1">
-                    <h2 className="text-2xl font-bold text-white">{selectedTerm.term}</h2>
-                    {selectedTerm.pronunciation && (
-                      <span className="text-lg text-gray-400">({selectedTerm.pronunciation})</span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-3 py-1 rounded-full bg-gradient-to-r ${getTraditionColor(selectedTerm.tradition)} text-white text-sm`}>
-                      {selectedTerm.tradition}
-                    </span>
-                    <span className="text-gray-400 text-sm">{selectedTerm.origin}</span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => setSelectedTerm(null)}
-                  className="p-2 text-gray-400 hover:text-white transition-colors"
-                >
-                  <Info className="w-6 h-6" />
-                </button>
-              </div>
-
-              {/* Content */}
-              <div className="space-y-6">
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                    <BookOpen className="w-5 h-5" />
-                    Definition
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">{selectedTerm.definition}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                    <Sparkles className="w-5 h-5" />
-                    Example
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed italic">"{selectedTerm.example}"</p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                    <Star className="w-5 h-5" />
-                    Significance
-                  </h3>
-                  <p className="text-gray-300 leading-relaxed">{selectedTerm.significance}</p>
-                </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-2 flex items-center gap-2">
-                    <Quote className="w-5 h-5" />
-                    Related Terms
-                  </h3>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedTerm.relatedTerms.map((relatedTerm, index) => (
-                      <span
-                        key={index}
-                        className="px-3 py-1 bg-white/10 border border-white/20 rounded-full text-sm text-gray-300"
-                      >
-                        {relatedTerm}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Footer */}
       <div className="mt-6 p-4 bg-white/5 rounded-lg">
