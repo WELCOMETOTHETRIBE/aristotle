@@ -77,8 +77,44 @@ export default function CommunityPage() {
   
   // AI Comments state
   const [aiComments, setAiComments] = useState<{[threadId: string]: any[]}>({});
+  const [aiCommentLoading, setAiCommentLoading] = useState<{[threadId: string]: boolean}>({});
 
   const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
+
+  // Function to extract insights from AI philosopher comments
+  const extractInsightsFromComment = (commentContent: string): string[] => {
+    const insights: string[] = [];
+    
+    // Extract key philosophical concepts and insights
+    const philosophicalTerms = [
+      'virtue', 'wisdom', 'courage', 'justice', 'temperance', 'eudaimonia', 'stoicism',
+      'mindfulness', 'resilience', 'growth', 'reflection', 'practice', 'discipline',
+      'balance', 'harmony', 'truth', 'knowledge', 'understanding', 'perspective'
+    ];
+    
+    // Look for sentences that contain philosophical terms
+    const sentences = commentContent.split(/[.!?]+/).filter(s => s.trim().length > 10);
+    
+    sentences.forEach(sentence => {
+      const lowerSentence = sentence.toLowerCase();
+      const hasPhilosophicalTerm = philosophicalTerms.some(term => 
+        lowerSentence.includes(term)
+      );
+      
+      if (hasPhilosophicalTerm && sentence.trim().length > 20) {
+        insights.push(sentence.trim());
+      }
+    });
+    
+    // If no philosophical insights found, create general insights
+    if (insights.length === 0) {
+      insights.push('This discussion touches on important philosophical themes');
+      insights.push('Consider how this relates to your personal growth journey');
+    }
+    
+    // Limit to 3 insights maximum
+    return insights.slice(0, 3);
+  };
 
   useEffect(() => {
     if (authLoading) return;
@@ -175,6 +211,17 @@ export default function CommunityPage() {
     );
   };
 
+  const likeAIComment = (threadId: string, commentId: string) => {
+    setAiComments(prev => ({
+      ...prev,
+      [threadId]: prev[threadId]?.map(comment => 
+        comment.id === commentId 
+          ? { ...comment, isLiked: !comment.isLiked, likes: comment.isLiked ? comment.likes - 1 : comment.likes + 1 }
+          : comment
+      ) || []
+    }));
+  };
+
   const createThread = async () => {
     if (!newThread.title || !newThread.content || !newThread.category) {
       return;
@@ -223,6 +270,7 @@ export default function CommunityPage() {
         isBookmarked: false,
         createdAt: new Date().toISOString(),
         lastActivity: new Date().toISOString(),
+        aiInsights: [], // Initialize empty insights
       };
 
       setThreads(prev => [newThreadData, ...prev]);
@@ -237,6 +285,9 @@ export default function CommunityPage() {
       // Trigger AI philosopher comment
       setTimeout(async () => {
         try {
+          // Set loading state for this thread
+          setAiCommentLoading(prev => ({ ...prev, [newPost.id]: true }));
+          
           const aiResponse = await fetch('/api/community/ai-comment', {
             method: 'POST',
             headers: {
@@ -260,17 +311,27 @@ export default function CommunityPage() {
               [newPost.id]: [...(prev[newPost.id] || []), aiData.comment]
             }));
             
-            // Update the thread's reply count
+            // Extract insights from the AI comment and update thread
+            const insights = extractInsightsFromComment(aiData.comment.content);
+            
+            // Update the thread's reply count and AI insights
             setThreads(prev => 
               prev.map(thread => 
                 thread.id === newPost.id 
-                  ? { ...thread, replies: thread.replies + 1 }
+                  ? { 
+                      ...thread, 
+                      replies: thread.replies + 1,
+                      aiInsights: insights
+                    }
                   : thread
               )
             );
           }
         } catch (error) {
           console.error('Error triggering AI comment:', error);
+        } finally {
+          // Clear loading state
+          setAiCommentLoading(prev => ({ ...prev, [newPost.id]: false }));
         }
       }, 2000); // Wait 2 seconds before AI responds
     } catch (error) {
@@ -516,37 +577,82 @@ export default function CommunityPage() {
                   </p>
                 </div>
 
-                {/* AI Insights */}
-                {thread.aiInsights && (
-                  <div className="mb-3 p-3 bg-primary/5 rounded-lg border border-primary/10">
-                    <h4 className="font-medium text-primary text-xs mb-2 flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      AI Insights
+                {/* AI Insights from Philosopher Comments */}
+                {thread.aiInsights && thread.aiInsights.length > 0 && (
+                  <div className="mb-3 p-3 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                    <h4 className="font-medium text-primary text-sm mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4" />
+                      Philosophical Insights
                     </h4>
-                    <ul className="space-y-1">
+                    <ul className="space-y-2">
                       {thread.aiInsights.map((insight, idx) => (
-                        <li key={idx} className="text-xs text-primary/80 flex items-center gap-2">
-                          <div className="w-1 h-1 bg-primary rounded-full" />
-                          {insight}
+                        <li key={idx} className="text-sm text-primary/90 flex items-start gap-2 leading-relaxed">
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
+                          <span>{insight}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
 
+                {/* AI Comment Loading State */}
+                {aiCommentLoading[thread.id] && (
+                  <div className="mb-3 p-4 bg-gradient-to-r from-primary/5 to-primary/10 rounded-xl border border-primary/20">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
+                        <Brain className="w-5 h-5 text-primary animate-pulse" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-primary text-sm">Philosopher is thinking...</div>
+                        <div className="text-xs text-primary/70">Generating philosophical insights</div>
+                      </div>
+                      <Loader2 className="w-4 h-4 text-primary animate-spin" />
+                    </div>
+                  </div>
+                )}
+
                 {/* AI Philosopher Comments */}
                 {aiComments[thread.id] && aiComments[thread.id].length > 0 && (
-                  <div className="mb-3 space-y-2">
+                  <div className="mb-3 space-y-3">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Brain className="w-4 h-4 text-primary" />
+                      <span className="text-sm font-medium text-primary">Philosopher Response</span>
+                    </div>
                     {aiComments[thread.id].map((comment, idx) => (
-                      <div key={comment.id} className="p-3 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-lg">{comment.author.avatar}</span>
+                      <div key={comment.id} className="p-4 bg-gradient-to-r from-primary/5 via-primary/8 to-primary/10 rounded-xl border border-primary/20 shadow-sm">
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
+                            <span className="text-lg">{comment.author.avatar}</span>
+                          </div>
                           <div>
-                            <div className="font-medium text-primary text-sm">{comment.author.name}</div>
-                            <div className="text-xs text-primary/70">{comment.author.persona}</div>
+                            <div className="font-semibold text-primary text-sm">{comment.author.name}</div>
+                            <div className="text-xs text-primary/70 font-medium">{comment.author.persona}</div>
                           </div>
                         </div>
                         <p className="text-sm text-text leading-relaxed">{comment.content}</p>
+                        <div className="mt-3 pt-3 border-t border-primary/10">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-4 text-xs text-primary/70">
+                              <span>Philosophical perspective</span>
+                              <span>•</span>
+                              <span>AI-generated</span>
+                            </div>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                likeAIComment(thread.id, comment.id);
+                              }}
+                              className={`flex items-center gap-1 px-2 py-1 rounded-lg transition-all duration-200 ${
+                                comment.isLiked 
+                                  ? 'text-primary bg-primary/10' 
+                                  : 'text-primary/70 hover:text-primary hover:bg-primary/5'
+                              }`}
+                            >
+                              <ThumbsUp className={`w-3 h-3 ${comment.isLiked ? 'fill-current' : ''}`} />
+                              <span className="text-xs font-medium">{comment.likes || 0}</span>
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     ))}
                   </div>
