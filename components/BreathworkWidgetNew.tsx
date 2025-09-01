@@ -570,92 +570,116 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       </AnimatePresence>
 
       {/* Main Breath Circle */}
-      <div className="flex justify-center mb-4">
-        <div className="relative">
+      <div className="flex justify-center mb-6">
+        <div className="relative w-48 h-48 flex items-center justify-center">
           {/* Outer session progress ring */}
-          <svg width="200" height="200" viewBox="0 0 200 200" className="absolute inset-0">
+          <svg width="192" height="192" viewBox="0 0 192 192" className="absolute inset-0">
+            <defs>
+              <linearGradient id="sessionProgress" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor="rgba(59, 130, 246, 0.2)" />
+                <stop offset="100%" stopColor="rgba(147, 197, 253, 0.4)" />
+              </linearGradient>
+            </defs>
             <circle
-              cx="100"
-              cy="100"
-              r="85"
-              stroke="rgba(255,255,255,0.1)"
-              strokeWidth="2"
+              cx="96"
+              cy="96"
+              r="88"
+              stroke="rgba(255,255,255,0.08)"
+              strokeWidth="3"
               fill="none"
+              className="drop-shadow-sm"
             />
             <motion.circle
-              cx="100"
-              cy="100"
-              r="85"
-              stroke="rgba(59, 130, 246, 0.3)"
-              strokeWidth="2"
+              cx="96"
+              cy="96"
+              r="88"
+              stroke="url(#sessionProgress)"
+              strokeWidth="3"
               fill="none"
               strokeLinecap="round"
-              initial={{ strokeDasharray: 534, strokeDashoffset: 534 }}
-              animate={{ strokeDashoffset: 534 * (1 - sessionProgress) }}
-              transition={{ duration: 0.5 }}
+              initial={{ strokeDasharray: 553, strokeDashoffset: 553 }}
+              animate={{ strokeDashoffset: 553 * (1 - sessionProgress) }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ 
                 transform: "rotate(-90deg)", 
-                transformOrigin: "100px 100px" 
+                transformOrigin: "96px 96px",
+                filter: "drop-shadow(0 0 8px rgba(59, 130, 246, 0.3))"
               }}
             />
           </svg>
 
           {/* Phase countdown ring */}
-          <svg width="200" height="200" viewBox="0 0 200 200" className="absolute inset-0">
+          <svg width="192" height="192" viewBox="0 0 192 192" className="absolute inset-0">
+            <defs>
+              <linearGradient id="phaseProgress" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stopColor={getPhaseRingColor(currentPhase)} />
+                <stop offset="100%" stopColor={getPhaseRingColor(currentPhase)} />
+              </linearGradient>
+            </defs>
             <circle
-              cx="100"
-              cy="100"
-              r="70"
-              stroke="rgba(255,255,255,0.05)"
-              strokeWidth="4"
+              cx="96"
+              cy="96"
+              r="72"
+              stroke="rgba(255,255,255,0.06)"
+              strokeWidth="5"
               fill="none"
+              className="drop-shadow-sm"
             />
             <motion.circle
-              cx="100"
-              cy="100"
-              r="70"
-              stroke={getPhaseRingColor(currentPhase)}
-              strokeWidth="4"
+              cx="96"
+              cy="96"
+              r="72"
+              stroke="url(#phaseProgress)"
+              strokeWidth="5"
               fill="none"
               strokeLinecap="round"
-              initial={{ strokeDasharray: 440, strokeDashoffset: 440 }}
-              animate={{ strokeDashoffset: 440 * (1 - getCurrentPhaseProgress()) }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
+              initial={{ strokeDasharray: 452, strokeDashoffset: 452 }}
+              animate={{ strokeDashoffset: 452 * (1 - getCurrentPhaseProgress()) }}
+              transition={{ duration: 0.4, ease: "easeInOut" }}
               style={{ 
                 transform: "rotate(-90deg)", 
-                transformOrigin: "100px 100px" 
+                transformOrigin: "96px 96px",
+                filter: `drop-shadow(0 0 12px ${getPhaseRingColor(currentPhase)}40)`
               }}
             />
           </svg>
           
           {/* Inner breath circle */}
           <motion.div 
-            className={`relative w-32 h-32 rounded-full border-4 flex items-center justify-center bg-gradient-to-br ${getPhaseBgColor(currentPhase)} border-white/20`}
+            className={`relative w-36 h-36 rounded-full border-4 flex items-center justify-center bg-gradient-to-br ${getPhaseBgColor(currentPhase)} shadow-2xl`}
             animate={{
-              scale: isActive ? [1, 1.1, 1] : 1,
-              borderColor: isActive ? [getPhaseRingColor(currentPhase) + '40', getPhaseRingColor(currentPhase) + '80', getPhaseRingColor(currentPhase) + '40'] : 'rgba(255,255,255,0.2)'
+              scale: isActive ? [1, 1.05, 1] : 1,
+              borderColor: isActive ? [getPhaseRingColor(currentPhase) + '30', getPhaseRingColor(currentPhase) + '60', getPhaseRingColor(currentPhase) + '30'] : 'rgba(255,255,255,0.15)',
+              boxShadow: isActive ? [
+                `0 0 20px ${getPhaseRingColor(currentPhase)}20`,
+                `0 0 30px ${getPhaseRingColor(currentPhase)}30`,
+                `0 0 20px ${getPhaseRingColor(currentPhase)}20`
+              ] : '0 4px 20px rgba(0,0,0,0.1)'
             }}
             transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
+            style={{
+              background: `radial-gradient(circle, ${getPhaseBgColor(currentPhase).replace('bg-gradient-to-br ', '').replace(' ', ', ')} 0%, rgba(0,0,0,0.1) 100%)`
+            }}
           >
             <div className="relative z-10 text-center">
               {isPreparing ? (
                 <motion.div 
-                  className="text-3xl font-bold text-amber-400"
-                  animate={{ scale: [1, 1.2, 1] }}
-                  transition={{ duration: 0.5, repeat: Infinity }}
+                  className="text-4xl font-bold text-amber-400"
+                  animate={{ scale: [1, 1.15, 1] }}
+                  transition={{ duration: 0.6, repeat: Infinity }}
                 >
                   {prepCountdown}
                 </motion.div>
               ) : (
                 <>
                   <motion.div 
-                    className={`text-2xl font-bold ${getPhaseColor()}`}
-                    animate={{ scale: isActive ? [1, 1.1, 1] : 1 }}
-                    transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
+                    className={`text-3xl font-bold ${getPhaseColor()} drop-shadow-sm`}
+                    animate={{ scale: isActive ? [1, 1.08, 1] : 1 }}
+                    transition={{ duration: 1.2, repeat: isActive ? Infinity : 0 }}
                   >
                     {timeLeft}
                   </motion.div>
-                  <div className="text-sm text-muted mt-1">{getPhaseText()}</div>
+                  <div className="text-sm text-muted mt-2 font-medium">{getPhaseText()}</div>
                 </>
               )}
             </div>
@@ -672,11 +696,11 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                 <motion.div
                   initial={{ scale: 0.8, opacity: 0 }}
                   animate={{ scale: 1, opacity: 1 }}
-                  className="text-lg text-amber-400 font-medium mb-2"
+                  className="text-xl text-amber-400 font-bold mb-3"
                 >
                   Get Ready
                 </motion.div>
-                <div className="text-sm text-muted">
+                <div className="text-sm text-muted font-medium">
                   Find a comfortable position
                 </div>
               </div>
