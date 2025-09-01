@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { BookOpen, Star, Sparkles, Quote, ArrowRight } from 'lucide-react';
+import { BookOpen, Star, Sparkles, Quote, ArrowRight, SkipForward } from 'lucide-react';
 
 interface PhilosophicalTerm {
   id: string;
@@ -346,13 +346,15 @@ const PHILOSOPHICAL_TERMS: PhilosophicalTerm[] = [
   }
 ];
 
-const TRADITIONS = ['All', 'Aristotelian', 'Stoic', 'Daoist', 'Confucian', 'Socratic', 'Buddhist', 'Classical Greek', 'Christian'];
-
 export function PhilosophicalTerminologyWidget() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const term = PHILOSOPHICAL_TERMS[currentIndex % PHILOSOPHICAL_TERMS.length];
 
   const nextTerm = () => {
+    setCurrentIndex((prev) => (prev + 1) % PHILOSOPHICAL_TERMS.length);
+  };
+
+  const skipTerm = () => {
     setCurrentIndex((prev) => (prev + 1) % PHILOSOPHICAL_TERMS.length);
   };
 
@@ -392,7 +394,7 @@ export function PhilosophicalTerminologyWidget() {
           </motion.div>
           <div>
             <h3 className="font-bold text-white text-lg">Philosophical Terminology</h3>
-            <p className="text-sm text-gray-400">1 / {PHILOSOPHICAL_TERMS.length} shown at a time</p>
+            <p className="text-sm text-gray-400">Term {currentIndex + 1} of {PHILOSOPHICAL_TERMS.length}</p>
           </div>
         </div>
         <div className="text-right">
@@ -404,52 +406,66 @@ export function PhilosophicalTerminologyWidget() {
       </div>
 
       {/* Single Term Card */}
-      <div className="p-5 bg-white/5 border border-white/10 rounded-xl">
-        <div className="flex items-start gap-4">
-          <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${term.color} flex items-center justify-center text-2xl`}>
-            {term.icon}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <h4 className="font-semibold text-white text-lg">{term.term}</h4>
-              {term.pronunciation && (
-                <span className="text-sm text-gray-400">({term.pronunciation})</span>
-              )}
+      <AnimatePresence mode="wait">
+        <motion.div 
+          key={term.id}
+          className="p-5 bg-white/5 border border-white/10 rounded-xl"
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="flex items-start gap-4">
+            <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${term.color} flex items-center justify-center text-2xl`}>
+              {term.icon}
             </div>
-            <div className="flex items-center gap-2 mb-3 text-xs">
-              <span className={`px-2 py-1 rounded-full bg-gradient-to-r ${getTraditionColor(term.tradition)} text-white`}>
-                {term.tradition}
-              </span>
-              <span className="text-gray-400">{term.origin}</span>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <h5 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4" /> Definition
-                </h5>
-                <p className="text-sm text-gray-300 leading-relaxed">{term.definition}</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h4 className="font-semibold text-white text-lg">{term.term}</h4>
+                {term.pronunciation && (
+                  <span className="text-sm text-gray-400">({term.pronunciation})</span>
+                )}
+              </div>
+              <div className="flex items-center gap-2 mb-3 text-xs">
+                <span className={`px-2 py-1 rounded-full bg-gradient-to-r ${getTraditionColor(term.tradition)} text-white`}>
+                  {term.tradition}
+                </span>
+                <span className="text-gray-400">{term.origin}</span>
+              </div>
+              <div className="space-y-3">
+                <div>
+                  <h5 className="text-sm font-medium text-white mb-1 flex items-center gap-2">
+                    <Sparkles className="w-4 h-4" /> Definition
+                  </h5>
+                  <p className="text-sm text-gray-300 leading-relaxed">{term.definition}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </div>
+        </motion.div>
+      </AnimatePresence>
 
       {/* Controls */}
-      <div className="mt-4 flex items-center justify-end">
-        <button
-          onClick={nextTerm}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/30 transition-colors"
-        >
-          Next
-          <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-
-      {/* Footer */}
-      <div className="mt-6 p-4 bg-white/5 rounded-lg">
-        <div className="text-xs text-gray-400 mb-1">Philosophical Insight:</div>
-        <div className="text-sm text-white">
-          These terms represent the distilled wisdom of humanity's greatest thinkers. Each concept offers a unique lens through which to understand life, virtue, and the nature of reality.
+      <div className="mt-4 flex items-center justify-between">
+        <div className="text-xs text-gray-400">
+          {term.tradition} • {term.origin}
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={skipTerm}
+            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-500/20 border border-gray-500/30 text-gray-300 hover:bg-gray-500/30 transition-colors"
+            title="Skip to next term"
+          >
+            <SkipForward className="w-4 h-4" />
+            Skip
+          </button>
+          <button
+            onClick={nextTerm}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/30 transition-colors"
+          >
+            Next
+            <ArrowRight className="w-4 h-4" />
+          </button>
         </div>
       </div>
     </motion.div>
