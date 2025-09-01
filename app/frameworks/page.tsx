@@ -209,10 +209,10 @@ export default function FrameworksPage() {
                 {tone}
               </button>
             ))}
-          </div>
-        </div>
+              </div>
+            </div>
 
-        {/* Frameworks Grid */}
+          {/* Frameworks Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <AnimatePresence>
             {filteredFrameworks.map((framework, index) => (
@@ -225,20 +225,20 @@ export default function FrameworksPage() {
               >
                 <Link href={`/frameworks/${framework.id}`}>
                   <div className="bg-surface border border-border rounded-lg p-4 hover:bg-surface-2 transition-all duration-200 hover:shadow-lg group">
-                    {/* Header */}
+                  {/* Header */}
                     <div className="flex items-center justify-between mb-3">
-                      <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3">
                         <div className={cn(
                           'w-10 h-10 rounded-lg flex items-center justify-center text-white',
                           `bg-gradient-to-r ${getToneGradient(framework.nav.tone)}`
                         )}>
                           {getFrameworkIcon(framework.id)}
-                        </div>
-                        <div>
+                      </div>
+                      <div>
                           <h3 className="text-lg font-semibold text-text group-hover:text-primary transition-colors">
                             {framework.name}
                           </h3>
-                          <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-2">
                             <span className="text-2xl">{framework.nav.emoji}</span>
                             <span className="text-sm text-muted">{framework.nav.badge}</span>
                           </div>
@@ -263,23 +263,23 @@ export default function FrameworksPage() {
                       <div className="text-center">
                         <div className="text-sm font-medium text-text">
                           {getTimeToLearn([...framework.coreModules, ...framework.supportModules])}
-                        </div>
-                        <div className="text-xs text-muted">Duration</div>
-                      </div>
                     </div>
+                        <div className="text-xs text-muted">Duration</div>
+                    </div>
+                  </div>
 
                     {/* Core Modules Preview */}
                     <div className="space-y-2">
                       <div className="text-xs text-muted font-medium">Core Modules</div>
                       <div className="flex flex-wrap gap-1">
                         {framework.coreModules.slice(0, 3).map((module, idx) => (
-                          <span
+                        <span
                             key={idx}
                             className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full"
-                          >
+                        >
                             {module.replace('_', ' ')}
-                          </span>
-                        ))}
+                        </span>
+                      ))}
                         {framework.coreModules.length > 3 && (
                           <span className="px-2 py-1 bg-surface-2 text-muted text-xs rounded-full">
                             +{framework.coreModules.length - 3} more
@@ -306,7 +306,7 @@ export default function FrameworksPage() {
             <BookOpen className="w-12 h-12 text-muted mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-text mb-2">No frameworks found</h3>
             <p className="text-muted">Try adjusting your search or filters</p>
-          </div>
+      </div>
         )}
       </main>
 

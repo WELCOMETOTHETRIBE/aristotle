@@ -10,6 +10,7 @@ import {
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
+import { useAuth } from '@/lib/auth-context';
 
 interface Thread {
   id: string;
@@ -51,6 +52,7 @@ interface Reply {
 }
 
 export default function CommunityPage() {
+  const { user, loading: authLoading } = useAuth();
   const [activeFilter, setActiveFilter] = useState<'all' | 'user' | 'ai'>('all');
   const [selectedThread, setSelectedThread] = useState<Thread | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
@@ -70,90 +72,88 @@ export default function CommunityPage() {
   const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
 
   useEffect(() => {
-    const mockThreads: Thread[] = [
-      {
-        id: '1',
-        title: 'How do I practice courage in daily life?',
-        content: 'I find myself avoiding difficult conversations and uncomfortable situations. What are some practical ways to build courage through small daily actions?',
-        author: {
-          name: 'Sarah Chen',
-          avatar: '/avatars/sarah.jpg',
-          isAI: false,
-        },
-        type: 'user',
-        category: 'Courage',
-        tags: ['courage', 'daily-practice', 'conversations'],
-        replies: 8,
-        views: 124,
-        likes: 23,
-        isLiked: false,
-        isBookmarked: false,
-        createdAt: '2024-01-15T10:30:00Z',
-        lastActivity: '2024-01-15T14:20:00Z',
-      },
-      {
-        id: '2',
-        title: 'The Stoic approach to dealing with uncertainty',
-        content: 'In times of uncertainty, Stoicism teaches us to focus on what we can control. Here are three practical exercises to help you navigate uncertainty with wisdom...',
-        author: {
-          name: 'Marcus Aurelius',
-          avatar: '/avatars/marcus.jpg',
-          isAI: true,
-          persona: 'Stoic Philosopher',
-        },
-        type: 'ai',
-        category: 'Wisdom',
-        tags: ['stoicism', 'uncertainty', 'control'],
-        replies: 12,
-        views: 89,
-        likes: 31,
-        isLiked: true,
-        isBookmarked: false,
-        createdAt: '2024-01-15T09:15:00Z',
-        lastActivity: '2024-01-15T16:45:00Z',
-        aiInsights: [
-          'Focus on what you can control',
-          'Practice negative visualization',
-          'Embrace the present moment'
-        ],
-      },
-      {
-        id: '3',
-        title: 'Building sustainable habits for justice',
-        content: 'Justice isn\'t just about big actions - it\'s about the small choices we make every day. How do you practice fairness and service in your daily routine?',
-        author: {
-          name: 'Alex Rodriguez',
-          avatar: '/avatars/alex.jpg',
-          isAI: false,
-        },
-        type: 'user',
-        category: 'Justice',
-        tags: ['justice', 'habits', 'daily-routine'],
-        replies: 5,
-        views: 67,
-        likes: 18,
-        isLiked: false,
-        isBookmarked: true,
-        createdAt: '2024-01-15T08:45:00Z',
-        lastActivity: '2024-01-15T12:30:00Z',
-      },
-    ];
+    if (authLoading) return;
 
-    // Simulate loading
-    setTimeout(() => {
-      setThreads(mockThreads);
-      setLoading(false);
-    }, 1000);
-  }, []);
+    const fetchThreads = async () => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        if (selectedCategory !== 'all') {
+          params.append('category', selectedCategory);
+        }
+        if (activeFilter !== 'all') {
+          params.append('type', activeFilter === 'ai' ? 'ai_question' : 'member_discussion');
+        }
+
+        const response = await fetch(`/api/community?${params.toString()}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch threads');
+        }
+
+        const data = await response.json();
+        
+        // Transform API data to match Thread interface
+        const transformedThreads: Thread[] = data.posts.map((post: any) => ({
+          id: post.id,
+          title: post.title,
+          content: post.content,
+          author: {
+            name: post.author.displayName || post.author.username,
+            avatar: `/avatars/${post.author.username}.jpg`,
+            isAI: post.isAIQuestion,
+          },
+          type: post.isAIQuestion ? 'ai' : 'user',
+          category: post.category,
+          tags: post.tags,
+          replies: post._count.replies,
+          views: post.views,
+          likes: post._count.likes,
+          isLiked: false, // Will be updated when we implement user-specific data
+          isBookmarked: false, // Will be updated when we implement user-specific data
+          createdAt: post.createdAt,
+          lastActivity: post.updatedAt,
+          isPinned: post.isPinned,
+          aiInsights: post.aiInsights,
+        }));
+
+        setThreads(transformedThreads);
+      } catch (err) {
+        console.error('Error fetching threads:', err);
+        setError('Failed to load community threads');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchThreads();
+  }, [authLoading, selectedCategory, activeFilter]);
 
   const toggleLike = async (threadId: string) => {
-    setThreads(prev => 
-      prev.map(thread => 
-        thread.id === threadId 
-          ? { ...thread, isLiked: !thread.isLiked, likes: thread.isLiked ? thread.likes - 1 : thread.likes + 1 }
-          : thread
-      )
-    );
+    try {
+      const response = await fetch(`/api/community/${threadId}/like`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to toggle like');
+      }
+
+      const result = await response.json();
+      
+      setThreads(prev => 
+        prev.map(thread => 
+          thread.id === threadId 
+            ? { 
+                ...thread, 
+                isLiked: result.liked, 
+                likes: result.liked ? thread.likes + 1 : thread.likes - 1 
+              }
+            : thread
+        )
+      );
+    } catch (error) {
+      console.error('Error toggling like:', error);
+    }
   };
 
   const toggleBookmark = async (threadId: string) => {
@@ -174,21 +174,39 @@ export default function CommunityPage() {
     try {
       setCreatingThread(true);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await fetch('/api/community', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: newThread.title,
+          content: newThread.content,
+          type: 'member_discussion',
+          category: newThread.category,
+          tags: newThread.tags,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create thread');
+      }
+
+      const newPost = await response.json();
       
+      // Transform the new post to match Thread interface
       const newThreadData: Thread = {
-        id: Date.now().toString(),
-        title: newThread.title,
-        content: newThread.content,
+        id: newPost.id,
+        title: newPost.title,
+        content: newPost.content,
         author: {
-          name: 'You',
-          avatar: '/avatars/user.jpg',
+          name: newPost.author.displayName || newPost.author.username,
+          avatar: `/avatars/${newPost.author.username}.jpg`,
           isAI: false,
         },
         type: 'user',
-        category: newThread.category,
-        tags: newThread.tags,
+        category: newPost.category,
+        tags: newPost.tags,
         replies: 0,
         views: 0,
         likes: 0,

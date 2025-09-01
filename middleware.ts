@@ -61,34 +61,6 @@ export async function middleware(request: NextRequest) {
 
   // Handle authentication logic
   if (isProtectedRoute && !isAuthenticated) {
-    // Allow main pages for development/testing
-    const allowedPaths = [
-      '/',
-      '/dashboard',
-      '/frameworks',
-      '/wisdom',
-      '/courage', 
-      '/justice',
-      '/temperance',
-      '/community',
-      '/today',
-      '/academy',
-      '/philosophers',
-      '/breath',
-      '/coach',
-      '/fasting',
-      '/progress',
-      '/onboarding',
-      '/tools'
-    ];
-    
-    const isAllowedPath = allowedPaths.includes(pathname) || pathname.startsWith('/frameworks/');
-    
-    if (isAllowedPath) {
-      console.log('✅ Allowing page access for development:', pathname);
-      return NextResponse.next();
-    }
-    
     console.log('🚫 Redirecting to auth (not authenticated)');
     return NextResponse.redirect(new URL('/auth', request.url));
   }
