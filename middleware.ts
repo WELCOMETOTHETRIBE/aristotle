@@ -61,6 +61,12 @@ export async function middleware(request: NextRequest) {
 
   // Handle authentication logic
   if (isProtectedRoute && !isAuthenticated) {
+    // Allow access in development mode
+    if (process.env.NODE_ENV === 'development') {
+      console.log('✅ Allowing page access for development:', pathname);
+      return NextResponse.next();
+    }
+    
     console.log('🚫 Redirecting to auth (not authenticated)');
     return NextResponse.redirect(new URL('/auth', request.url));
   }

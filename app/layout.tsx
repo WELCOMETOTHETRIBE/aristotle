@@ -14,6 +14,13 @@ export const metadata: Metadata = {
   description: "A comprehensive wellness system based on ancient philosophical wisdom and modern science",
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
