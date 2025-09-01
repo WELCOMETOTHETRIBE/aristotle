@@ -74,6 +74,9 @@ export default function CommunityPage() {
   const [selectedThreadForComment, setSelectedThreadForComment] = useState<Thread | null>(null);
   const [newComment, setNewComment] = useState('');
   const [postingComment, setPostingComment] = useState(false);
+  
+  // AI Comments state
+  const [aiComments, setAiComments] = useState<{[threadId: string]: any[]}>({});
 
   const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
 
@@ -230,6 +233,46 @@ export default function CommunityPage() {
         category: 'Stoicism',
         tags: [],
       });
+
+      // Trigger AI philosopher comment
+      setTimeout(async () => {
+        try {
+          const aiResponse = await fetch('/api/community/ai-comment', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              threadId: newPost.id,
+              threadTitle: newThread.title,
+              threadContent: newThread.content,
+              threadCategory: newThread.category,
+            }),
+          });
+
+          if (aiResponse.ok) {
+            const aiData = await aiResponse.json();
+            console.log(`AI comment from ${aiData.philosopher.name}: ${aiData.comment.content}`);
+            
+            // Store the AI comment in frontend state
+            setAiComments(prev => ({
+              ...prev,
+              [newPost.id]: [...(prev[newPost.id] || []), aiData.comment]
+            }));
+            
+            // Update the thread's reply count
+            setThreads(prev => 
+              prev.map(thread => 
+                thread.id === newPost.id 
+                  ? { ...thread, replies: thread.replies + 1 }
+                  : thread
+              )
+            );
+          }
+        } catch (error) {
+          console.error('Error triggering AI comment:', error);
+        }
+      }, 2000); // Wait 2 seconds before AI responds
     } catch (error) {
       console.error('Error creating thread:', error);
       setError('Failed to create thread');
@@ -487,6 +530,24 @@ export default function CommunityPage() {
                         </li>
                       ))}
                     </ul>
+                  </div>
+                )}
+
+                {/* AI Philosopher Comments */}
+                {aiComments[thread.id] && aiComments[thread.id].length > 0 && (
+                  <div className="mb-3 space-y-2">
+                    {aiComments[thread.id].map((comment, idx) => (
+                      <div key={comment.id} className="p-3 bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">{comment.author.avatar}</span>
+                          <div>
+                            <div className="font-medium text-primary text-sm">{comment.author.name}</div>
+                            <div className="text-xs text-primary/70">{comment.author.persona}</div>
+                          </div>
+                        </div>
+                        <p className="text-sm text-text leading-relaxed">{comment.content}</p>
+                      </div>
+                    ))}
                   </div>
                 )}
 
