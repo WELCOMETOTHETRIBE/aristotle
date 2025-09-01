@@ -43,12 +43,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if intention already exists for this user, date, and time period
+    const today = new Date();
+    const startOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const endOfDay = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59, 999);
+    
     const existingIntention = await prisma.dailyIntention.findFirst({
       where: {
         userId: parseInt(userId),
         date: {
-          gte: new Date().setHours(0, 0, 0, 0),
-          lt: new Date().setHours(23, 59, 59, 999)
+          gte: startOfDay,
+          lt: endOfDay
         },
         timePeriod
       }

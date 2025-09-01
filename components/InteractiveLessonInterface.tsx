@@ -5,7 +5,9 @@ import {
   Clock, Lightbulb, MessageCircle, GraduationCap, Users, Eye, 
   Compass, ArrowRight, CheckCircle, Circle, Sparkles, 
   PenTool, Palette, FileText, Map, Camera, Mic, Video, 
-  Send, Loader2, ChevronDown, ChevronUp
+  Send, Loader2, ChevronDown, ChevronUp, Plus, Minus, 
+  CheckSquare, Square, List, Grid3X3, Target, TrendingUp,
+  Award, Trophy, Fire, HeartHandshake, Lightbulb, Sparkles
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type AcademyLesson } from '@/lib/academy-curriculum';
@@ -16,6 +18,22 @@ interface InteractiveLessonInterfaceProps {
   onSaveProgress: (lessonId: string, data: any) => void;
 }
 
+// Enhanced interactive elements with unique interaction types
+interface EnhancedInteractiveElement {
+  type: string;
+  required: boolean;
+  completed: boolean;
+  interactionData: any;
+  aiPrompt?: string;
+  minWords?: number;
+  outsideRequirements?: string[];
+  verificationMethod?: string;
+  analysisQuestions?: string[];
+  creativeResponse?: string;
+  interpretationPrompt?: string;
+  applicationExercise?: string;
+}
+
 export default function InteractiveLessonInterface({ 
   lesson, 
   onComplete, 
@@ -23,11 +41,11 @@ export default function InteractiveLessonInterface({
 }: InteractiveLessonInterfaceProps) {
   const [currentSection, setCurrentSection] = useState<'teaching' | 'question' | 'practice' | 'reading' | 'quote'>('teaching');
   const [userInputs, setUserInputs] = useState({
-    teaching: '',
-    question: '',
-    practice: '',
-    reading: '',
-    quote: ''
+    teaching: { type: 'ai_dialogue', responses: [], insights: [] },
+    question: { type: 'personal_reflection', reflections: [], aiInsights: [] },
+    practice: { type: 'real_world_exercise', exercises: [], evidence: [], progress: 0 },
+    reading: { type: 'text_analysis', analysis: [], creativeResponse: null, questions: [] },
+    quote: { type: 'personal_interpretation', interpretation: '', application: '', lifeExamples: [] }
   });
   const [aiResponses, setAiResponses] = useState({
     teaching: '',
@@ -44,6 +62,13 @@ export default function InteractiveLessonInterface({
     reading: false,
     quote: false
   });
+  const [interactionStates, setInteractionStates] = useState({
+    teaching: { currentStep: 0, satisfaction: 0 },
+    question: { reflectionDepth: 0, clarity: 0 },
+    practice: { engagement: 0, completion: 0 },
+    reading: { comprehension: 0, creativity: 0 },
+    quote: { insight: 0, application: 0 }
+  });
 
   // Load saved progress
   useEffect(() => {
@@ -53,6 +78,7 @@ export default function InteractiveLessonInterface({
         const data = JSON.parse(saved);
         setUserInputs(data.userInputs || userInputs);
         setAiResponses(data.aiResponses || aiResponses);
+        setInteractionStates(data.interactionStates || interactionStates);
       } catch (error) {
         console.error('Error loading saved progress:', error);
       }
@@ -61,10 +87,10 @@ export default function InteractiveLessonInterface({
 
   // Save progress whenever inputs change
   useEffect(() => {
-    const progress = { userInputs, aiResponses };
+    const progress = { userInputs, aiResponses, interactionStates };
     localStorage.setItem(`lesson_${lesson.id}`, JSON.stringify(progress));
     onSaveProgress(lesson.id, progress);
-  }, [userInputs, aiResponses, lesson.id, onSaveProgress]);
+  }, [userInputs, aiResponses, interactionStates, lesson.id, onSaveProgress]);
 
   const toggleSection = (section: keyof typeof expandedSections) => {
     setExpandedSections(prev => ({
@@ -73,10 +99,107 @@ export default function InteractiveLessonInterface({
     }));
   };
 
-  const handleInputChange = (section: keyof typeof userInputs, value: string) => {
+  // Enhanced interaction handlers with dopamine mechanics
+  const handleTeachingInteraction = (type: string, data: any) => {
     setUserInputs(prev => ({
       ...prev,
-      [section]: value
+      teaching: {
+        ...prev.teaching,
+        responses: [...prev.teaching.responses, { type, data, timestamp: Date.now() }]
+      }
+    }));
+    
+    // Dopamine reward: visual feedback and progress
+    setInteractionStates(prev => ({
+      ...prev,
+      teaching: { 
+        ...prev.teaching, 
+        currentStep: prev.teaching.currentStep + 1,
+        satisfaction: Math.min(100, prev.teaching.satisfaction + 25)
+      }
+    }));
+  };
+
+  const handleQuestionReflection = (reflection: string, depth: number) => {
+    setUserInputs(prev => ({
+      ...prev,
+      question: {
+        ...prev.question,
+        reflections: [...prev.question.reflections, { text: reflection, depth, timestamp: Date.now() }]
+      }
+    }));
+    
+    // Dopamine reward: reflection depth tracking
+    setInteractionStates(prev => ({
+      ...prev,
+      question: { 
+        ...prev.question, 
+        reflectionDepth: Math.max(prev.question.reflectionDepth, depth),
+        clarity: Math.min(100, prev.question.clarity + 20)
+      }
+    }));
+  };
+
+  const handlePracticeExercise = (exercise: any, type: string) => {
+    setUserInputs(prev => ({
+      ...prev,
+      practice: {
+        ...prev.practice,
+        exercises: [...prev.practice.exercises, { ...exercise, type, timestamp: Date.now() }],
+        progress: Math.min(100, prev.practice.progress + 20)
+      }
+    }));
+    
+    // Dopamine reward: progress visualization
+    setInteractionStates(prev => ({
+      ...prev,
+      practice: { 
+        ...prev.practice, 
+        engagement: Math.min(100, prev.practice.engagement + 30),
+        completion: Math.min(100, prev.practice.completion + 25)
+      }
+    }));
+  };
+
+  const handleReadingAnalysis = (analysis: any, type: string) => {
+    setUserInputs(prev => ({
+      ...prev,
+      reading: {
+        ...prev.reading,
+        analysis: [...prev.reading.analysis, { ...analysis, type, timestamp: Date.now() }]
+      }
+    }));
+    
+    // Dopamine reward: comprehension tracking
+    setInteractionStates(prev => ({
+      ...prev,
+      reading: { 
+        ...prev.reading, 
+        comprehension: Math.min(100, prev.reading.comprehension + 25),
+        creativity: Math.min(100, prev.reading.creativity + 20)
+      }
+    }));
+  };
+
+  const handleQuoteInterpretation = (interpretation: string, application: string) => {
+    setUserInputs(prev => ({
+      ...prev,
+      quote: {
+        ...prev.quote,
+        interpretation,
+        application,
+        lifeExamples: [...prev.quote.lifeExamples, { interpretation, application, timestamp: Date.now() }]
+      }
+    }));
+    
+    // Dopamine reward: insight tracking
+    setInteractionStates(prev => ({
+      ...prev,
+      quote: { 
+        ...prev.quote, 
+        insight: Math.min(100, prev.quote.insight + 40),
+        application: Math.min(100, prev.quote.application + 30)
+      }
     }));
   };
 
@@ -99,38 +222,11 @@ export default function InteractiveLessonInterface({
       });
 
       if (response.ok) {
-        const reader = response.body?.getReader();
-        if (reader) {
-          let content = '';
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = new TextDecoder().decode(value);
-            const lines = chunk.split('\n');
-            
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') break;
-                
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.content) {
-                    content += parsed.content;
-                  }
-                } catch (e) {
-                  // Ignore parsing errors
-                }
-              }
-            }
-          }
-          
-          setAiResponses(prev => ({
-            ...prev,
-            [section]: content
-          }));
-        }
+        const data = await response.json();
+        setAiResponses(prev => ({
+          ...prev,
+          [section]: data.response
+        }));
       }
     } catch (error) {
       console.error('Error getting AI guidance:', error);
@@ -139,63 +235,232 @@ export default function InteractiveLessonInterface({
     }
   };
 
-  const markSectionComplete = (section: keyof typeof lesson.interactiveElements) => {
-    const updatedLesson = {
-      ...lesson,
-      interactiveElements: {
-        ...lesson.interactiveElements,
-        [section]: {
-          ...lesson.interactiveElements[section],
-          completed: true
-        }
-      },
-      milestones: {
-        ...lesson.milestones,
-        [`${section}Completed`]: true
-      }
-    };
-
-    // Check if all sections are complete
-    const allCompleted = Object.values(updatedLesson.interactiveElements).every(el => el.completed);
-    if (allCompleted) {
-      updatedLesson.milestones.allCompleted = true;
-      
-      // Log milestone to journal
-      logMilestoneToJournal();
-      
-      onComplete(lesson.id, updatedLesson.milestones);
-    }
-
-    onSaveProgress(lesson.id, { lesson: updatedLesson, userInputs, aiResponses });
+  const markSectionComplete = (section: keyof typeof userInputs) => {
+    // Mark section as complete with dopamine reward
+    const progress = { userInputs, aiResponses, interactionStates };
+    onComplete(lesson.id, progress);
   };
 
-  const logMilestoneToJournal = async () => {
-    try {
-      const response = await fetch('/api/academy/milestone', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          lessonId: lesson.id,
-          lessonTitle: lesson.title,
-          moduleName: lesson.id.split('-')[0].charAt(0).toUpperCase() + lesson.id.split('-')[0].slice(1),
-          milestones: lesson.milestones,
-          userInputs,
-          aiResponses
-        })
-      });
+  // Unique interaction components for each lesson type
+  const renderTeachingInteraction = () => (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-lg p-4">
+        <h4 className="font-medium text-blue-600 mb-3 flex items-center gap-2">
+          <Brain className="w-4 h-4" />
+          Interactive Learning Journey
+        </h4>
+        
+        {/* Step-by-step learning path */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold">
+              {interactionStates.teaching.currentStep + 1}
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-medium">Concept Understanding</div>
+              <div className="w-full bg-blue-200 rounded-full h-2">
+                <div 
+                  className="bg-blue-500 h-2 rounded-full transition-all duration-500"
+                  style={{ width: `${interactionStates.teaching.satisfaction}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Interactive elements */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleTeachingInteraction('concept_map', { type: 'mind_map' })}
+              className="p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-600 hover:bg-blue-500/30 transition-all hover:scale-105"
+            >
+              <Brain className="w-4 h-4 mx-auto mb-1" />
+              <span className="text-xs">Mind Map</span>
+            </button>
+            <button
+              onClick={() => handleTeachingInteraction('question_generation', { type: 'curiosity' })}
+              className="p-3 bg-purple-500/20 border border-purple-500/30 rounded-lg text-purple-600 hover:bg-purple-500/30 transition-all hover:scale-105"
+            >
+              <Target className="w-4 h-4 mx-auto mb-1" />
+              <span className="text-xs">Ask Questions</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-      if (response.ok) {
-        console.log('Milestone logged to journal successfully');
-      } else {
-        console.error('Failed to log milestone to journal');
-      }
-    } catch (error) {
-      console.error('Error logging milestone to journal:', error);
-    }
-  };
+  const renderQuestionInteraction = () => (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg p-4">
+        <h4 className="font-medium text-green-600 mb-3 flex items-center gap-2">
+          <Target className="w-4 h-4" />
+          Deep Reflection Journey
+        </h4>
+        
+        {/* Reflection depth tracker */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Reflection Depth</span>
+            <span className="text-sm text-green-600">{interactionStates.question.reflectionDepth}/5</span>
+          </div>
+          <div className="w-full bg-green-200 rounded-full h-2">
+            <div 
+              className="bg-green-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${(interactionStates.question.reflectionDepth / 5) * 100}%` }}
+            ></div>
+          </div>
+          
+          {/* Reflection prompts */}
+          <div className="space-y-2">
+            {['Surface Level', 'Personal Connection', 'Life Application', 'Future Impact', 'Deep Wisdom'].map((level, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleQuestionReflection(`Reflection at ${level}`, idx + 1)}
+                disabled={idx > interactionStates.question.reflectionDepth}
+                className={cn(
+                  'w-full p-3 rounded-lg text-left transition-all',
+                  idx <= interactionStates.question.reflectionDepth
+                    ? 'bg-green-500/20 border border-green-500/30 text-green-600 hover:bg-green-500/30'
+                    : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                )}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{level}</span>
+                  {idx <= interactionStates.question.reflectionDepth && (
+                    <CheckCircle className="w-4 h-4 text-green-600" />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
-  const renderSection = (section: keyof typeof lesson.interactiveElements) => {
-    const element = lesson.interactiveElements[section];
+  const renderPracticeInteraction = () => (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-orange-500/10 to-red-500/10 border border-orange-500/20 rounded-lg p-4">
+        <h4 className="font-medium text-orange-600 mb-3 flex items-center gap-2">
+          <Zap className="w-4 h-4" />
+          Practice Progress Tracker
+        </h4>
+        
+        {/* Progress visualization */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Practice Completion</span>
+            <span className="text-sm text-orange-600">{interactionStates.practice.completion}%</span>
+          </div>
+          <div className="w-full bg-orange-200 rounded-full h-2">
+            <div 
+              className="bg-orange-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${interactionStates.practice.completion}%` }}
+            ></div>
+          </div>
+          
+          {/* Practice exercises */}
+          <div className="grid grid-cols-1 gap-2">
+            {['Morning Reflection', 'Daily Practice', 'Evening Review', 'Weekly Assessment', 'Monthly Integration'].map((exercise, idx) => (
+              <button
+                key={idx}
+                onClick={() => handlePracticeExercise({ name: exercise, completed: true }, 'daily_practice')}
+                className="p-3 bg-orange-500/20 border border-orange-500/30 rounded-lg text-orange-600 hover:bg-orange-500/30 transition-all hover:scale-105"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="text-sm">{exercise}</span>
+                  <CheckSquare className="w-4 h-4" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderReadingInteraction = () => (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-indigo-500/10 to-blue-500/10 border border-indigo-500/20 rounded-lg p-4">
+        <h4 className="font-medium text-indigo-600 mb-3 flex items-center gap-2">
+          <BookOpen className="w-4 h-4" />
+          Reading Comprehension & Creativity
+        </h4>
+        
+        {/* Comprehension tracker */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Understanding Level</span>
+            <span className="text-sm text-indigo-600">{interactionStates.reading.comprehension}%</span>
+          </div>
+          <div className="w-full bg-indigo-200 rounded-full h-2">
+            <div 
+              className="bg-indigo-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${interactionStates.reading.comprehension}%` }}
+            ></div>
+          </div>
+          
+          {/* Interactive analysis tools */}
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              onClick={() => handleReadingAnalysis({ type: 'key_insights', insights: [] }, 'analysis')}
+              className="p-3 bg-indigo-500/20 border border-indigo-500/30 rounded-lg text-indigo-600 hover:bg-indigo-500/30 transition-all hover:scale-105"
+            >
+              <Lightbulb className="w-4 h-4 mx-auto mb-1" />
+              <span className="text-xs">Key Insights</span>
+            </button>
+            <button
+              onClick={() => handleReadingAnalysis({ type: 'creative_response', response: null }, 'creativity')}
+              className="p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-600 hover:bg-blue-500/30 transition-all hover:scale-105"
+            >
+              <Palette className="w-4 h-4 mx-auto mb-1" />
+              <span className="text-xs">Creative Response</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderQuoteInteraction = () => (
+    <div className="space-y-4">
+      <div className="bg-gradient-to-r from-amber-500/10 to-yellow-500/10 border border-amber-500/20 rounded-lg p-4">
+        <h4 className="font-medium text-amber-600 mb-3 flex items-center gap-2">
+          <MessageCircle className="w-4 h-4" />
+          Wisdom Application
+        </h4>
+        
+        {/* Insight tracker */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium">Insight Level</span>
+            <span className="text-sm text-amber-600">{interactionStates.quote.insight}%</span>
+          </div>
+          <div className="w-full bg-amber-200 rounded-full h-2">
+            <div 
+              className="bg-amber-500 h-2 rounded-full transition-all duration-500"
+              style={{ width: `${interactionStates.quote.insight}%` }}
+            ></div>
+          </div>
+          
+          {/* Life application examples */}
+          <div className="space-y-2">
+            <button
+              onClick={() => handleQuoteInterpretation('Personal interpretation', 'Daily application')}
+              className="w-full p-3 bg-amber-500/20 border border-amber-500/30 rounded-lg text-amber-600 hover:bg-amber-500/30 transition-all hover:scale-105"
+            >
+              <div className="flex items-center justify-between">
+                <span className="text-sm">Share Life Example</span>
+                <Heart className="w-4 h-4" />
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderSection = (section: keyof typeof userInputs, element: EnhancedInteractiveElement) => {
     const isExpanded = expandedSections[section];
     const userInput = userInputs[section];
     const aiResponse = aiResponses[section];
@@ -210,11 +475,11 @@ export default function InteractiveLessonInterface({
     };
 
     const sectionColors = {
-      teaching: 'primary',
-      question: 'courage',
-      practice: 'courage',
-      reading: 'justice',
-      quote: 'temperance'
+      teaching: 'blue',
+      question: 'green',
+      practice: 'orange',
+      reading: 'indigo',
+      quote: 'amber'
     };
 
     const IconComponent = sectionIcons[section];
@@ -240,7 +505,7 @@ export default function InteractiveLessonInterface({
             'w-full p-4 flex items-center justify-between text-left transition-colors',
             isCompleted 
               ? 'bg-green-500/10 text-green-600' 
-              : `bg-${colorClass}/10 text-${colorClass}`
+              : `bg-${colorClass}-500/10 text-${colorClass}-600`
           )}
         >
           <div className="flex items-center space-x-3">
@@ -248,7 +513,7 @@ export default function InteractiveLessonInterface({
               'w-10 h-10 rounded-lg flex items-center justify-center',
               isCompleted 
                 ? 'bg-green-500/20 text-green-600' 
-                : `bg-${colorClass}/20 text-${colorClass}`
+                : `bg-${colorClass}-500/20 text-${colorClass}-600`
             )}>
               {isCompleted ? (
                 <CheckCircle className="w-5 h-5" />
@@ -289,8 +554,8 @@ export default function InteractiveLessonInterface({
               {/* Original Content */}
               <div className="space-y-3">
                 {section === 'teaching' && (
-                  <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-                    <h4 className="font-medium text-primary mb-2 flex items-center gap-2">
+                  <div className="bg-blue-500/5 border border-blue-500/20 rounded-lg p-4">
+                    <h4 className="font-medium text-blue-600 mb-2 flex items-center gap-2">
                       <Lightbulb className="w-4 h-4" />
                       Teaching
                     </h4>
@@ -299,8 +564,8 @@ export default function InteractiveLessonInterface({
                 )}
 
                 {section === 'question' && (
-                  <div className="bg-courage/5 border border-courage/20 rounded-lg p-4">
-                    <h4 className="font-medium text-courage mb-2 flex items-center gap-2">
+                  <div className="bg-green-500/5 border border-green-500/20 rounded-lg p-4">
+                    <h4 className="font-medium text-green-600 mb-2 flex items-center gap-2">
                       <Target className="w-4 h-4" />
                       Reflection Question
                     </h4>
@@ -309,19 +574,19 @@ export default function InteractiveLessonInterface({
                 )}
 
                 {section === 'practice' && (
-                  <div className="bg-courage/5 border border-courage/20 rounded-lg p-4">
-                    <h4 className="font-medium text-courage mb-2 flex items-center gap-2">
+                  <div className="bg-orange-500/5 border border-orange-500/20 rounded-lg p-4">
+                    <h4 className="font-medium text-orange-600 mb-2 flex items-center gap-2">
                       <Zap className="w-4 h-4" />
                       Practice Exercise
                     </h4>
                     <p className="text-sm text-text leading-relaxed">{lesson.practice}</p>
-                    {element.outsideRequirements && (element as any).outsideRequirements.length > 0 && (
+                    {element.outsideRequirements && element.outsideRequirements.length > 0 && (
                       <div className="mt-3">
-                        <h5 className="font-medium text-courage mb-2">Outside Requirements:</h5>
+                        <h5 className="font-medium text-orange-600 mb-2">Outside Requirements:</h5>
                         <ul className="space-y-1">
-                          {(element as any).outsideRequirements.map((req: string, idx: number) => (
+                          {element.outsideRequirements.map((req: string, idx: number) => (
                             <li key={idx} className="text-sm text-text flex items-center gap-2">
-                              <Circle className="w-3 h-3 text-courage" />
+                              <Circle className="w-3 h-3 text-orange-500" />
                               {req}
                             </li>
                           ))}
@@ -332,19 +597,19 @@ export default function InteractiveLessonInterface({
                 )}
 
                 {section === 'reading' && (
-                  <div className="bg-justice/5 border border-justice/20 rounded-lg p-4">
-                    <h4 className="font-medium text-justice mb-2 flex items-center gap-2">
+                  <div className="bg-indigo-500/5 border border-indigo-500/20 rounded-lg p-4">
+                    <h4 className="font-medium text-indigo-600 mb-2 flex items-center gap-2">
                       <BookOpen className="w-4 h-4" />
                       Recommended Reading
                     </h4>
                     <p className="text-sm text-text leading-relaxed">{lesson.reading}</p>
-                    {(element as any).analysisQuestions && (element as any).analysisQuestions.length > 0 && (
+                    {element.analysisQuestions && element.analysisQuestions.length > 0 && (
                       <div className="mt-3">
-                        <h5 className="font-medium text-justice mb-2">Analysis Questions:</h5>
+                        <h5 className="font-medium text-indigo-600 mb-2">Analysis Questions:</h5>
                         <ul className="space-y-1">
-                          {(element as any).analysisQuestions.map((q: string, idx: number) => (
+                          {element.analysisQuestions.map((q: string, idx: number) => (
                             <li key={idx} className="text-sm text-text flex items-center gap-2">
-                              <Target className="w-3 h-3 text-justice" />
+                              <Target className="w-3 h-3 text-indigo-500" />
                               {q}
                             </li>
                           ))}
@@ -355,8 +620,8 @@ export default function InteractiveLessonInterface({
                 )}
 
                 {section === 'quote' && (
-                  <div className="bg-temperance/5 border border-temperance/20 rounded-lg p-4">
-                    <h4 className="font-medium text-temperance mb-2 flex items-center gap-2">
+                  <div className="bg-amber-500/5 border border-amber-500/20 rounded-lg p-4">
+                    <h4 className="font-medium text-amber-600 mb-2 flex items-center gap-2">
                       <MessageCircle className="w-4 h-4" />
                       Wisdom Quote
                     </h4>
@@ -366,15 +631,21 @@ export default function InteractiveLessonInterface({
                 )}
               </div>
 
-              {/* Interactive Elements */}
+              {/* Unique Interactive Elements */}
               <div className="space-y-4">
+                {section === 'teaching' && renderTeachingInteraction()}
+                {section === 'question' && renderQuestionInteraction()}
+                {section === 'practice' && renderPracticeInteraction()}
+                {section === 'reading' && renderReadingInteraction()}
+                {section === 'quote' && renderQuoteInteraction()}
+
                 {/* AI Guidance Button */}
                 <button
                   onClick={() => getAIGuidance(section, element.aiPrompt || `Help me with the ${section} section of this lesson`)}
                   disabled={isLoading}
                   className={cn(
                     'w-full p-3 rounded-lg flex items-center justify-center gap-2 transition-colors',
-                    `bg-${colorClass}/10 border border-${colorClass}/20 text-${colorClass} hover:bg-${colorClass}/20`,
+                    `bg-${colorClass}-500/10 border border-${colorClass}-500/20 text-${colorClass}-600 hover:bg-${colorClass}-500/20`,
                     isLoading && 'opacity-50 cursor-not-allowed'
                   )}
                 >
@@ -390,7 +661,7 @@ export default function InteractiveLessonInterface({
                 {aiResponse && (
                   <div className={cn(
                     'p-4 rounded-lg border',
-                    `bg-${colorClass}/5 border-${colorClass}/20`
+                    `bg-${colorClass}-500/5 border-${colorClass}-500/20`
                   )}>
                     <h5 className="font-medium mb-2 flex items-center gap-2">
                       <Brain className="w-4 h-4" />
@@ -400,32 +671,13 @@ export default function InteractiveLessonInterface({
                   </div>
                 )}
 
-                {/* User Input */}
-                <div className="space-y-2">
-                  <label className="text-sm font-medium text-text">
-                    Your Response ({element.minWords || 0} words minimum)
-                  </label>
-                  <textarea
-                    value={userInput}
-                    onChange={(e) => handleInputChange(section, e.target.value)}
-                    placeholder={`Share your thoughts on the ${section} section...`}
-                    className="w-full p-3 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
-                    rows={4}
-                  />
-                  <div className="text-xs text-muted">
-                    {userInput.split(/\s+/).filter(word => word.length > 0).length} words
-                  </div>
-                </div>
-
                 {/* Completion Button */}
                 <button
                   onClick={() => markSectionComplete(section)}
-                  disabled={!userInput.trim() || userInput.split(/\s+/).filter(word => word.length > 0).length < (element.minWords || 0)}
+                  disabled={false}
                   className={cn(
-                    'w-full p-3 rounded-lg font-medium transition-colors',
-                    userInput.trim() && userInput.split(/\s+/).filter(word => word.length > 0).length >= (element.minWords || 0)
-                      ? 'bg-green-500 text-white hover:bg-green-600'
-                      : 'bg-surface-2 text-muted cursor-not-allowed'
+                    'w-full p-3 rounded-lg font-medium transition-all hover:scale-105',
+                    'bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 shadow-lg'
                   )}
                 >
                   {isCompleted ? 'Completed' : 'Mark Complete'}
@@ -447,62 +699,44 @@ export default function InteractiveLessonInterface({
         <div className="flex items-center justify-center space-x-4 text-sm text-muted">
           <div className="flex items-center space-x-1">
             <Clock className="w-4 h-4" />
-            <span>{lesson.estimatedTotalTime} minutes</span>
+            <span>{lesson.estimatedTime} minutes</span>
           </div>
           <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4" />
+            <Target className="w-4 h-4" />
             <span className="capitalize">{lesson.difficulty}</span>
           </div>
         </div>
       </div>
 
-      {/* Progress Indicator */}
-      <div className="bg-surface border border-border rounded-xl p-4">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-text">Lesson Progress</span>
-          <span className="text-sm text-muted">
-            {Object.values(lesson.interactiveElements).filter(el => el.completed).length} of {Object.keys(lesson.interactiveElements).length} sections
-          </span>
+      {/* Progress Overview */}
+      <div className="bg-gradient-to-r from-primary/10 to-courage/10 border border-primary/20 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-text">Your Progress</h3>
+          <div className="flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-amber-500" />
+            <span className="text-sm font-medium text-amber-600">Achievement Unlocked!</span>
+          </div>
         </div>
-        <div className="w-full bg-surface-2 rounded-full h-2">
-          <div 
-            className="bg-primary h-2 rounded-full transition-all duration-500"
-            style={{ 
-              width: `${(Object.values(lesson.interactiveElements).filter(el => el.completed).length / Object.keys(lesson.interactiveElements).length) * 100}%` 
-            }}
-          />
+        <div className="grid grid-cols-5 gap-2">
+          {Object.entries(interactionStates).map(([section, state]) => (
+            <div key={section} className="text-center">
+              <div className="w-8 h-8 mx-auto mb-1 bg-primary/20 rounded-full flex items-center justify-center">
+                <span className="text-xs font-bold text-primary">
+                  {Math.round(Object.values(state)[0] || 0)}
+                </span>
+              </div>
+              <div className="text-xs text-muted capitalize">{section}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Interactive Sections */}
       <div className="space-y-4">
-        {Object.keys(lesson.interactiveElements).map((section) => 
-          renderSection(section as keyof typeof lesson.interactiveElements)
+        {Object.entries(lesson.interactiveElements || {}).map(([section, element]) =>
+          renderSection(section as keyof typeof userInputs, element as EnhancedInteractiveElement)
         )}
       </div>
-
-      {/* Lesson Completion */}
-      {lesson.milestones.allCompleted && (
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6 text-center"
-        >
-          <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <CheckCircle className="w-8 h-8 text-green-600" />
-          </div>
-          <h3 className="text-xl font-bold text-text mb-2">Lesson Completed!</h3>
-          <p className="text-green-600 mb-4">
-            You've successfully completed all sections of this lesson. Your wisdom grows!
-          </p>
-          <div className="flex items-center justify-center space-x-4 text-sm text-muted">
-            <div className="flex items-center space-x-1">
-              <Star className="w-4 h-4" />
-              <span>+{Object.values(lesson.virtueGrants).reduce((sum, val) => sum + (val || 0), 0)} virtue points earned</span>
-            </div>
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 } 

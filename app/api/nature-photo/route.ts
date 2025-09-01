@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
-import { existsSync } from 'fs';
+import { getStorageService, generateUniqueFilename, getFileExtensionFromBase64 } from '@/lib/storage-service';
 
 const prisma = new PrismaClient();
 
@@ -15,39 +13,22 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), 'public', 'uploads', 'nature-photos');
-    try {
-      if (!existsSync(uploadsDir)) {
-        await mkdir(uploadsDir, { recursive: true });
-      }
-    } catch (dirError) {
-      console.error('Error creating uploads directory:', dirError);
-      return NextResponse.json({ error: 'Failed to create upload directory' }, { status: 500 });
-    }
-
-    // Generate unique filename with better naming
-    const timestamp = Date.now();
-    const randomId = Math.random().toString(36).substring(2, 15);
-    const filename = `nature_${userId}_${timestamp}_${randomId}.jpg`;
-    const filePath = join(uploadsDir, filename);
+    // Get storage service for current environment
+    const storageService = getStorageService();
+    
+    // Generate unique filename with proper extension
+    const fileExtension = getFileExtensionFromBase64(imageData);
+    const filename = generateUniqueFilename(parseInt(userId), fileExtension);
 
     try {
-      // Convert base64 to buffer and save file
-      const base64Data = imageData.replace(/^data:image\/[a-z]+;base64,/, '');
-      const buffer = Buffer.from(base64Data, 'base64');
-      await writeFile(filePath, buffer);
-    } catch (fileError) {
-      console.error('Error saving image file:', fileError);
-      return NextResponse.json({ error: 'Failed to save image file' }, { status: 500 });
-    }
-
-    // Save to database
-    try {
+      // Save image using storage service
+      const imageUrl = await storageService.saveImage(filename, imageData);
+      
+      // Save to database
       const photo = await prisma.naturePhoto.create({
         data: {
           userId: parseInt(userId),
-          imagePath: `/uploads/nature-photos/${filename}`,
+          imagePath: imageUrl,
           caption,
           tags,
           location: location || null,
@@ -62,20 +43,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ 
         success: true,
         photo,
-        message: 'Photo uploaded successfully'
+        message: 'Photo uploaded successfully',
+        note: process.env.NODE_ENV === 'production' 
+          ? 'Image stored in temporary location. Consider implementing cloud storage for production.' 
+          : 'Image stored successfully'
       });
-    } catch (dbError) {
-      console.error('Error saving to database:', dbError);
-      // Try to clean up the file if database save failed
-      try {
-        const fs = require('fs');
-        if (existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-        }
-      } catch (cleanupError) {
-        console.error('Error cleaning up file:', cleanupError);
-      }
-      return NextResponse.json({ error: 'Failed to save photo to database' }, { status: 500 });
+    } catch (storageError) {
+      console.error('Error saving image:', storageError);
+      return NextResponse.json({ error: 'Failed to save image' }, { status: 500 });
     }
   } catch (error) {
     console.error('Error uploading nature photo:', error);

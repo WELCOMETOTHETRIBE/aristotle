@@ -22,7 +22,7 @@ interface Thread {
     isAI: boolean;
     persona?: string;
   };
-  type: 'user' | 'ai';
+  type: 'user' | 'ai' | 'nature_photo';
   category: string;
   tags: string[];
   replies: number;
@@ -34,6 +34,8 @@ interface Thread {
   lastActivity: string;
   isPinned?: boolean;
   aiInsights?: string[];
+  imagePath?: string;
+  aiComment?: string;
 }
 
 interface Reply {
@@ -80,7 +82,7 @@ export default function CommunityPage() {
   const [aiCommentLoading, setAiCommentLoading] = useState<{[threadId: string]: boolean}>({});
   const [generatingAIThread, setGeneratingAIThread] = useState(false);
 
-  const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
+  const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance', 'Nature Logs'];
 
   // Function to extract insights from AI philosopher comments
   const extractInsightsFromComment = (commentContent: string): string[] => {
@@ -581,7 +583,7 @@ export default function CommunityPage() {
       setThreads(prev => [newAIThread, ...prev]);
       console.log('AI thread successfully added to threads list');
       
-      // Refresh the threads list to ensure we have the latest data from the database
+      // Reload page to show updated data
       setTimeout(() => {
         window.location.reload();
       }, 1000);
@@ -776,6 +778,30 @@ export default function CommunityPage() {
                   <p className="text-muted text-sm line-clamp-3 leading-relaxed">
                     {thread.content}
                   </p>
+                  
+                  {/* Nature Photo Image Display */}
+                  {thread.type === 'nature_photo' && thread.imagePath && (
+                    <div className="mt-3">
+                      <img
+                        src={thread.imagePath}
+                        alt={thread.title}
+                        className="w-full h-48 object-cover rounded-lg border border-border/50"
+                        onError={(e) => {
+                          // Fallback if image fails to load
+                          (e.currentTarget as HTMLImageElement).style.display = 'none';
+                        }}
+                      />
+                      {thread.aiComment && (
+                        <div className="mt-3 p-3 bg-gradient-to-r from-green-500/5 to-emerald-500/10 rounded-lg border border-green-500/20">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Brain className="w-4 h-4 text-green-500" />
+                            <span className="text-sm font-medium text-green-600">Nature Wisdom</span>
+                          </div>
+                          <p className="text-sm text-green-700 leading-relaxed">{thread.aiComment}</p>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* AI Insights from Philosopher Comments */}

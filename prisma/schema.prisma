@@ -500,7 +500,7 @@ model CommunityPost {
   content       String
   authorId      Int
   author        User     @relation(fields: [authorId], references: [id])
-  type          String   // ai_question, member_discussion, resource_share
+  type          String   // ai_question, member_discussion, resource_share, nature_photo
   category      String
   tags          String[] // Array of tags
   isPinned      Boolean  @default(false)
@@ -509,6 +509,12 @@ model CommunityPost {
   views         Int      @default(0)
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+  
+  // Nature photo specific fields
+  imagePath     String?  // Path to the nature photo image
+  aiComment     String?  // AI-generated comment for nature photos
+  source        String?  // Source of the post (e.g., 'nature_photo')
+  sourceId      String?  // ID from the source system
 
   replies       CommunityReply[]
   likes         CommunityLike[]
@@ -529,6 +535,10 @@ model CommunityReply {
   likes     Int      @default(0)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // AI comment specific fields
+  philosopher String? // Name of the philosopher for AI comments
+  isAI       Boolean @default(false) // Whether this is an AI-generated comment
 }
 
 model CommunityLike {

@@ -6,6 +6,23 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    const body = await request.json();
+    const { 
+      title, 
+      content, 
+      category, 
+      tags, 
+      imagePath, 
+      aiComment, 
+      source, 
+      sourceId 
+    } = body;
+
+    // Check if this is a nature photo thread request
+    if (source === 'nature_photo') {
+      return await createNaturePhotoThread(body);
+    }
+
     // Enforce server-side authorization via shared secret (e.g., cron job)
     const secret = request.headers.get('x-cron-secret') || request.nextUrl.searchParams.get('secret');
     if (!secret || secret !== process.env.CRON_SECRET) {
@@ -97,13 +114,13 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     const categoryMatch = aiThreadContent.match(/Category:\s*(.+)/);
     const tagsMatch = aiThreadContent.match(/Tags:\s*(.+)/);
 
-    const title = titleMatch ? titleMatch[1].trim() : `Daily Wisdom from ${randomPhilosopher.name}`;
-    const content = contentMatch ? contentMatch[1].trim() : aiThreadContent;
-    const category = categoryMatch ? categoryMatch[1].trim() : 'Wisdom';
-    const tags = tagsMatch ? tagsMatch[1].split(',').map((tag: string) => tag.trim()) : ['daily-wisdom', 'philosophy'];
+    const generatedTitle = titleMatch ? titleMatch[1].trim() : `Daily Wisdom from ${randomPhilosopher.name}`;
+    const generatedContent = contentMatch ? contentMatch[1].trim() : aiThreadContent;
+    const generatedCategory = categoryMatch ? categoryMatch[1].trim() : 'Wisdom';
+    const generatedTags = tagsMatch ? tagsMatch[1].split(',').map((tag: string) => tag.trim()) : ['daily-wisdom', 'philosophy'];
 
     // Extract AI insights from the content
-    const aiInsights = extractAIInsights(content);
+    const aiInsights = extractAIInsights(generatedContent);
 
     // Create a system user for AI posts (or use a default user ID)
     const defaultUserId = 1; // Ensure this exists in DB
@@ -111,12 +128,12 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     // Save the AI thread to the database
     const savedThread = await prisma.communityPost.create({
       data: {
-        title,
-        content,
+        title: generatedTitle,
+        content: generatedContent,
         authorId: defaultUserId,
         type: 'ai_question',
-        category,
-        tags,
+        category: generatedCategory,
+        tags: generatedTags,
         isAIQuestion: true,
         aiInsights,
         views: 0,
@@ -168,6 +185,104 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
   } catch (error) {
     console.error('Error generating AI thread:', error);
     return NextResponse.json({ error: 'Failed to generate AI thread' }, { status: 500 });
+  }
+}
+
+// Function to create nature photo community threads
+async function createNaturePhotoThread(data: any) {
+  try {
+    console.log('Creating nature photo thread with data:', data);
+    const { title, content, category, tags, imagePath, aiComment, sourceId } = data;
+    
+    // Create a system user for AI posts (or use a default user ID)
+    const defaultUserId = 1; // Ensure this exists in DB
+
+    console.log('About to create community post with data:', {
+      title: title || 'Nature Log: A Moment of Reflection',
+      content: content || 'A moment captured in nature that speaks to the soul.',
+      authorId: defaultUserId,
+      type: 'nature_photo',
+      category: category || 'Nature Logs',
+      tags: tags || ['Nature Logs', 'reflection', 'nature'],
+      isAIQuestion: false,
+      aiInsights: aiComment ? [aiComment] : [],
+      views: 0,
+      imagePath,
+      source: 'nature_photo',
+      sourceId: sourceId?.toString(),
+      aiComment,
+    });
+
+    // Save the nature photo thread to the database
+    const savedThread = await prisma.communityPost.create({
+      data: {
+        title: title || 'Nature Log: A Moment of Reflection',
+        content: content || 'A moment captured in nature that speaks to the soul.',
+        authorId: defaultUserId,
+        type: 'nature_photo',
+        category: category || 'Nature Logs',
+        tags: tags || ['Nature Logs', 'reflection', 'nature'],
+        isAIQuestion: false,
+        aiInsights: aiComment ? [aiComment] : [],
+        views: 0,
+        imagePath,
+        source: 'nature_photo',
+        sourceId: sourceId?.toString(),
+        aiComment,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+          },
+        },
+        _count: {
+          select: {
+            replies: true,
+            likes: true,
+          },
+        },
+      },
+    });
+
+    console.log('Nature photo thread created successfully:', savedThread);
+
+    return NextResponse.json({
+      success: true,
+      thread: {
+        id: savedThread.id,
+        title: savedThread.title,
+        content: savedThread.content,
+        category: savedThread.category,
+        tags: savedThread.tags,
+        author: {
+          name: 'Nature Enthusiast',
+          avatar: '/avatars/nature.jpg',
+          isAI: false,
+        },
+        createdAt: savedThread.createdAt.toISOString(),
+        replies: savedThread._count.replies,
+        views: savedThread.views,
+        likes: savedThread._count.likes,
+        imagePath,
+        aiComment,
+      },
+      message: 'Nature photo thread created successfully'
+    });
+
+  } catch (error) {
+    console.error('Error creating nature photo thread:', error);
+    console.error('Error details:', {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
+    });
+    return NextResponse.json({ 
+      error: 'Failed to create nature photo thread',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 });
   }
 }
 

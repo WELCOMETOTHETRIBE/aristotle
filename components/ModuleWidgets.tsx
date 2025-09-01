@@ -954,6 +954,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [imagePreview, setImagePreview] = useState<string>('');
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [shareToCommunity, setShareToCommunity] = useState(false);
 
   const availableTags = ['dawn', 'dusk', 'tree', 'water', 'earth', 'sky', 'flower', 'animal', 'mountain', 'forest', 'ocean', 'river', 'sunset', 'sunrise', 'clouds', 'rain', 'snow', 'wind'];
 
@@ -1094,6 +1095,19 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         console.log('Photo uploaded successfully:', data);
         setPhotos(prev => [data.photo, ...prev]);
         
+        // If user chose to share to community, create a community thread
+        if (shareToCommunity) {
+          try {
+            await createCommunityThread(data.photo, aiInsights);
+            setSuccessMessage('Photo uploaded and shared to community successfully!');
+          } catch (communityError) {
+            console.error('Failed to share to community:', communityError);
+            setSuccessMessage('Photo uploaded successfully, but failed to share to community.');
+          }
+        } else {
+          setSuccessMessage('Photo uploaded successfully!');
+        }
+        
         // Reset form
         setIsAdding(false);
         setSelectedTags([]);
@@ -1103,9 +1117,9 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         setMood('');
         setUploadedImage(null);
         setImagePreview('');
+        setShareToCommunity(false);
         
         // Show success notification
-        setSuccessMessage('Photo uploaded successfully!');
         setShowSuccess(true);
         setTimeout(() => setShowSuccess(false), 3000);
       } else {
@@ -1117,6 +1131,39 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       alert(`Failed to save photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  // Function to create community thread from nature photo
+  const createCommunityThread = async (photo: NaturePhoto, aiInsights: string) => {
+    try {
+      const response = await fetch('/api/community/ai-thread', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          title: `Nature Log: ${photo.caption}`,
+          content: `A moment captured in nature that speaks to the soul. ${photo.caption}`,
+          category: 'Nature Logs',
+          tags: ['Nature Logs', ...photo.tags],
+          imagePath: photo.imagePath,
+          aiComment: aiInsights,
+          source: 'nature_photo',
+          sourceId: photo.id
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create community thread');
+      }
+
+      const threadData = await response.json();
+      console.log('Community thread created successfully:', threadData);
+      return threadData;
+    } catch (error) {
+      console.error('Error creating community thread:', error);
+      throw error;
     }
   };
 
@@ -1296,6 +1343,20 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             </div>
           </div>
 
+          {/* Community Share Checkbox */}
+          <div className="flex items-center mt-4">
+            <input
+              type="checkbox"
+              id="share-to-community"
+              checked={shareToCommunity}
+              onChange={(e) => setShareToCommunity(e.target.checked)}
+              className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+            />
+            <label htmlFor="share-to-community" className="text-sm text-gray-400">
+              Share this photo to the community?
+            </label>
+          </div>
+
           {/* Action Buttons */}
           <div className="flex gap-2">
             <button
@@ -1308,6 +1369,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                 setMood('');
                 setUploadedImage(null);
                 setImagePreview('');
+                setShareToCommunity(false);
               }}
               className="flex-1 px-3 py-2 bg-surface-2 border border-border text-text rounded-lg hover:bg-surface transition-colors duration-150"
             >
