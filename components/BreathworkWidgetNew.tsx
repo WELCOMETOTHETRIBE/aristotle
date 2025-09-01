@@ -168,6 +168,22 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
 
   // Calculate total session time
   const totalSessionTime = (pattern.pattern.inhale + pattern.pattern.hold + pattern.pattern.exhale + pattern.pattern.hold2) * pattern.pattern.cycles;
+  
+  // Calculate cycle progress (how many cycles completed out of total suggested cycles)
+  const cycleProgress = isActive ? (currentCycle - 1) / pattern.pattern.cycles : 0;
+  
+  // Calculate current cycle phase progress (within the current cycle)
+  const currentCyclePhaseProgress = isActive ? {
+    inhale: currentPhase === 'inhale' ? (pattern.pattern.inhale - timeLeft) / pattern.pattern.inhale : 
+            currentPhase === 'hold' || currentPhase === 'exhale' || currentPhase === 'hold2' ? 1 : 0,
+    hold: currentPhase === 'hold' ? (pattern.pattern.hold - timeLeft) / pattern.pattern.hold :
+          currentPhase === 'exhale' || currentPhase === 'hold2' ? 1 : 0,
+    exhale: currentPhase === 'exhale' ? (pattern.pattern.exhale - timeLeft) / pattern.pattern.exhale :
+            currentPhase === 'hold2' ? 1 : 0,
+    hold2: currentPhase === 'hold2' ? (pattern.pattern.hold2 - timeLeft) / pattern.pattern.hold2 : 0
+  } : { inhale: 0, hold: 0, exhale: 0, hold2: 0 };
+  
+  // Calculate overall session progress (for backward compatibility)
   const sessionProgress = isActive ? ((currentCycle - 1) * (pattern.pattern.inhale + pattern.pattern.hold + pattern.pattern.exhale + pattern.pattern.hold2) + 
     (pattern.pattern.inhale + pattern.pattern.hold + pattern.pattern.exhale + pattern.pattern.hold2) - timeLeft) / totalSessionTime : 0;
 
@@ -416,7 +432,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, 0)}`;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Calculate the current phase progress for the countdown ring
@@ -572,10 +588,10 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       {/* Main Breath Circle */}
       <div className="flex justify-center mb-6">
         <div className="relative w-48 h-48 flex items-center justify-center">
-          {/* Outer session progress ring */}
+          {/* Outer cycle progress ring */}
           <svg width="192" height="192" viewBox="0 0 192 192" className="absolute inset-0">
             <defs>
-              <linearGradient id="sessionProgress" x1="0%" y1="0%" x2="100%" y2="0%">
+              <linearGradient id="cycleProgress" x1="0%" y1="0%" x2="100%" y2="0%">
                 <stop offset="0%" stopColor="rgba(59, 130, 246, 0.2)" />
                 <stop offset="100%" stopColor="rgba(147, 197, 253, 0.4)" />
               </linearGradient>
@@ -593,12 +609,12 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
               cx="96"
               cy="96"
               r="88"
-              stroke="url(#sessionProgress)"
+              stroke="url(#cycleProgress)"
               strokeWidth="3"
               fill="none"
               strokeLinecap="round"
               initial={{ strokeDasharray: 553, strokeDashoffset: 553 }}
-              animate={{ strokeDashoffset: 553 * (1 - sessionProgress) }}
+              animate={{ strokeDashoffset: 553 * (1 - cycleProgress) }}
               transition={{ duration: 0.8, ease: "easeInOut" }}
               style={{ 
                 transform: "rotate(-90deg)", 
@@ -736,13 +752,13 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       <div className="mb-4">
         <div className="flex justify-between text-xs text-muted mb-1">
           <span>Cycle {currentCycle}/{pattern.pattern.cycles}</span>
-          <span>{Math.round(sessionProgress * 100)}%</span>
+          <span>{Math.round(cycleProgress * 100)}%</span>
         </div>
         <div className="w-full bg-surface-2 rounded-full h-2">
           <motion.div 
             className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${sessionProgress * 100}%` }}
+            animate={{ width: `${cycleProgress * 100}%` }}
             transition={{ duration: 0.5 }}
           />
         </div>
