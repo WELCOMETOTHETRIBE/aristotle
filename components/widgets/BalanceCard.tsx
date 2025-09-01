@@ -44,6 +44,9 @@ export default function BalanceCard({
   useEffect(() => {
     if (typeof window !== 'undefined' && 'DeviceMotionEvent' in window) {
       setIsDeviceMotionSupported(true);
+      console.log('Device motion supported');
+    } else {
+      console.log('Device motion not supported');
     }
   }, []);
 
@@ -53,13 +56,18 @@ export default function BalanceCard({
 
     const handleMotion = (event: DeviceMotionEvent) => {
       const { accelerationIncludingGravity } = event;
-      if (!accelerationIncludingGravity) return;
+      if (!accelerationIncludingGravity) {
+        console.log('No acceleration data');
+        return;
+      }
 
       const { x, y, z } = accelerationIncludingGravity;
       const timestamp = Date.now();
 
       // Calculate motion magnitude
       const magnitude = Math.sqrt((x || 0) ** 2 + (y || 0) ** 2 + (z || 0) ** 2);
+      
+      console.log('Motion detected:', { x, y, z, magnitude });
       
       // Get sensitivity threshold
       const sensitivityThresholds = {
@@ -86,16 +94,9 @@ export default function BalanceCard({
       lastMotionTimeRef.current = timestamp;
     };
 
-    // Request permission on iOS
-    if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-      (DeviceMotionEvent as any).requestPermission().then((permission: string) => {
-        if (permission === 'granted') {
-          window.addEventListener('devicemotion', handleMotion);
-        }
-      });
-    } else {
-      window.addEventListener('devicemotion', handleMotion);
-    }
+    // Add motion event listener directly (iOS doesn't need permission for DeviceMotionEvent)
+    window.addEventListener('devicemotion', handleMotion);
+    console.log('Motion event listener added');
 
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
@@ -271,6 +272,28 @@ export default function BalanceCard({
             <div className="text-gray-400">Best</div>
           </div>
         </div>
+      </div>
+
+      {/* Real-time Motion Data */}
+      <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
+        <div className="flex items-center gap-2 mb-2">
+          <TrendingUp className="w-4 h-4 text-blue-400" />
+          <span className="text-sm font-medium text-white">Motion Data</span>
+        </div>
+        {motionHistory.length > 0 && (
+          <div className="text-xs text-gray-400 space-y-1">
+            <div>X: {motionHistory[motionHistory.length - 1]?.x?.toFixed(2) || '0.00'}</div>
+            <div>Y: {motionHistory[motionHistory.length - 1]?.y?.toFixed(2) || '0.00'}</div>
+            <div>Z: {motionHistory[motionHistory.length - 1]?.z?.toFixed(2) || '0.00'}</div>
+            <div>Magnitude: {motionHistory[motionHistory.length - 1] ? 
+              Math.sqrt(
+                (motionHistory[motionHistory.length - 1].x || 0) ** 2 + 
+                (motionHistory[motionHistory.length - 1].y || 0) ** 2 + 
+                (motionHistory[motionHistory.length - 1].z || 0) ** 2
+              ).toFixed(2) : '0.00'
+            }</div>
+          </div>
+        )}
       </div>
 
       {/* Sensitivity Info */}
