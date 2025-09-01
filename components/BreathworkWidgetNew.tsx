@@ -130,7 +130,7 @@ const breathPatterns: BreathPattern[] = [
     pattern: { inhale: 4, hold: 4, exhale: 4, hold2: 0, cycles: 10 },
     benefits: ['Builds mental focus', 'Improves concentration', 'Reduces mental fatigue', 'Enhances cognitive performance'],
     color: 'from-indigo-500 to-purple-500',
-    gradient: 'bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-indigo-500/20',
+    gradient: 'bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border-purple-500/20',
     icon: <Target className="w-6 h-6" />,
     intent: 'focus',
     primaryVirtue: 'Wisdom',
@@ -151,6 +151,7 @@ interface BreathworkWidgetNewProps {
 export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidgetNewProps) {
   const [selectedPattern, setSelectedPattern] = useState(0);
   const [isActive, setIsActive] = useState(false);
+  const [isPreparing, setIsPreparing] = useState(false);
   const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'hold2'>('inhale');
   const [timeLeft, setTimeLeft] = useState(breathPatterns[0].pattern.inhale);
   const [currentCycle, setCurrentCycle] = useState(1);
@@ -160,6 +161,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
   const [sessionStats, setSessionStats] = useState({ totalSessions: 0, totalMinutes: 0 });
   const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
   const [audioEnabled, setAudioEnabled] = useState(true);
+  const [prepCountdown, setPrepCountdown] = useState(3);
 
   const pattern = breathPatterns[selectedPattern];
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -168,6 +170,28 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
   const totalSessionTime = (pattern.pattern.inhale + pattern.pattern.hold + pattern.pattern.exhale + pattern.pattern.hold2) * pattern.pattern.cycles;
   const sessionProgress = isActive ? ((currentCycle - 1) * (pattern.pattern.inhale + pattern.pattern.hold + pattern.pattern.exhale + pattern.pattern.hold2) + 
     (pattern.pattern.inhale + pattern.pattern.hold + pattern.pattern.exhale + pattern.pattern.hold2) - timeLeft) / totalSessionTime : 0;
+
+  // Get phase colors for the countdown rings
+  const getPhaseRingColor = (phase: string) => {
+    switch (phase) {
+      case 'inhale': return '#3b82f6'; // blue-500
+      case 'hold': return '#f59e0b'; // amber-500
+      case 'exhale': return '#10b981'; // emerald-500
+      case 'hold2': return '#8b5cf6'; // violet-500
+      default: return '#6b7280'; // gray-500
+    }
+  };
+
+  // Get phase background colors
+  const getPhaseBgColor = (phase: string) => {
+    switch (phase) {
+      case 'inhale': return 'from-blue-500/20 to-cyan-500/20';
+      case 'hold': return 'from-amber-500/20 to-yellow-500/20';
+      case 'exhale': return 'from-emerald-500/20 to-green-500/20';
+      case 'hold2': return 'from-violet-500/20 to-purple-500/20';
+      default: return 'from-gray-500/20 to-gray-600/20';
+    }
+  };
 
   // Audio cue system
   const playAudioCue = async (phase: string) => {
@@ -202,6 +226,28 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   };
 
+  // Preparation phase countdown
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+
+    if (isPreparing && prepCountdown > 0) {
+      interval = setInterval(() => {
+        setPrepCountdown(prev => {
+          if (prev <= 1) {
+            setIsPreparing(false);
+            setIsActive(true);
+            playAudioCue('inhale');
+            return 3;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+
+    return () => clearInterval(interval);
+  }, [isPreparing, prepCountdown]);
+
+  // Main breathwork session timer
   useEffect(() => {
     let interval: NodeJS.Timeout;
 
@@ -304,32 +350,33 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   };
 
+  const startSession = () => {
+    setIsPreparing(true);
+    setPrepCountdown(3);
+    setSessionStartTime(new Date());
+    
+    // Play preparation audio
+    if (!isMuted && audioEnabled && audioRef.current) {
+      audioRef.current.src = '/audio/breathwork/session-start.mp3';
+      audioRef.current.volume = 0.7;
+      audioRef.current.play();
+    }
+  };
+
   const toggleSession = () => {
-    if (isActive) {
+    if (isActive || isPreparing) {
       setIsActive(false);
+      setIsPreparing(false);
+      setPrepCountdown(3);
     } else {
-      setIsActive(true);
-      setTimeLeft(pattern.pattern.inhale);
-      setCurrentPhase('inhale');
-      setCurrentCycle(1);
-      setSessionStartTime(new Date());
-      
-      // Play session start audio
-      if (!isMuted && audioEnabled && audioRef.current) {
-        audioRef.current.src = '/audio/breathwork/session-start.mp3';
-        audioRef.current.volume = 0.7;
-        audioRef.current.play().then(() => {
-          // Play first inhale cue after session start
-          setTimeout(() => playAudioCue('inhale'), 2000);
-        });
-      } else {
-        playAudioCue('inhale');
-      }
+      startSession();
     }
   };
 
   const resetSession = () => {
     setIsActive(false);
+    setIsPreparing(false);
+    setPrepCountdown(3);
     setTimeLeft(pattern.pattern.inhale);
     setCurrentPhase('inhale');
     setCurrentCycle(1);
@@ -339,9 +386,9 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
   const getPhaseColor = () => {
     switch (currentPhase) {
       case 'inhale': return 'text-blue-400';
-      case 'hold': return 'text-yellow-400';
-      case 'exhale': return 'text-green-400';
-      case 'hold2': return 'text-purple-400';
+      case 'hold': return 'text-amber-400';
+      case 'exhale': return 'text-emerald-400';
+      case 'hold2': return 'text-violet-400';
       default: return 'text-gray-400';
     }
   };
@@ -369,7 +416,14 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, 0)}`;
+  };
+
+  // Calculate the current phase progress for the countdown ring
+  const getCurrentPhaseProgress = () => {
+    const phaseDuration = pattern.pattern[currentPhase];
+    const phaseTimeLeft = timeLeft;
+    return (phaseDuration - phaseTimeLeft) / phaseDuration;
   };
 
   return (
@@ -518,72 +572,132 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       {/* Main Breath Circle */}
       <div className="flex justify-center mb-4">
         <div className="relative">
-          {/* Outer progress ring */}
-          <svg width="160" height="160" viewBox="0 0 160 160" className="absolute inset-0">
+          {/* Outer session progress ring */}
+          <svg width="200" height="200" viewBox="0 0 200 200" className="absolute inset-0">
             <circle
-              cx="80"
-              cy="80"
-              r="70"
+              cx="100"
+              cy="100"
+              r="85"
               stroke="rgba(255,255,255,0.1)"
-              strokeWidth="3"
+              strokeWidth="2"
               fill="none"
             />
             <motion.circle
-              cx="80"
-              cy="80"
-              r="70"
+              cx="100"
+              cy="100"
+              r="85"
               stroke="rgba(59, 130, 246, 0.3)"
-              strokeWidth="3"
+              strokeWidth="2"
               fill="none"
               strokeLinecap="round"
-              initial={{ strokeDasharray: 440, strokeDashoffset: 440 }}
-              animate={{ strokeDashoffset: 440 * (1 - sessionProgress) }}
+              initial={{ strokeDasharray: 534, strokeDashoffset: 534 }}
+              animate={{ strokeDashoffset: 534 * (1 - sessionProgress) }}
               transition={{ duration: 0.5 }}
               style={{ 
                 transform: "rotate(-90deg)", 
-                transformOrigin: "80px 80px" 
+                transformOrigin: "100px 100px" 
+              }}
+            />
+          </svg>
+
+          {/* Phase countdown ring */}
+          <svg width="200" height="200" viewBox="0 0 200 200" className="absolute inset-0">
+            <circle
+              cx="100"
+              cy="100"
+              r="70"
+              stroke="rgba(255,255,255,0.05)"
+              strokeWidth="4"
+              fill="none"
+            />
+            <motion.circle
+              cx="100"
+              cy="100"
+              r="70"
+              stroke={getPhaseRingColor(currentPhase)}
+              strokeWidth="4"
+              fill="none"
+              strokeLinecap="round"
+              initial={{ strokeDasharray: 440, strokeDashoffset: 440 }}
+              animate={{ strokeDashoffset: 440 * (1 - getCurrentPhaseProgress()) }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              style={{ 
+                transform: "rotate(-90deg)", 
+                transformOrigin: "100px 100px" 
               }}
             />
           </svg>
           
           {/* Inner breath circle */}
           <motion.div 
-            className="relative w-24 h-24 rounded-full border-3 border-white/20 flex items-center justify-center"
+            className={`relative w-32 h-32 rounded-full border-4 flex items-center justify-center bg-gradient-to-br ${getPhaseBgColor(currentPhase)} border-white/20`}
             animate={{
-              scale: isActive ? [1, 1.15, 1] : 1,
-              borderColor: isActive ? ['rgba(255,255,255,0.2)', 'rgba(59,130,246,0.4)', 'rgba(255,255,255,0.2)'] : 'rgba(255,255,255,0.2)'
+              scale: isActive ? [1, 1.1, 1] : 1,
+              borderColor: isActive ? [getPhaseRingColor(currentPhase) + '40', getPhaseRingColor(currentPhase) + '80', getPhaseRingColor(currentPhase) + '40'] : 'rgba(255,255,255,0.2)'
             }}
             transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
           >
             <div className="relative z-10 text-center">
-              <motion.div 
-                className={`text-xl font-bold ${getPhaseColor()}`}
-                animate={{ scale: isActive ? [1, 1.1, 1] : 1 }}
-                transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
-              >
-                {timeLeft}
-              </motion.div>
-              <div className="text-xs text-muted">{getPhaseText()}</div>
+              {isPreparing ? (
+                <motion.div 
+                  className="text-3xl font-bold text-amber-400"
+                  animate={{ scale: [1, 1.2, 1] }}
+                  transition={{ duration: 0.5, repeat: Infinity }}
+                >
+                  {prepCountdown}
+                </motion.div>
+              ) : (
+                <>
+                  <motion.div 
+                    className={`text-2xl font-bold ${getPhaseColor()}`}
+                    animate={{ scale: isActive ? [1, 1.1, 1] : 1 }}
+                    transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
+                  >
+                    {timeLeft}
+                  </motion.div>
+                  <div className="text-sm text-muted mt-1">{getPhaseText()}</div>
+                </>
+              )}
             </div>
           </motion.div>
+
+          {/* Preparation overlay */}
+          {isPreparing && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="absolute inset-0 flex items-center justify-center"
+            >
+              <div className="text-center">
+                <motion.div
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  className="text-lg text-amber-400 font-medium mb-2"
+                >
+                  Get Ready
+                </motion.div>
+                <div className="text-sm text-muted">
+                  Find a comfortable position
+                </div>
+              </div>
+            </motion.div>
+          )}
         </div>
       </div>
 
       {/* Phase Indicators */}
-      <div className="flex justify-center gap-1.5 mb-4">
+      <div className="flex justify-center gap-2 mb-4">
         {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => {
           if (phase === 'hold2' && pattern.pattern.hold2 === 0) return null;
           return (
             <motion.div
               key={phase}
-              className={`h-1.5 rounded-full transition-all duration-300 ${
-                currentPhase === phase ? 'w-6' : 'w-3'
+              className={`h-2 rounded-full transition-all duration-300 ${
+                currentPhase === phase ? 'w-8' : 'w-4'
               }`}
               style={{
                 backgroundColor: currentPhase === phase 
-                  ? (phase === 'inhale' ? '#60a5fa' : 
-                     phase === 'hold' ? '#fbbf24' : 
-                     phase === 'exhale' ? '#34d399' : '#a78bfa')
+                  ? getPhaseRingColor(phase)
                   : 'rgba(255,255,255,0.2)'
               }}
               animate={{
@@ -600,9 +714,9 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           <span>Cycle {currentCycle}/{pattern.pattern.cycles}</span>
           <span>{Math.round(sessionProgress * 100)}%</span>
         </div>
-        <div className="w-full bg-surface-2 rounded-full h-1.5">
+        <div className="w-full bg-surface-2 rounded-full h-2">
           <motion.div 
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 h-1.5 rounded-full"
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${sessionProgress * 100}%` }}
             transition={{ duration: 0.5 }}
@@ -618,26 +732,26 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       <div className="flex justify-center gap-2 mb-3">
         <motion.button
           onClick={toggleSession}
-          className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1.5 text-sm ${
-            isActive 
+          className={`px-6 py-3 rounded-xl font-medium transition-all flex items-center gap-2 text-sm ${
+            isActive || isPreparing
               ? 'bg-error hover:bg-error/80 text-white' 
               : 'bg-primary hover:bg-primary/80 text-white'
           }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {isActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-          <span>{isActive ? 'Pause' : 'Start'}</span>
+          {isActive || isPreparing ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          <span>{isActive || isPreparing ? 'Pause' : 'Start'}</span>
         </motion.button>
         
         <motion.button
           onClick={resetSession}
-          className="px-3 py-2 rounded-lg bg-surface-2 hover:bg-surface text-text transition-all"
+          className="px-4 py-3 rounded-xl bg-surface-2 hover:bg-surface text-text transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="Reset Session"
         >
-          <RotateCcw className="w-3.5 h-3.5" />
+          <RotateCcw className="w-4 h-4" />
         </motion.button>
       </div>
 
