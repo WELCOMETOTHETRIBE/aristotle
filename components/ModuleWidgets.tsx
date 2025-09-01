@@ -935,6 +935,8 @@ interface NaturePhoto {
   timestamp: Date;
   weather?: string;
   mood?: string;
+  aiInsights?: string;
+  aiComment?: string;
 }
 
 export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePhotoLogWidgetProps) {
@@ -947,6 +949,9 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [mood, setMood] = useState('');
   const [showGallery, setShowGallery] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<NaturePhoto | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [uploadedImage, setUploadedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>('');
 
   const availableTags = ['dawn', 'dusk', 'tree', 'water', 'earth', 'sky', 'flower', 'animal', 'mountain', 'forest', 'ocean', 'river', 'sunset', 'sunrise', 'clouds', 'rain', 'snow', 'wind'];
 
@@ -967,35 +972,125 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     localStorage.setItem('naturePhotoLog', JSON.stringify(photos));
   }, [photos]);
 
-  const addPhoto = () => {
-    if (selectedTags.length === 0) return;
-
-    // For demo purposes, create a placeholder image URL
-    // In a real app, this would be an actual photo upload
-    const newPhoto: NaturePhoto = {
-      id: Date.now().toString(),
-      url: `https://picsum.photos/400/300?random=${Date.now()}`, // Placeholder image
-      caption: caption.trim() || 'Nature connection',
-      tags: selectedTags,
-      location: location.trim() || undefined,
-      timestamp: new Date(),
-      weather: weather.trim() || undefined,
-      mood: mood.trim() || undefined
-    };
-
-    setPhotos(prev => [newPhoto, ...prev]);
-    
-    // Reset form
-    setSelectedTags([]);
-    setCaption('');
-    setLocation('');
-    setWeather('');
-    setMood('');
-    setIsAdding(false);
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setUploadedImage(file);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
-  const removePhoto = (id: string) => {
-    setPhotos(prev => prev.filter(photo => photo.id !== id));
+  const generateAIInsights = async (imageFile: File, tags: string[], caption: string) => {
+    try {
+      setIsProcessing(true);
+      
+      // Convert image to base64 for API
+      const base64Image = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(imageFile);
+      });
+      
+      const response = await fetch('/api/ai/guide', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: `Analyze this nature photo and provide thoughtful insights. The user has tagged it with: ${tags.join(', ')} and added the caption: "${caption}". 
+          
+          Please provide:
+          1. A brief philosophical reflection on the natural elements shown
+          2. A thoughtful comment about what this moment might teach us
+          3. A connection to mindfulness or the user's relationship with nature
+          
+          Keep it warm, insightful, and under 150 words total.`,
+          context: {
+            page: 'nature_photo_log',
+            focusVirtue: 'temperance',
+            timeOfDay: new Date().getHours(),
+          },
+        }),
+      });
+
+      if (response.ok) {
+        const reader = response.body?.getReader();
+        if (reader) {
+          let content = '';
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            
+            const chunk = new TextDecoder().decode(value);
+            const lines = chunk.split('\n');
+            
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') break;
+                
+                try {
+                  const parsed = JSON.parse(data);
+                  if (parsed.content) {
+                    content += parsed.content;
+                  }
+                } catch (e) {
+                  // Ignore parsing errors
+                }
+              }
+            }
+          }
+          
+          return content.trim();
+        }
+      }
+    } catch (error) {
+      console.error('Failed to generate AI insights:', error);
+      return "This moment in nature reminds us of the beauty and wisdom that surrounds us. Take a moment to breathe and appreciate the simple gifts of the natural world.";
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const addPhoto = () => {
+    if (selectedTags.length === 0 || !uploadedImage) return;
+    
+    setIsProcessing(true);
+    
+    // Generate AI insights first
+    generateAIInsights(uploadedImage, selectedTags, caption).then((aiInsights) => {
+      const newPhoto: NaturePhoto = {
+        id: Date.now().toString(),
+        url: imagePreview,
+        caption: caption || 'Nature moment',
+        tags: selectedTags,
+        location: location || undefined,
+        timestamp: new Date(),
+        weather: weather || undefined,
+        mood: mood || undefined,
+        aiInsights: aiInsights,
+        aiComment: aiInsights,
+      };
+
+      setPhotos(prev => [newPhoto, ...prev]);
+      
+      // Reset form
+      setIsAdding(false);
+      setSelectedTags([]);
+      setCaption('');
+      setLocation('');
+      setWeather('');
+      setMood('');
+      setUploadedImage(null);
+      setImagePreview('');
+      setIsProcessing(false);
+    });
+  };
+
+  const removePhoto = (photoId: string) => {
+    setPhotos(prev => prev.filter(photo => photo.id !== photoId));
   };
 
   const toggleTag = (tag: string) => {
@@ -1007,49 +1102,31 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
   return (
-    <motion.div 
-      className="p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-blue-500/10 border border-green-500/20 backdrop-blur-sm"
-      whileHover={{ scale: 1.02 }}
-      transition={{ type: "spring", stiffness: 300 }}
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="space-y-6"
     >
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <motion.div 
-            className="p-3 rounded-xl bg-green-500/20"
-            animate={{ 
-              scale: [1, 1.1, 1],
-              rotate: [0, 5, -5, 0]
-            }}
-            transition={{ duration: 3, repeat: Infinity }}
-          >
-            <Camera className="w-6 h-6 text-green-400" />
-          </motion.div>
-          <div>
-            <h3 className="font-bold text-white text-lg">Nature Photo Log</h3>
-            <p className="text-sm text-gray-400">Connect with the natural world</p>
-          </div>
+      <div className="text-center">
+        <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+          <Camera className="w-8 h-8 text-green-500" />
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-green-400">{photos.length}</div>
-          <div className="text-xs text-gray-400">Photos</div>
-        </div>
+        <h3 className="text-xl font-bold text-text mb-2">Nature Photo Log</h3>
+        <p className="text-sm text-muted">
+          Capture moments in nature and reflect on their meaning
+        </p>
       </div>
 
       {/* Add Photo Section */}
       {!isAdding ? (
         <motion.button
           onClick={() => setIsAdding(true)}
-          className="w-full p-4 border-2 border-dashed border-green-500/30 rounded-xl text-green-400 hover:border-green-500/50 hover:bg-green-500/10 transition-all mb-6"
+          className="w-full p-6 border-2 border-dashed border-green-500/30 rounded-xl text-green-400 hover:border-green-500/50 hover:bg-green-500/10 transition-all mb-6"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
@@ -1060,74 +1137,108 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         </motion.button>
       ) : (
         <motion.div 
-          className="mb-6 p-4 bg-white/5 rounded-lg border border-green-500/20"
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
+          className="mb-6 space-y-4"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
         >
-          <div className="text-sm text-gray-400 mb-3">Select tags for your nature connection:</div>
-          
-          {/* Tag Selection */}
-          <div className="flex flex-wrap gap-2 mb-4">
-            {availableTags.map((tag) => (
-              <motion.button
-                key={tag}
-                onClick={() => toggleTag(tag)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${
-                  selectedTags.includes(tag)
-                    ? 'bg-green-500/30 text-green-200 border border-green-500/50'
-                    : 'bg-white/10 text-gray-400 hover:bg-white/20'
-                }`}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {tag}
-              </motion.button>
-            ))}
+          {/* Image Upload */}
+          <div className="space-y-3">
+            <label className="text-sm font-medium text-text">Upload Photo</label>
+            <div className="border-2 border-dashed border-green-500/30 rounded-lg p-4 text-center">
+              {imagePreview ? (
+                <div className="space-y-3">
+                  <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover rounded-lg" />
+                  <button
+                    onClick={() => {
+                      setUploadedImage(null);
+                      setImagePreview('');
+                    }}
+                    className="text-sm text-red-400 hover:text-red-300"
+                  >
+                    Remove Image
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Camera className="w-8 h-8 text-green-400 mx-auto" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                    id="photo-upload"
+                  />
+                  <label htmlFor="photo-upload" className="cursor-pointer text-green-400 hover:text-green-300">
+                    Click to upload or drag and drop
+                  </label>
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Additional Details */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-4">
+          {/* Caption */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-text">Caption</label>
             <input
               type="text"
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
-              placeholder="Caption (optional)"
-              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
-            />
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              placeholder="Location (optional)"
-              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
-            />
-            <input
-              type="text"
-              value={weather}
-              onChange={(e) => setWeather(e.target.value)}
-              placeholder="Weather (optional)"
-              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
-            />
-            <input
-              type="text"
-              value={mood}
-              onChange={(e) => setMood(e.target.value)}
-              placeholder="Mood (optional)"
-              className="p-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 text-sm"
+              placeholder="Describe this moment..."
+              className="w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500"
             />
           </div>
 
+          {/* Tags */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-text">Tags</label>
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setSelectedTags(prev => 
+                    prev.includes(tag) 
+                      ? prev.filter(t => t !== tag)
+                      : [...prev, tag]
+                  )}
+                  className={`px-3 py-1 rounded-full text-xs transition-all ${
+                    selectedTags.includes(tag)
+                      ? 'bg-green-500 text-white'
+                      : 'bg-surface-2 text-muted hover:text-text hover:bg-green-500/10'
+                  }`}
+                >
+                  {tag}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Optional Fields */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-text">Location</label>
+              <input
+                type="text"
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="Where was this taken?"
+                className="w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-text">Weather</label>
+              <input
+                type="text"
+                value={weather}
+                onChange={(e) => setWeather(e.target.value)}
+                placeholder="Sunny, rainy, etc."
+                className="w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500"
+              />
+            </div>
+          </div>
+
+          {/* Action Buttons */}
           <div className="flex gap-2">
-            <motion.button
-              onClick={addPhoto}
-              disabled={selectedTags.length === 0}
-              className="px-4 py-2 bg-green-500 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Add Photo
-            </motion.button>
-            <motion.button
+            <button
               onClick={() => {
                 setIsAdding(false);
                 setSelectedTags([]);
@@ -1135,13 +1246,20 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                 setLocation('');
                 setWeather('');
                 setMood('');
+                setUploadedImage(null);
+                setImagePreview('');
               }}
-              className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-all"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+              className="flex-1 px-3 py-2 bg-surface-2 border border-border text-text rounded-lg hover:bg-surface transition-colors duration-150"
             >
               Cancel
-            </motion.button>
+            </button>
+            <button
+              onClick={addPhoto}
+              disabled={isProcessing || selectedTags.length === 0 || !uploadedImage}
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? 'Processing...' : 'Add Photo'}
+            </button>
           </div>
         </motion.div>
       )}
@@ -1207,54 +1325,65 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
 
       {/* Photo Detail Modal */}
       {selectedPhoto && (
-        <motion.div 
-          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setSelectedPhoto(null)}
         >
-          <motion.div 
-            className="bg-gray-900 rounded-xl p-6 max-w-md w-full"
-            initial={{ scale: 0.8, opacity: 0 }}
+          <motion.div
+            initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
+            className="bg-surface border border-border rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <img
-              src={selectedPhoto.url}
-              alt={selectedPhoto.caption}
-              className="w-full h-48 object-cover rounded-lg mb-4"
-            />
-            <h3 className="text-white font-bold mb-2">{selectedPhoto.caption}</h3>
-            <div className="space-y-2 text-sm text-gray-300">
-              <div>📅 {formatDate(selectedPhoto.timestamp)}</div>
-              {selectedPhoto.location && <div>📍 {selectedPhoto.location}</div>}
-              {selectedPhoto.weather && <div>🌤️ {selectedPhoto.weather}</div>}
-              {selectedPhoto.mood && <div>😊 {selectedPhoto.mood}</div>}
-              <div className="flex flex-wrap gap-1 mt-2">
-                {selectedPhoto.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-1 bg-green-500/20 text-green-300 text-xs rounded">
-                    {tag}
-                  </span>
-                ))}
+            <div className="space-y-4">
+              <img
+                src={selectedPhoto.url}
+                alt={selectedPhoto.caption}
+                className="w-full h-48 object-cover rounded-lg"
+              />
+              
+              <div>
+                <h3 className="font-semibold text-text text-lg mb-2">{selectedPhoto.caption}</h3>
+                <div className="flex flex-wrap gap-2 mb-3">
+                  {selectedPhoto.tags.map((tag) => (
+                    <span key={tag} className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+                
+                {selectedPhoto.location && (
+                  <p className="text-sm text-muted mb-2">📍 {selectedPhoto.location}</p>
+                )}
+                {selectedPhoto.weather && (
+                  <p className="text-sm text-muted mb-2">🌤️ {selectedPhoto.weather}</p>
+                )}
+                <p className="text-sm text-muted mb-4">{formatDate(selectedPhoto.timestamp)}</p>
+                
+                {/* AI Insights */}
+                {selectedPhoto.aiComment && (
+                  <div className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-lg p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Brain className="w-4 h-4 text-green-500" />
+                      <span className="text-sm font-medium text-green-400">AI Reflection</span>
+                    </div>
+                    <p className="text-sm text-green-300 leading-relaxed">{selectedPhoto.aiComment}</p>
+                  </div>
+                )}
               </div>
+              
+              <button
+                onClick={() => setSelectedPhoto(null)}
+                className="w-full px-4 py-2 bg-surface-2 border border-border text-text rounded-lg hover:bg-surface transition-colors"
+              >
+                Close
+              </button>
             </div>
-            <button
-              onClick={() => setSelectedPhoto(null)}
-              className="mt-4 w-full px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
-            >
-              Close
-            </button>
           </motion.div>
         </motion.div>
       )}
-
-      {/* Nature Connection Tips */}
-      <div className="mt-4 p-3 bg-white/5 rounded-lg">
-        <div className="text-xs text-gray-400 mb-1">Connection Tip:</div>
-        <div className="text-sm text-white">
-          Take time to observe and photograph nature. This practice helps cultivate mindfulness and deepens your connection to the natural world.
-        </div>
-      </div>
     </motion.div>
   );
 }

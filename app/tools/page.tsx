@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Wrench, Plus, Check, Sparkles, Wind, Heart, Droplets, Moon, 
   Target, Timer, Brain, Activity, BookOpen, Zap, Shield, Leaf,
-  Settings, Palette, Grid3X3, Star, Eye, EyeOff
+  Settings, Palette, Grid3X3, Star, Eye, EyeOff, Camera
 } from 'lucide-react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
@@ -172,6 +172,16 @@ const availableWidgets: Widget[] = [
     icon: BookOpen,
     category: 'learning',
     color: 'from-indigo-500 to-purple-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'nature_photo_log',
+    name: 'Nature Photo Log',
+    description: 'Capture and reflect on nature moments with AI interpretation',
+    icon: Camera,
+    category: 'mindfulness',
+    color: 'from-green-500 to-emerald-500',
     isActive: true,
     isAdded: false,
   },
