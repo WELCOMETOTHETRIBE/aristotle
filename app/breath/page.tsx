@@ -504,13 +504,39 @@ export default function BreathPage() {
       playSessionCompleteAudio();
     }
     
-    // Log session completion (optional - don't block if it fails)
+    // Log session completion to API
     try {
-      console.log('Breathwork session completed:', {
-        pattern: selectedPattern.name,
-        duration: sessionDuration,
-        cycles: totalCycles,
+      const response = await fetch('/api/breathwork/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pattern: selectedPattern.name,
+          durationSec: sessionDuration,
+          startedAt: sessionStartTime,
+          completedAt: new Date()
+        })
       });
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Show XP gained notification
+        if (result.xpGained) {
+          console.log(`🎯 +${result.xpGained} Temperance XP gained!`);
+          // You could add a toast notification here
+        }
+        
+        // Show journal entry created notification
+        if (result.journalEntry) {
+          console.log('📝 Session logged to journal');
+        }
+        
+        console.log('Breathwork session completed and logged:', {
+          pattern: selectedPattern.name,
+          duration: sessionDuration,
+          cycles: totalCycles,
+        });
+      }
     } catch (error) {
       console.warn('Session completion logging failed (non-critical):', error);
     }

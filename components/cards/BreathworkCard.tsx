@@ -263,7 +263,7 @@ export function BreathworkCard({ className }: BreathworkCardProps) {
     }, 1000);
   };
 
-  const handleSessionComplete = () => {
+  const handleSessionComplete = async () => {
     setIsActive(false);
     setIsPaused(false);
     setCurrentPhase('inhale');
@@ -281,6 +281,40 @@ export function BreathworkCard({ className }: BreathworkCardProps) {
     }
     
     triggerHaptic();
+
+    // Log session to API
+    try {
+      const sessionDuration = getTotalDuration();
+      const response = await fetch('/api/breathwork/sessions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pattern: currentPattern.label,
+          durationSec: sessionDuration,
+          startedAt: new Date(Date.now() - sessionDuration * 1000),
+          completedAt: new Date()
+        })
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        
+        // Show XP gained notification
+        if (result.xpGained) {
+          console.log(`🎯 +${result.xpGained} Temperance XP gained!`);
+          // You could add a toast notification here
+        }
+        
+        // Show journal entry created notification
+        if (result.journalEntry) {
+          console.log('📝 Session logged to journal');
+        }
+        
+        console.log('Breathwork session logged successfully');
+      }
+    } catch (error) {
+      console.error('Failed to log breathwork session:', error);
+    }
   };
 
   const handlePause = () => {

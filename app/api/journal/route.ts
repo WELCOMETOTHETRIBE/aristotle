@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 
 // Validation schemas for different journal entry types
 const JournalEntrySchema = z.object({
-  type: z.enum(['gratitude', 'reflection', 'voice_note', 'boundaries', 'community_connections']),
+  type: z.enum(['gratitude', 'reflection', 'voice_note', 'boundaries', 'community_connections', 'mood']),
   content: z.string().min(1, 'Content is required'),
   prompt: z.string().optional(),
   category: z.string().optional(),
@@ -144,7 +144,8 @@ async function generateAIInsights(type: string, content: string, prompt?: string
       reflection: "Self-reflection is a powerful tool for personal growth and self-awareness.",
       voice_note: "Voice notes capture authentic thoughts and emotions that might be lost in writing.",
       boundaries: "Setting healthy boundaries is essential for maintaining well-being and relationships.",
-      community_connections: "Building meaningful connections enriches our lives and supports our growth."
+      community_connections: "Building meaningful connections enriches our lives and supports our growth.",
+      mood: "Tracking your mood helps build emotional awareness and identify patterns in your well-being."
     };
 
     return insights[type as keyof typeof insights] || "Your entry has been recorded for future reflection.";

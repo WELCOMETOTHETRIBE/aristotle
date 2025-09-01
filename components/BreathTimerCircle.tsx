@@ -168,6 +168,18 @@ export default function BreathTimerCircle({
       
       if (response.ok) {
         const result = await response.json();
+        
+        // Show XP gained notification
+        if (result.xpGained) {
+          console.log(`🎯 +${result.xpGained} Temperance XP gained!`);
+          // You could add a toast notification here
+        }
+        
+        // Show journal entry created notification
+        if (result.journalEntry) {
+          console.log('📝 Session logged to journal');
+        }
+        
         onSessionComplete?.(result.session);
       }
     } catch (error) {
