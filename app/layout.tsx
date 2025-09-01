@@ -6,6 +6,7 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
 import ClickToFeedback from "@/components/ClickToFeedback";
 import DeveloperToolbar from "@/components/DeveloperToolbar";
+import ScrollRestoration from "@/components/ScrollRestoration";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           <QueryProvider>
             <AuthProvider>
               <div className="min-h-screen bg-bg">
+                <ScrollRestoration />
                 <ClickToFeedback>
                   {children}
                 </ClickToFeedback>

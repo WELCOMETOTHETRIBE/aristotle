@@ -15,9 +15,12 @@ import { FocusTimerCard } from '@/components/cards/FocusTimerCard';
 import { SleepTrackerCard } from '@/components/cards/SleepTrackerCard';
 import { HabitTrackerCard } from '@/components/cards/HabitTrackerCard';
 import { JournalCard } from '@/components/cards/JournalCard';
+import { GratitudeJournalCard } from '@/components/cards/GratitudeJournalCard';
 import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
 import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
+import { TerminologyWidget } from '@/components/cards/TerminologyWidget';
 import AcademyLogo from '@/components/AcademyLogo';
+import VirtueRadar from '@/components/VirtueRadar';
 import { Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -43,6 +46,7 @@ export default function TodayPage() {
   const [focusVirtue, setFocusVirtue] = useState<'wisdom' | 'courage' | 'justice' | 'temperance'>('wisdom');
   const [mood, setMood] = useState<number | null>(null);
   const [intention, setIntention] = useState('');
+  const [virtueData, setVirtueData] = useState<Array<{ virtue: string; score: number }>>([]);
   
   // Initialize empty arrays for authenticated users, mockup data for demo
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -74,6 +78,38 @@ export default function TodayPage() {
     }
   }, [user, loading]);
 
+  // Load virtue progress data
+  useEffect(() => {
+    const fetchVirtueData = async () => {
+      try {
+        const response = await fetch('/api/progress/virtues?days=7');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.scores) {
+            const radarData = [
+              { virtue: 'Wisdom', score: data.scores.wisdom || 0 },
+              { virtue: 'Courage', score: data.scores.courage || 0 },
+              { virtue: 'Justice', score: data.scores.justice || 0 },
+              { virtue: 'Temperance', score: data.scores.temperance || 0 }
+            ];
+            setVirtueData(radarData);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching virtue data:', error);
+        // Set default data if API fails
+        setVirtueData([
+          { virtue: 'Wisdom', score: 0 },
+          { virtue: 'Courage', score: 0 },
+          { virtue: 'Justice', score: 0 },
+          { virtue: 'Temperance', score: 0 }
+        ]);
+      }
+    };
+
+    fetchVirtueData();
+  }, []);
+
   // Save widget changes
   const saveUserWidgets = (widgets: string[]) => {
     if (user) {
@@ -99,10 +135,14 @@ export default function TodayPage() {
           return <HabitTrackerCard key={widgetId} />;
         case 'journal':
           return <JournalCard key={widgetId} />;
+        case 'gratitude_journal':
+          return <GratitudeJournalCard key={widgetId} />;
         case 'goal_tracker':
           return <GoalTrackerCard key={widgetId} />;
         case 'wisdom_spotlight':
           return <WisdomSpotlightCard key={widgetId} />;
+        case 'terminology':
+          return <TerminologyWidget key={widgetId} />;
         default:
           console.warn(`Unknown widget ID: ${widgetId}`);
           return null;
@@ -250,6 +290,17 @@ export default function TodayPage() {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Virtue Progress Radar */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-text">Virtue Progress</h2>
+            <div className="text-xs text-muted">7-day average</div>
+          </div>
+          <div className="bg-surface border border-border rounded-2xl p-6">
+            <VirtueRadar data={virtueData} />
           </div>
         </div>
 
