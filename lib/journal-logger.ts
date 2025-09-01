@@ -29,7 +29,9 @@ export interface JournalLogResult {
  */
 export async function logToJournal(data: JournalLogData): Promise<JournalLogResult> {
   try {
-    const response = await fetch('/api/journal', {
+    // Use absolute URL for server-side calls
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const response = await fetch(`${baseUrl}/api/journal`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),

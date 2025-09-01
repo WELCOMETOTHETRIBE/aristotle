@@ -256,6 +256,13 @@ export default function DashboardPage() {
     localStorage.setItem('activeWidgets', JSON.stringify(activeWidgets));
   }, [activeWidgets]);
 
+  // Debug: Log widget info when gallery opens
+  useEffect(() => {
+    if (showWidgetGallery) {
+      console.log('Dashboard Debug - WIDGET_INFO:', WIDGET_INFO.map(w => ({ id: w.id, title: w.title, category: w.category })));
+    }
+  }, [showWidgetGallery]);
+
   const handleAddWidget = (widgetId: string) => {
     if (!activeWidgets.includes(widgetId)) {
       setActiveWidgets(prev => [...prev, widgetId]);
@@ -481,6 +488,13 @@ export default function DashboardPage() {
             onClose={() => setShowWidgetGallery(false)}
           />
         )}
+
+        {/* Debug: Show Balance widget info */}
+        <div className="fixed bottom-4 right-4 bg-black/80 text-white p-4 rounded-lg text-sm">
+          <div>Total Widgets: {WIDGET_INFO.length}</div>
+          <div>Balance Widget: {WIDGET_INFO.find(w => w.id === 'balance_gyro')?.title || 'NOT FOUND'}</div>
+          <div>Practice Widgets: {WIDGET_INFO.filter(w => w.category === 'practice').length}</div>
+        </div>
 
         {/* Widget Detail Modal */}
         {selectedWidget && (

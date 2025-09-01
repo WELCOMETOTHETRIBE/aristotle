@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Create comprehensive journal entry using the new logging system
+    // Create comprehensive journal entry directly in the database
     const journalData = createNaturePhotoLog(
       caption || 'Nature moment',
       tags || [],
@@ -43,13 +43,25 @@ export async function POST(request: NextRequest) {
       mood
     );
 
-    const journalResult = await logToJournal(journalData);
+    // Create journal entry directly instead of making HTTP call
+    const journalEntry = await prisma.journalEntry.create({
+      data: {
+        userId: actualUserId,
+        type: journalData.type,
+        content: journalData.content,
+        category: journalData.category,
+        date: new Date(),
+        metadata: journalData.metadata,
+        moduleId: journalData.moduleId,
+        widgetId: journalData.widgetId,
+      },
+    });
 
     return NextResponse.json({
       success: true,
       photo,
       imageUrl,
-      journalEntry: journalResult.entry,
+      journalEntry: journalEntry,
       message: 'Nature photo saved and logged to journal successfully!'
     });
 
