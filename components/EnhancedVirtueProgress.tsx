@@ -8,6 +8,7 @@ import {
   Zap, Crown, BookOpen, Lightbulb
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import VirtueRadar from '@/components/VirtueRadar';
 
 interface VirtueScores {
   wisdom: number;
@@ -216,197 +217,49 @@ export default function EnhancedVirtueProgress() {
         </div>
       </motion.div>
 
-      {/* Individual Virtue Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {Object.entries(virtueScores).map(([virtue, score], index) => {
-          const currentLevel = getCurrentLevel(virtue, score);
-          const nextLevel = getNextLevel(virtue, score);
-          const progressToNext = getProgressToNext(virtue, score);
-          const IconComponent = getVirtueIcon(virtue);
-          
-          return (
-            <motion.div
-              key={virtue}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.1 }}
-              className={cn(
-                "bg-surface border border-border rounded-2xl p-6 hover:bg-surface-2 transition-all duration-200 cursor-pointer",
-                selectedVirtue === virtue && "ring-2 ring-primary/50 bg-surface-2"
-              )}
-              onClick={() => setSelectedVirtue(selectedVirtue === virtue ? null : virtue)}
-            >
-              {/* Virtue Header */}
-              <div className="flex items-center gap-3 mb-4">
-                <div className={cn(
-                  'w-12 h-12 rounded-xl flex items-center justify-center text-white',
-                  `bg-gradient-to-r ${getVirtueGradient(virtue)}`
-                )}>
-                  <IconComponent className="w-6 h-6" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-text capitalize">{virtue}</h3>
+      {/* Overview Visualization */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+        {/* Radar Chart */}
+        <div className="md:col-span-3 bg-surface border border-border rounded-2xl p-4">
+          <div className="text-sm font-medium text-text mb-2">Virtue Balance (7-day)</div>
+          <div className="h-64">
+            {/* Radar graph of the four virtues */}
+            {/* @ts-ignore */}
+            <VirtueRadar data={[
+              { virtue: 'Wisdom', score: virtueScores.wisdom },
+              { virtue: 'Courage', score: virtueScores.courage },
+              { virtue: 'Justice', score: virtueScores.justice },
+              { virtue: 'Temperance', score: virtueScores.temperance }
+            ]} />
+          </div>
+        </div>
+        
+        {/* Compact per-virtue summary */}
+        <div className="md:col-span-2 bg-surface border border-border rounded-2xl p-4 space-y-4">
+          {(['wisdom','courage','justice','temperance'] as const).map((virtueKey) => {
+            const score = virtueScores[virtueKey];
+            const IconComponent = getVirtueIcon(virtueKey);
+            const level = getCurrentLevel(virtueKey, score);
+            return (
+              <div key={virtueKey} className="space-y-1">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="text-2xl">{getVirtueEmoji(virtue)}</span>
-                    <span className={`text-sm font-medium ${currentLevel.color}`}>
-                      {currentLevel.title}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Current Level Info */}
-              <div className="mb-4">
-                <p className="text-sm text-muted mb-2">{currentLevel.description}</p>
-                <div className="flex items-center justify-between text-xs text-muted mb-2">
-                  <span>Level {VIRTUE_LEVELS[virtue]?.findIndex(l => l.name === currentLevel.name) + 1}/5</span>
-                  <span>{score} XP</span>
-                </div>
-              </div>
-
-              {/* Progress to Next Level */}
-              {nextLevel && (
-                <div className="mb-4">
-                  <div className="flex items-center justify-between text-xs text-muted mb-2">
-                    <span>Progress to {nextLevel.name}</span>
-                    <span>{Math.round(progressToNext)}%</span>
-                  </div>
-                  <div className="w-full bg-surface-2 rounded-full h-2">
-                    <motion.div 
-                      className={cn('h-2 rounded-full bg-gradient-to-r', getVirtueGradient(virtue))}
-                      initial={{ width: 0 }}
-                      animate={{ width: `${progressToNext}%` }}
-                      transition={{ duration: 1, delay: index * 0.1 }}
-                    />
-                  </div>
-                  <p className="text-xs text-muted mt-1">
-                    {nextLevel.minXP - score} XP needed for {nextLevel.name}
-                  </p>
-                </div>
-              )}
-
-              {/* Quick Update Buttons */}
-              <div className="flex gap-2">
-                {[25, 50, 75, 100].map((value) => (
-                  <button
-                    key={value}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleVirtueUpdate(virtue as keyof VirtueScores, value);
-                    }}
-                    disabled={isUpdating === virtue}
-                    className={cn(
-                      "flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-all duration-200",
-                      score >= value
-                        ? "bg-primary text-white"
-                        : "bg-surface-2 text-muted hover:bg-primary/10 hover:text-primary"
-                    )}
-                  >
-                    {isUpdating === virtue ? "..." : value}
-                  </button>
-                ))}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Detailed View for Selected Virtue */}
-      <AnimatePresence>
-        {selectedVirtue && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="bg-surface border border-border rounded-2xl p-6"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-text capitalize">
-                {selectedVirtue} Journey Details
-              </h3>
-              <button
-                onClick={() => setSelectedVirtue(null)}
-                className="text-muted hover:text-text transition-colors"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Level Progression */}
-              <div>
-                <h4 className="font-medium text-text mb-3">Your Journey</h4>
-                <div className="space-y-3">
-                  {VIRTUE_LEVELS[selectedVirtue]?.map((level, index) => {
-                    const isCurrent = getCurrentLevel(selectedVirtue, virtueScores[selectedVirtue as keyof VirtueScores]).name === level.name;
-                    const isCompleted = virtueScores[selectedVirtue as keyof VirtueScores] >= level.minXP;
-                    const IconComponent = level.icon;
-                    
-                    return (
-                      <div
-                        key={level.name}
-                        className={cn(
-                          "flex items-center gap-3 p-3 rounded-lg border transition-all duration-200",
-                          isCurrent
-                            ? "bg-primary/10 border-primary/20"
-                            : isCompleted
-                            ? "bg-success/10 border-success/20"
-                            : "bg-surface-2 border-border"
-                        )}
-                      >
-                        <div className={cn(
-                          "w-8 h-8 rounded-lg flex items-center justify-center",
-                          isCurrent
-                            ? "bg-primary text-white"
-                            : isCompleted
-                            ? "bg-success text-white"
-                            : "bg-surface-3 text-muted"
-                        )}>
-                          {isCompleted ? (
-                            <Trophy className="w-4 h-4" />
-                          ) : (
-                            <IconComponent className="w-4 h-4" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className={cn(
-                              "font-medium",
-                              isCurrent ? "text-primary" : isCompleted ? "text-success" : "text-muted"
-                            )}>
-                              {level.name}
-                            </span>
-                            {isCurrent && <span className="text-xs text-primary">Current</span>}
-                          </div>
-                          <p className="text-sm text-muted">{level.title}</p>
-                          <p className="text-xs text-muted">{level.description}</p>
-                        </div>
-                        <div className="text-right">
-                          <div className="text-sm font-medium text-muted">{level.minXP} XP</div>
-                          {isCompleted && <div className="text-xs text-success">✓ Complete</div>}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Achievements */}
-              <div>
-                <h4 className="font-medium text-text mb-3">Recent Achievements</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {getCurrentLevel(selectedVirtue, virtueScores[selectedVirtue as keyof VirtueScores]).achievements.map((achievement, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-success/10 border border-success/20 rounded-lg">
-                      <Star className="w-4 h-4 text-success" />
-                      <span className="text-sm text-success">{achievement}</span>
+                    <div className={cn('w-8 h-8 rounded-lg text-white flex items-center justify-center bg-gradient-to-r', getVirtueGradient(virtueKey))}>
+                      <IconComponent className="w-4 h-4" />
                     </div>
-                  ))}
+                    <div className="text-sm font-medium text-text capitalize">{virtueKey}</div>
+                  </div>
+                  <div className="text-xs text-muted">{score} XP</div>
                 </div>
+                <div className="w-full bg-surface-2 rounded-full h-2">
+                  <div className={cn('h-2 rounded-full bg-gradient-to-r', getVirtueGradient(virtueKey))} style={{ width: `${Math.min(100, score)}%` }} />
+                </div>
+                <div className="text-[10px] text-muted">{level.title}</div>
               </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 } 

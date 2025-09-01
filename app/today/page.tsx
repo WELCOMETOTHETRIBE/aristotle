@@ -308,16 +308,8 @@ export default function TodayPage() {
           </div>
         </div>
 
-        {/* Virtue Progress Radar */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-text">Virtue Progress</h2>
-            <div className="text-xs text-muted">7-day average</div>
-          </div>
-          <div className="bg-surface border border-border rounded-2xl p-6">
-            <EnhancedVirtueProgress />
-          </div>
-        </div>
+        {/* Virtue Progress */}
+        <EnhancedVirtueProgress />
 
         {/* Enhanced Morning Intention */}
         {isMorning && (
