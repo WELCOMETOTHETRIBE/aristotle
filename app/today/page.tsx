@@ -185,6 +185,7 @@ export default function TodayPage() {
                 <div>
                   <h1 className="text-2xl font-bold text-text mb-1">
                     {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
+                    {user?.displayName && `, ${user.displayName.split(' ')[0]}`}
                   </h1>
                   <p className="text-muted font-medium">Ready to flourish today?</p>
                 </div>
