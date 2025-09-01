@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Info, CheckCircle } from 'lucide-react';
+import { Info, CheckCircle, Mic } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue';
 
@@ -258,6 +258,16 @@ function ReflectionJournalWidget() {
   const [saved, setSaved] = useState(false);
   const [aiInsights, setAiInsights] = useState<any>(null);
   const [showInsights, setShowInsights] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState(0);
+
+  const prompts = [
+    "What did I learn about myself today?",
+    "How did I handle challenges today?",
+    "What would I do differently?",
+    "What am I proud of today?",
+    "What am I struggling with?",
+    "What am I grateful for?"
+  ];
 
   const handleSave = async () => {
     if (!reflectionEntry.trim()) return;
@@ -269,6 +279,7 @@ function ReflectionJournalWidget() {
         body: JSON.stringify({ 
           type: 'reflection',
           content: reflectionEntry,
+          prompt: prompts[selectedPrompt],
           date: new Date().toISOString()
         })
       });
@@ -292,367 +303,46 @@ function ReflectionJournalWidget() {
 
   return (
     <div className="space-y-3">
-      <textarea 
-        className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-sm"
-        placeholder="What insights did you gain today?"
-        rows={4}
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-text">Reflection Journal</h3>
+        <div className="text-xs text-muted">
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <label className="text-sm text-muted">Reflection Prompt</label>
+        <select
+          value={selectedPrompt}
+          onChange={(e) => setSelectedPrompt(Number(e.target.value))}
+          className="w-full p-2 bg-surface border border-border rounded-lg text-text text-sm"
+        >
+          {prompts.map((prompt, index) => (
+            <option key={index} value={index}>{prompt}</option>
+          ))}
+        </select>
+      </div>
+
+      <textarea
         value={reflectionEntry}
         onChange={(e) => setReflectionEntry(e.target.value)}
+        placeholder="Write your reflection..."
+        className="w-full p-3 bg-surface border border-border rounded-lg text-text placeholder-muted resize-none"
+        rows={4}
       />
-      <Button 
-        size="sm" 
-        className="w-full"
+
+      <button
         onClick={handleSave}
-        disabled={!reflectionEntry.trim()}
+        disabled={!reflectionEntry.trim() || saved}
+        className="w-full py-2 bg-primary text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {saved ? '✓ Saved' : 'Save Reflection'}
-      </Button>
+        {saved ? 'Saved!' : 'Save Reflection'}
+      </button>
 
-      {/* Show AI insights */}
       {showInsights && aiInsights && (
-        <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">AI Insights</h4>
-          {aiInsights.themes && (
-            <div className="mb-2">
-              <p className="text-xs text-gray-400 mb-1">Themes:</p>
-              <div className="flex flex-wrap gap-1">
-                {aiInsights.themes.map((theme: string, index: number) => (
-                  <span key={index} className="text-xs bg-purple-500/20 text-purple-300 px-2 py-1 rounded">
-                    {theme}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-          {aiInsights.reflection && (
-            <div>
-              <p className="text-xs text-gray-400 mb-1">Reflection:</p>
-              <p className="text-sm text-gray-300">{aiInsights.reflection}</p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function VirtueAssessmentWidget() {
-  const [virtueScores, setVirtueScores] = useState({
-    wisdom: 5,
-    courage: 5,
-    justice: 5,
-    temperance: 5
-  });
-  const [saved, setSaved] = useState(false);
-  const [aiInsights, setAiInsights] = useState<any>(null);
-  const [showInsights, setShowInsights] = useState(false);
-
-  const handleVirtueChange = (virtue: string, value: number) => {
-    setVirtueScores(prev => ({ ...prev, [virtue.toLowerCase()]: value }));
-  };
-
-  const handleSave = async () => {
-    try {
-      const response = await fetch('/api/progress/virtues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(virtueScores)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        // Generate AI insights for virtue assessment
-        try {
-          const insightsResponse = await fetch('/api/generate/virtue-insights', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              virtueScores,
-              userId: 1 // In real app, get from auth
-            })
-          });
-
-          if (insightsResponse.ok) {
-            const insights = await insightsResponse.json();
-            setAiInsights(insights);
-            setShowInsights(true);
-          }
-        } catch (error) {
-          console.error('Error generating virtue insights:', error);
-        }
-
-        setSaved(true);
-        setTimeout(() => {
-          setSaved(false);
-          setShowInsights(false);
-          setAiInsights(null);
-        }, 5000);
-      }
-    } catch (error) {
-      console.error('Error saving virtue assessment:', error);
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-        <p className="text-sm text-gray-400 mb-2">Daily virtue assessment</p>
-        <div className="space-y-3">
-          {Object.entries(virtueScores).map(([virtue, score]) => (
-            <div key={virtue} className="space-y-1">
-              <div className="flex items-center justify-between">
-                <span className="text-sm capitalize">{virtue}</span>
-                <span className="text-xs text-muted-foreground">{score}/10</span>
-              </div>
-              <input 
-                type="range" 
-                min="1" 
-                max="10" 
-                value={score}
-                onChange={(e) => handleVirtueChange(virtue, parseInt(e.target.value))}
-                className="w-full"
-              />
-            </div>
-          ))}
-        </div>
-      </div>
-      <Button 
-        size="sm" 
-        className="w-full"
-        onClick={handleSave}
-      >
-        {saved ? '✓ Saved' : 'Save Assessment'}
-      </Button>
-
-      {/* Show AI insights */}
-      {showInsights && aiInsights && (
-        <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-          <h4 className="text-sm font-medium mb-2">AI Insights</h4>
-          {aiInsights.analysis && (
-            <div className="mb-2">
-              <p className="text-xs text-gray-400 mb-1">Analysis:</p>
-              <p className="text-sm text-gray-300">{aiInsights.analysis}</p>
-            </div>
-          )}
-          {aiInsights.recommendations && (
-            <div>
-              <p className="text-xs text-gray-400 mb-1">Recommendations:</p>
-              <ul className="text-sm text-gray-300 space-y-1">
-                {aiInsights.recommendations.map((rec: string, index: number) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="text-xs">•</span>
-                    <span>{rec}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function BoundarySetterWidget() {
-  const [selectedBoundary, setSelectedBoundary] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-  const [aiInsights, setAiInsights] = useState<any>(null);
-
-  const boundaries = [
-    {
-      id: 'say_no',
-      title: 'Say "No" to unnecessary commitments',
-      description: 'Practice declining requests that don\'t align with your priorities'
-    },
-    {
-      id: 'protect_energy',
-      title: 'Protect my energy',
-      description: 'Set limits on draining activities and people'
-    },
-    {
-      id: 'time_boundaries',
-      title: 'Set time boundaries',
-      description: 'Establish clear start and end times for activities'
-    }
-  ];
-
-  const handleBoundarySelect = async (boundaryId: string) => {
-    setSelectedBoundary(boundaryId);
-    
-    try {
-      const response = await fetch('/api/boundaries', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          boundaryId,
-          date: new Date().toISOString()
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setAiInsights(result.practice.aiInsights);
-        setSaved(true);
-        setTimeout(() => {
-          setSaved(false);
-          setSelectedBoundary(null);
-          setAiInsights(null);
-        }, 5000);
-      }
-    } catch (error) {
-      console.error('Error saving boundary practice:', error);
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-        <p className="text-sm text-gray-400 mb-2">Set healthy boundaries</p>
-        <div className="space-y-2">
-          {boundaries.map((boundary) => (
-            <Button 
-              key={boundary.id}
-              size="sm" 
-              variant={selectedBoundary === boundary.id ? "default" : "outline"}
-              className="w-full justify-start text-left h-auto p-3"
-              onClick={() => handleBoundarySelect(boundary.id)}
-              disabled={saved}
-            >
-              <div>
-                <div className="font-medium">{boundary.title}</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {boundary.description}
-                </div>
-              </div>
-            </Button>
-          ))}
-        </div>
-      </div>
-      {saved && (
-        <div className="space-y-2">
-          <div className="text-center text-sm text-green-400">
-            ✓ Boundary practice recorded
-          </div>
-          {aiInsights && (
-            <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-              <h4 className="text-sm font-medium mb-2">AI Insights</h4>
-              {aiInsights.strength && (
-                <div className="mb-2">
-                  <p className="text-xs text-gray-400 mb-1">Strength:</p>
-                  <p className="text-sm text-gray-300">{aiInsights.strength}</p>
-                </div>
-              )}
-              {aiInsights.growth && (
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Growth:</p>
-                  <p className="text-sm text-gray-300">{aiInsights.growth}</p>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function CommunityConnectionWidget() {
-  const [selectedAction, setSelectedAction] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
-  const [aiInsights, setAiInsights] = useState<any>(null);
-
-  const communityActions = [
-    {
-      id: 'reach_out',
-      title: 'Reach out to a friend',
-      description: 'Send a message or call someone you haven\'t connected with recently'
-    },
-    {
-      id: 'join_group',
-      title: 'Join a community',
-      description: 'Find and participate in a group with shared interests'
-    },
-    {
-      id: 'share_wisdom',
-      title: 'Share wisdom',
-      description: 'Share insights or help someone with their practice'
-    }
-  ];
-
-  const handleActionSelect = async (actionId: string) => {
-    setSelectedAction(actionId);
-    
-    try {
-      const response = await fetch('/api/community', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          actionId,
-          date: new Date().toISOString()
-        })
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setAiInsights(result.action.aiInsights);
-        setSaved(true);
-        setTimeout(() => {
-          setSaved(false);
-          setSelectedAction(null);
-          setAiInsights(null);
-        }, 5000);
-      }
-    } catch (error) {
-      console.error('Error saving community action:', error);
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
-        <p className="text-sm text-gray-400 mb-3 text-center">Connect with your community</p>
-        <div className="space-y-2">
-          {communityActions.map((action) => (
-            <Button 
-              key={action.id}
-              size="sm" 
-              variant={selectedAction === action.id ? "default" : "outline"}
-              className="w-full justify-start text-left h-auto p-3"
-              onClick={() => handleActionSelect(action.id)}
-              disabled={saved}
-            >
-              <div>
-                <div className="font-medium">{action.title}</div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  {action.description}
-                </div>
-              </div>
-            </Button>
-          ))}
-        </div>
-      </div>
-      {saved && (
-        <div className="space-y-2">
-          <div className="text-center text-sm text-green-400">
-            ✓ Community action recorded
-          </div>
-          {aiInsights && (
-            <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-              <h4 className="text-sm font-medium mb-2">AI Insights</h4>
-              {aiInsights.impact && (
-                <div className="mb-2">
-                  <p className="text-xs text-gray-400 mb-1">Impact:</p>
-                  <p className="text-sm text-gray-300">{aiInsights.impact}</p>
-                </div>
-              )}
-              {aiInsights.growth && (
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Growth:</p>
-                  <p className="text-sm text-gray-300">{aiInsights.growth}</p>
-                </div>
-              )}
-            </div>
-          )}
+        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <h4 className="font-medium text-primary mb-2">AI Insights</h4>
+          <p className="text-sm text-muted">{aiInsights}</p>
         </div>
       )}
     </div>
@@ -661,120 +351,489 @@ function CommunityConnectionWidget() {
 
 function VoiceNotesWidget() {
   const [isRecording, setIsRecording] = useState(false);
-  const [recordingTime, setRecordingTime] = useState(0);
+  const [transcription, setTranscription] = useState('');
   const [saved, setSaved] = useState(false);
-  const [transcription, setTranscription] = useState<string | null>(null);
   const [aiInsights, setAiInsights] = useState<any>(null);
-  const [showResults, setShowResults] = useState(false);
 
-  const handleStartRecording = async () => {
-    setIsRecording(true);
-    setRecordingTime(0);
-    setTranscription(null);
-    setAiInsights(null);
-    setShowResults(false);
-    
-    // In a real implementation, this would start actual audio recording
-    const interval = setInterval(() => {
-      setRecordingTime(prev => prev + 1);
-    }, 1000);
-    
-    // Store interval reference for cleanup
-    (window as any).recordingInterval = interval;
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      setIsRecording(true);
+      
+      // Create MediaRecorder
+      const mediaRecorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+      
+      mediaRecorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+      
+      mediaRecorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+        await transcribeAudio(audioBlob);
+        stream.getTracks().forEach(track => track.stop());
+      };
+      
+      mediaRecorder.start();
+      
+      // Stop recording after 30 seconds
+      setTimeout(() => {
+        if (isRecording) {
+          mediaRecorder.stop();
+          setIsRecording(false);
+        }
+      }, 30000);
+      
+    } catch (error) {
+      console.error('Error starting recording:', error);
+    }
   };
 
-  const handleStopRecording = async () => {
-    setIsRecording(false);
-    clearInterval((window as any).recordingInterval);
-    
-    // Simulate audio data (in real app, this would be actual audio)
-    const mockAudioData = `audio_data_${Date.now()}`;
+  const transcribeAudio = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData();
+      formData.append('audio', audioBlob);
+      
+      const response = await fetch('/api/transcribe', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        setTranscription(result.text);
+      }
+    } catch (error) {
+      console.error('Error transcribing audio:', error);
+    }
+  };
+
+  const saveNote = async () => {
+    if (!transcription.trim()) return;
     
     try {
-      const response = await fetch('/api/voice-notes', {
+      const response = await fetch('/api/journal', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          audioData: mockAudioData,
-          duration: recordingTime,
+        body: JSON.stringify({ 
+          type: 'voice_note',
+          content: transcription,
           date: new Date().toISOString()
         })
       });
 
       if (response.ok) {
         const result = await response.json();
-        setTranscription(result.voiceNote.transcription);
-        setAiInsights(result.voiceNote.aiInsights);
+        setAiInsights(result.entry.aiInsights);
         setSaved(true);
-        setShowResults(true);
-        
-        setTimeout(() => setSaved(false), 5000);
+        setTranscription('');
+        setTimeout(() => {
+          setSaved(false);
+          setAiInsights(null);
+        }, 5000);
       }
     } catch (error) {
       console.error('Error saving voice note:', error);
     }
   };
 
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-text">Voice Notes</h3>
+        <div className="text-xs text-muted">
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+      
+      <button
+        onClick={isRecording ? undefined : startRecording}
+        disabled={isRecording}
+        className={`w-full py-3 rounded-lg font-medium flex items-center justify-center gap-2 ${
+          isRecording 
+            ? 'bg-error text-white animate-pulse' 
+            : 'bg-primary text-white hover:bg-primary/90'
+        }`}
+      >
+        {isRecording ? (
+          <>
+            <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+            Recording... (30s max)
+          </>
+        ) : (
+          <>
+            <Mic className="w-4 h-4" />
+            Start Recording
+          </>
+        )}
+      </button>
+
+      {transcription && (
+        <div className="space-y-2">
+          <label className="text-sm text-muted">Transcription</label>
+          <textarea
+            value={transcription}
+            onChange={(e) => setTranscription(e.target.value)}
+            className="w-full p-3 bg-surface border border-border rounded-lg text-text placeholder-muted resize-none"
+            rows={3}
+            placeholder="Your transcribed voice note will appear here..."
+          />
+          
+          <button
+            onClick={saveNote}
+            disabled={!transcription.trim() || saved}
+            className="w-full py-2 bg-success text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {saved ? 'Saved!' : 'Save Note'}
+          </button>
+        </div>
+      )}
+
+      {saved && aiInsights && (
+        <div className="p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <h4 className="font-medium text-primary mb-2">AI Insights</h4>
+          <p className="text-sm text-muted">{aiInsights}</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function BoundarySetterWidget() {
+  const [boundaries, setBoundaries] = useState<string[]>([]);
+  const [newBoundary, setNewBoundary] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('personal');
+
+  const categories = [
+    { id: 'personal', label: 'Personal', icon: '👤' },
+    { id: 'work', label: 'Work', icon: '💼' },
+    { id: 'social', label: 'Social', icon: '👥' },
+    { id: 'digital', label: 'Digital', icon: '📱' },
+    { id: 'health', label: 'Health', icon: '🏥' }
+  ];
+
+  const addBoundary = () => {
+    if (newBoundary.trim()) {
+      setBoundaries(prev => [...prev, `${selectedCategory}: ${newBoundary.trim()}`]);
+      setNewBoundary('');
+    }
+  };
+
+  const removeBoundary = (index: number) => {
+    setBoundaries(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const saveBoundaries = async () => {
+    try {
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          type: 'boundaries',
+          content: boundaries.join('\n'),
+          category: selectedCategory,
+          date: new Date().toISOString()
+        })
+      });
+
+      if (response.ok) {
+        setBoundaries([]);
+      }
+    } catch (error) {
+      console.error('Error saving boundaries:', error);
+    }
   };
 
   return (
     <div className="space-y-3">
-      <div className="p-4 bg-white/5 border border-white/10 rounded-lg">
-        <p className="text-sm text-gray-400 mb-3 text-center">Voice recording</p>
-        {isRecording && (
-          <div className="mb-3 text-center">
-            <div className="text-lg font-mono">{formatTime(recordingTime)}</div>
-            <div className="text-xs text-red-400">Recording...</div>
-          </div>
-        )}
-        <Button 
-          size="sm" 
-          variant={isRecording ? "destructive" : "outline"}
-          onClick={isRecording ? handleStopRecording : handleStartRecording}
-          disabled={saved}
-          className="w-full"
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-text">Boundary Setter</h3>
+        <div className="text-xs text-muted">
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <label className="text-sm text-muted">Category</label>
+        <select
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="w-full p-2 bg-surface border border-border rounded-lg text-text text-sm"
         >
-          {isRecording ? 'Stop Recording' : saved ? '✓ Saved' : 'Start Recording'}
-        </Button>
+          {categories.map((category) => (
+            <option key={category.id} value={category.id}>
+              {category.icon} {category.label}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* Show transcription and AI insights */}
-      {showResults && transcription && (
-        <div className="space-y-3">
-          <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-            <h4 className="text-sm font-medium mb-2">Transcription</h4>
-            <p className="text-sm text-gray-300">{transcription}</p>
+      <div className="space-y-2">
+        <label className="text-sm text-muted">New Boundary</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newBoundary}
+            onChange={(e) => setNewBoundary(e.target.value)}
+            placeholder="e.g., I will not check work emails after 6 PM"
+            className="flex-1 p-2 bg-surface border border-border rounded-lg text-text text-sm"
+            onKeyPress={(e) => e.key === 'Enter' && addBoundary()}
+          />
+          <button
+            onClick={addBoundary}
+            disabled={!newBoundary.trim()}
+            className="px-3 py-2 bg-primary text-white rounded-lg disabled:opacity-50"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+
+      {boundaries.length > 0 && (
+        <div className="space-y-2">
+          <label className="text-sm text-muted">Your Boundaries</label>
+          <div className="space-y-1">
+            {boundaries.map((boundary, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-surface/50 border border-border rounded-lg">
+                <span className="text-sm text-text">{boundary}</span>
+                <button
+                  onClick={() => removeBoundary(index)}
+                  className="text-error hover:text-error/80"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
           </div>
           
-          {aiInsights && (
-            <div className="p-3 bg-white/5 border border-white/10 rounded-lg">
-              <h4 className="text-sm font-medium mb-2">AI Insights</h4>
-              {aiInsights.themes && (
-                <div className="mb-2">
-                  <p className="text-xs text-gray-400 mb-1">Themes:</p>
-                  <div className="flex flex-wrap gap-1">
-                    {aiInsights.themes.map((theme: string, index: number) => (
-                      <span key={index} className="text-xs bg-blue-500/20 text-blue-300 px-2 py-1 rounded">
-                        {theme}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-              {aiInsights.reflection && (
-                <div>
-                  <p className="text-xs text-gray-400 mb-1">Reflection:</p>
-                  <p className="text-sm text-gray-300">{aiInsights.reflection}</p>
-                </div>
-              )}
-            </div>
-          )}
+          <button
+            onClick={saveBoundaries}
+            className="w-full py-2 bg-success text-white rounded-lg font-medium"
+          >
+            Save Boundaries
+          </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function CommunityConnectionWidget() {
+  const [connections, setConnections] = useState<string[]>([]);
+  const [newConnection, setNewConnection] = useState('');
+  const [connectionType, setConnectionType] = useState('gratitude');
+
+  const connectionTypes = [
+    { id: 'gratitude', label: 'Gratitude', icon: '🙏' },
+    { id: 'support', label: 'Support', icon: '🤝' },
+    { id: 'celebration', label: 'Celebration', icon: '🎉' },
+    { id: 'learning', label: 'Learning', icon: '📚' },
+    { id: 'inspiration', label: 'Inspiration', icon: '✨' }
+  ];
+
+  const addConnection = () => {
+    if (newConnection.trim()) {
+      setConnections(prev => [...prev, `${connectionType}: ${newConnection.trim()}`]);
+      setNewConnection('');
+    }
+  };
+
+  const removeConnection = (index: number) => {
+    setConnections(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const saveConnections = async () => {
+    try {
+      const response = await fetch('/api/journal', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          type: 'community_connections',
+          content: connections.join('\n'),
+          category: connectionType,
+          date: new Date().toISOString()
+        })
+      });
+
+      if (response.ok) {
+        setConnections([]);
+      }
+    } catch (error) {
+      console.error('Error saving connections:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-text">Community Connections</h3>
+        <div className="text-xs text-muted">
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <label className="text-sm text-muted">Connection Type</label>
+        <select
+          value={connectionType}
+          onChange={(e) => setConnectionType(e.target.value)}
+          className="w-full p-2 bg-surface border border-border rounded-lg text-text text-sm"
+        >
+          {connectionTypes.map((type) => (
+            <option key={type.id} value={type.id}>
+              {type.icon} {type.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm text-muted">New Connection</label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={newConnection}
+            onChange={(e) => setNewConnection(e.target.value)}
+            placeholder="e.g., Thanked Sarah for her support during my presentation"
+            className="flex-1 p-2 bg-surface border border-border rounded-lg text-text text-sm"
+            onKeyPress={(e) => e.key === 'Enter' && addConnection()}
+          />
+          <button
+            onClick={addConnection}
+            disabled={!newConnection.trim()}
+            className="px-3 py-2 bg-primary text-white rounded-lg disabled:opacity-50"
+          >
+            Add
+          </button>
+        </div>
+      </div>
+
+      {connections.length > 0 && (
+        <div className="space-y-2">
+          <label className="text-sm text-muted">Your Connections</label>
+          <div className="space-y-1">
+            {connections.map((connection, index) => (
+              <div key={index} className="flex items-center justify-between p-2 bg-surface/50 border border-border rounded-lg">
+                <span className="text-sm text-text">{connection}</span>
+                <button
+                  onClick={() => removeConnection(index)}
+                  className="text-error hover:text-error/80"
+                >
+                  ×
+                </button>
+              </div>
+            ))}
+          </div>
+          
+          <button
+            onClick={saveConnections}
+            className="w-full py-2 bg-success text-white rounded-lg font-medium"
+          >
+            Save Connections
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function VirtueAssessmentWidget() {
+  const [virtueScores, setVirtueScores] = useState({
+    wisdom: 3,
+    courage: 3,
+    justice: 3,
+    temperance: 3
+  });
+  const [assessment, setAssessment] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  const virtues = [
+    { key: 'wisdom', label: 'Wisdom', emoji: '🧠', color: 'text-primary' },
+    { key: 'courage', label: 'Courage', emoji: '⚡', color: 'text-courage' },
+    { key: 'justice', label: 'Justice', emoji: '⚖️', color: 'text-justice' },
+    { key: 'temperance', label: 'Temperance', emoji: '🌊', color: 'text-temperance' }
+  ];
+
+  const updateScore = (virtue: string, score: number) => {
+    setVirtueScores(prev => ({ ...prev, [virtue]: score }));
+  };
+
+  const saveAssessment = async () => {
+    try {
+      const response = await fetch('/api/progress/virtues', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          ...virtueScores,
+          note: assessment,
+          date: new Date().toISOString()
+        })
+      });
+
+      if (response.ok) {
+        setSaved(true);
+        setAssessment('');
+        setTimeout(() => setSaved(false), 3000);
+      }
+    } catch (error) {
+      console.error('Error saving virtue assessment:', error);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <h3 className="font-semibold text-text">Virtue Assessment</h3>
+        <div className="text-xs text-muted">
+          {new Date().toLocaleDateString()}
+        </div>
+      </div>
+      
+      <div className="space-y-3">
+        {virtues.map((virtue) => (
+          <div key={virtue.key} className="space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-text">
+                {virtue.emoji} {virtue.label}
+              </label>
+              <span className="text-sm text-muted">
+                {virtueScores[virtue.key as keyof typeof virtueScores]}/5
+              </span>
+            </div>
+            <input
+              type="range"
+              min="1"
+              max="5"
+              value={virtueScores[virtue.key as keyof typeof virtueScores]}
+              onChange={(e) => updateScore(virtue.key, parseInt(e.target.value))}
+              className="w-full h-2 bg-surface rounded-lg appearance-none cursor-pointer slider"
+            />
+            <div className="flex justify-between text-xs text-muted">
+              <span>Needs Work</span>
+              <span>Excellent</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="space-y-2">
+        <label className="text-sm text-muted">Reflection</label>
+        <textarea
+          value={assessment}
+          onChange={(e) => setAssessment(e.target.value)}
+          placeholder="How did you demonstrate these virtues today?"
+          className="w-full p-3 bg-surface border border-border rounded-lg text-text placeholder-muted resize-none"
+          rows={3}
+        />
+      </div>
+
+      <button
+        onClick={saveAssessment}
+        disabled={saved}
+        className="w-full py-2 bg-primary text-white rounded-lg font-medium disabled:opacity-50"
+      >
+        {saved ? 'Assessment Saved!' : 'Save Assessment'}
+      </button>
     </div>
   );
 }

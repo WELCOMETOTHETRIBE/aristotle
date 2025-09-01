@@ -248,6 +248,9 @@ model User {
   likes       CommunityLike[]
   bookmarks   CommunityBookmark[]
   notifications CommunityNotification[]
+  
+  // Journal relations
+  journalEntries JournalEntry[]
 }
 
 model Session {
@@ -530,4 +533,19 @@ model CommunityNotification {
   post      CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
+}
+
+// Journal Entry Model
+model JournalEntry {
+  id          String   @id @default(cuid())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  type        String   // gratitude, reflection, voice_note, boundaries, community_connections
+  content     String
+  prompt      String?  // For reflection entries
+  category    String?  // For boundaries and community connections
+  date        DateTime @default(now())
+  aiInsights  String?  // AI-generated insights
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 } 

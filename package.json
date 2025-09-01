@@ -23,6 +23,7 @@
     "generate-breathwork-audio": "node scripts/generate-breathwork-audio.js",
     "db:setup": "node scripts/setup-database.js",
     "doctor": "tsx scripts/strip-placeholders.ts && tsx scripts/check-framework-map.ts",
+    "setup-env": "node scripts/setup-env.js",
     "typecheck": "tsc --noEmit",
     "lint:fix": "next lint --fix",
     "e2e": "playwright test",
