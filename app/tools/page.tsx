@@ -176,6 +176,16 @@ const availableWidgets: Widget[] = [
     isAdded: false,
   },
   {
+    id: 'balance_gyro',
+    name: 'Balance Training',
+    description: 'Physical balance and coordination exercises using device motion sensors. Improve stability and body awareness.',
+    icon: Activity,
+    category: 'health',
+    color: 'from-teal-500 to-cyan-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
     id: 'nature_photo_log',
     name: 'Nature Photo Log',
     description: 'Capture and reflect on nature moments with AI interpretation',
