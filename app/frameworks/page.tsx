@@ -179,7 +179,7 @@ export default function FrameworksPage() {
               className={cn(
                 'px-4 py-2 rounded-full text-sm font-medium transition-colors whitespace-nowrap',
                 !selectedTone
-                  ? 'bg-primary text-white'
+                  ? 'bg-primary text-black font-semibold'
                   : 'bg-surface-2 text-muted hover:text-text'
               )}
             >
@@ -192,7 +192,7 @@ export default function FrameworksPage() {
                 className={cn(
                   'px-4 py-2 rounded-full text-sm font-medium transition-colors capitalize whitespace-nowrap',
                   selectedTone === tone
-                    ? 'bg-primary text-white'
+                    ? 'bg-primary text-black font-semibold'
                     : 'bg-surface-2 text-muted hover:text-text'
                 )}
               >

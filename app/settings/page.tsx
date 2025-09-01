@@ -42,6 +42,27 @@ const settings: SettingSection[] = [
         type: 'text',
         value: 'john@example.com',
       },
+      {
+        id: 'timezone',
+        label: 'Timezone',
+        description: 'Your local timezone for accurate AI content',
+        type: 'select',
+        value: 'UTC',
+        options: [
+          'UTC',
+          'America/New_York',
+          'America/Chicago',
+          'America/Denver',
+          'America/Los_Angeles',
+          'Europe/London',
+          'Europe/Paris',
+          'Europe/Berlin',
+          'Asia/Tokyo',
+          'Asia/Shanghai',
+          'Australia/Sydney',
+          'Pacific/Auckland'
+        ],
+      },
     ],
   },
   {
@@ -125,6 +146,7 @@ export default function SettingsPage() {
   const [settingsState, setSettingsState] = useState<Record<string, any>>({
     displayName: 'User',
     email: '',
+    timezone: 'UTC',
     theme: 'dark',
     focusVirtue: 'wisdom',
     dailyReminders: true,

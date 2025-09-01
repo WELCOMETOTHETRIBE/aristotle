@@ -229,7 +229,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
             <h1 className="text-2xl font-bold text-text mb-2">Framework Not Found</h1>
             <p className="text-muted mb-6">The framework you're looking for doesn't exist.</p>
             <Link href="/frameworks">
-              <button className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+              <button className="px-4 py-2 bg-primary text-black font-semibold rounded-lg hover:bg-primary/90 transition-colors">
                 Browse All Frameworks
               </button>
             </Link>
@@ -281,7 +281,7 @@ export default function FrameworkDetailPage({ params }: FrameworkDetailPageProps
               className={cn(
                 'flex-1 px-4 py-2 rounded-md text-sm font-medium transition-colors capitalize',
                 activeTab === tab
-                  ? 'bg-white text-text shadow-sm'
+                  ? 'bg-primary text-black font-semibold shadow-sm'
                   : 'text-muted hover:text-text'
               )}
             >
