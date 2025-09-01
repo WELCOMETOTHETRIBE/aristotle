@@ -360,10 +360,11 @@ export default function CommunityPage() {
             </div>
             <button
               onClick={() => setShowCreateThread(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200"
+              className="group relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
             >
-              <Plus className="w-4 h-4" />
-              New Thread
+              <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <Plus className="w-4 h-4 relative z-10" />
+              <span className="relative z-10">New Thread</span>
             </button>
           </div>
         </div>
@@ -570,18 +571,25 @@ export default function CommunityPage() {
 
                 {/* Thread Stats */}
                 <div className="flex items-center justify-between text-xs text-muted">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         toggleLike(thread.id);
                       }}
-                      className={`flex items-center gap-1 hover:text-primary transition-colors ${
-                        thread.isLiked ? 'text-primary' : ''
+                      className={`group flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-200 hover:bg-surface-2 ${
+                        thread.isLiked 
+                          ? 'text-primary bg-primary/10' 
+                          : 'hover:text-primary'
                       }`}
                     >
-                      <ThumbsUp className="w-3 h-3" />
-                      <span>{thread.likes}</span>
+                      <motion.div
+                        animate={thread.isLiked ? { scale: [1, 1.2, 1] } : {}}
+                        transition={{ duration: 0.3 }}
+                      >
+                        <ThumbsUp className={`w-3.5 h-3.5 ${thread.isLiked ? 'fill-current' : ''}`} />
+                      </motion.div>
+                      <span className="font-medium">{thread.likes}</span>
                     </button>
                     <button
                       onClick={(e) => {
@@ -589,14 +597,14 @@ export default function CommunityPage() {
                         setSelectedThreadForComment(thread);
                         setShowCommentModal(true);
                       }}
-                      className="flex items-center gap-1 hover:text-primary transition-colors"
+                      className="group flex items-center gap-1.5 px-2 py-1.5 rounded-lg transition-all duration-200 hover:bg-surface-2 hover:text-primary"
                     >
-                      <MessageSquare className="w-3 h-3" />
-                      <span>{thread.replies}</span>
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span className="font-medium">{thread.replies}</span>
                     </button>
-                    <div className="flex items-center gap-1">
-                      <Eye className="w-3 h-3" />
-                      <span>{thread.views}</span>
+                    <div className="flex items-center gap-1.5 px-2 py-1.5">
+                      <Eye className="w-3.5 h-3.5" />
+                      <span className="font-medium">{thread.views}</span>
                     </div>
                   </div>
                 </div>
