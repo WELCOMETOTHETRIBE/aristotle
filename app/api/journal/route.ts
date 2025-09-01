@@ -5,13 +5,45 @@ import { z } from 'zod';
 
 const prisma = new PrismaClient();
 
-// Validation schemas for different journal entry types
+// Comprehensive validation schema for all journal entry types
 const JournalEntrySchema = z.object({
-  type: z.enum(['gratitude', 'reflection', 'voice_note', 'boundaries', 'community_connections', 'mood']),
+  type: z.enum([
+    'gratitude', 
+    'reflection', 
+    'voice_note', 
+    'boundaries', 
+    'community_connections', 
+    'mood',
+    'breathwork_session',
+    'nature_photo',
+    'hydration_log',
+    'sleep_log',
+    'movement_session',
+    'focus_session',
+    'habit_checkin',
+    'goal_progress',
+    'academy_lesson',
+    'virtue_practice',
+    'meditation_session',
+    'exercise_session',
+    'mindfulness_moment',
+    'learning_insight',
+    'personal_growth',
+    'wellness_activity',
+    'productivity_session',
+    'creative_expression',
+    'social_connection',
+    'self_care_activity'
+  ]),
   content: z.string().min(1, 'Content is required'),
   prompt: z.string().optional(),
   category: z.string().optional(),
   date: z.string().optional(),
+  metadata: z.record(z.any()).optional(), // For additional context like duration, patterns, etc.
+  virtueGains: z.record(z.number()).optional(), // Track virtue XP gained
+  moduleId: z.string().optional(), // Which module/widget was used
+  widgetId: z.string().optional(), // Specific widget identifier
+  frameworkSlug: z.string().optional(), // Which framework was used
 });
 
 export async function POST(request: NextRequest) {
@@ -45,7 +77,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { type, content, prompt, category, date } = validationResult.data;
+    const { type, content, prompt, category, date, metadata, virtueGains, moduleId, widgetId, frameworkSlug } = validationResult.data;
 
     // Create journal entry
     const entry = await prisma.journalEntry.create({
@@ -56,7 +88,7 @@ export async function POST(request: NextRequest) {
         prompt: prompt || null,
         category: category || null,
         date: date ? new Date(date) : new Date(),
-        aiInsights: await generateAIInsights(type, content, prompt),
+        aiInsights: await generateAIInsights(type, content, prompt, metadata),
       },
     });
 
@@ -135,7 +167,7 @@ export async function GET(request: NextRequest) {
 }
 
 // Helper function to generate AI insights based on entry type
-async function generateAIInsights(type: string, content: string, prompt?: string): Promise<string | null> {
+async function generateAIInsights(type: string, content: string, prompt?: string, metadata?: any): Promise<string | null> {
   try {
     // For now, return a simple insight based on the type
     // In a full implementation, this would call OpenAI API
@@ -145,7 +177,27 @@ async function generateAIInsights(type: string, content: string, prompt?: string
       voice_note: "Voice notes capture authentic thoughts and emotions that might be lost in writing.",
       boundaries: "Setting healthy boundaries is essential for maintaining well-being and relationships.",
       community_connections: "Building meaningful connections enriches our lives and supports our growth.",
-      mood: "Tracking your mood helps build emotional awareness and identify patterns in your well-being."
+      mood: "Tracking your mood helps build emotional awareness and identify patterns in your well-being.",
+      breathwork_session: "Breathwork cultivates inner calm and strengthens the mind-body connection.",
+      nature_photo: "Connecting with nature through photography nurtures our sense of wonder and presence.",
+      hydration_log: "Staying hydrated supports physical and mental performance throughout the day.",
+      sleep_log: "Quality sleep is the foundation of health, recovery, and daily vitality.",
+      movement_session: "Movement nourishes both body and mind, creating energy and clarity.",
+      focus_session: "Deep focus builds concentration and creates meaningful progress in your work.",
+      habit_checkin: "Consistent habits compound into remarkable long-term results.",
+      goal_progress: "Progress toward goals builds confidence and momentum in your journey.",
+      academy_lesson: "Learning expands your perspective and deepens your understanding of life.",
+      virtue_practice: "Practicing virtues strengthens character and guides ethical decision-making.",
+      meditation_session: "Meditation cultivates inner peace and mental clarity.",
+      exercise_session: "Physical exercise builds strength, endurance, and mental resilience.",
+      mindfulness_moment: "Mindfulness brings awareness to the present moment and reduces stress.",
+      learning_insight: "New insights expand your understanding and open new possibilities.",
+      personal_growth: "Personal growth is a journey of continuous self-improvement and discovery.",
+      wellness_activity: "Wellness activities nurture your physical, mental, and emotional health.",
+      productivity_session: "Productive sessions create momentum and build confidence in your abilities.",
+      creative_expression: "Creative expression connects you with your authentic self and inner wisdom.",
+      social_connection: "Social connections provide support, joy, and a sense of belonging.",
+      self_care_activity: "Self-care is essential for maintaining balance and preventing burnout."
     };
 
     return insights[type as keyof typeof insights] || "Your entry has been recorded for future reflection.";

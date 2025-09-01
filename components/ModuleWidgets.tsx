@@ -4,7 +4,7 @@ import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-mo
 import { 
   Play, Pause, RotateCcw, Timer, Target, BookOpen, Heart, Brain, Zap, 
   Users, Sun, Moon, Coffee, Droplets, Dumbbell, CheckCircle,
-  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera
+  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera, Minus, Plus
 } from 'lucide-react';
 import { BreathworkWidgetNew } from './BreathworkWidgetNew';
 
@@ -21,58 +21,34 @@ export function BreathworkWidget({
 
 // ===== FOCUS TIMER WIDGET =====
 interface FocusTimerWidgetProps {
-  duration?: number;
-  technique?: string;
   frameworkTone?: string;
 }
 
-export function FocusTimerWidget({ 
-  duration = 25, 
-  technique = 'pomodoro',
-  frameworkTone = "stoic"
-}: FocusTimerWidgetProps) {
-  const [isActive, setIsActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(duration * 60);
+export function FocusTimerWidget({ frameworkTone = "stoic" }: FocusTimerWidgetProps) {
+  const [timeLeft, setTimeLeft] = useState(25 * 60); // 25 minutes default
+  const [isRunning, setIsRunning] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
-  const [sessions, setSessions] = useState(0);
-  const [currentSession, setCurrentSession] = useState(1);
-  const [isBreak, setIsBreak] = useState(false);
+  const [currentTask, setCurrentTask] = useState('');
+  const [interruptions, setInterruptions] = useState(0);
+  const [isLogging, setIsLogging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const breakDuration = technique === 'pomodoro' ? 5 : technique === 'deep-work' ? 15 : 10;
-  const longBreakDuration = 15;
-  const sessionsBeforeLongBreak = 4;
-
-  // Haptic feedback
-  const triggerHaptic = useCallback(() => {
-    if (navigator.vibrate) {
-      navigator.vibrate(200);
-    }
-  }, []);
+  const focusDurations = [
+    { value: 15, label: '15 min', color: 'text-green-400' },
+    { value: 25, label: '25 min', color: 'text-blue-400' },
+    { value: 45, label: '45 min', color: 'text-purple-400' },
+    { value: 60, label: '60 min', color: 'text-red-400' }
+  ];
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-
-    if (isActive && timeLeft > 0) {
+    
+    if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
-        setTimeLeft((prev) => {
+        setTimeLeft(prev => {
           if (prev <= 1) {
-            setIsActive(false);
+            setIsRunning(false);
             setIsCompleted(true);
-            triggerHaptic();
-            
-            if (isBreak) {
-              // Break completed, start next session
-              setIsBreak(false);
-              setTimeLeft(duration * 60);
-              setCurrentSession(prev => prev + 1);
-            } else {
-              // Session completed, start break
-              setIsBreak(true);
-              const isLongBreak = currentSession % sessionsBeforeLongBreak === 0;
-              setTimeLeft((isLongBreak ? longBreakDuration : breakDuration) * 60);
-              setSessions(prev => prev + 1);
-            }
-            
             return 0;
           }
           return prev - 1;
@@ -81,33 +57,65 @@ export function FocusTimerWidget({
     }
 
     return () => clearInterval(interval);
-  }, [isActive, timeLeft, isBreak, currentSession, duration, breakDuration, longBreakDuration, sessionsBeforeLongBreak, triggerHaptic]);
+  }, [isRunning, timeLeft]);
 
-  const toggleTimer = () => {
-    if (isCompleted) {
-      if (isBreak) {
-        setIsBreak(false);
-        setTimeLeft(duration * 60);
-        setCurrentSession(prev => prev + 1);
-      } else {
-        setIsBreak(true);
-        const isLongBreak = currentSession % sessionsBeforeLongBreak === 0;
-        setTimeLeft((isLongBreak ? longBreakDuration : breakDuration) * 60);
-      }
-      setIsCompleted(false);
-    } else {
-      setIsActive(!isActive);
-      triggerHaptic();
-    }
+  const startTimer = () => {
+    setIsRunning(true);
+  };
+
+  const pauseTimer = () => {
+    setIsRunning(false);
   };
 
   const resetTimer = () => {
-    setIsActive(false);
-    setIsBreak(false);
-    setTimeLeft(duration * 60);
+    setTimeLeft(25 * 60);
+    setIsRunning(false);
     setIsCompleted(false);
-    setCurrentSession(1);
-    triggerHaptic();
+    setInterruptions(0);
+  };
+
+  const setDuration = (minutes: number) => {
+    setTimeLeft(minutes * 60);
+    setIsRunning(false);
+    setIsCompleted(false);
+    setInterruptions(0);
+  };
+
+  const logFocusSession = async () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      
+      try {
+        // Create focus log using the new journal system
+        const { createFocusLog, logToJournal } = await import('@/lib/journal-logger');
+        
+        const sessionDuration = 25 * 60 - timeLeft; // Calculate actual duration
+        
+        const journalData = createFocusLog(
+          Math.floor(sessionDuration / 60),
+          currentTask || undefined,
+          interruptions
+        );
+
+        const result = await logToJournal(journalData);
+        
+        if (result.success) {
+          // Reset form
+          setCurrentTask('');
+          setInterruptions(0);
+          setIsLogging(false);
+          
+          // Show success feedback
+          console.log('✅ Focus session logged to journal:', result.message);
+        } else {
+          console.error('❌ Failed to log focus session:', result.error);
+        }
+      } catch (error) {
+        console.error('Error logging focus session:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -116,32 +124,34 @@ export function FocusTimerWidget({
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
+  const progress = ((25 * 60 - timeLeft) / (25 * 60)) * 100;
+
   const getProgressPercentage = () => {
-    const totalTime = isBreak ? (currentSession % sessionsBeforeLongBreak === 0 ? longBreakDuration : breakDuration) * 60 : duration * 60;
-    return ((totalTime - timeLeft) / totalTime) * 100;
+    const totalTime = isCompleted ? (timeLeft + (interruptions * 10)) : timeLeft; // Adjust for interruptions
+    return ((totalTime / (25 * 60)) * 100);
   };
 
   const getTechniqueColor = () => {
-    switch (technique) {
-      case 'pomodoro': return 'from-red-500/10 to-orange-500/10 border-red-500/20';
-      case 'deep-work': return 'from-purple-500/10 to-indigo-500/10 border-purple-500/20';
-      case 'flow': return 'from-green-500/10 to-emerald-500/10 border-green-500/20';
+    switch (timeLeft) {
+      case 15 * 60: return 'from-red-500/10 to-orange-500/10 border-red-500/20';
+      case 25 * 60: return 'from-blue-500/10 to-purple-500/10 border-blue-500/20';
+      case 45 * 60: return 'from-purple-500/10 to-indigo-500/10 border-purple-500/20';
       default: return 'from-blue-500/10 to-purple-500/10 border-blue-500/20';
     }
   };
 
   const getTechniqueIcon = () => {
-    switch (technique) {
-      case 'pomodoro': return <Timer className="w-6 h-6 text-red-400" />;
-      case 'deep-work': return <Brain className="w-6 h-6 text-purple-400" />;
-      case 'flow': return <Zap className="w-6 h-6 text-green-400" />;
+    switch (timeLeft) {
+      case 15 * 60: return <Timer className="w-6 h-6 text-red-400" />;
+      case 25 * 60: return <Brain className="w-6 h-6 text-purple-400" />;
+      case 45 * 60: return <Zap className="w-6 h-6 text-green-400" />;
       default: return <Target className="w-6 h-6 text-blue-400" />;
     }
   };
 
   return (
     <motion.div 
-      className={`p-6 rounded-xl bg-gradient-to-br ${getTechniqueColor()} backdrop-blur-sm`}
+      className="p-6 rounded-xl bg-gradient-to-br from-blue-500/10 to-purple-500/10 border border-blue-500/20 backdrop-blur-sm"
       whileHover={{ scale: 1.02 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
@@ -149,44 +159,69 @@ export function FocusTimerWidget({
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <motion.div 
-            className="p-3 rounded-xl bg-white/10"
-            animate={{ rotate: isActive ? 360 : 0 }}
-            transition={{ duration: 3, repeat: isActive ? Infinity : 0, ease: "linear" }}
+            className="p-3 rounded-xl bg-blue-500/20"
+            animate={{ 
+              scale: isRunning ? [1, 1.1, 1] : 1,
+              rotate: isRunning ? 360 : 0
+            }}
+            transition={{ duration: 3, repeat: isRunning ? Infinity : 0, ease: "linear" }}
           >
-            {getTechniqueIcon()}
+            <Target className="w-6 h-6 text-blue-400" />
           </motion.div>
           <div>
-            <h3 className="font-bold text-white text-lg capitalize">{technique.replace('-', ' ')}</h3>
+            <h3 className="font-bold text-white text-lg">Focus Timer</h3>
             <p className="text-sm text-gray-400">
-              {isBreak ? 'Break Time' : `Session ${currentSession}`}
+              {isCompleted ? 'Session Complete!' : isRunning ? 'Focusing...' : 'Deep work timer'}
             </p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-white">{sessions}</div>
-          <div className="text-xs text-gray-400">Completed</div>
+      </div>
+
+      {/* Duration Selection */}
+      <div className="mb-6">
+        <div className="text-sm text-gray-400 mb-3">Focus Duration:</div>
+        <div className="grid grid-cols-4 gap-2">
+          {focusDurations.map((duration) => (
+            <motion.button
+              key={duration.value}
+              onClick={() => setDuration(duration.value)}
+              className={`p-3 rounded-lg border transition-all ${
+                timeLeft === duration.value * 60
+                  ? 'border-blue-500 bg-blue-500/20 text-blue-400'
+                  : 'border-white/20 bg-white/5 text-white hover:bg-white/10'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="text-sm font-medium">{duration.label}</div>
+            </motion.button>
+          ))}
         </div>
+      </div>
+
+      {/* Task Input */}
+      <div className="mb-6">
+        <div className="text-sm text-gray-400 mb-2">What are you focusing on?</div>
+        <input
+          type="text"
+          value={currentTask}
+          onChange={(e) => setCurrentTask(e.target.value)}
+          placeholder="Enter your focus task..."
+          className="w-full p-3 bg-white/10 border border-blue-500/30 rounded-lg text-white placeholder-gray-400"
+        />
       </div>
 
       {/* Progress Bar */}
       <div className="mb-6">
         <div className="flex justify-between text-xs text-gray-400 mb-2">
-          <span>{isBreak ? 'Break' : 'Focus'} Progress</span>
-          <span>{Math.round(getProgressPercentage())}%</span>
+          <span>Focus Progress</span>
+          <span>{Math.round(progress)}%</span>
         </div>
         <div className="w-full bg-gray-700 rounded-full h-2">
           <motion.div 
-            className={`h-2 rounded-full ${
-              isBreak 
-                ? 'bg-gradient-to-r from-green-500 to-emerald-500'
-                : technique === 'pomodoro'
-                  ? 'bg-gradient-to-r from-red-500 to-orange-500'
-                  : technique === 'deep-work'
-                    ? 'bg-gradient-to-r from-purple-500 to-indigo-500'
-                    : 'bg-gradient-to-r from-green-500 to-emerald-500'
-            }`}
+            className="bg-gradient-to-r from-blue-500 to-purple-500 h-2 rounded-full"
             initial={{ width: 0 }}
-            animate={{ width: `${getProgressPercentage()}%` }}
+            animate={{ width: `${progress}%` }}
             transition={{ duration: 0.5 }}
           />
         </div>
@@ -197,65 +232,89 @@ export function FocusTimerWidget({
         <motion.div 
           className="text-5xl font-bold text-white mb-2"
           animate={{ 
-            scale: isActive ? [1, 1.05, 1] : 1,
-            color: isBreak ? '#10b981' : '#ffffff'
+            scale: isRunning ? [1, 1.05, 1] : 1,
+            color: isRunning ? '#3b82f6' : '#ffffff'
           }}
-          transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
+          transition={{ duration: 1, repeat: isRunning ? Infinity : 0 }}
         >
           {formatTime(timeLeft)}
         </motion.div>
         <div className="text-sm text-gray-400">
-          {isBreak ? 'Break Time' : `${technique.replace('-', ' ')} Session`}
+          {isCompleted ? 'Session Complete!' : 'Focus Time'}
         </div>
       </div>
 
-      {/* Session Info */}
-      <div className="flex justify-center gap-4 mb-6 text-sm">
-        <div className="text-center">
-          <div className="text-white font-semibold">{currentSession}</div>
-          <div className="text-gray-400">Session</div>
-        </div>
-        <div className="text-center">
-          <div className="text-white font-semibold">{sessionsBeforeLongBreak - (currentSession % sessionsBeforeLongBreak)}</div>
-          <div className="text-gray-400">Until Long Break</div>
+      {/* Interruption Counter */}
+      <div className="mb-6 text-center">
+        <div className="text-sm text-gray-400 mb-2">Interruptions:</div>
+        <div className="flex items-center justify-center gap-2">
+          <motion.button
+            onClick={() => setInterruptions(prev => Math.max(0, prev - 1))}
+            className="p-2 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Minus className="w-4 h-4" />
+          </motion.button>
+          <span className="text-2xl font-bold text-white px-4">{interruptions}</span>
+          <motion.button
+            onClick={() => setInterruptions(prev => prev + 1)}
+            className="p-2 rounded-lg bg-green-500/20 text-green-400 hover:bg-green-500/30 transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Plus className="w-4 h-4" />
+          </motion.button>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex justify-center gap-4">
-        <motion.button
-          onClick={toggleTimer}
-          className={`px-6 py-3 rounded-xl font-semibold transition-all ${
-            isCompleted 
-              ? 'bg-green-500 hover:bg-green-600 text-white' 
-              : isActive 
-                ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-          }`}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          {isCompleted ? (
+      <div className="flex justify-center gap-3 mb-6">
+        {!isCompleted ? (
+          <>
+            {!isRunning ? (
+              <motion.button
+                onClick={startTimer}
+                className="px-6 py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold rounded-xl transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="flex items-center gap-2">
+                  <Play className="w-5 h-5" />
+                  <span>Start Focus</span>
+                </div>
+              </motion.button>
+            ) : (
+              <motion.button
+                onClick={pauseTimer}
+                className="px-6 py-3 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-xl transition-all"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <div className="flex items-center gap-2">
+                  <Pause className="w-5 h-5" />
+                  <span>Pause</span>
+                </div>
+              </motion.button>
+            )}
+          </>
+        ) : (
+          <motion.button
+            onClick={() => setIsLogging(true)}
+            className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-all"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
             <div className="flex items-center gap-2">
               <CheckCircle className="w-5 h-5" />
-              <span>Continue</span>
+              <span>Log Session</span>
             </div>
-          ) : isActive ? (
-            <div className="flex items-center gap-2">
-              <Pause className="w-5 h-5" />
-              <span>Pause</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2">
-              <Play className="w-5 h-5" />
-              <span>Start</span>
-            </div>
-          )}
-        </motion.button>
+          </motion.button>
+        )}
         
         <motion.button
           onClick={resetTimer}
-          className="px-4 py-3 rounded-xl bg-gray-600 hover:bg-gray-700 text-white transition-all"
+          className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -263,13 +322,54 @@ export function FocusTimerWidget({
         </motion.button>
       </div>
 
-      {/* Technique Tips */}
+      {/* Logging Form */}
+      {isLogging && (
+        <motion.div 
+          className="mb-6 p-4 bg-white/5 rounded-lg border border-blue-500/30"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: 'auto' }}
+          exit={{ opacity: 0, height: 0 }}
+        >
+          <div className="text-sm text-white mb-3">Log your focus session:</div>
+          <div className="space-y-3">
+            <div>
+              <div className="text-xs text-gray-400 mb-1">Task:</div>
+              <input
+                type="text"
+                value={currentTask}
+                onChange={(e) => setCurrentTask(e.target.value)}
+                placeholder="What did you focus on?"
+                className="w-full p-2 bg-white/10 border border-blue-500/30 rounded text-white placeholder-gray-400 text-sm"
+              />
+            </div>
+            <div className="flex justify-center gap-3">
+              <motion.button
+                onClick={logFocusSession}
+                disabled={isSubmitting}
+                className="px-4 py-2 bg-blue-500 hover:bg-blue-600 disabled:opacity-50 text-white text-sm rounded transition-colors"
+                whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
+                whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Session'}
+              </motion.button>
+              <motion.button
+                onClick={() => setIsLogging(false)}
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Cancel
+              </motion.button>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Focus Tips */}
       <div className="mt-4 p-3 bg-white/5 rounded-lg">
-        <div className="text-xs text-gray-400 mb-1">Tip:</div>
+        <div className="text-xs text-gray-400 mb-1">Focus Tip:</div>
         <div className="text-sm text-white">
-          {technique === 'pomodoro' && 'Work in focused 25-minute sessions with 5-minute breaks'}
-          {technique === 'deep-work' && 'Immerse yourself in complex tasks for extended periods'}
-          {technique === 'flow' && 'Find your optimal state of concentration and creativity'}
+          Deep focus builds concentration and creates meaningful progress in your work.
         </div>
       </div>
     </motion.div>
@@ -286,6 +386,7 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
   const [currentEntry, setCurrentEntry] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Load saved entries from localStorage on component mount
   useEffect(() => {
@@ -309,11 +410,37 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
     "What moment brought me joy today?"
   ];
 
-  const addEntry = () => {
-    if (currentEntry.trim()) {
-      setEntries(prev => [currentEntry.trim(), ...prev.slice(0, 4)]);
-      setCurrentEntry('');
-      setIsAdding(false);
+  const addEntry = async () => {
+    if (currentEntry.trim() && !isSubmitting) {
+      setIsSubmitting(true);
+      
+      try {
+        // Create gratitude log using the new journal system
+        const { createGratitudeLog, logToJournal } = await import('@/lib/journal-logger');
+        
+        const journalData = createGratitudeLog(
+          currentEntry.trim(),
+          prompts[selectedPrompt]
+        );
+
+        const result = await logToJournal(journalData);
+        
+        if (result.success) {
+          // Add to local state
+          setEntries(prev => [currentEntry.trim(), ...prev.slice(0, 4)]);
+          setCurrentEntry('');
+          setIsAdding(false);
+          
+          // Show success feedback
+          console.log('✅ Gratitude entry logged to journal:', result.message);
+        } else {
+          console.error('❌ Failed to log gratitude entry:', result.error);
+        }
+      } catch (error) {
+        console.error('Error logging gratitude entry:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
@@ -410,7 +537,7 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
           <div className="flex gap-2 mt-3">
             <motion.button
               onClick={addEntry}
-              disabled={!currentEntry.trim()}
+              disabled={!currentEntry.trim() || isSubmitting}
               className="px-4 py-2 bg-yellow-500 hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed text-black font-medium rounded-lg transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -479,82 +606,71 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
   );
 }
 
-// ===== ENHANCED MOVEMENT WIDGET =====
+// ===== MOVEMENT WIDGET =====
 interface MovementWidgetProps {
   frameworkTone?: string;
 }
 
 export function MovementWidget({ frameworkTone = "stoic" }: MovementWidgetProps) {
-  const [currentExercise, setCurrentExercise] = useState(0);
-  const [isActive, setIsActive] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [sets, setSets] = useState(0);
-  const [completedExercises, setCompletedExercises] = useState<number[]>([]);
+  const [selectedActivity, setSelectedActivity] = useState('walking');
+  const [duration, setDuration] = useState(30);
+  const [intensity, setIntensity] = useState('moderate');
+  const [notes, setNotes] = useState('');
+  const [isLogging, setIsLogging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const exercises = [
-    { name: "Push-ups", duration: 30, icon: "💪", category: "Strength" },
-    { name: "Squats", duration: 45, icon: "🦵", category: "Strength" },
-    { name: "Plank", duration: 60, icon: "🧘", category: "Core" },
-    { name: "Jumping Jacks", duration: 30, icon: "🏃", category: "Cardio" },
-    { name: "Lunges", duration: 40, icon: "🚶", category: "Strength" },
-    { name: "Mountain Climbers", duration: 30, icon: "⛰️", category: "Cardio" }
+  const activities = [
+    { id: 'walking', name: 'Walking', icon: '🚶', color: 'text-green-400' },
+    { id: 'running', name: 'Running', icon: '🏃', color: 'text-blue-400' },
+    { id: 'cycling', name: 'Cycling', icon: '🚴', color: 'text-yellow-400' },
+    { id: 'swimming', name: 'Swimming', icon: '🏊', color: 'text-cyan-400' },
+    { id: 'yoga', name: 'Yoga', icon: '🧘', color: 'text-purple-400' },
+    { id: 'strength', name: 'Strength Training', icon: '💪', color: 'text-red-400' }
   ];
 
-  const currentExerciseData = exercises[currentExercise];
+  const intensityLevels = [
+    { value: 'light', label: 'Light', color: 'text-green-400' },
+    { value: 'moderate', label: 'Moderate', color: 'text-yellow-400' },
+    { value: 'vigorous', label: 'Vigorous', color: 'text-red-400' }
+  ];
 
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
+  const logMovement = async () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      
+      try {
+        // Create movement log using the new journal system
+        const { createMovementLog, logToJournal } = await import('@/lib/journal-logger');
+        
+        const activityName = activities.find(a => a.id === selectedActivity)?.name || selectedActivity;
+        
+        const journalData = createMovementLog(
+          activityName,
+          duration,
+          intensity,
+          notes || undefined
+        );
 
-    if (isActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            setIsActive(false);
-            setSets(prev => prev + 1);
-            setCompletedExercises(prev => [...prev, currentExercise]);
-            return currentExerciseData.duration;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+        const result = await logToJournal(journalData);
+        
+        if (result.success) {
+          // Reset form
+          setDuration(30);
+          setIntensity('moderate');
+          setNotes('');
+          setIsLogging(false);
+          
+          // Show success feedback
+          console.log('✅ Movement logged to journal:', result.message);
+        } else {
+          console.error('❌ Failed to log movement:', result.error);
+        }
+      } catch (error) {
+        console.error('Error logging movement:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
-
-    return () => clearInterval(interval);
-  }, [isActive, timeLeft, currentExercise, currentExerciseData.duration]);
-
-  const startExercise = () => {
-    setIsActive(true);
-    setTimeLeft(currentExerciseData.duration);
-  };
-
-  const pauseExercise = () => {
-    setIsActive(false);
-  };
-
-  const nextExercise = () => {
-    if (currentExercise < exercises.length - 1) {
-      setCurrentExercise(prev => prev + 1);
-      setTimeLeft(exercises[currentExercise + 1].duration);
-      setIsActive(false);
-    }
-  };
-
-  const resetWorkout = () => {
-    setCurrentExercise(0);
-    setTimeLeft(exercises[0].duration);
-    setIsActive(false);
-    setSets(0);
-    setCompletedExercises([]);
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const getProgressPercentage = () => {
-    return ((currentExerciseData.duration - timeLeft) / currentExerciseData.duration) * 100;
   };
 
   return (
@@ -569,172 +685,221 @@ export function MovementWidget({ frameworkTone = "stoic" }: MovementWidgetProps)
           <motion.div 
             className="p-3 rounded-xl bg-green-500/20"
             animate={{ 
-              scale: isActive ? [1, 1.1, 1] : 1,
-              rotate: isActive ? [0, 5, -5, 0] : 0
+              scale: isLogging ? [1, 1.1, 1] : 1,
+              rotate: isLogging ? [0, 5, -5, 0] : 0
             }}
-            transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
+            transition={{ duration: 1, repeat: isLogging ? Infinity : 0 }}
           >
             <Dumbbell className="w-6 h-6 text-green-400" />
           </motion.div>
           <div>
             <h3 className="font-bold text-white text-lg">Movement</h3>
-            <p className="text-sm text-gray-400">Exercise {currentExercise + 1} of {exercises.length}</p>
+            <p className="text-sm text-gray-400">
+              {isLogging ? 'Logging activity...' : 'Track your movement'}
+            </p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-green-400">{sets}</div>
-          <div className="text-xs text-gray-400">Sets</div>
-        </div>
       </div>
 
-      {/* Current Exercise */}
-      <div className="text-center mb-6">
-        <div className="text-6xl mb-4">{currentExerciseData.icon}</div>
-        <h4 className="text-xl font-bold text-white mb-2">{currentExerciseData.name}</h4>
-        <div className="inline-flex items-center px-3 py-1 rounded-full bg-green-500/20 text-green-300 text-sm">
-          {currentExerciseData.category}
-        </div>
-      </div>
-
-      {/* Progress Bar */}
+      {/* Activity Selection */}
       <div className="mb-6">
-        <div className="flex justify-between text-xs text-gray-400 mb-2">
-          <span>Exercise Progress</span>
-          <span>{Math.round(getProgressPercentage())}%</span>
-        </div>
-        <div className="w-full bg-gray-700 rounded-full h-2">
-          <motion.div 
-            className="bg-gradient-to-r from-green-500 to-emerald-500 h-2 rounded-full"
-            initial={{ width: 0 }}
-            animate={{ width: `${getProgressPercentage()}%` }}
-            transition={{ duration: 0.5 }}
-          />
+        <div className="text-sm text-gray-400 mb-3">Select Activity:</div>
+        <div className="grid grid-cols-3 gap-2">
+          {activities.map((activity) => (
+            <motion.button
+              key={activity.id}
+              onClick={() => setSelectedActivity(activity.id)}
+              className={`p-3 rounded-lg border transition-all ${
+                selectedActivity === activity.id
+                  ? 'border-green-500 bg-green-500/20 text-green-400'
+                  : 'border-white/20 bg-white/5 text-white hover:bg-white/10'
+              }`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <div className="text-2xl mb-1">{activity.icon}</div>
+              <div className="text-xs">{activity.name}</div>
+            </motion.button>
+          ))}
         </div>
       </div>
 
-      {/* Timer Display */}
-      <div className="text-center mb-6">
-        <motion.div 
-          className="text-4xl font-bold text-white mb-2"
-          animate={{ 
-            scale: isActive ? [1, 1.05, 1] : 1,
-            color: isActive ? '#10b981' : '#ffffff'
-          }}
-          transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
-        >
-          {formatTime(timeLeft)}
-        </motion.div>
-        <div className="text-sm text-gray-400">Time Remaining</div>
+      {/* Duration and Intensity */}
+      <div className="mb-6 space-y-4">
+        <div>
+          <div className="text-sm text-gray-400 mb-2">Duration (minutes):</div>
+          <input
+            type="range"
+            min="5"
+            max="120"
+            step="5"
+            value={duration}
+            onChange={(e) => setDuration(parseInt(e.target.value))}
+            className="w-full"
+          />
+          <div className="text-center text-white font-medium">{duration} min</div>
+        </div>
+
+        <div>
+          <div className="text-sm text-gray-400 mb-2">Intensity:</div>
+          <div className="flex gap-2">
+            {intensityLevels.map((level) => (
+              <motion.button
+                key={level.value}
+                onClick={() => setIntensity(level.value)}
+                className={`px-3 py-2 rounded-lg border transition-all ${
+                  intensity === level.value
+                    ? 'border-green-500 bg-green-500/20 text-green-400'
+                    : 'border-white/20 bg-white/5 text-white hover:bg-white/10'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {level.label}
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Notes */}
+      <div className="mb-6">
+        <div className="text-sm text-gray-400 mb-2">Notes:</div>
+        <textarea
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="How did this activity feel?"
+          className="w-full p-3 bg-white/10 border border-green-500/30 rounded-lg text-white placeholder-gray-400 resize-none"
+          rows={3}
+        />
       </div>
 
       {/* Controls */}
       <div className="flex justify-center gap-3 mb-6">
-        {!isActive ? (
+        {!isLogging ? (
           <motion.button
-            onClick={startExercise}
+            onClick={() => setIsLogging(true)}
             className="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-semibold rounded-xl transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             <div className="flex items-center gap-2">
               <Play className="w-5 h-5" />
-              <span>Start</span>
+              <span>Log Activity</span>
             </div>
           </motion.button>
         ) : (
           <motion.button
-            onClick={pauseExercise}
-            className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            onClick={logMovement}
+            disabled={isSubmitting}
+            className="px-6 py-3 bg-green-500 hover:bg-green-600 disabled:opacity-50 text-white font-semibold rounded-xl transition-all"
+            whileHover={{ scale: isSubmitting ? 1 : 1.05 }}
+            whileTap={{ scale: isSubmitting ? 1 : 0.95 }}
           >
             <div className="flex items-center gap-2">
-              <Pause className="w-5 h-5" />
-              <span>Pause</span>
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  <span>Save Activity</span>
+                </>
+              )}
             </div>
           </motion.button>
         )}
         
         <motion.button
-          onClick={resetWorkout}
+          onClick={() => {
+            setDuration(30);
+            setIntensity('moderate');
+            setNotes('');
+            setIsLogging(false);
+          }}
           className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <RotateCcw className="w-5 h-5" />
+          Reset
         </motion.button>
       </div>
-
-      {/* Exercise Progress */}
-      <div className="mb-4">
-        <div className="text-sm text-gray-400 mb-2">Workout Progress:</div>
-        <div className="grid grid-cols-3 gap-2">
-          {exercises.map((exercise, index) => (
-            <motion.div
-              key={index}
-              className={`p-2 rounded-lg text-center text-xs ${
-                completedExercises.includes(index)
-                  ? 'bg-green-500/30 text-green-200 border border-green-500/50'
-                  : index === currentExercise
-                    ? 'bg-blue-500/30 text-blue-200 border border-blue-500/50'
-                    : 'bg-white/10 text-gray-400'
-              }`}
-              whileHover={{ scale: 1.05 }}
-            >
-              <div className="text-lg mb-1">{exercise.icon}</div>
-              <div className="font-medium">{exercise.name}</div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-
-      {/* Next Exercise Button */}
-      {currentExercise < exercises.length - 1 && (
-        <motion.button
-          onClick={nextExercise}
-          className="w-full px-4 py-3 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-xl transition-all"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          Next: {exercises[currentExercise + 1].name}
-        </motion.button>
-      )}
 
       {/* Movement Tips */}
       <div className="mt-4 p-3 bg-white/5 rounded-lg">
         <div className="text-xs text-gray-400 mb-1">Movement Tip:</div>
         <div className="text-sm text-white">
-          Focus on form over speed. Quality movement builds strength and prevents injury.
+          Regular movement nourishes both body and mind, creating energy and clarity.
         </div>
       </div>
     </motion.div>
   );
 }
 
-// ===== ENHANCED HYDRATION WIDGET =====
+// ===== HYDRATION WIDGET =====
 interface HydrationWidgetProps {
   frameworkTone?: string;
 }
 
 export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProps) {
-  const [waterIntake, setWaterIntake] = useState(0);
-  const [goal, setGoal] = useState(8); // cups
-  const [lastDrink, setLastDrink] = useState<Date | null>(null);
-  const [showGoalSettings, setShowGoalSettings] = useState(false);
-  const [tempGoal, setTempGoal] = useState(8);
+  const [currentHydration, setCurrentHydration] = useState(0);
+  const [targetHydration, setTargetHydration] = useState(2500);
+  const [isAdding, setIsAdding] = useState(false);
+  const [amount, setAmount] = useState(250);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const addWater = (amount: number) => {
-    setWaterIntake(prev => Math.min(prev + amount, goal * 2)); // Cap at 2x goal
-    setLastDrink(new Date());
-  };
+  // Load saved hydration from localStorage on component mount
+  useEffect(() => {
+    const savedHydration = localStorage.getItem('dailyHydration');
+    if (savedHydration) {
+      setCurrentHydration(parseInt(savedHydration));
+    }
+  }, []);
 
-  const resetWater = () => {
-    setWaterIntake(0);
-    setLastDrink(null);
+  // Save hydration to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('dailyHydration', JSON.stringify(currentHydration));
+  }, [currentHydration]);
+
+  const addHydration = async () => {
+    if (amount > 0 && !isSubmitting) {
+      setIsSubmitting(true);
+      
+      try {
+        // Create hydration log using the new journal system
+        const { createHydrationLog, logToJournal } = await import('@/lib/journal-logger');
+        
+        const journalData = createHydrationLog(
+          amount,
+          'ml',
+          currentHydration + amount
+        );
+
+        const result = await logToJournal(journalData);
+        
+        if (result.success) {
+          // Update local state
+          setCurrentHydration(prev => prev + amount);
+          setIsAdding(false);
+          setAmount(250);
+          
+          // Show success feedback
+          console.log('✅ Hydration logged to journal:', result.message);
+        } else {
+          console.error('❌ Failed to log hydration:', result.error);
+        }
+      } catch (error) {
+        console.error('Error logging hydration:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
   const getProgressPercentage = () => {
-    return Math.min((waterIntake / goal) * 100, 100);
+    return Math.min((currentHydration / targetHydration) * 100, 100);
   };
 
   const getWaterLevel = () => {
@@ -771,13 +936,13 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
           </div>
         </div>
         <div className="text-right">
-          <div className="text-2xl font-bold text-blue-400">{waterIntake}</div>
-          <div className="text-xs text-gray-400">Cups</div>
+          <div className="text-2xl font-bold text-blue-400">{currentHydration}</div>
+          <div className="text-xs text-gray-400">ml</div>
           <button
-            onClick={() => setShowGoalSettings(!showGoalSettings)}
+            onClick={() => setIsAdding(true)}
             className="text-xs text-blue-300 hover:text-blue-200 mt-1 underline"
           >
-            Set Goal
+            Add Water
           </button>
         </div>
       </div>
@@ -821,46 +986,39 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
           />
         </div>
         <div className="text-center text-sm text-gray-400 mt-1">
-          {waterIntake} / {goal} cups
+          {currentHydration} / {targetHydration} ml
         </div>
       </div>
 
-      {/* Goal Settings */}
-      {showGoalSettings && (
+      {/* Add Water Form */}
+      {isAdding && (
         <motion.div 
           className="mb-6 p-4 bg-white/5 rounded-lg border border-white/10"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
           exit={{ opacity: 0, height: 0 }}
         >
-          <div className="text-sm text-white mb-3">Set Daily Water Goal</div>
+          <div className="text-sm text-white mb-3">Add Water</div>
           <div className="flex items-center gap-3 mb-3">
             <input
-              type="range"
-              min="4"
-              max="16"
-              step="0.5"
-              value={tempGoal}
-              onChange={(e) => setTempGoal(parseFloat(e.target.value))}
+              type="number"
+              min="0"
+              value={amount}
+              onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
               className="flex-1"
             />
-            <span className="text-white font-medium min-w-[3rem]">{tempGoal} cups</span>
+            <span className="text-white font-medium min-w-[3rem]">ml</span>
           </div>
           <div className="flex gap-2">
             <button
-              onClick={() => {
-                setGoal(tempGoal);
-                setShowGoalSettings(false);
-              }}
+              onClick={addHydration}
+              disabled={amount <= 0 || isSubmitting}
               className="px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white text-sm rounded transition-colors"
             >
-              Save Goal
+              Add
             </button>
             <button
-              onClick={() => {
-                setTempGoal(goal);
-                setShowGoalSettings(false);
-              }}
+              onClick={() => setIsAdding(false)}
               className="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white text-sm rounded transition-colors"
             >
               Cancel
@@ -871,50 +1029,24 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
 
       {/* Quick Add Buttons */}
       <div className="grid grid-cols-3 gap-2 mb-6">
-        {[0.5, 1, 2].map((amount) => (
+        {[250, 500, 1000].map((amount) => (
           <motion.button
             key={amount}
-            onClick={() => addWater(amount)}
+            onClick={() => setAmount(amount)}
             className="p-3 bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/30 rounded-lg text-white font-medium transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            +{amount} cup{amount !== 1 ? 's' : ''}
+            +{amount} ml
           </motion.button>
         ))}
-      </div>
-
-      {/* Last Drink Info */}
-      {lastDrink && (
-        <div className="mb-4 p-3 bg-white/5 rounded-lg">
-          <div className="text-xs text-gray-400 mb-1">Last Drink:</div>
-          <div className="text-sm text-white">
-            {lastDrink.toLocaleTimeString('en-US', { 
-              hour: 'numeric', 
-              minute: '2-digit',
-              hour12: true 
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* Controls */}
-      <div className="flex justify-center gap-3">
-        <motion.button
-          onClick={resetWater}
-          className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-all"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          Reset
-        </motion.button>
       </div>
 
       {/* Hydration Tips */}
       <div className="mt-4 p-3 bg-white/5 rounded-lg">
         <div className="text-xs text-gray-400 mb-1">Hydration Tip:</div>
         <div className="text-sm text-white">
-          Aim for 8 cups of water daily. Listen to your body and drink when thirsty.
+          Aim for 2.5L (2500ml) of water daily. Listen to your body and drink when thirsty.
         </div>
       </div>
     </motion.div>
@@ -1521,42 +1653,59 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   );
 }
 
-// ===== ENHANCED SLEEP TRACKER WIDGET =====
+// ===== SLEEP TRACKER WIDGET =====
 interface SleepTrackerWidgetProps {
   frameworkTone?: string;
 }
 
 export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidgetProps) {
-  const [sleepHours, setSleepHours] = useState(0);
-  const [sleepQuality, setSleepQuality] = useState<number | null>(null);
-  const [isTracking, setIsTracking] = useState(false);
-  const [bedtime, setBedtime] = useState<Date | null>(null);
+  const [sleepHours, setSleepHours] = useState(7);
+  const [sleepQuality, setSleepQuality] = useState('good');
+  const [sleepNotes, setSleepNotes] = useState('');
+  const [isLogging, setIsLogging] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const startTracking = () => {
-    setIsTracking(true);
-    setBedtime(new Date());
-  };
+  const qualityOptions = [
+    { value: 'excellent', label: 'Excellent', color: 'text-green-400', emoji: '😴' },
+    { value: 'good', label: 'Good', color: 'text-blue-400', emoji: '😊' },
+    { value: 'fair', label: 'Fair', color: 'text-yellow-400', emoji: '😐' },
+    { value: 'poor', label: 'Poor', color: 'text-red-400', emoji: '😴' }
+  ];
 
-  const stopTracking = () => {
-    if (bedtime) {
-      const now = new Date();
-      const diffMs = now.getTime() - bedtime.getTime();
-      const diffHours = diffMs / (1000 * 60 * 60);
-      setSleepHours(Math.round(diffHours * 10) / 10);
+  const logSleep = async () => {
+    if (!isSubmitting) {
+      setIsSubmitting(true);
+      
+      try {
+        // Create sleep log using the new journal system
+        const { createSleepLog, logToJournal } = await import('@/lib/journal-logger');
+        
+        const journalData = createSleepLog(
+          sleepHours,
+          sleepQuality,
+          sleepNotes || undefined
+        );
+
+        const result = await logToJournal(journalData);
+        
+        if (result.success) {
+          // Reset form
+          setSleepHours(7);
+          setSleepQuality('good');
+          setSleepNotes('');
+          setIsLogging(false);
+          
+          // Show success feedback
+          console.log('✅ Sleep logged to journal:', result.message);
+        } else {
+          console.error('❌ Failed to log sleep:', result.error);
+        }
+      } catch (error) {
+        console.error('Error logging sleep:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
     }
-    setIsTracking(false);
-    setBedtime(null);
-  };
-
-  const setQuality = (quality: number) => {
-    setSleepQuality(quality);
-  };
-
-  const resetSleep = () => {
-    setSleepHours(0);
-    setSleepQuality(null);
-    setIsTracking(false);
-    setBedtime(null);
   };
 
   const getSleepStatus = () => {
@@ -1580,17 +1729,17 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
           <motion.div 
             className="p-3 rounded-xl bg-indigo-500/20"
             animate={{ 
-              scale: isTracking ? [1, 1.1, 1] : 1,
-              opacity: isTracking ? [1, 0.7, 1] : 1
+              scale: isLogging ? [1, 1.1, 1] : 1,
+              opacity: isLogging ? [1, 0.7, 1] : 1
             }}
-            transition={{ duration: 2, repeat: isTracking ? Infinity : 0 }}
+            transition={{ duration: 2, repeat: isLogging ? Infinity : 0 }}
           >
             <Moon className="w-6 h-6 text-indigo-400" />
           </motion.div>
           <div>
             <h3 className="font-bold text-white text-lg">Sleep Tracker</h3>
             <p className="text-sm text-gray-400">
-              {isTracking ? 'Tracking sleep...' : 'Monitor your rest'}
+              {isLogging ? 'Logging sleep...' : 'Monitor your rest'}
             </p>
           </div>
         </div>
@@ -1615,9 +1764,9 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
 
       {/* Tracking Controls */}
       <div className="flex justify-center gap-3 mb-6">
-        {!isTracking ? (
+        {!isLogging ? (
           <motion.button
-            onClick={startTracking}
+            onClick={() => setIsLogging(true)}
             className="px-6 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-semibold rounded-xl transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -1629,7 +1778,7 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
           </motion.button>
         ) : (
           <motion.button
-            onClick={stopTracking}
+            onClick={logSleep}
             className="px-6 py-3 bg-red-500 hover:bg-red-600 text-white font-semibold rounded-xl transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -1642,7 +1791,12 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
         )}
         
         <motion.button
-          onClick={resetSleep}
+          onClick={() => {
+            setSleepHours(7);
+            setSleepQuality('good');
+            setSleepNotes('');
+            setIsLogging(false);
+          }}
           className="px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-xl transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
@@ -1652,19 +1806,21 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
       </div>
 
       {/* Sleep Quality Rating */}
-      {sleepHours > 0 && sleepQuality === null && (
+      {sleepHours > 0 && (
         <div className="mb-6">
           <div className="text-sm text-gray-400 mb-3 text-center">Rate your sleep quality:</div>
           <div className="flex justify-center gap-2">
-            {[1, 2, 3, 4, 5].map((rating) => (
+            {qualityOptions.map((option) => (
               <motion.button
-                key={rating}
-                onClick={() => setQuality(rating)}
-                className="p-2 text-2xl hover:scale-110 transition-all"
+                key={option.value}
+                onClick={() => setSleepQuality(option.value)}
+                className={`p-2 text-2xl hover:scale-110 transition-all ${
+                  sleepQuality === option.value ? 'text-white' : option.color
+                }`}
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
               >
-                {rating <= 2 ? "😴" : rating <= 3 ? "😐" : rating <= 4 ? "😊" : "😴"}
+                {option.emoji}
               </motion.button>
             ))}
           </div>
@@ -1676,11 +1832,25 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
         <div className="mb-4 p-3 bg-white/5 rounded-lg text-center">
           <div className="text-xs text-gray-400 mb-1">Sleep Quality:</div>
           <div className="text-2xl mb-1">
-            {sleepQuality <= 2 ? "😴" : sleepQuality <= 3 ? "😐" : sleepQuality <= 4 ? "😊" : "😴"}
+            {sleepQuality === 'excellent' ? "😴" : sleepQuality === 'good' ? "😊" : sleepQuality === 'fair' ? "😐" : "😴"}
           </div>
           <div className="text-sm text-white">
-            {sleepQuality}/5 stars
+            {sleepQuality}
           </div>
+        </div>
+      )}
+
+      {/* Sleep Notes */}
+      {sleepHours > 0 && (
+        <div className="mb-6">
+          <div className="text-sm text-gray-400 mb-2">Notes:</div>
+          <textarea
+            value={sleepNotes}
+            onChange={(e) => setSleepNotes(e.target.value)}
+            placeholder="Any thoughts or feelings about your sleep?"
+            className="w-full p-3 bg-white/10 border border-indigo-500/30 rounded-lg text-white placeholder-gray-400 resize-none"
+            rows={3}
+          />
         </div>
       )}
 

@@ -51,6 +51,8 @@ export const zFastingSession = z.object({
 export const zBreathworkSession = z.object({
   pattern: z.string(),
   durationSec: z.number().positive(),
+  startedAt: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)),
+  completedAt: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)),
   moodBefore: z.number().min(1).max(5).optional(),
   moodAfter: z.number().min(1).max(5).optional()
 });
