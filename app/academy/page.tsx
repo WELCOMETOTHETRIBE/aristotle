@@ -351,76 +351,246 @@ export default function AcademyPage() {
 
                 {/* Lesson Selection */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-text">Choose a Lesson</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {selectedModule.lessons.map((lesson) => (
-                      <motion.button
-                        key={lesson.id}
-                        onClick={() => setCurrentLesson(lesson)}
-                        className={cn(
-                          'p-4 border rounded-xl text-left transition-all duration-200 hover:scale-105',
-                          currentLesson?.id === lesson.id
-                            ? 'border-primary bg-primary/5'
-                            : lesson.completed
-                            ? 'border-green-500/30 bg-green-500/5'
-                            : 'border-border bg-surface hover:bg-surface-2'
-                        )}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className="flex items-start justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            {lesson.completed ? (
-                              <CheckCircle className="w-4 h-4 text-green-500" />
-                            ) : (
-                              <Circle className="w-4 h-4 text-muted" />
+                  <h3 className="text-lg font-semibold text-text">Your Learning Journey</h3>
+                  <div className="bg-surface border border-border rounded-xl p-4">
+                    <div className="flex items-center space-x-2 mb-4">
+                      <Compass className="w-5 h-5 text-primary" />
+                      <span className="text-sm font-medium text-text">Progress: {selectedModule.lessons.filter(l => l.completed).length} of {selectedModule.lessons.length} lessons</span>
+                    </div>
+                    
+                    {/* Compact Journey Map */}
+                    <div className="space-y-3">
+                      {selectedModule.lessons.map((lesson, index) => {
+                        const isCompleted = lesson.completed;
+                        const isCurrent = currentLesson?.id === lesson.id;
+                        const isAccessible = index === 0 || selectedModule.lessons[index - 1]?.completed;
+                        const isLocked = !isAccessible;
+                        
+                        return (
+                          <motion.div
+                            key={lesson.id}
+                            className={cn(
+                              'relative flex items-center space-x-3 p-3 rounded-lg border transition-all duration-200',
+                              isCurrent
+                                ? 'border-primary bg-primary/5'
+                                : isCompleted
+                                ? 'border-green-500/30 bg-green-500/5'
+                                : isLocked
+                                ? 'border-border/50 bg-surface-2 opacity-50'
+                                : 'border-border bg-surface hover:bg-surface-2 cursor-pointer'
                             )}
-                            <span className="text-sm font-medium text-text">{lesson.title}</span>
-                          </div>
-                          <div className={cn('px-2 py-1 rounded text-xs', getDifficultyColor(lesson.difficulty))}>
-                            {(() => {
-                              const DifficultyIcon = getDifficultyIcon(lesson.difficulty);
-                              return <DifficultyIcon className="w-3 h-3" />;
-                            })()}
-                          </div>
+                            onClick={() => {
+                              if (!isLocked) {
+                                setCurrentLesson(lesson);
+                              }
+                            }}
+                            whileHover={!isLocked ? { scale: 1.02 } : {}}
+                            whileTap={!isLocked ? { scale: 0.98 } : {}}
+                          >
+                            {/* Lesson Number & Status */}
+                            <div className={cn(
+                              'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0',
+                              isCompleted
+                                ? 'bg-green-500 text-white'
+                                : isCurrent
+                                ? 'bg-primary text-white'
+                                : isLocked
+                                ? 'bg-surface-2 text-muted'
+                                : 'bg-surface-2 text-text'
+                            )}>
+                              {isCompleted ? (
+                                <CheckCircle className="w-4 h-4" />
+                              ) : (
+                                index + 1
+                              )}
+                            </div>
+
+                            {/* Lesson Info */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between mb-1">
+                                <h4 className={cn(
+                                  'font-medium text-sm truncate',
+                                  isCompleted ? 'text-green-600' : 'text-text'
+                                )}>
+                                  {lesson.title}
+                                </h4>
+                                <div className={cn('px-2 py-1 rounded text-xs', getDifficultyColor(lesson.difficulty))}>
+                                  {(() => {
+                                    const DifficultyIcon = getDifficultyIcon(lesson.difficulty);
+                                    return <DifficultyIcon className="w-3 h-3" />;
+                                  })()}
+                                </div>
+                              </div>
+                              <p className="text-xs text-muted truncate">{lesson.subtitle}</p>
+                              <div className="flex items-center space-x-4 mt-1 text-xs text-muted">
+                                <span>{lesson.estimatedTotalTime || lesson.estimatedTime} min</span>
+                                {isCompleted && <span className="text-green-500">✓ Completed</span>}
+                                {isCurrent && <span className="text-primary">→ Current</span>}
+                                {isLocked && <span className="text-muted">🔒 Locked</span>}
+                              </div>
+                            </div>
+
+                            {/* Connection Line */}
+                            {index < selectedModule.lessons.length - 1 && (
+                              <div className="absolute left-4 top-11 w-0.5 h-6 bg-border transform -translate-x-1/2" />
+                            )}
+                          </motion.div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Journey Legend */}
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center space-x-4 text-xs text-muted">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-green-500 rounded-full" />
+                          <span>Completed</span>
                         </div>
-                        <p className="text-xs text-muted mb-2">{lesson.subtitle}</p>
-                        <div className="flex items-center justify-between text-xs text-muted">
-                          <span>{lesson.estimatedTotalTime || lesson.estimatedTime} min</span>
-                          {lesson.completed && <span className="text-green-500">Completed</span>}
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-primary rounded-full" />
+                          <span>Current</span>
                         </div>
-                      </motion.button>
-                    ))}
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-surface-2 rounded-full" />
+                          <span>Available</span>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-3 h-3 bg-surface-2 rounded-full opacity-50" />
+                          <span>Locked</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {/* Interactive Lesson Interface */}
                 {currentLesson && (
-                  <InteractiveLessonInterface
-                    lesson={currentLesson}
-                    onComplete={(lessonId, milestones) => {
-                      console.log('Lesson completed:', lessonId, milestones);
-                      // Update lesson completion status
-                      const updatedModules = modules.map(module => {
-                        if (module.id === selectedModule.id) {
-                          const updatedLessons = module.lessons.map(lesson => {
-                            if (lesson.id === lessonId) {
-                              return { ...lesson, completed: true };
+                  <div className="space-y-4">
+                    {/* Module Completion Celebration */}
+                    {selectedModule.completed && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6 text-center"
+                      >
+                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <GraduationCap className="w-8 h-8 text-green-600" />
+                        </div>
+                        <h3 className="text-xl font-bold text-text mb-2">Module Completed!</h3>
+                        <p className="text-green-600 mb-4">
+                          Congratulations! You've mastered {selectedModule.name} ({selectedModule.greekName}). 
+                          Your journey toward wisdom continues.
+                        </p>
+                        <div className="flex items-center justify-center space-x-4 text-sm text-muted">
+                          <div className="flex items-center space-x-1">
+                            <Star className="w-4 h-4" />
+                            <span>All {selectedModule.totalLessons} lessons completed</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <Clock className="w-4 h-4" />
+                            <span>{selectedModule.estimatedTotalTime} minutes of learning</span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Lesson Navigation */}
+                    <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-xl">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                          <BookOpen className="w-5 h-5 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-text">{currentLesson.title}</h3>
+                          <p className="text-sm text-muted">Lesson {selectedModule.lessons.findIndex(l => l.id === currentLesson.id) + 1} of {selectedModule.lessons.length}</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => {
+                            const currentIndex = selectedModule.lessons.findIndex(l => l.id === currentLesson.id);
+                            const prevLesson = selectedModule.lessons[currentIndex - 1];
+                            if (prevLesson && (prevLesson.completed || currentIndex === 0)) {
+                              setCurrentLesson(prevLesson);
                             }
-                            return lesson;
-                          });
-                          return { ...module, lessons: updatedLessons };
+                          }}
+                          disabled={selectedModule.lessons.findIndex(l => l.id === currentLesson.id) === 0}
+                          className={cn(
+                            'p-2 rounded-lg transition-colors',
+                            selectedModule.lessons.findIndex(l => l.id === currentLesson.id) === 0
+                              ? 'bg-surface-2 text-muted cursor-not-allowed'
+                              : 'bg-surface-2 text-text hover:bg-surface-3'
+                          )}
+                        >
+                          <ArrowRight className="w-4 h-4 rotate-180" />
+                        </button>
+                        
+                        <button
+                          onClick={() => {
+                            const currentIndex = selectedModule.lessons.findIndex(l => l.id === currentLesson.id);
+                            const nextLesson = selectedModule.lessons[currentIndex + 1];
+                            if (nextLesson && nextLesson.completed) {
+                              setCurrentLesson(nextLesson);
+                            }
+                          }}
+                          disabled={!selectedModule.lessons.find(l => l.id === currentLesson.id)?.completed}
+                          className={cn(
+                            'p-2 rounded-lg transition-colors',
+                            !selectedModule.lessons.find(l => l.id === currentLesson.id)?.completed
+                              ? 'bg-surface-2 text-surface-2 cursor-not-allowed'
+                              : 'bg-surface-2 text-text hover:bg-surface-3'
+                          )}
+                        >
+                          <ArrowRight className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    <InteractiveLessonInterface
+                      lesson={currentLesson}
+                      onComplete={(lessonId, milestones) => {
+                        console.log('Lesson completed:', lessonId, milestones);
+                        // Update lesson completion status
+                        const updatedModules = modules.map(module => {
+                          if (module.id === selectedModule.id) {
+                            const updatedLessons = module.lessons.map(lesson => {
+                              if (lesson.id === lessonId) {
+                                return { ...lesson, completed: true };
+                              }
+                              return lesson;
+                            });
+                            
+                            // Calculate new progress
+                            const completedLessons = updatedLessons.filter(l => l.completed).length;
+                            const progress = Math.round((completedLessons / updatedLessons.length) * 100);
+                            
+                            return { 
+                              ...module, 
+                              lessons: updatedLessons,
+                              progress,
+                              completedLessons,
+                              completed: progress === 100
+                            };
+                          }
+                          return module;
+                        });
+                        setModules(updatedModules);
+                        
+                        // Auto-advance to next lesson
+                        const currentLessonIndex = selectedModule.lessons.findIndex(l => l.id === lessonId);
+                        const nextLesson = selectedModule.lessons[currentLessonIndex + 1];
+                        if (nextLesson) {
+                          setCurrentLesson(nextLesson);
                         }
-                        return module;
-                      });
-                      setModules(updatedModules);
-                    }}
-                    onSaveProgress={(lessonId, data) => {
-                      console.log('Progress saved for lesson:', lessonId, data);
-                      // Save progress to localStorage
-                      localStorage.setItem(`academyLesson_${lessonId}`, JSON.stringify(data));
-                    }}
-                  />
+                      }}
+                      onSaveProgress={(lessonId, data) => {
+                        console.log('Progress saved for lesson:', lessonId, data);
+                        // Save progress to localStorage
+                        localStorage.setItem(`academyLesson_${lessonId}`, JSON.stringify(data));
+                      }}
+                    />
+                  </div>
                 )}
               </div>
             )}
