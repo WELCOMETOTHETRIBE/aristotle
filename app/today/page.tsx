@@ -49,6 +49,8 @@ export default function TodayPage() {
   const [intention, setIntention] = useState('');
   const [virtueData, setVirtueData] = useState<Array<{ virtue: string; score: number }>>([]);
   const [userPreferences, setUserPreferences] = useState<any>(null);
+  const [submittedIntentions, setSubmittedIntentions] = useState<{[key: string]: boolean}>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   // Initialize empty arrays for authenticated users, mockup data for demo
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -188,7 +190,17 @@ export default function TodayPage() {
 
   const currentHour = new Date().getHours();
   const isMorning = currentHour < 12;
+  const isAfternoon = currentHour >= 12 && currentHour < 18;
   const isEvening = currentHour >= 18;
+
+  // Determine current time period
+  const getCurrentTimePeriod = () => {
+    if (isMorning) return 'morning';
+    if (isAfternoon) return 'afternoon';
+    return 'evening';
+  };
+
+  const currentTimePeriod = getCurrentTimePeriod();
 
   const handleTaskToggle = (taskId: string) => {
     setTasks(prev => 
@@ -210,7 +222,80 @@ export default function TodayPage() {
     );
   };
 
+  // Load submitted intentions for today
+  useEffect(() => {
+    if (!user) return;
 
+    const loadIntentions = async () => {
+      try {
+        const response = await fetch(`/api/daily-intention?userId=${user.id}&date=${new Date().toISOString().split('T')[0]}`);
+        if (response.ok) {
+          const data = await response.json();
+          const submitted = data.intentions.reduce((acc: {[key: string]: boolean}, intention: any) => {
+            acc[intention.timePeriod] = intention.submitted;
+            return acc;
+          }, {});
+          setSubmittedIntentions(submitted);
+        }
+      } catch (error) {
+        console.error('Error loading intentions:', error);
+      }
+    };
+
+    loadIntentions();
+  }, [user]);
+
+  const handleIntentionSubmit = async () => {
+    if (!user || !mood || !intention.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const response = await fetch('/api/daily-intention', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          timePeriod: currentTimePeriod,
+          mood,
+          intention: intention.trim()
+        }),
+      });
+
+      if (response.ok) {
+        setSubmittedIntentions(prev => ({
+          ...prev,
+          [currentTimePeriod]: true
+        }));
+        // Reset form
+        setMood(null);
+        setIntention('');
+      }
+    } catch (error) {
+      console.error('Error submitting intention:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getTimePeriodTitle = () => {
+    switch (currentTimePeriod) {
+      case 'morning': return 'Morning Intention';
+      case 'afternoon': return 'Afternoon Intention';
+      case 'evening': return 'Evening Intention';
+      default: return 'Daily Intention';
+    }
+  };
+
+  const getTimePeriodGreeting = () => {
+    switch (currentTimePeriod) {
+      case 'morning': return 'Set your intention for the day ahead';
+      case 'afternoon': return 'Reflect on your morning and set afternoon goals';
+      case 'evening': return 'Review your day and set evening intentions';
+      default: return 'Set your intention';
+    }
+  };
 
   const topTasks = tasks.filter(task => !task.completed).slice(0, 3);
   const completedTasks = tasks.filter(task => task.completed);
@@ -314,11 +399,11 @@ export default function TodayPage() {
         {/* Virtue Progress */}
         <EnhancedVirtueProgress />
 
-        {/* Enhanced Morning Intention */}
-        {isMorning && (
+        {/* Dynamic Daily Intention */}
+        {!submittedIntentions[currentTimePeriod] ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text">Morning Intention</h2>
+              <h2 className="text-lg font-semibold text-text">{getTimePeriodTitle()}</h2>
               <div className="text-xs text-muted">
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
@@ -366,23 +451,37 @@ export default function TodayPage() {
                     <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
                       <Target className="w-4 h-4 text-primary" />
                     </div>
-                    <h3 className="font-semibold text-text">Today's intention</h3>
+                    <h3 className="font-semibold text-text">{getTimePeriodGreeting()}</h3>
                   </div>
                   <div className="space-y-3">
                     <input
                       type="text"
                       value={intention}
                       onChange={(e) => setIntention(e.target.value)}
-                      placeholder="What will you focus on today?"
+                      placeholder={currentTimePeriod === 'morning' ? "What will you focus on today?" : 
+                                   currentTimePeriod === 'afternoon' ? "What's your afternoon priority?" : 
+                                   "What's your evening intention?"}
                       className="w-full px-4 py-3 bg-surface-2 border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
                     />
                     <div className="flex flex-wrap gap-2">
-                      {[
+                      {currentTimePeriod === 'morning' ? [
                         'Practice patience',
                         'Show kindness',
                         'Learn something new',
                         'Stay present',
                         'Be grateful'
+                      ] : currentTimePeriod === 'afternoon' ? [
+                        'Maintain focus',
+                        'Take breaks',
+                        'Connect with others',
+                        'Review progress',
+                        'Stay energized'
+                      ] : [
+                        'Reflect on the day',
+                        'Prepare for tomorrow',
+                        'Practice gratitude',
+                        'Wind down mindfully',
+                        'Connect with loved ones'
                       ].map((suggestion) => (
                         <button
                           key={suggestion}
@@ -393,9 +492,41 @@ export default function TodayPage() {
                         </button>
                       ))}
                     </div>
+                    {/* Submit Button */}
+                    <button
+                      onClick={handleIntentionSubmit}
+                      disabled={!mood || !intention.trim() || isSubmitting}
+                      className="w-full px-4 py-3 bg-gradient-to-r from-primary to-courage text-white font-semibold rounded-xl hover:from-primary/90 hover:to-courage/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {isSubmitting ? 'Submitting...' : `Submit ${currentTimePeriod.charAt(0).toUpperCase() + currentTimePeriod.slice(1)} Intention`}
+                    </button>
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-text">{getTimePeriodTitle()} - Completed</h2>
+              <div className="text-xs text-muted">
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
+                  <Target className="w-4 h-4 text-green-500" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Intention Set</h3>
+                  <p className="text-sm text-muted">Your {currentTimePeriod} intention has been recorded</p>
+                </div>
+              </div>
+              <p className="text-sm text-green-400">
+                Check back for your next time period or review your intentions in your daily journal.
+              </p>
             </div>
           </div>
         )}

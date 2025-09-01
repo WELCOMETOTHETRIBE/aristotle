@@ -240,6 +240,7 @@ model User {
   fastingSessions FastingSession[]
   hydrationLogs HydrationLog[]
   moodLogs    MoodLog[]
+  dailyIntentions DailyIntention[]
   timerSessions TimerSession[]
   
   // Community relations
@@ -449,6 +450,20 @@ model MoodLog {
   mood      Int      // 1..5
   note      String?
   user      User      @relation(fields: [userId], references: [id])
+}
+
+model DailyIntention {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  date        DateTime @default(now())
+  timePeriod  String   // "morning", "afternoon", "evening"
+  mood        Int      // 1..5
+  intention   String
+  submitted   Boolean  @default(false)
+  submittedAt DateTime?
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date, timePeriod])
 }
 
 model TimerSession {
