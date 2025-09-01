@@ -139,6 +139,20 @@ export default function WidgetGallery({
           </div>
         </div>
 
+        {/* Debug Display */}
+        <div className="p-4 bg-yellow-500/20 border border-yellow-500/50 rounded-lg mx-6 mb-4">
+          <h3 className="font-bold text-yellow-800 mb-2">🔍 DEBUG INFO</h3>
+          <div className="text-sm text-yellow-800 space-y-1">
+            <div>Total Widgets: {availableWidgets.length}</div>
+            <div>Practice Widgets: {availableWidgets.filter(w => w.category === 'practice').length}</div>
+            <div>Balance Widget Found: {availableWidgets.find(w => w.id === 'balance_gyro') ? 'YES' : 'NO'}</div>
+            <div>Selected Category: {selectedCategory}</div>
+            <div>Search Query: {searchQuery}</div>
+            <div>Filtered Count: {filteredWidgets.length}</div>
+            <div>Balance in Filtered: {filteredWidgets.find(w => w.id === 'balance_gyro') ? 'YES' : 'NO'}</div>
+          </div>
+        </div>
+
         {/* Widget Grid */}
         <div className="p-6 overflow-y-auto max-h-[60vh] bg-[rgb(var(--bg))]">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
