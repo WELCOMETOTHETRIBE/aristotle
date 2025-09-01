@@ -50,9 +50,9 @@ export default function BalanceCard({
     }
   }, []);
 
-  // Handle device motion
+  // Handle device motion - always active for testing
   useEffect(() => {
-    if (!isActive || !isDeviceMotionSupported) return;
+    if (!isDeviceMotionSupported) return;
 
     const handleMotion = (event: DeviceMotionEvent) => {
       const { accelerationIncludingGravity } = event;
@@ -139,6 +139,17 @@ export default function BalanceCard({
     setMotionHistory([]);
     startTimeRef.current = Date.now();
     lastMotionTimeRef.current = Date.now();
+  };
+
+  // Test motion detection with sample data
+  const testMotionDetection = () => {
+    const testData = [
+      { x: 0.1, y: 0.05, z: 9.81, timestamp: Date.now() },
+      { x: 0.15, y: -0.02, z: 9.79, timestamp: Date.now() + 100 },
+      { x: 0.08, y: 0.12, z: 9.82, timestamp: Date.now() + 200 }
+    ];
+    setMotionHistory(testData);
+    console.log('Test motion data added:', testData);
   };
 
   const stopBalance = () => {
@@ -278,9 +289,9 @@ export default function BalanceCard({
       <div className="mb-4 p-3 bg-gray-800/50 rounded-lg">
         <div className="flex items-center gap-2 mb-2">
           <TrendingUp className="w-4 h-4 text-blue-400" />
-          <span className="text-sm font-medium text-white">Motion Data</span>
+          <span className="text-sm font-medium text-white">Motion Data (Always Active)</span>
         </div>
-        {motionHistory.length > 0 && (
+        {motionHistory.length > 0 ? (
           <div className="text-xs text-gray-400 space-y-1">
             <div>X: {motionHistory[motionHistory.length - 1]?.x?.toFixed(2) || '0.00'}</div>
             <div>Y: {motionHistory[motionHistory.length - 1]?.y?.toFixed(2) || '0.00'}</div>
@@ -292,6 +303,13 @@ export default function BalanceCard({
                 (motionHistory[motionHistory.length - 1].z || 0) ** 2
               ).toFixed(2) : '0.00'
             }</div>
+            <div className="text-green-400 mt-2">✅ Motion detection active</div>
+          </div>
+        ) : (
+          <div className="text-xs text-red-400 space-y-1">
+            <div>No motion data received</div>
+            <div>Check console for motion events</div>
+            <div className="text-yellow-400 mt-2">⚠️ Try moving your device</div>
           </div>
         )}
       </div>
@@ -307,6 +325,27 @@ export default function BalanceCard({
           {config.sensitivity === 'medium' && 'Balanced - moderate stability required'}
           {config.sensitivity === 'high' && 'Precise - requires very stable balance'}
         </p>
+      </div>
+
+      {/* Test Controls */}
+      <div className="mb-4 p-3 bg-yellow-500/20 border border-yellow-500/50 rounded-lg">
+        <div className="text-center mb-2">
+          <span className="text-sm font-medium text-yellow-400">Motion Detection Test</span>
+        </div>
+        <div className="flex justify-center gap-2">
+          <button
+            onClick={testMotionDetection}
+            className="px-3 py-1 bg-yellow-600 hover:bg-yellow-700 rounded text-xs text-white transition-colors"
+          >
+            Test Motion Data
+          </button>
+          <button
+            onClick={() => setMotionHistory([])}
+            className="px-3 py-1 bg-gray-600 hover:bg-gray-700 rounded text-xs text-white transition-colors"
+          >
+            Clear Data
+          </button>
+        </div>
       </div>
 
       {/* Controls */}
