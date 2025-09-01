@@ -380,7 +380,10 @@ export default function AcademyPage() {
             <div className="flex items-center justify-between p-6 bg-surface border border-border rounded-2xl">
               <div className="flex items-center space-x-4">
                 <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center shadow-lg', selectedVirtue.color)}>
-                  <selectedVirtue.icon className="w-6 h-6" />
+                  {(() => {
+                    const IconComponent = selectedVirtue.icon;
+                    return <IconComponent className="w-6 h-6" />;
+                  })()}
                 </div>
                 <div>
                   <h2 className="text-xl font-bold text-text">{selectedVirtue.name} Spotlight</h2>

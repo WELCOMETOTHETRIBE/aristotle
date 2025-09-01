@@ -72,12 +72,14 @@ export async function middleware(request: NextRequest) {
       '/temperance',
       '/community',
       '/today',
+      '/academy',
       '/philosophers',
       '/breath',
       '/coach',
       '/fasting',
       '/progress',
-      '/onboarding'
+      '/onboarding',
+      '/tools'
     ];
     
     const isAllowedPath = allowedPaths.includes(pathname) || pathname.startsWith('/frameworks/');

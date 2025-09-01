@@ -53,9 +53,9 @@ export function Header({ focusVirtue }: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 bg-surface border-b border-border">
       <div className="flex items-center justify-between px-4 py-3">
-        {/* Academy Logo - Home Button */}
+        {/* Academy Logo - Academy Button */}
         <button
-          onClick={() => window.location.href = '/'}
+          onClick={() => window.location.href = '/academy'}
           className="flex items-center space-x-2 p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
         >
           <AcademyLogo className="w-8 h-8" />
