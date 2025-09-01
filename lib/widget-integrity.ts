@@ -77,6 +77,7 @@ export const BreathConfigSchema = z.object({
 
 export const BalanceGyroConfigSchema = z.object({
   targetSec: z.number().positive().optional(),
+  sensitivity: z.enum(['low', 'medium', 'high']).optional(),
   teaching: z.string().max(140).optional(),
 });
 
@@ -168,8 +169,9 @@ export const WIDGET_DEFAULTS: Record<WidgetKind, any> = {
   },
   BALANCE_GYRO: {
     targetSec: 30,
+    sensitivity: 'medium',
     teaching: 'Find your center and balance',
-    kpis: ['balance_sec', 'attempts']
+    kpis: ['balance_sec', 'attempts', 'best_streak', 'sensitivity_level']
   },
   WHEEL: {
     options: ['Option 1', 'Option 2', 'Option 3'],

@@ -25,6 +25,7 @@ import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
 import { Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NaturePhotoLogWidget } from '@/components/ModuleWidgets';
+import BalanceCard from '@/components/widgets/BalanceCard';
 
 interface Task {
   id: string;
@@ -148,6 +149,16 @@ export default function TodayPage() {
           return <HydrationTrackerCard key={widgetId} />;
         case 'focus_timer':
           return <FocusTimerCard key={widgetId} />;
+        case 'balance_gyro':
+          return (
+            <BalanceCard 
+              key={widgetId}
+              title="Balance Challenge"
+              config={{ targetSec: 60, sensitivity: 'medium', teaching: "Find your center through stillness" }}
+              onComplete={() => console.log('Balance challenge completed')}
+              virtueGrantPerCompletion={{ temperance: 2, wisdom: 1 }}
+            />
+          );
         case 'sleep_tracker':
           return <SleepTrackerCard key={widgetId} />;
         case 'habit_tracker':

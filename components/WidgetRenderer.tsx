@@ -9,6 +9,7 @@ import { getVirtueEmoji, getVirtueColor, getVirtueGradient } from '@/lib/virtue'
 // Import all widget components
 import TimerCard from '@/components/widgets/TimerCard';
 import CounterCard from '@/components/widgets/CounterCard';
+import BalanceCard from '@/components/widgets/BalanceCard';
 import { HydrationWidget, SleepTrackerWidget, MovementWidget, NaturePhotoLogWidget } from '@/components/ModuleWidgets';
 import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { HedonicAwarenessWidget } from '@/components/HedonicAwarenessWidget';
@@ -1076,6 +1077,16 @@ export default function WidgetRenderer({
             config={{ target: 20, unit: "reps", exercises: ["push-ups", "squats", "pull-ups"], teaching: "Perfect practice makes perfect" }}
             onComplete={() => console.log('Strength training completed')}
             virtueGrantPerCompletion={{ courage: 2 }}
+          />
+        );
+      
+      case 'balance_gyro':
+        return (
+          <BalanceCard 
+            title="Balance Challenge"
+            config={{ targetSec: 60, sensitivity: 'medium', teaching: "Find your center through stillness" }}
+            onComplete={() => console.log('Balance challenge completed')}
+            virtueGrantPerCompletion={{ temperance: 2, wisdom: 1 }}
           />
         );
       

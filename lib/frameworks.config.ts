@@ -92,6 +92,17 @@ export const FRAMEWORKS: FrameworkConfig[] = [
           teaching: 'Master your breath to master your mind'
         },
         virtueGrantPerCompletion: { courage: 1, temperance: 1 }
+      },
+      {
+        id: 'spartan_balance',
+        kind: 'BALANCE_GYRO',
+        title: 'Spartan Balance',
+        config: {
+          targetSec: 90,
+          sensitivity: 'medium',
+          teaching: 'Hold steady like a Spartan warrior'
+        },
+        virtueGrantPerCompletion: { temperance: 2, courage: 1 }
       }
     ],
     quests: [
@@ -118,6 +129,14 @@ export const FRAMEWORKS: FrameworkConfig[] = [
         widgetIds: ['trial_counter', 'cold_heat_timer'],
         minutes: 6,
         virtueGrants: { courage: 3, temperance: 1 }
+      },
+      {
+        id: 'spartan_trial_4',
+        title: '90s balance challenge + reflection',
+        description: 'Hold steady balance and reflect on discipline',
+        widgetIds: ['spartan_balance', 'adversity_log'],
+        minutes: 5,
+        virtueGrants: { temperance: 2, courage: 1, wisdom: 1 }
       }
     ],
     capstone: {

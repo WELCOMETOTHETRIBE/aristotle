@@ -7,6 +7,7 @@ import {
   Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera, Minus, Plus
 } from 'lucide-react';
 import { BreathworkWidgetNew } from './BreathworkWidgetNew';
+import BalanceCard from './widgets/BalanceCard';
 
 // ===== ENHANCED BREATHWORK WIDGET =====
 interface BreathworkWidgetProps {
@@ -1891,6 +1892,13 @@ export default function ModuleWidget({ moduleId, moduleName, frameworkTone }: {
       return <SleepTrackerWidget frameworkTone={frameworkTone} />;
     case 'nature_photo_log':
       return <NaturePhotoLogWidget frameworkTone={frameworkTone} />;
+    case 'balance_gyro':
+      return <BalanceCard 
+        title="Balance Challenge"
+        config={{ targetSec: 60, sensitivity: 'medium', teaching: "Find your center through stillness" }}
+        onComplete={() => console.log('Balance challenge completed')}
+        virtueGrantPerCompletion={{ temperance: 2, wisdom: 1 }}
+      />;
     default:
       return (
         <motion.div 
