@@ -432,10 +432,6 @@ export function TerminologyWidget() {
     setCurrentTermIndex((prev) => (prev + 1) % totalTerms);
   };
 
-  const skipTerm = () => {
-    setCurrentTermIndex((prev) => (prev + 1) % totalTerms);
-  };
-
   const getFrameworkColor = (frameworkId: string) => {
     const framework = frameworks.find(f => f.id === frameworkId);
     return framework?.color || 'from-gray-500 to-gray-600';
@@ -577,15 +573,7 @@ export function TerminologyWidget() {
         <div className="text-xs text-gray-400">
           {currentTerm?.tradition} • {currentTerm?.origin}
         </div>
-        <div className="flex items-center gap-2">
-          <button
-            onClick={skipTerm}
-            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-gray-500/20 border border-gray-500/30 text-gray-300 hover:bg-gray-500/30 transition-colors"
-            title="Skip to next term"
-          >
-            <SkipForward className="w-4 h-4" />
-            Skip
-          </button>
+        <div className="flex items-center justify-end">
           <button
             onClick={nextTerm}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-500/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/30 transition-colors"

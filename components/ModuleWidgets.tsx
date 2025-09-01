@@ -927,12 +927,12 @@ interface NaturePhotoLogWidgetProps {
 }
 
 interface NaturePhoto {
-  id: string;
-  url: string;
+  id: number;
+  imagePath: string;
   caption: string;
   tags: string[];
   location?: string;
-  timestamp: Date;
+  date: Date;
   weather?: string;
   mood?: string;
   aiInsights?: string;
@@ -955,22 +955,23 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
 
   const availableTags = ['dawn', 'dusk', 'tree', 'water', 'earth', 'sky', 'flower', 'animal', 'mountain', 'forest', 'ocean', 'river', 'sunset', 'sunrise', 'clouds', 'rain', 'snow', 'wind'];
 
-  // Load saved photos from localStorage on component mount
+  // Load saved photos from database on component mount
   useEffect(() => {
-    const savedPhotos = localStorage.getItem('naturePhotoLog');
-    if (savedPhotos) {
-      const parsedPhotos = JSON.parse(savedPhotos).map((photo: any) => ({
-        ...photo,
-        timestamp: new Date(photo.timestamp)
-      }));
-      setPhotos(parsedPhotos);
-    }
-  }, []);
+    const loadPhotos = async () => {
+      try {
+        // For now, we'll use a demo user ID. In a real app, this would come from auth context
+        const response = await fetch('/api/nature-photo?userId=1');
+        if (response.ok) {
+          const data = await response.json();
+          setPhotos(data.photos || []);
+        }
+      } catch (error) {
+        console.error('Error loading photos:', error);
+      }
+    };
 
-  // Save photos to localStorage whenever they change
-  useEffect(() => {
-    localStorage.setItem('naturePhotoLog', JSON.stringify(photos));
-  }, [photos]);
+    loadPhotos();
+  }, []);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1054,42 +1055,63 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     }
   };
 
-  const addPhoto = () => {
+  const addPhoto = async () => {
     if (selectedTags.length === 0 || !uploadedImage) return;
     
     setIsProcessing(true);
     
-    // Generate AI insights first
-    generateAIInsights(uploadedImage, selectedTags, caption).then((aiInsights) => {
-      const newPhoto: NaturePhoto = {
-        id: Date.now().toString(),
-        url: imagePreview,
-        caption: caption || 'Nature moment',
-        tags: selectedTags,
-        location: location || undefined,
-        timestamp: new Date(),
-        weather: weather || undefined,
-        mood: mood || undefined,
-        aiInsights: aiInsights,
-        aiComment: aiInsights,
-      };
-
-      setPhotos(prev => [newPhoto, ...prev]);
+    try {
+      // Generate AI insights first
+      const aiInsights = await generateAIInsights(uploadedImage, selectedTags, caption);
       
-      // Reset form
-      setIsAdding(false);
-      setSelectedTags([]);
-      setCaption('');
-      setLocation('');
-      setWeather('');
-      setMood('');
-      setUploadedImage(null);
-      setImagePreview('');
+      // Convert image to base64 for API
+      const base64Image = await new Promise<string>((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.readAsDataURL(uploadedImage);
+      });
+
+      // Upload to API
+      const response = await fetch('/api/nature-photo', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1, // Demo user ID - in real app this would come from auth context
+          imageData: base64Image,
+          caption: caption || 'Nature moment',
+          tags: selectedTags,
+          location: location || null,
+          weather: weather || null,
+          mood: mood || null,
+          aiInsights: aiInsights,
+          aiComment: aiInsights,
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setPhotos(prev => [data.photo, ...prev]);
+        
+        // Reset form
+        setIsAdding(false);
+        setSelectedTags([]);
+        setCaption('');
+        setLocation('');
+        setWeather('');
+        setMood('');
+        setUploadedImage(null);
+        setImagePreview('');
+      }
+    } catch (error) {
+      console.error('Error adding photo:', error);
+    } finally {
       setIsProcessing(false);
-    });
+    }
   };
 
-  const removePhoto = (photoId: string) => {
+  const removePhoto = (photoId: number) => {
     setPhotos(prev => prev.filter(photo => photo.id !== photoId));
   };
 
@@ -1314,14 +1336,14 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                   onClick={() => setSelectedPhoto(photo)}
                 >
                   <img
-                    src={photo.url}
+                    src={photo.imagePath}
                     alt={photo.caption}
                     className="w-full h-24 object-cover rounded-lg"
                   />
                   <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center">
                     <div className="text-white text-xs text-center">
                       <div className="font-medium">{photo.caption}</div>
-                      <div className="text-gray-300">{formatDate(photo.timestamp)}</div>
+                      <div className="text-gray-300">{formatDate(new Date(photo.date))}</div>
                     </div>
                   </div>
                   <button
@@ -1356,7 +1378,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           >
             <div className="space-y-4">
               <img
-                src={selectedPhoto.url}
+                src={selectedPhoto.imagePath}
                 alt={selectedPhoto.caption}
                 className="w-full h-48 object-cover rounded-lg"
               />
@@ -1377,7 +1399,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                 {selectedPhoto.weather && (
                   <p className="text-sm text-muted mb-2">🌤️ {selectedPhoto.weather}</p>
                 )}
-                <p className="text-sm text-muted mb-4">{formatDate(selectedPhoto.timestamp)}</p>
+                <p className="text-sm text-muted mb-4">{formatDate(new Date(selectedPhoto.date))}</p>
                 
                 {/* AI Insights */}
                 {selectedPhoto.aiComment && (

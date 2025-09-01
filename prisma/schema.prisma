@@ -241,6 +241,7 @@ model User {
   hydrationLogs HydrationLog[]
   moodLogs    MoodLog[]
   dailyIntentions DailyIntention[]
+  naturePhotos NaturePhoto[]
   timerSessions TimerSession[]
   
   // Community relations
@@ -464,6 +465,21 @@ model DailyIntention {
   user        User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, date, timePeriod])
+}
+
+model NaturePhoto {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  date        DateTime @default(now())
+  imagePath   String   // Path to stored image file
+  caption     String
+  tags        String[] // Array of tags
+  location    String?
+  weather     String?
+  mood        String?
+  aiInsights  String?
+  aiComment   String?
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model TimerSession {
