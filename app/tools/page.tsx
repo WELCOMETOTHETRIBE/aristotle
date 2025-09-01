@@ -87,8 +87,8 @@ const availableWidgets: Widget[] = [
   },
   {
     id: 'wisdom_spotlight',
-    name: 'Wisdom Spotlight',
-    description: 'Daily philosophical insights and lessons',
+    name: 'Daily Wisdom',
+    description: 'AI-generated daily wisdom from ancient traditions',
     icon: Brain,
     category: 'learning',
     color: 'from-purple-500 to-violet-500',

@@ -18,6 +18,7 @@ import { JournalCard } from '@/components/cards/JournalCard';
 import { GratitudeJournalCard } from '@/components/cards/GratitudeJournalCard';
 import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
 import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
+import { DailyWisdomCard } from '@/components/cards/DailyWisdomCard';
 import { TerminologyWidget } from '@/components/cards/TerminologyWidget';
 import AcademyLogo from '@/components/AcademyLogo';
 import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
@@ -158,7 +159,7 @@ export default function TodayPage() {
         case 'goal_tracker':
           return <GoalTrackerCard key={widgetId} />;
         case 'wisdom_spotlight':
-          return <WisdomSpotlightCard key={widgetId} />;
+          return <DailyWisdomCard key={widgetId} />;
         case 'terminology':
           return <TerminologyWidget key={widgetId} />;
         case 'nature_photo_log':
