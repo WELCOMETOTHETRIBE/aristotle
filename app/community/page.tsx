@@ -68,6 +68,12 @@ export default function CommunityPage() {
     category: 'Stoicism',
     tags: [] as string[],
   });
+  
+  // Comment functionality
+  const [showCommentModal, setShowCommentModal] = useState(false);
+  const [selectedThreadForComment, setSelectedThreadForComment] = useState<Thread | null>(null);
+  const [newComment, setNewComment] = useState('');
+  const [postingComment, setPostingComment] = useState(false);
 
   const categories = ['all', 'Stoicism', 'Aristotelian Ethics', 'Courage', 'Wisdom', 'Justice', 'Temperance'];
 
@@ -232,6 +238,47 @@ export default function CommunityPage() {
     }
   };
 
+  const postComment = async () => {
+    if (!newComment.trim() || !selectedThreadForComment) {
+      return;
+    }
+
+    try {
+      setPostingComment(true);
+      
+      const response = await fetch(`/api/community/${selectedThreadForComment.id}/replies`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          content: newComment,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to post comment');
+      }
+
+      // Update the thread's reply count
+      setThreads(prev => 
+        prev.map(thread => 
+          thread.id === selectedThreadForComment.id 
+            ? { ...thread, replies: thread.replies + 1 }
+            : thread
+        )
+      );
+
+      setShowCommentModal(false);
+      setNewComment('');
+      setSelectedThreadForComment(null);
+    } catch (error) {
+      console.error('Error posting comment:', error);
+    } finally {
+      setPostingComment(false);
+    }
+  };
+
   const formatTimeAgo = (dateString: string) => {
     const date = new Date(dateString);
     const now = new Date();
@@ -258,14 +305,23 @@ export default function CommunityPage() {
       <main className="pb-20 pt-4 px-4">
         {/* Hero Section */}
         <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 bg-gradient-to-r from-primary to-primary/80 rounded-xl flex items-center justify-center">
-              <Users className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-r from-primary to-primary/80 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-display font-bold text-text">Community</h1>
+                <p className="text-muted text-sm">Connect with fellow seekers</p>
+              </div>
             </div>
-            <div>
-              <h1 className="text-2xl font-display font-bold text-text">Community</h1>
-              <p className="text-muted text-sm">Connect with fellow seekers</p>
-            </div>
+            <button
+              onClick={() => setShowCreateThread(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200"
+            >
+              <Plus className="w-4 h-4" />
+              New Thread
+            </button>
           </div>
         </div>
 
@@ -466,10 +522,17 @@ export default function CommunityPage() {
                       <ThumbsUp className="w-3 h-3" />
                       <span>{thread.likes}</span>
                     </button>
-                    <div className="flex items-center gap-1">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedThreadForComment(thread);
+                        setShowCommentModal(true);
+                      }}
+                      className="flex items-center gap-1 hover:text-primary transition-colors"
+                    >
                       <MessageSquare className="w-3 h-3" />
                       <span>{thread.replies}</span>
-                    </div>
+                    </button>
                     <div className="flex items-center gap-1">
                       <Eye className="w-3 h-3" />
                       <span>{thread.views}</span>
@@ -482,13 +545,7 @@ export default function CommunityPage() {
         </div>
       </main>
 
-      {/* Create Thread FAB */}
-      <button
-        onClick={() => setShowCreateThread(true)}
-        className="fixed bottom-24 right-4 w-14 h-14 bg-primary hover:bg-primary/90 text-white rounded-full shadow-4 flex items-center justify-center transition-all duration-200 z-40"
-      >
-        <Plus className="w-6 h-6" />
-      </button>
+
 
       {/* Create Thread Modal */}
       <AnimatePresence>
@@ -582,6 +639,83 @@ export default function CommunityPage() {
                       <>
                         <Send className="w-4 h-4" />
                         Create Thread
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Comment Modal */}
+      <AnimatePresence>
+        {showCommentModal && selectedThreadForComment && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            onClick={() => setShowCommentModal(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              className="bg-surface border border-border rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-display font-bold text-text">Add Comment</h2>
+                <button
+                  onClick={() => setShowCommentModal(false)}
+                  className="p-2 hover:bg-surface-2 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-muted" />
+                </button>
+              </div>
+
+              <div className="mb-4 p-4 bg-surface-2 rounded-lg">
+                <h3 className="font-semibold text-text mb-2">{selectedThreadForComment.title}</h3>
+                <p className="text-muted text-sm">{selectedThreadForComment.content}</p>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-text mb-2">
+                    Your Comment
+                  </label>
+                  <textarea
+                    value={newComment}
+                    onChange={(e) => setNewComment(e.target.value)}
+                    rows={4}
+                    className="w-full px-4 py-3 bg-surface border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-text resize-none"
+                    placeholder="Share your thoughts on this thread..."
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3 pt-4">
+                  <button
+                    onClick={() => setShowCommentModal(false)}
+                    className="px-4 py-2 text-muted hover:bg-surface-2 rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={postComment}
+                    disabled={postingComment || !newComment.trim()}
+                    className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {postingComment ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Posting...
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-4 h-4" />
+                        Post Comment
                       </>
                     )}
                   </button>
