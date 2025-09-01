@@ -94,7 +94,7 @@ export default function BalanceCard({
       lastMotionTimeRef.current = timestamp;
     };
 
-    // Add motion event listener directly (iOS doesn't need permission for DeviceMotionEvent)
+    // Add motion event listener directly
     window.addEventListener('devicemotion', handleMotion);
     console.log('Motion event listener added');
 
