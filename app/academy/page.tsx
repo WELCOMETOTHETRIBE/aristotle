@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle, GraduationCap } from 'lucide-react';
@@ -442,9 +443,68 @@ export default function AcademyPage() {
             )}
           </div>
         )}
+
+        {/* Philosopher's Dialogue Button - Only show when no virtue is selected */}
+        {!selectedVirtue && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold text-text mb-2">Ready for deeper dialogue?</h2>
+              <p className="text-sm text-muted">Chat directly with ancient philosophers</p>
+            </div>
+            
+            <motion.button
+              onClick={() => {
+                // This will open the Philosopher's Dialogue modal/component
+                // For now, we'll just show a placeholder
+                alert('Philosopher\'s Dialogue coming soon!');
+              }}
+              className="w-full p-6 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-purple-500/5 border border-purple-500/20 rounded-2xl hover:from-purple-500/15 hover:via-violet-500/15 hover:to-purple-500/10 hover:border-purple-500/30 transition-all duration-300 hover:scale-[1.02] group"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center shadow-lg">
+                    <MessageCircle className="w-6 h-6 text-purple-300" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-text group-hover:text-purple-300 transition-colors">
+                      Philosopher's Dialogue
+                    </h3>
+                    <p className="text-sm text-muted group-hover:text-purple-200 transition-colors">
+                      Engage in deep conversations with ancient wisdom
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
+                      <span className="text-xs text-blue-300">A</span>
+                    </div>
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
+                      <span className="text-xs text-green-300">S</span>
+                    </div>
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
+                      <span className="text-xs text-yellow-300">P</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-purple-300 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+              
+              <div className="mt-4 flex items-center justify-between text-xs text-muted">
+                <span>Choose from 8+ philosophers</span>
+                <span className="flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  AI-powered conversations
+                </span>
+              </div>
+            </motion.button>
+          </div>
+        )}
       </main>
 
-                   <PhilosophersJourney />
       <TabBar />
     </div>
   );
