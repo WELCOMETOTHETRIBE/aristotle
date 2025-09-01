@@ -148,7 +148,7 @@ export default function CommunityPage() {
             avatar: `/avatars/${post.author.username}.jpg`,
             isAI: post.isAIQuestion,
           },
-          type: post.isAIQuestion ? 'ai' : 'user',
+          type: post.isAIQuestion ? 'ai' : 'member_discussion',
           category: post.category,
           tags: post.tags,
           replies: post._count.replies,
@@ -163,6 +163,9 @@ export default function CommunityPage() {
         }));
 
         setThreads(transformedThreads);
+        
+        // Fetch replies for each thread to populate AI comments
+        await fetchRepliesForThreads(transformedThreads);
       } catch (err) {
         console.error('Error fetching threads:', err);
         setError('Failed to load community threads');
@@ -173,6 +176,40 @@ export default function CommunityPage() {
 
     fetchThreads();
   }, [authLoading, selectedCategory, activeFilter]);
+
+  // Function to fetch replies for all threads
+  const fetchRepliesForThreads = async (threadsList: Thread[]) => {
+    try {
+      for (const thread of threadsList) {
+        const response = await fetch(`/api/community/${thread.id}/replies`);
+        if (response.ok) {
+          const replies = await response.json();
+          // Filter for AI comments and store them
+          const aiReplies = replies.filter((reply: any) => 
+            reply.author.username === 'ai' || reply.author.displayName?.includes('AI')
+          );
+          if (aiReplies.length > 0) {
+            setAiComments(prev => ({
+              ...prev,
+              [thread.id]: aiReplies.map((reply: any) => ({
+                id: reply.id,
+                content: reply.content,
+                author: {
+                  name: reply.author.displayName || reply.author.username,
+                  avatar: reply.author.avatar || '/avatars/ai.jpg',
+                  isAI: true,
+                },
+                createdAt: reply.createdAt,
+                likes: reply.likes,
+              }))
+            }));
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching replies:', error);
+    }
+  };
 
   // Check if we need to generate a daily AI thread
   useEffect(() => {
@@ -362,6 +399,11 @@ export default function CommunityPage() {
                   : thread
               )
             );
+            
+            // Refresh the page to show the AI comment from the database
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           }
         } catch (error) {
           console.error('Error triggering AI comment:', error);
@@ -467,6 +509,11 @@ export default function CommunityPage() {
                   : thread
               )
             );
+            
+            // Refresh the page to show the AI comment from the database
+            setTimeout(() => {
+              window.location.reload();
+            }, 1000);
           }
         } catch (error) {
           console.error('Error triggering AI response to comment:', error);
@@ -537,18 +584,23 @@ export default function CommunityPage() {
         type: 'ai',
         category: aiThreadData.thread.category,
         tags: aiThreadData.thread.tags,
-        replies: 0,
-        views: 0,
-        likes: 0,
+        replies: aiThreadData.thread.replies || 0,
+        views: aiThreadData.thread.views || 0,
+        likes: aiThreadData.thread.likes || 0,
         isLiked: false,
         isBookmarked: false,
-        createdAt: new Date().toISOString(),
-        lastActivity: new Date().toISOString(),
+        createdAt: aiThreadData.thread.createdAt,
+        lastActivity: aiThreadData.thread.createdAt,
         aiInsights: [],
       };
 
       setThreads(prev => [newAIThread, ...prev]);
       console.log('AI thread successfully added to threads list');
+      
+      // Refresh the threads list to ensure we have the latest data from the database
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
       
     } catch (error) {
       console.error('Error generating AI thread:', error);

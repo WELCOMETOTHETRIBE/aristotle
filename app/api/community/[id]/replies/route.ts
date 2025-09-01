@@ -4,6 +4,52 @@ import { verifyToken } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const postId = params.id;
+
+    // Check if post exists
+    const post = await prisma.communityPost.findUnique({
+      where: { id: postId },
+    });
+
+    if (!post) {
+      return NextResponse.json(
+        { error: 'Post not found' },
+        { status: 404 }
+      );
+    }
+
+    // Get all replies for this post
+    const replies = await prisma.communityReply.findMany({
+      where: { postId },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+          },
+        },
+      },
+      orderBy: {
+        createdAt: 'asc',
+      },
+    });
+
+    return NextResponse.json(replies);
+  } catch (error) {
+    console.error('Community replies GET error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch replies' },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }

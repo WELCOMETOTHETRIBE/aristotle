@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PHILOSOPHERS } from '@/lib/philosophers';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
@@ -74,40 +77,57 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
     const aiData = await aiResponse.json();
     const aiComment = aiData.choices[0].message.content.trim();
 
-    // Post the AI comment to the database
-    const commentResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/community/${threadId}/replies`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.AI_SYSTEM_TOKEN || 'ai-system-token'}`,
-      },
-      body: JSON.stringify({
-        content: aiComment,
-        author: {
-          name: randomPhilosopher.name,
-          avatar: randomPhilosopher.avatar,
-          isAI: true,
-          persona: randomPhilosopher.title,
-        },
-      }),
+    // Check if the thread exists
+    const thread = await prisma.communityPost.findUnique({
+      where: { id: threadId },
     });
 
-    if (!commentResponse.ok) {
-      console.warn('Failed to post AI comment to database, but continuing with response');
+    if (!thread) {
+      return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
+
+    // Use a default user ID for AI comments (same as AI threads)
+    const defaultUserId = 1; // This should be a valid user ID in your database
+
+    // Save the AI comment directly to the database
+    const savedComment = await prisma.communityReply.create({
+      data: {
+        content: aiComment,
+        authorId: defaultUserId,
+        postId: threadId,
+        parentId: null, // Top-level comment
+        likes: 0,
+      },
+      include: {
+        author: {
+          select: {
+            id: true,
+            username: true,
+            displayName: true,
+          },
+        },
+      },
+    });
+
+    console.log('AI comment saved to database successfully:', {
+      id: savedComment.id,
+      threadId,
+      philosopher: randomPhilosopher.name,
+    });
 
     return NextResponse.json({
       success: true,
       comment: {
-        id: `ai-${Date.now()}`,
-        content: aiComment,
+        id: savedComment.id,
+        content: savedComment.content,
         author: {
           name: randomPhilosopher.name,
           avatar: randomPhilosopher.avatar,
           isAI: true,
           persona: randomPhilosopher.title,
         },
-        createdAt: new Date().toISOString(),
+        createdAt: savedComment.createdAt.toISOString(),
+        likes: savedComment.likes,
       },
       philosopher: {
         id: randomPhilosopher.id,
