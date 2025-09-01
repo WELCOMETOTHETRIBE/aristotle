@@ -78,6 +78,25 @@ body {
   *:focus-visible {
     @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-bg;
   }
+
+  /* Custom scrollbar styles */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: rgb(22, 25, 33);
+    border-radius: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgb(45, 50, 65);
+    border-radius: 4px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgb(60, 65, 80);
+  }
 }
 
 /* ===== COMPONENT UTILITIES ===== */

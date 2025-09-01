@@ -464,34 +464,57 @@ export default function TodayPage() {
                                    "What's your evening intention?"}
                       className="w-full px-4 py-3 bg-surface-2 border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
                     />
-                    <div className="flex flex-wrap gap-2">
-                      {currentTimePeriod === 'morning' ? [
-                        'Practice patience',
-                        'Show kindness',
-                        'Learn something new',
-                        'Stay present',
-                        'Be grateful'
-                      ] : currentTimePeriod === 'afternoon' ? [
-                        'Maintain focus',
-                        'Take breaks',
-                        'Connect with others',
-                        'Review progress',
-                        'Stay energized'
-                      ] : [
-                        'Reflect on the day',
-                        'Prepare for tomorrow',
-                        'Practice gratitude',
-                        'Wind down mindfully',
-                        'Connect with loved ones'
-                      ].map((suggestion) => (
-                        <button
-                          key={suggestion}
-                          onClick={() => setIntention(suggestion)}
-                          className="px-3 py-1 bg-surface-2 border border-border rounded-full text-xs text-muted hover:text-text hover:border-primary/30 transition-colors duration-150"
-                        >
-                          {suggestion}
-                        </button>
-                      ))}
+                    <div className="space-y-2">
+                      <label className="text-xs font-medium text-muted">Quick suggestions:</label>
+                      <div className="max-h-24 overflow-y-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-surface-2 rounded-lg border border-border p-2">
+                        <div className="flex flex-wrap gap-1.5">
+                          {currentTimePeriod === 'morning' ? [
+                            'Practice patience',
+                            'Show kindness',
+                            'Learn something new',
+                            'Stay present',
+                            'Be grateful',
+                            'Focus on growth',
+                            'Embrace challenges',
+                            'Practice mindfulness',
+                            'Help someone today',
+                            'Stay positive'
+                          ] : currentTimePeriod === 'afternoon' ? [
+                            'Maintain focus',
+                            'Take breaks',
+                            'Connect with others',
+                            'Review progress',
+                            'Stay energized',
+                            'Stay organized',
+                            'Practice patience',
+                            'Be productive',
+                            'Stay hydrated',
+                            'Take deep breaths'
+                          ] : [
+                            'Reflect on the day',
+                            'Prepare for tomorrow',
+                            'Practice gratitude',
+                            'Wind down mindfully',
+                            'Connect with loved ones',
+                            'Review achievements',
+                            'Plan for tomorrow',
+                            'Practice self-care',
+                            'Let go of stress',
+                            'Be present'
+                          ].map((suggestion) => (
+                            <button
+                              key={suggestion}
+                              onClick={() => setIntention(suggestion)}
+                              className={cn(
+                                "px-2 py-1 bg-surface-2 border border-border rounded-md text-xs text-muted hover:text-text hover:border-primary/30 hover:bg-primary/5 transition-all duration-150 whitespace-nowrap",
+                                intention === suggestion && "bg-primary/10 border-primary/30 text-primary"
+                              )}
+                            >
+                              {suggestion}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
                     {/* Submit Button */}
                     <button
