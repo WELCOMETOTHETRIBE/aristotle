@@ -32,8 +32,8 @@ interface WidgetGalleryProps {
 const categories = [
   { id: 'core', name: 'Core', color: 'bg-blue-500' },
   { id: 'practice', name: 'Practice', color: 'bg-green-500' },
-  { id: 'health', name: 'Health', color: 'bg-purple-500' },
-  { id: 'wisdom', name: 'Wisdom', color: 'bg-orange-500' },
+  { id: 'wellness', name: 'Wellness', color: 'bg-purple-500' },
+  { id: 'community', name: 'Community', color: 'bg-orange-500' },
 ];
 
 export default function WidgetGallery({ 

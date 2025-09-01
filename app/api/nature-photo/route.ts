@@ -30,8 +30,7 @@ export async function POST(request: NextRequest) {
         weather: weather || null,
         mood: mood || null,
         aiInsights: aiInsights || null,
-        aiComment: aiComment || null,
-        createdAt: new Date()
+        aiComment: aiComment || null
       }
     });
 
@@ -73,7 +72,7 @@ export async function GET(request: NextRequest) {
         userId: parseInt(userId)
       },
       orderBy: {
-        createdAt: 'desc'
+        date: 'desc'
       }
     });
 
