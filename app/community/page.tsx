@@ -379,7 +379,17 @@ export default function CommunityPage() {
   };
 
   const postComment = async () => {
+    console.log('postComment called with:', { 
+      comment: newComment, 
+      thread: selectedThreadForComment?.id,
+      postingComment 
+    });
+    
     if (!newComment.trim() || !selectedThreadForComment) {
+      console.log('Validation failed:', { 
+        hasComment: !!newComment.trim(), 
+        hasThread: !!selectedThreadForComment 
+      });
       return;
     }
 
@@ -400,10 +410,17 @@ export default function CommunityPage() {
         throw new Error('Failed to post comment');
       }
 
+      // Store thread info for AI response before clearing state
+      const threadId = selectedThreadForComment.id;
+      const threadTitle = selectedThreadForComment.title;
+      const threadContent = selectedThreadForComment.content;
+      const threadCategory = selectedThreadForComment.category;
+      const userCommentContent = newComment;
+
       // Update the thread's reply count
       setThreads(prev => 
         prev.map(thread => 
-          thread.id === selectedThreadForComment.id 
+          thread.id === threadId 
             ? { ...thread, replies: thread.replies + 1 }
             : thread
         )
@@ -416,7 +433,7 @@ export default function CommunityPage() {
       // Trigger AI philosopher response to the user's comment
       setTimeout(async () => {
         try {
-          setAiCommentLoading(prev => ({ ...prev, [selectedThreadForComment.id]: true }));
+          setAiCommentLoading(prev => ({ ...prev, [threadId]: true }));
           
           const aiResponse = await fetch('/api/community/ai-comment', {
             method: 'POST',
@@ -424,11 +441,11 @@ export default function CommunityPage() {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              threadId: selectedThreadForComment.id,
-              threadTitle: selectedThreadForComment.title,
-              threadContent: selectedThreadForComment.content,
-              threadCategory: selectedThreadForComment.category,
-              userComment: newComment, // Include the user's comment for context
+              threadId: threadId,
+              threadTitle: threadTitle,
+              threadContent: threadContent,
+              threadCategory: threadCategory,
+              userComment: userCommentContent, // Include the user's comment for context
             }),
           });
 
@@ -439,13 +456,13 @@ export default function CommunityPage() {
             // Store the AI comment in frontend state
             setAiComments(prev => ({
               ...prev,
-              [selectedThreadForComment.id]: [...(prev[selectedThreadForComment.id] || []), aiData.comment]
+              [threadId]: [...(prev[threadId] || []), aiData.comment]
             }));
             
             // Update the thread's reply count again for AI response
             setThreads(prev => 
               prev.map(thread => 
-                thread.id === selectedThreadForComment.id 
+                thread.id === threadId 
                   ? { ...thread, replies: thread.replies + 1 }
                   : thread
               )
@@ -454,7 +471,7 @@ export default function CommunityPage() {
         } catch (error) {
           console.error('Error triggering AI response to comment:', error);
         } finally {
-          setAiCommentLoading(prev => ({ ...prev, [selectedThreadForComment.id]: false }));
+          setAiCommentLoading(prev => ({ ...prev, [threadId]: false }));
         }
       }, 2000); // Wait 2 seconds before AI responds
     } catch (error) {
@@ -1010,14 +1027,14 @@ export default function CommunityPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4"
             onClick={() => setShowCommentModal(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-surface border border-border rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto"
+              className="bg-surface border border-border rounded-2xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto relative"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between mb-6">
@@ -1057,7 +1074,10 @@ export default function CommunityPage() {
                     Cancel
                   </button>
                   <button
-                    onClick={postComment}
+                    onClick={() => {
+                      console.log('Post Comment button clicked!');
+                      postComment();
+                    }}
                     disabled={postingComment || !newComment.trim()}
                     className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg font-medium transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                   >
