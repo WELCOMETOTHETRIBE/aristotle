@@ -101,7 +101,7 @@ export default function BalanceCard({
     return () => {
       window.removeEventListener('devicemotion', handleMotion);
     };
-  }, [isActive, isDeviceMotionSupported, config.sensitivity, currentStreak, bestStreak]);
+  }, [isDeviceMotionSupported, config.sensitivity, currentStreak, bestStreak]);
 
   // Animation loop for balance time tracking
   useEffect(() => {
