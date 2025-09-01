@@ -5,7 +5,7 @@ import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
 import { TaskCard } from '@/components/cards/TaskCard';
-import { BreathworkCard } from '@/components/cards/BreathworkCard';
+import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { useAuth } from '@/lib/auth-context';
 
 import { StreakCard } from '@/components/cards/StreakCard';
@@ -86,7 +86,7 @@ export default function TodayPage() {
     try {
       switch (widgetId) {
         case 'breathwork':
-          return <BreathworkCard key={widgetId} />;
+          return <BreathworkWidgetNew key={widgetId} />;
         case 'mood_tracker':
           return <MoodTrackerCard key={widgetId} />;
         case 'hydration':
