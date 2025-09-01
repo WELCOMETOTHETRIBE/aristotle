@@ -1,5 +1,88 @@
 import { Brain, Shield, Scale, Leaf, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle, GraduationCap, Users, Eye, Compass, ArrowRight, CheckCircle, Circle } from 'lucide-react';
 
+// Helper function to generate interactive elements for lessons
+function createInteractiveElements(lessonData: {
+  teachingType?: 'ai_dialogue' | 'reflection_input' | 'knowledge_check';
+  questionType?: 'personal_reflection' | 'ai_guidance' | 'peer_discussion';
+  practiceType?: 'real_world_exercise' | 'journal_entry' | 'skill_practice' | 'ai_coaching';
+  readingType?: 'text_analysis' | 'ai_summary' | 'discussion_forum' | 'creative_response';
+  quoteType?: 'personal_interpretation' | 'ai_insight' | 'life_application' | 'creative_expression';
+  aiPrompts?: {
+    teaching?: string;
+    question?: string;
+    practice?: string;
+    reading?: string;
+    quote?: string;
+  };
+  outsideRequirements?: string[];
+  verificationMethod?: 'self_report' | 'ai_assessment' | 'peer_review' | 'photo_evidence';
+  analysisQuestions?: string[];
+  creativeResponse?: 'poem' | 'art' | 'story' | 'mind_map';
+  interpretationPrompt?: string;
+  applicationExercise?: string;
+}) {
+  return {
+    teaching: {
+      type: lessonData.teachingType || 'ai_dialogue',
+      required: true,
+      aiPrompt: lessonData.aiPrompts?.teaching || 'Help me understand this concept through Socratic questioning',
+      reflectionPrompt: 'What aspects of this teaching resonate with you?',
+      questions: ['What is the main principle here?', 'How does this apply to your life?'],
+      completed: false,
+    },
+    question: {
+      type: lessonData.questionType || 'personal_reflection',
+      required: true,
+      minWords: 50,
+      aiFollowUp: lessonData.aiPrompts?.question || 'Based on your reflection, what would be your next step?',
+      completed: false,
+    },
+    practice: {
+      type: lessonData.practiceType || 'real_world_exercise',
+      required: true,
+      instructions: 'Complete the practice exercise as described in the lesson',
+      outsideRequirements: lessonData.outsideRequirements || [],
+      verificationMethod: lessonData.verificationMethod || 'self_report',
+      completed: false,
+    },
+    reading: {
+      type: lessonData.readingType || 'text_analysis',
+      required: true,
+      analysisQuestions: lessonData.analysisQuestions || ['What are the key insights?', 'How does this relate to the lesson?'],
+      creativeResponse: lessonData.creativeResponse,
+      completed: false,
+    },
+    quote: {
+      type: lessonData.quoteType || 'personal_interpretation',
+      required: true,
+      interpretationPrompt: lessonData.interpretationPrompt || 'What does this quote mean to you personally?',
+      applicationExercise: lessonData.applicationExercise || 'How can you apply this wisdom today?',
+      completed: false,
+    },
+  };
+}
+
+function createMilestones() {
+  return {
+    teachingCompleted: false,
+    questionAnswered: false,
+    practiceCompleted: false,
+    readingAnalyzed: false,
+    quoteInterpreted: false,
+    allCompleted: false,
+  };
+}
+
+function createAIGuidance(lessonTitle: string) {
+  return {
+    teachingAssistant: `I'm here to guide you through understanding ${lessonTitle}. Ask me anything!`,
+    reflectionCoach: `Let me help you reflect deeper on this question. What's on your mind?`,
+    practiceMentor: `I'll support you in completing this practice. What challenges are you facing?`,
+    readingGuide: `I can help you analyze this reading. What aspects would you like to explore?`,
+    wisdomInterpreter: `Let's unpack this wisdom together. What does it mean to you?`,
+  };
+}
+
 export interface AcademyLesson {
   id: string;
   title: string;
@@ -21,6 +104,62 @@ export interface AcademyLesson {
     courage?: number;
     temperance?: number;
   };
+  // Interactive components
+  interactiveElements: {
+    teaching: {
+      type: 'ai_dialogue' | 'reflection_input' | 'knowledge_check';
+      required: boolean;
+      aiPrompt?: string;
+      reflectionPrompt?: string;
+      questions?: string[];
+      completed: boolean;
+    };
+    question: {
+      type: 'personal_reflection' | 'ai_guidance' | 'peer_discussion';
+      required: boolean;
+      minWords: number;
+      aiFollowUp?: string;
+      completed: boolean;
+    };
+    practice: {
+      type: 'real_world_exercise' | 'journal_entry' | 'skill_practice' | 'ai_coaching';
+      required: boolean;
+      instructions: string;
+      outsideRequirements?: string[];
+      verificationMethod: 'self_report' | 'ai_assessment' | 'peer_review' | 'photo_evidence';
+      completed: boolean;
+    };
+    reading: {
+      type: 'text_analysis' | 'ai_summary' | 'discussion_forum' | 'creative_response';
+      required: boolean;
+      analysisQuestions: string[];
+      creativeResponse?: 'poem' | 'art' | 'story' | 'mind_map';
+      completed: boolean;
+    };
+    quote: {
+      type: 'personal_interpretation' | 'ai_insight' | 'life_application' | 'creative_expression';
+      required: boolean;
+      interpretationPrompt: string;
+      applicationExercise: string;
+      completed: boolean;
+    };
+  };
+  milestones: {
+    teachingCompleted: boolean;
+    questionAnswered: boolean;
+    practiceCompleted: boolean;
+    readingAnalyzed: boolean;
+    quoteInterpreted: boolean;
+    allCompleted: boolean;
+  };
+  aiGuidance: {
+    teachingAssistant: string;
+    reflectionCoach: string;
+    practiceMentor: string;
+    readingGuide: string;
+    wisdomInterpreter: string;
+  };
+  estimatedTotalTime: number; // Total time including all interactive elements
 }
 
 export interface VirtueModule {
@@ -78,7 +217,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 15,
         prerequisites: [],
-        virtueGrants: { wisdom: 2 }
+        virtueGrants: { wisdom: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Write down 5 beliefs you hold strongly.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Socratic Method'),
+        estimatedTotalTime: 15,
       },
       {
         id: 'wisdom-2',
@@ -94,7 +256,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 20,
         prerequisites: ['wisdom-1'],
-        virtueGrants: { wisdom: 2, temperance: 1 }
+        virtueGrants: { wisdom: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify 3 areas where you tend toward extremes.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Golden Mean'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'wisdom-3',
@@ -110,7 +295,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 25,
         prerequisites: ['wisdom-1', 'wisdom-2'],
-        virtueGrants: { wisdom: 3 }
+        virtueGrants: { wisdom: 3 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on 3 recent decisions.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Practical Wisdom'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'wisdom-4',
@@ -126,7 +334,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 15,
         prerequisites: ['wisdom-1'],
-        virtueGrants: { wisdom: 1, temperance: 1 }
+        virtueGrants: { wisdom: 1, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Set aside 15 minutes daily for contemplation.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Contemplative Practice'),
+        estimatedTotalTime: 15,
       },
       {
         id: 'wisdom-5',
@@ -142,7 +373,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['wisdom-2', 'wisdom-3'],
-        virtueGrants: { wisdom: 2 }
+        virtueGrants: { wisdom: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Choose an object or situation and analyze it using the four causes.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Four Causes'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'wisdom-6',
@@ -158,7 +412,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 25,
         prerequisites: ['wisdom-3', 'wisdom-4'],
-        virtueGrants: { wisdom: 3 }
+        virtueGrants: { wisdom: 3 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Choose one intellectual virtue to focus on for a week.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Intellectual Virtues'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'wisdom-7',
@@ -174,7 +451,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['wisdom-4', 'wisdom-5'],
-        virtueGrants: { wisdom: 2, temperance: 1 }
+        virtueGrants: { wisdom: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Create a weekly examination practice.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Examined Life'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'wisdom-8',
@@ -190,7 +490,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 30,
         prerequisites: ['wisdom-6', 'wisdom-7'],
-        virtueGrants: { wisdom: 3, justice: 1 }
+        virtueGrants: { wisdom: 3, justice: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Have a philosophical conversation with someone.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Dialectical Reasoning'),
+        estimatedTotalTime: 30,
       },
       {
         id: 'wisdom-9',
@@ -206,7 +529,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['wisdom-5', 'wisdom-8'],
-        virtueGrants: { wisdom: 3 }
+        virtueGrants: { wisdom: 3 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on the most important questions.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Theoretical Wisdom'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'wisdom-10',
@@ -222,7 +568,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['wisdom-7', 'wisdom-8'],
-        virtueGrants: { wisdom: 2, temperance: 1 }
+        virtueGrants: { wisdom: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify a belief you hold strongly.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Intellectual Humility'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'wisdom-11',
@@ -238,7 +607,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 30,
         prerequisites: ['wisdom-9', 'wisdom-10'],
-        virtueGrants: { wisdom: 3 }
+        virtueGrants: { wisdom: 3 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Create a mind map showing how your different areas of knowledge, experience, and values connect.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Unity of Knowledge'),
+        estimatedTotalTime: 30,
       },
       {
         id: 'wisdom-12',
@@ -254,7 +646,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['wisdom-11'],
-        virtueGrants: { wisdom: 3, temperance: 1 }
+        virtueGrants: { wisdom: 3, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['For one week, consciously apply your wisdom to every significant decision.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Wisdom in Action'),
+        estimatedTotalTime: 25,
       }
     ],
     capstoneProject: {
@@ -299,7 +714,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 15,
         prerequisites: [],
-        virtueGrants: { justice: 2 }
+        virtueGrants: { justice: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify 3 relationships where you could be more just.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Fairness in Relationships'),
+        estimatedTotalTime: 15,
       },
       {
         id: 'justice-2',
@@ -315,7 +753,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['justice-1'],
-        virtueGrants: { justice: 2, wisdom: 1 }
+        virtueGrants: { justice: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Analyze a current social issue using principles of distributive justice.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Distributive Justice'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'justice-3',
@@ -331,7 +792,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['justice-1', 'justice-2'],
-        virtueGrants: { justice: 2, courage: 1 }
+        virtueGrants: { justice: 2, courage: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on a time when you wronged someone.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Corrective Justice'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'justice-4',
@@ -347,7 +831,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 25,
         prerequisites: ['justice-2', 'justice-3'],
-        virtueGrants: { justice: 2, courage: 1 }
+        virtueGrants: { justice: 2, courage: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify a social issue you care about.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Social Responsibility'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'justice-5',
@@ -363,7 +870,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['justice-3', 'justice-4'],
-        virtueGrants: { justice: 2, wisdom: 1 }
+        virtueGrants: { justice: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Before making an important decision, write down the perspectives of all stakeholders involved.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Balanced Judgment'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'justice-6',
@@ -379,7 +909,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['justice-4', 'justice-5'],
-        virtueGrants: { justice: 2, temperance: 1 }
+        virtueGrants: { justice: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on your closest friendships.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Friendship and Justice'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'justice-7',
@@ -395,7 +948,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['justice-5', 'justice-6'],
-        virtueGrants: { justice: 2, wisdom: 1 }
+        virtueGrants: { justice: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Research a current political issue.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Political Justice'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'justice-8',
@@ -411,7 +987,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['justice-6', 'justice-7'],
-        virtueGrants: { justice: 2, temperance: 1 }
+        virtueGrants: { justice: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Audit your economic practices.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Economic Justice'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'justice-9',
@@ -427,7 +1026,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['justice-7', 'justice-8'],
-        virtueGrants: { justice: 2, temperance: 1 }
+        virtueGrants: { justice: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Learn about restorative justice practices.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Restorative Justice'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'justice-10',
@@ -443,7 +1065,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['justice-8', 'justice-9'],
-        virtueGrants: { justice: 2, courage: 1 }
+        virtueGrants: { justice: 2, courage: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Research a global justice issue.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Global Justice'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'justice-11',
@@ -459,7 +1104,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['justice-9', 'justice-10'],
-        virtueGrants: { justice: 2, temperance: 1 }
+        virtueGrants: { justice: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Audit your environmental impact.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Environmental Justice'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'justice-12',
@@ -475,7 +1143,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['justice-11'],
-        virtueGrants: { justice: 3, wisdom: 1 }
+        virtueGrants: { justice: 3, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['For one week, consciously practice justice in every interaction.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Justice in Action'),
+        estimatedTotalTime: 25,
       }
     ],
     capstoneProject: {
@@ -521,7 +1212,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 15,
         prerequisites: [],
-        virtueGrants: { courage: 2 }
+        virtueGrants: { courage: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify a fear that holds you back.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Facing Fear'),
+        estimatedTotalTime: 15,
       },
       {
         id: 'courage-2',
@@ -537,7 +1251,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['courage-1'],
-        virtueGrants: { courage: 2, justice: 1 }
+        virtueGrants: { courage: 2, justice: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify a situation where you need moral courage.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Moral Courage'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'courage-3',
@@ -553,7 +1290,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['courage-1', 'courage-2'],
-        virtueGrants: { courage: 2, temperance: 1 }
+        virtueGrants: { courage: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Choose a challenging goal.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Perseverance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'courage-4',
@@ -569,7 +1329,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 25,
         prerequisites: ['courage-2', 'courage-3'],
-        virtueGrants: { courage: 2 }
+        virtueGrants: { courage: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Choose a physical challenge that pushes your comfort zone.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Physical Courage'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'courage-5',
@@ -585,7 +1368,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['courage-3', 'courage-4'],
-        virtueGrants: { courage: 2, wisdom: 1 }
+        virtueGrants: { courage: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify a belief you hold strongly.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Intellectual Courage'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'courage-6',
@@ -601,7 +1407,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['courage-4', 'courage-5'],
-        virtueGrants: { courage: 2, temperance: 1 }
+        virtueGrants: { courage: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['When you feel a difficult emotion, instead of avoiding it, sit with it for a few minutes.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Emotional Courage'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'courage-7',
@@ -617,7 +1446,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['courage-5', 'courage-6'],
-        virtueGrants: { courage: 2, justice: 1 }
+        virtueGrants: { courage: 2, justice: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Choose one relationship where you can be more authentic.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Social Courage'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'courage-8',
@@ -633,7 +1485,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 25,
         prerequisites: ['courage-6', 'courage-7'],
-        virtueGrants: { courage: 2, wisdom: 1 }
+        virtueGrants: { courage: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Start a creative project you\'ve been putting off.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Creative Courage'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'courage-9',
@@ -649,7 +1524,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['courage-7', 'courage-8'],
-        virtueGrants: { courage: 2, wisdom: 1 }
+        virtueGrants: { courage: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Spend time contemplating a big life question.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Spiritual Courage'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'courage-10',
@@ -665,7 +1563,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['courage-8', 'courage-9'],
-        virtueGrants: { courage: 2, justice: 1 }
+        virtueGrants: { courage: 2, justice: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Take on a leadership role in a project or group.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Leadership Courage'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'courage-11',
@@ -681,7 +1602,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['courage-9', 'courage-10'],
-        virtueGrants: { courage: 2, temperance: 1 }
+        virtueGrants: { courage: 2, temperance: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify one area where you want to change.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Courage to Change'),
+        estimatedTotalTime: 25,
       },
       {
         id: 'courage-12',
@@ -697,7 +1641,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['courage-11'],
-        virtueGrants: { courage: 3, wisdom: 1 }
+        virtueGrants: { courage: 3, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['For one week, consciously practice courage in every significant decision.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Courage in Daily Life'),
+        estimatedTotalTime: 25,
       }
     ],
     capstoneProject: {
@@ -743,7 +1710,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 15,
         prerequisites: [],
-        virtueGrants: { temperance: 2 }
+        virtueGrants: { temperance: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Choose one area where you struggle with self-control.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Self-Control'),
+        estimatedTotalTime: 15,
       },
       {
         id: 'temperance-2',
@@ -759,7 +1749,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'beginner',
         estimatedTime: 20,
         prerequisites: ['temperance-1'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Identify 3 areas where you tend toward extremes.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Moderation'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-3',
@@ -775,7 +1788,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-1', 'temperance-2'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Develop a daily practice that promotes inner harmony.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Inner Harmony'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-4',
@@ -791,7 +1827,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-2', 'temperance-3'],
-        virtueGrants: { temperance: 2 }
+        virtueGrants: { temperance: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on your desires.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Desire Management'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-5',
@@ -807,7 +1866,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-3', 'temperance-4'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Practice emotional awareness.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Emotional Balance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-6',
@@ -823,7 +1905,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-4', 'temperance-5'],
-        virtueGrants: { temperance: 2 }
+        virtueGrants: { temperance: 2 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Audit your physical habits.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Physical Temperance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-7',
@@ -839,7 +1944,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-5', 'temperance-6'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Develop a mental discipline practice.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Mental Discipline'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-8',
@@ -855,7 +1983,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-6', 'temperance-7'],
-        virtueGrants: { temperance: 2, justice: 1 }
+        virtueGrants: { temperance: 2, justice: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on your social relationships.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Social Temperance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-9',
@@ -871,7 +2022,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-7', 'temperance-8'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Audit your time allocation.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Work-Life Balance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-10',
@@ -887,7 +2061,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 20,
         prerequisites: ['temperance-8', 'temperance-9'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Reflect on your spiritual life.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Spiritual Temperance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-11',
@@ -903,7 +2100,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'intermediate',
         estimatedTime: 20,
         prerequisites: ['temperance-9', 'temperance-10'],
-        virtueGrants: { temperance: 2, wisdom: 1 }
+        virtueGrants: { temperance: 2, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['Audit your material possessions and consumption habits.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('Material Temperance'),
+        estimatedTotalTime: 20,
       },
       {
         id: 'temperance-12',
@@ -919,7 +2139,30 @@ export const ACADEMY_CURRICULUM: VirtueModule[] = [
         difficulty: 'advanced',
         estimatedTime: 25,
         prerequisites: ['temperance-11'],
-        virtueGrants: { temperance: 3, wisdom: 1 }
+        virtueGrants: { temperance: 3, wisdom: 1 },
+        interactiveElements: createInteractiveElements({
+          teachingType: 'ai_dialogue',
+          questionType: 'personal_reflection',
+          practiceType: 'real_world_exercise',
+          readingType: 'text_analysis',
+          quoteType: 'personal_interpretation',
+          aiPrompts: {
+            teaching: 'Help me understand this concept through Socratic questioning',
+            question: 'Based on your reflection, what would be your next step?',
+            practice: 'Complete the practice exercise as described in the lesson',
+            reading: 'I can help you analyze this reading. What aspects would you like to explore?',
+            quote: 'What does this quote mean to you personally?',
+          },
+          outsideRequirements: ['For one week, consciously practice temperance in every significant choice.'],
+          verificationMethod: 'self_report',
+          analysisQuestions: ['What is the main principle here?', 'How does this apply to your life?'],
+          creativeResponse: 'mind_map',
+          interpretationPrompt: 'What does this quote mean to you personally?',
+          applicationExercise: 'How can you apply this wisdom today?',
+        }),
+        milestones: createMilestones(),
+        aiGuidance: createAIGuidance('The Temperate Life'),
+        estimatedTotalTime: 25,
       }
     ],
     capstoneProject: {

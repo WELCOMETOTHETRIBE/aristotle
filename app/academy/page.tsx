@@ -11,6 +11,7 @@ import PhilosophersDialogueModal from '@/components/PhilosophersDialogueModal';
 import { ACADEMY_CURRICULUM, type VirtueModule, type AcademyLesson } from '@/lib/academy-curriculum';
 import AcademyOverview from '@/components/AcademyOverview';
 import AcademyProgress from '@/components/AcademyProgress';
+import InteractiveLessonInterface from '@/components/InteractiveLessonInterface';
 
 export default function AcademyPage() {
   const { user, loading } = useAuth();
@@ -321,7 +322,6 @@ export default function AcademyPage() {
             )}
 
             {selectedModule && (
-              /* Lesson Interface */
               <div className="space-y-6">
                 {/* Module Header */}
                 <div className="flex items-center justify-between p-6 bg-surface border border-border rounded-2xl">
@@ -349,102 +349,78 @@ export default function AcademyPage() {
                   </button>
                 </div>
 
-                {currentLesson && (
-                  <div className="space-y-6">
-                    {/* Lesson Content */}
-                    <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl p-6">
-                      <div className="flex items-center gap-2 mb-4">
-                        <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
-                          <BookOpen className="w-4 h-4 text-primary" />
+                {/* Lesson Selection */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold text-text">Choose a Lesson</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {selectedModule.lessons.map((lesson) => (
+                      <motion.button
+                        key={lesson.id}
+                        onClick={() => setCurrentLesson(lesson)}
+                        className={cn(
+                          'p-4 border rounded-xl text-left transition-all duration-200 hover:scale-105',
+                          currentLesson?.id === lesson.id
+                            ? 'border-primary bg-primary/5'
+                            : lesson.completed
+                            ? 'border-green-500/30 bg-green-500/5'
+                            : 'border-border bg-surface hover:bg-surface-2'
+                        )}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div className="flex items-start justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            {lesson.completed ? (
+                              <CheckCircle className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-muted" />
+                            )}
+                            <span className="text-sm font-medium text-text">{lesson.title}</span>
+                          </div>
+                          <div className={cn('px-2 py-1 rounded text-xs', getDifficultyColor(lesson.difficulty))}>
+                            {(() => {
+                              const DifficultyIcon = getDifficultyIcon(lesson.difficulty);
+                              return <DifficultyIcon className="w-3 h-3" />;
+                            })()}
+                          </div>
                         </div>
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-text">{currentLesson.title}</h3>
-                          <p className="text-sm text-muted">{currentLesson.subtitle}</p>
+                        <p className="text-xs text-muted mb-2">{lesson.subtitle}</p>
+                        <div className="flex items-center justify-between text-xs text-muted">
+                          <span>{lesson.estimatedTotalTime || lesson.estimatedTime} min</span>
+                          {lesson.completed && <span className="text-green-500">Completed</span>}
                         </div>
-                        <div className={cn('px-3 py-1 rounded-full text-xs flex items-center space-x-1', getDifficultyColor(currentLesson.difficulty))}>
-                          {(() => {
-                            const DifficultyIcon = getDifficultyIcon(currentLesson.difficulty);
-                            return <DifficultyIcon className="w-3 h-3" />;
-                          })()}
-                          <span className="capitalize">{currentLesson.difficulty}</span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-4">
-                        <div className="bg-surface-2 border border-border rounded-xl p-4">
-                          <h4 className="font-medium text-text mb-2 flex items-center gap-2">
-                            <Lightbulb className="w-4 h-4 text-primary" />
-                            Teaching
-                          </h4>
-                          <p className="text-sm text-muted leading-relaxed">{currentLesson.teaching}</p>
-                        </div>
-                        
-                        <div className="bg-primary/5 border border-primary/20 rounded-xl p-4">
-                          <h4 className="font-medium text-primary mb-2 flex items-center gap-2">
-                            <Target className="w-4 h-4" />
-                            Reflection Question
-                          </h4>
-                          <p className="text-sm text-text leading-relaxed">{currentLesson.question}</p>
-                        </div>
-
-                        <div className="bg-courage/5 border border-courage/20 rounded-xl p-4">
-                          <h4 className="font-medium text-courage mb-2 flex items-center gap-2">
-                            <Zap className="w-4 h-4" />
-                            Practice Exercise
-                          </h4>
-                          <p className="text-sm text-text leading-relaxed">{currentLesson.practice}</p>
-                        </div>
-
-                        <div className="bg-justice/5 border border-justice/20 rounded-xl p-4">
-                          <h4 className="font-medium text-justice mb-2 flex items-center gap-2">
-                            <BookMarked className="w-4 h-4" />
-                            Recommended Reading
-                          </h4>
-                          <p className="text-sm text-text leading-relaxed">{currentLesson.reading}</p>
-                        </div>
-
-                        <div className="bg-temperance/5 border border-temperance/20 rounded-xl p-4">
-                          <h4 className="font-medium text-temperance mb-2 flex items-center gap-2">
-                            <Quote className="w-4 h-4" />
-                            Wisdom Quote
-                          </h4>
-                          <p className="text-sm text-text leading-relaxed italic">"{currentLesson.quote}"</p>
-                          <p className="text-xs text-muted mt-1">— {currentLesson.author}</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Response Input */}
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-courage/20 rounded-lg flex items-center justify-center">
-                          <Target className="w-4 h-4 text-courage" />
-                        </div>
-                        <h3 className="font-semibold text-text">Your Reflection</h3>
-                      </div>
-                      
-                      <textarea
-                        value={userResponse}
-                        onChange={(e) => setUserResponse(e.target.value)}
-                        placeholder="Share your thoughts, reflections, and insights from this lesson..."
-                        className="w-full p-4 bg-surface border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary resize-none"
-                        rows={6}
-                      />
-                      
-                      <div className="flex items-center justify-between">
-                        <div className="text-xs text-muted">
-                          Estimated time: {currentLesson.estimatedTime} minutes
-                        </div>
-                        <button
-                          onClick={submitResponse}
-                          disabled={!userResponse.trim()}
-                          className="px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
-                        >
-                          Continue Journey
-                        </button>
-                      </div>
-                    </div>
+                      </motion.button>
+                    ))}
                   </div>
+                </div>
+
+                {/* Interactive Lesson Interface */}
+                {currentLesson && (
+                  <InteractiveLessonInterface
+                    lesson={currentLesson}
+                    onComplete={(lessonId, milestones) => {
+                      console.log('Lesson completed:', lessonId, milestones);
+                      // Update lesson completion status
+                      const updatedModules = modules.map(module => {
+                        if (module.id === selectedModule.id) {
+                          const updatedLessons = module.lessons.map(lesson => {
+                            if (lesson.id === lessonId) {
+                              return { ...lesson, completed: true };
+                            }
+                            return lesson;
+                          });
+                          return { ...module, lessons: updatedLessons };
+                        }
+                        return module;
+                      });
+                      setModules(updatedModules);
+                    }}
+                    onSaveProgress={(lessonId, data) => {
+                      console.log('Progress saved for lesson:', lessonId, data);
+                      // Save progress to localStorage
+                      localStorage.setItem(`academyLesson_${lessonId}`, JSON.stringify(data));
+                    }}
+                  />
                 )}
               </div>
             )}
