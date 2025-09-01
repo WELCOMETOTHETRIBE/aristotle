@@ -46,11 +46,28 @@ export default function WidgetGallery({
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Debug: Log what widgets are being received
+  console.log('WidgetGallery received:', {
+    totalWidgets: availableWidgets.length,
+    practiceWidgets: availableWidgets.filter(w => w.category === 'practice').length,
+    balanceWidget: availableWidgets.find(w => w.id === 'balance_gyro'),
+    allWidgets: availableWidgets.map(w => ({ id: w.id, title: w.title, category: w.category }))
+  });
+
   const filteredWidgets = availableWidgets.filter(widget => {
     const matchesCategory = selectedCategory === 'all' || widget.category === selectedCategory;
     const matchesSearch = widget.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          widget.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
+  });
+
+  // Debug: Log filtering results
+  console.log('Filtering results:', {
+    selectedCategory,
+    searchQuery,
+    totalFiltered: filteredWidgets.length,
+    practiceFiltered: filteredWidgets.filter(w => w.category === 'practice').length,
+    balanceFiltered: filteredWidgets.find(w => w.id === 'balance_gyro')
   });
 
   const getCategoryColor = (category: string) => {
