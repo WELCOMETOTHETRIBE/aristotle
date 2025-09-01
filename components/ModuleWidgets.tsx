@@ -964,6 +964,8 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         if (response.ok) {
           const data = await response.json();
           setPhotos(data.photos || []);
+        } else {
+          console.error('Failed to load photos:', response.status);
         }
       } catch (error) {
         console.error('Error loading photos:', error);
@@ -989,64 +991,52 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     try {
       setIsProcessing(true);
       
-      // Convert image to base64 for API
-      const base64Image = await new Promise<string>((resolve) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(imageFile);
-      });
-      
-      const response = await fetch('/api/ai/guide', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: `Analyze this nature photo and provide thoughtful insights. The user has tagged it with: ${tags.join(', ')} and added the caption: "${caption}". 
-          
-          Please provide:
-          1. A brief philosophical reflection on the natural elements shown
-          2. A thoughtful comment about what this moment might teach us
-          3. A connection to mindfulness or the user's relationship with nature
-          
-          Keep it warm, insightful, and under 150 words total.`,
-          context: {
-            page: 'nature_photo_log',
-            focusVirtue: 'temperance',
-            timeOfDay: new Date().getHours(),
-          },
-        }),
-      });
+      // For now, we'll generate a simple AI insight based on the tags and caption
+      // In the future, this could be enhanced with actual image analysis
+      const tagDescriptions = {
+        'dawn': 'the gentle awakening of a new day',
+        'dusk': 'the peaceful transition into evening',
+        'tree': 'the strength and wisdom of nature',
+        'water': 'the flow and adaptability of life',
+        'earth': 'the grounding presence of the natural world',
+        'sky': 'the vastness and possibility above us',
+        'flower': 'the beauty and resilience of growth',
+        'animal': 'the wild spirit and freedom of nature',
+        'mountain': 'the enduring strength and majesty',
+        'forest': 'the interconnected web of life',
+        'ocean': 'the depth and mystery of existence',
+        'river': 'the constant flow and change of time',
+        'sunset': 'the beautiful conclusion of another day',
+        'sunrise': 'the promise of new beginnings',
+        'clouds': 'the ever-changing patterns of life',
+        'rain': 'the cleansing and renewal of nature',
+        'snow': 'the quiet beauty of transformation',
+        'wind': 'the unseen force that moves through all things'
+      };
 
-      if (response.ok) {
-        const reader = response.body?.getReader();
-        if (reader) {
-          let content = '';
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            
-            const chunk = new TextDecoder().decode(value);
-            const lines = chunk.split('\n');
-            
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') break;
-                
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.content) {
-                    content += parsed.content;
-                  }
-                } catch (e) {
-                  // Ignore parsing errors
-                }
-              }
-            }
-          }
-          
-          return content.trim();
-        }
-      }
+      const selectedTagDescriptions = tags
+        .map(tag => tagDescriptions[tag as keyof typeof tagDescriptions])
+        .filter(Boolean)
+        .slice(0, 3);
+
+      const timeOfDay = new Date().getHours();
+      let timeContext = '';
+      if (timeOfDay < 12) timeContext = 'morning light';
+      else if (timeOfDay < 17) timeContext = 'afternoon warmth';
+      else timeContext = 'evening peace';
+
+      const insights = [
+        `In this moment captured with ${selectedTagDescriptions.join(', ')}, we find ourselves in the presence of nature's timeless wisdom.`,
+        `The ${caption.toLowerCase()} reminds us that beauty exists in the simplest of moments, inviting us to pause and breathe deeply.`,
+        `As we connect with the natural world through this image, we're reminded of our place within the greater tapestry of life - both small and significant, temporary and eternal.`,
+        `This ${timeContext} moment teaches us that nature offers endless opportunities for reflection and renewal, if only we take the time to notice.`
+      ];
+
+      // Randomly select 2-3 insights and combine them
+      const shuffled = insights.sort(() => 0.5 - Math.random());
+      const selectedInsights = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
+      
+      return selectedInsights.join(' ');
     } catch (error) {
       console.error('Failed to generate AI insights:', error);
       return "This moment in nature reminds us of the beauty and wisdom that surrounds us. Take a moment to breathe and appreciate the simple gifts of the natural world.";
@@ -1061,8 +1051,13 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     setIsProcessing(true);
     
     try {
-      // Generate AI insights first
-      const aiInsights = await generateAIInsights(uploadedImage, selectedTags, caption);
+      // Generate AI insights first (with fallback)
+      let aiInsights = "This moment in nature reminds us of the beauty and wisdom that surrounds us. Take a moment to breathe and appreciate the simple gifts of the natural world.";
+      try {
+        aiInsights = await generateAIInsights(uploadedImage, selectedTags, caption);
+      } catch (aiError) {
+        console.error('AI insights generation failed, using fallback:', aiError);
+      }
       
       // Convert image to base64 for API
       const base64Image = await new Promise<string>((resolve) => {
@@ -1103,9 +1098,14 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         setMood('');
         setUploadedImage(null);
         setImagePreview('');
+      } else {
+        const errorData = await response.json();
+        console.error('API error:', errorData);
+        alert('Failed to save photo. Please try again.');
       }
     } catch (error) {
       console.error('Error adding photo:', error);
+      alert('Failed to save photo. Please try again.');
     } finally {
       setIsProcessing(false);
     }
@@ -1295,9 +1295,20 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             <button
               onClick={addPhoto}
               disabled={isProcessing || selectedTags.length === 0 || !uploadedImage}
-              className="flex-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
-              {isProcessing ? 'Processing...' : 'Add Photo'}
+              {isProcessing ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                  />
+                  Processing...
+                </>
+              ) : (
+                'Add Photo'
+              )}
             </button>
           </div>
         </motion.div>
