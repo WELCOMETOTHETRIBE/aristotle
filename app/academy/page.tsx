@@ -3,9 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
-import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb } from 'lucide-react';
+import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
+import PhilosopherChat from '@/components/PhilosopherChat';
 
 interface VirtueSpotlight {
   id: string;
@@ -161,39 +162,7 @@ const virtueSpotlights: VirtueSpotlight[] = [
       }
     ]
   },
-  {
-    id: 'philosophical_practice',
-    name: 'Philosophical Practice',
-    description: 'Applying ancient wisdom to modern daily life',
-    icon: Lightbulb,
-    color: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
-    gradient: 'from-amber-500/20 to-amber-500/5',
-    progress: 0,
-    completed: false,
-    lessons: [
-      {
-        id: 'practice-1',
-        title: 'Daily Reflection',
-        teaching: 'The Stoics practiced daily reflection as a way to examine their actions, thoughts, and character. This practice helps us become more aware of our patterns, learn from our experiences, and align our actions with our values. Set aside time each day to reflect on what went well, what could be improved, and how you lived according to your principles.',
-        question: 'What would a meaningful daily reflection practice look like for you?',
-        completed: false
-      },
-      {
-        id: 'practice-2',
-        title: 'Mindful Decision Making',
-        teaching: 'Philosophical practice involves making decisions with greater awareness and intention. Before making important choices, pause to consider: What are my values? What would wisdom look like here? How does this choice align with the person I want to become? This practice helps us act more deliberately and in accordance with our principles.',
-        question: 'What decision are you currently facing that could benefit from this mindful approach?',
-        completed: false
-      },
-      {
-        id: 'practice-3',
-        title: 'Virtue in Action',
-        teaching: 'True philosophical practice means embodying virtues in our daily actions. It\'s not enough to understand wisdom, courage, justice, and temperance—we must practice them in our relationships, work, and daily choices. This involves seeing every moment as an opportunity to cultivate character and live according to our highest principles.',
-        question: 'How can you practice one of the four virtues in a specific situation today?',
-        completed: false
-      }
-    ]
-  }
+
 ];
 
 export default function AcademyPage() {
@@ -310,6 +279,34 @@ export default function AcademyPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-text mb-2">Academy</h1>
           <p className="text-muted">Master the four cardinal virtues through guided learning journeys</p>
+        </div>
+
+        {/* Philosopher Chat Introduction */}
+        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6 text-center">
+          <div className="flex items-center justify-center space-x-3 mb-3">
+            <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
+              <MessageCircle className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-lg font-semibold text-text">Chat with Ancient Philosophers</h2>
+          </div>
+          <p className="text-sm text-muted mb-4">
+            Engage in deep philosophical discussions with Aristotle, Socrates, Epictetus, and other great thinkers. 
+            Ask questions about virtue, wisdom, and the good life. Look for the chat button in the bottom right corner.
+          </p>
+          <div className="flex items-center justify-center space-x-4 text-xs text-muted">
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-primary rounded-full"></span>
+              <span>AI-powered responses</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-primary rounded-full"></span>
+              <span>Historical accuracy</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="w-2 h-2 bg-primary rounded-full"></span>
+              <span>Personal guidance</span>
+            </div>
+          </div>
         </div>
 
         {!selectedVirtue ? (
@@ -475,6 +472,7 @@ export default function AcademyPage() {
         )}
       </main>
 
+      <PhilosopherChat />
       <TabBar />
     </div>
   );

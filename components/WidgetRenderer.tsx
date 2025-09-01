@@ -14,6 +14,7 @@ import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { HedonicAwarenessWidget } from '@/components/HedonicAwarenessWidget';
 import { MoodTrackerWidget } from '@/components/MoodTrackerWidget';
 import { PhilosophicalTerminologyWidget } from '@/components/PhilosophicalTerminologyWidget';
+import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
 
 interface VirtueScores {
   wisdom: number;
@@ -36,75 +37,7 @@ interface WidgetRendererProps {
 }
 
 function VirtueProgressWidget() {
-  const [virtueScores, setVirtueScores] = useState<VirtueScores>({ wisdom: 0, courage: 0, justice: 0, temperance: 0 });
-
-  useEffect(() => {
-    fetchVirtueScores();
-  }, []);
-
-  const fetchVirtueScores = async () => {
-    try {
-      const response = await fetch('/api/progress/virtues');
-      if (response.ok) {
-        const data = await response.json();
-        setVirtueScores(data.scores);
-      }
-    } catch (error) {
-      console.error('Error fetching virtue scores:', error);
-    }
-  };
-
-  const handleVirtueUpdate = async (virtue: keyof VirtueScores, value: number) => {
-    try {
-      const updatedScores = { ...virtueScores, [virtue]: value };
-      const response = await fetch('/api/progress/virtues', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedScores)
-      });
-
-      if (response.ok) {
-        setVirtueScores(updatedScores);
-      }
-    } catch (error) {
-      console.error('Error updating virtue scores:', error);
-    }
-  };
-
-  return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-      {Object.entries(virtueScores).map(([virtue, score]) => (
-        <div key={virtue} className="text-center">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            <span className="text-2xl">{getVirtueEmoji(virtue as keyof VirtueScores)}</span>
-            <span className={`text-sm font-medium ${getVirtueColor(virtue as keyof VirtueScores)}`}>
-              {virtue.charAt(0).toUpperCase() + virtue.slice(1)}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
-            <div 
-              className={`h-2 rounded-full bg-gradient-to-r ${getVirtueGradient(virtue as keyof VirtueScores)}`}
-              style={{ width: `${Math.min(100, score)}%` }}
-            />
-          </div>
-          <div className="text-xs text-muted-foreground">{score}/100</div>
-          <div className="flex gap-1 mt-2">
-            {[20, 40, 60, 80, 100].map((value) => (
-              <button
-                key={value}
-                onClick={() => handleVirtueUpdate(virtue as keyof VirtueScores, value)}
-                className={`w-4 h-4 rounded-full text-xs ${
-                  score >= value ? 'bg-primary text-white' : 'bg-gray-200 text-gray-400'
-                }`}
-              >
-                {value}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
+  return <EnhancedVirtueProgress />;
 }
 
 function WisdomSpotlightWidget() {

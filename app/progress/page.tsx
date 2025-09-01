@@ -6,6 +6,7 @@ import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
 import { TrendingUp, Flame, Target, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
 
 interface Streak {
   name: string;
@@ -137,34 +138,10 @@ export default function ProgressPage() {
           </div>
         </div>
 
-        {/* Virtue Radar */}
+        {/* Enhanced Virtue Progress */}
         <div className="bg-surface border border-border rounded-lg p-4">
           <h3 className="text-sm font-semibold text-text mb-4">Virtue Development</h3>
-          <div className="space-y-3">
-            {virtueScores.map((virtue) => {
-              const percentage = (virtue.score / virtue.maxScore) * 100;
-              return (
-                <div key={virtue.virtue} className="space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-text">{virtue.virtue}</span>
-                    <span className="text-sm text-muted">{virtue.score}/{virtue.maxScore}</span>
-                  </div>
-                  <div className="w-full bg-surface-2 rounded-full h-2">
-                    <div
-                      className={cn(
-                        'h-2 rounded-full transition-all duration-500',
-                        virtue.virtue === 'Wisdom' && 'bg-primary',
-                        virtue.virtue === 'Courage' && 'bg-courage',
-                        virtue.virtue === 'Justice' && 'bg-justice',
-                        virtue.virtue === 'Temperance' && 'bg-temperance'
-                      )}
-                      style={{ width: `${percentage}%` }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <EnhancedVirtueProgress />
         </div>
 
         {/* Streak Details */}
