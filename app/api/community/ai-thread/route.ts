@@ -123,15 +123,26 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     // Extract AI insights from the content
     const aiInsights = extractAIInsights(generatedContent);
 
-    // Create a system user for AI posts (or use a default user ID)
-    const defaultUserId = 1; // Ensure this exists in DB
+    // Check if default user exists, create if not
+    let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
+    if (!defaultUser) {
+      defaultUser = await prisma.user.create({
+        data: {
+          id: 1,
+          username: 'ai_philosopher',
+          displayName: 'AI Philosopher',
+          email: 'ai@aristotle.com',
+          password: 'system_user_no_password',
+        }
+      });
+    }
 
     // Save the AI thread to the database
     const savedThread = await prisma.communityPost.create({
       data: {
         title: generatedTitle,
         content: generatedContent,
-        authorId: defaultUserId,
+        authorId: defaultUser.id,
         type: 'ai_question',
         category: generatedCategory,
         tags: generatedTags,
