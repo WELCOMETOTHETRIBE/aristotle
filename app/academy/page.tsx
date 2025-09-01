@@ -3,10 +3,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
-import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle } from 'lucide-react';
+import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
-import PhilosopherChat from '@/components/PhilosopherChat';
+import PhilosophersJourney from '@/components/PhilosophersJourney';
 
 interface VirtueSpotlight {
   id: string;
@@ -281,30 +281,30 @@ export default function AcademyPage() {
           <p className="text-muted">Master the four cardinal virtues through guided learning journeys</p>
         </div>
 
-        {/* Philosopher Chat Introduction */}
+        {/* Philosopher's Journey Introduction */}
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6 text-center">
           <div className="flex items-center justify-center space-x-3 mb-3">
             <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
-              <MessageCircle className="w-5 h-5 text-primary" />
+              <GraduationCap className="w-5 h-5 text-primary" />
             </div>
-            <h2 className="text-lg font-semibold text-text">Chat with Ancient Philosophers</h2>
+            <h2 className="text-lg font-semibold text-text">Philosopher's Journey</h2>
           </div>
           <p className="text-sm text-muted mb-4">
-            Engage in deep philosophical discussions with Aristotle, Socrates, Epictetus, and other great thinkers. 
-            Ask questions about virtue, wisdom, and the good life. Look for the chat button in the bottom right corner.
+            Embark on a transformative journey with ancient wisdom seekers. Engage in deep philosophical dialogue
+            with Aristotle, Socrates, Epictetus, and other great thinkers to explore virtue, wisdom, and the good life.
           </p>
           <div className="flex items-center justify-center space-x-4 text-xs text-muted">
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
-              <span>AI-powered responses</span>
+              <span>AI-powered wisdom</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
-              <span>Historical accuracy</span>
+              <span>Historical authenticity</span>
             </div>
             <div className="flex items-center space-x-2">
               <span className="w-2 h-2 bg-primary rounded-full"></span>
-              <span>Personal guidance</span>
+              <span>Personal transformation</span>
             </div>
           </div>
         </div>
@@ -472,7 +472,7 @@ export default function AcademyPage() {
         )}
       </main>
 
-      <PhilosopherChat />
+                   <PhilosophersJourney />
       <TabBar />
     </div>
   );
