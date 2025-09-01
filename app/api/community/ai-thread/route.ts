@@ -196,7 +196,18 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
 
   } catch (error) {
     console.error('Error generating AI thread:', error);
-    return NextResponse.json({ error: 'Failed to generate AI thread' }, { status: 500 });
+    
+    // Return more detailed error information for debugging
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+    const errorStack = error instanceof Error ? error.stack : 'No stack trace available';
+    
+    console.error('Error details:', { message: errorMessage, stack: errorStack });
+    
+    return NextResponse.json({ 
+      error: 'Failed to generate AI thread',
+      details: errorMessage,
+      timestamp: new Date().toISOString()
+    }, { status: 500 });
   }
 }
 

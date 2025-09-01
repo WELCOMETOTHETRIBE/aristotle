@@ -472,14 +472,14 @@ export default function CommunityPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4 pb-20 sm:pb-4"
             onClick={() => setShowCreateThread(false)}
           >
             <motion.div
               initial={{ scale: 0.95, opacity: 0, y: 20 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.95, opacity: 0, y: 20 }}
-              className="bg-surface border border-border rounded-2xl w-full max-w-lg max-h-[80vh] flex flex-col"
+              className="bg-surface border border-border rounded-2xl w-full max-w-lg max-h-[85vh] flex flex-col overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="p-6 pb-4">
@@ -539,8 +539,8 @@ export default function CommunityPage() {
                 </div>
               </div>
               
-              {/* Submit Button Area */}
-              <div className="p-6 pt-4 border-t border-border bg-surface-2/50">
+              {/* Submit Button Area - Always Visible */}
+              <div className="p-6 pt-4 border-t border-border bg-surface-2/50 flex-shrink-0">
                 <div className="flex items-center justify-end gap-3">
                   <button
                     onClick={() => setShowCreateThread(false)}
