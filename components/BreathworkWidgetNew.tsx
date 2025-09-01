@@ -198,15 +198,15 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
 
   return (
     <motion.div 
-      className={`p-6 rounded-xl ${pattern.gradient} backdrop-blur-sm`}
-      whileHover={{ scale: 1.02 }}
+      className={`p-4 rounded-xl ${pattern.gradient} backdrop-blur-sm`}
+      whileHover={{ scale: 1.01 }}
       transition={{ type: "spring", stiffness: 300 }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      {/* Compact Header */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
           <motion.div 
-            className="p-3 rounded-xl bg-white/10"
+            className="p-2 rounded-lg bg-white/10"
             animate={{ 
               scale: isActive ? [1, 1.1, 1] : 1,
               rotate: isActive ? [0, 5, -5, 0] : 0
@@ -216,96 +216,73 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
             {pattern.icon}
           </motion.div>
           <div>
-            <h3 className="font-bold text-white text-lg">Breathwork</h3>
-            <p className="text-sm text-gray-400">Master your breath</p>
+            <h3 className="font-bold text-white text-base">Breathwork</h3>
+            <p className="text-xs text-gray-400">{sessionStats.totalSessions} sessions</p>
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold text-white">{sessionStats.totalSessions}</div>
-          <div className="text-xs text-gray-400">Sessions</div>
-        </div>
-      </div>
-
-      {/* Pattern Selector */}
-      <div className="mb-6">
-        <div className="flex items-center justify-between mb-3">
-          <div className="text-sm text-gray-400">Breathing Pattern:</div>
+        
+        {/* Pattern Dropdown */}
+        <div className="relative">
           <button
             onClick={() => setShowPatterns(!showPatterns)}
-            className="text-sm text-white hover:text-gray-300 transition-colors"
+            className="flex items-center gap-1 px-3 py-1.5 bg-white/10 rounded-lg text-white text-sm hover:bg-white/20 transition-colors"
           >
-            {showPatterns ? 'Hide' : 'Change'}
+            <span className="truncate max-w-20">{pattern.name}</span>
+            <motion.div
+              animate={{ rotate: showPatterns ? 180 : 0 }}
+              transition={{ duration: 0.2 }}
+            >
+              ▼
+            </motion.div>
           </button>
+          
+          <AnimatePresence>
+            {showPatterns && (
+              <motion.div 
+                className="absolute top-full right-0 mt-1 w-48 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20 z-10"
+                initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              >
+                {breathPatterns.map((p, index) => (
+                  <button
+                    key={index}
+                    onClick={() => {
+                      setSelectedPattern(index);
+                      setShowPatterns(false);
+                      resetSession();
+                    }}
+                    className={`w-full p-2 text-left hover:bg-white/10 transition-colors ${
+                      selectedPattern === index ? 'bg-white/20 text-white' : 'text-gray-300'
+                    } ${index === 0 ? 'rounded-t-lg' : ''} ${index === breathPatterns.length - 1 ? 'rounded-b-lg' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm">{p.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="font-medium text-sm truncate">{p.name}</div>
+                        <div className="text-xs opacity-75 truncate">{p.description}</div>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
-        
-        <AnimatePresence>
-          {showPatterns ? (
-            <motion.div 
-              className="mb-4 space-y-2"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: "auto" }}
-              exit={{ opacity: 0, height: 0 }}
-            >
-              {breathPatterns.map((p, index) => (
-                <motion.button
-                  key={index}
-                  onClick={() => {
-                    setSelectedPattern(index);
-                    setShowPatterns(false);
-                    resetSession();
-                  }}
-                  className={`w-full p-3 rounded-lg text-left transition-all ${
-                    selectedPattern === index
-                      ? 'bg-white/20 text-white border border-white/30'
-                      : 'bg-white/5 text-gray-400 hover:bg-white/10'
-                  }`}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="p-2 rounded-lg bg-white/10">
-                      {p.icon}
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-medium text-sm">{p.name}</div>
-                      <div className="text-xs opacity-75">{p.description}</div>
-                    </div>
-                  </div>
-                </motion.button>
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div 
-              className="p-3 bg-white/10 rounded-lg border border-white/20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 rounded-lg bg-white/10">
-                  {pattern.icon}
-                </div>
-                <div className="flex-1">
-                  <div className="font-medium text-white">{pattern.name}</div>
-                  <div className="text-sm text-gray-400">{pattern.description}</div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
-      {/* Breath Circle */}
-      <div className="flex justify-center mb-6">
+      {/* Compact Breath Circle */}
+      <div className="flex justify-center mb-4">
         <motion.div 
-          className="relative w-32 h-32 rounded-full border-4 border-white/20 flex items-center justify-center"
+          className="relative w-20 h-20 rounded-full border-3 border-white/20 flex items-center justify-center"
           animate={{
-            scale: isActive ? [1, 1.2, 1] : 1,
+            scale: isActive ? [1, 1.15, 1] : 1,
             borderColor: isActive ? ['rgba(255,255,255,0.2)', 'rgba(255,255,255,0.4)', 'rgba(255,255,255,0.2)'] : 'rgba(255,255,255,0.2)'
           }}
           transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
         >
           <motion.div 
-            className="absolute inset-4 rounded-full bg-gradient-to-br from-white/10 to-white/5"
+            className="absolute inset-3 rounded-full bg-gradient-to-br from-white/10 to-white/5"
             animate={{
               scale: isActive ? [1, 1.1, 1] : 1,
             }}
@@ -313,26 +290,26 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           />
           <div className="relative z-10 text-center">
             <motion.div 
-              className={`text-3xl font-bold mb-1 ${getPhaseColor()}`}
+              className={`text-xl font-bold ${getPhaseColor()}`}
               animate={{ scale: isActive ? [1, 1.1, 1] : 1 }}
               transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
             >
               {timeLeft}
             </motion.div>
-            <div className="text-sm text-gray-400">{getPhaseText()}</div>
+            <div className="text-xs text-gray-400">{getPhaseText()}</div>
           </div>
         </motion.div>
       </div>
 
-      {/* Session Progress */}
-      <div className="mb-6">
-        <div className="flex justify-between text-xs text-gray-400 mb-2">
-          <span>Cycle {currentCycle} of {pattern.pattern.cycles}</span>
+      {/* Compact Progress */}
+      <div className="mb-4">
+        <div className="flex justify-between text-xs text-gray-400 mb-1">
+          <span>Cycle {currentCycle}/{pattern.pattern.cycles}</span>
           <span>{Math.round((currentCycle / pattern.pattern.cycles) * 100)}%</span>
         </div>
-        <div className="w-full bg-white/10 rounded-full h-2">
+        <div className="w-full bg-white/10 rounded-full h-1.5">
           <motion.div 
-            className="bg-gradient-to-r from-white/30 to-white/50 h-2 rounded-full"
+            className="bg-gradient-to-r from-white/30 to-white/50 h-1.5 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${(currentCycle / pattern.pattern.cycles) * 100}%` }}
             transition={{ duration: 0.5 }}
@@ -340,11 +317,11 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
         </div>
       </div>
 
-      {/* Controls */}
-      <div className="flex justify-center gap-4 mb-6">
+      {/* Compact Controls */}
+      <div className="flex justify-center gap-2 mb-3">
         <motion.button
           onClick={toggleSession}
-          className={`px-6 py-3 rounded-xl font-semibold transition-all ${
+          className={`px-4 py-2 rounded-lg font-medium transition-all ${
             isActive 
               ? 'bg-red-500 hover:bg-red-600 text-white' 
               : 'bg-green-500 hover:bg-green-600 text-white'
@@ -352,41 +329,37 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <div className="flex items-center gap-2">
-            {isActive ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
-            <span>{isActive ? 'Pause' : 'Start'}</span>
+          <div className="flex items-center gap-1">
+            {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+            <span className="text-sm">{isActive ? 'Pause' : 'Start'}</span>
           </div>
         </motion.button>
         
         <motion.button
           onClick={resetSession}
-          className="px-4 py-3 rounded-xl bg-gray-600 hover:bg-gray-700 text-white transition-all"
+          className="px-3 py-2 rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          <RotateCcw className="w-5 h-5" />
+          <RotateCcw className="w-4 h-4" />
         </motion.button>
       </div>
 
-      {/* Benefits */}
-      <div className="mb-4">
-        <div className="text-sm text-gray-400 mb-2">Benefits:</div>
-        <div className="flex flex-wrap gap-2">
-          {pattern.benefits.map((benefit, index) => (
-            <span
-              key={index}
-              className="px-2 py-1 bg-white/10 text-white text-xs rounded-full"
-            >
-              {benefit}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      {/* Session Stats */}
-      <div className="p-3 bg-white/5 rounded-lg">
-        <div className="text-xs text-gray-400 mb-1">Total Practice Time:</div>
-        <div className="text-sm text-white">{sessionStats.totalMinutes} minutes</div>
+      {/* Compact Benefits */}
+      <div className="flex flex-wrap gap-1">
+        {pattern.benefits.slice(0, 2).map((benefit, index) => (
+          <span
+            key={index}
+            className="px-2 py-1 bg-white/10 text-white text-xs rounded-full"
+          >
+            {benefit}
+          </span>
+        ))}
+        {pattern.benefits.length > 2 && (
+          <span className="px-2 py-1 bg-white/10 text-white text-xs rounded-full">
+            +{pattern.benefits.length - 2}
+          </span>
+        )}
       </div>
     </motion.div>
   );
