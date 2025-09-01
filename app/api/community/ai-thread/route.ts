@@ -6,6 +6,29 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    // Enforce server-side authorization via shared secret (e.g., cron job)
+    const secret = request.headers.get('x-cron-secret') || request.nextUrl.searchParams.get('secret');
+    if (!secret || secret !== process.env.CRON_SECRET) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Enforce one AI thread per day
+    const startOfDay = new Date();
+    startOfDay.setHours(0, 0, 0, 0);
+    const endOfDay = new Date();
+    endOfDay.setHours(23, 59, 59, 999);
+
+    const existingToday = await prisma.communityPost.findFirst({
+      where: {
+        isAIQuestion: true,
+        createdAt: { gte: startOfDay, lte: endOfDay },
+      },
+    });
+
+    if (existingToday) {
+      return NextResponse.json({ success: true, message: 'AI thread for today already exists' });
+    }
+
     // Select a random philosopher for today's thread
     const randomPhilosopher = PHILOSOPHERS[Math.floor(Math.random() * PHILOSOPHERS.length)];
     
@@ -83,8 +106,7 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     const aiInsights = extractAIInsights(content);
 
     // Create a system user for AI posts (or use a default user ID)
-    // For now, we'll use a default user ID that should exist in the database
-    const defaultUserId = 1; // This should be a valid user ID in your database
+    const defaultUserId = 1; // Ensure this exists in DB
 
     // Save the AI thread to the database
     const savedThread = await prisma.communityPost.create({
@@ -116,13 +138,6 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
       },
     });
 
-    console.log('AI thread saved to database successfully:', { 
-      id: savedThread.id, 
-      title, 
-      category, 
-      tags 
-    });
-
     return NextResponse.json({
       success: true,
       thread: {
@@ -133,7 +148,7 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
         tags: savedThread.tags,
         author: {
           name: randomPhilosopher.name,
-          avatar: randomPhilosopher.avatar,
+          avatar: randomPhilosopher.avatar || '/avatars/ai.jpg',
           isAI: true,
           persona: randomPhilosopher.title,
         },
@@ -146,7 +161,7 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
         id: randomPhilosopher.id,
         name: randomPhilosopher.name,
         title: randomPhilosopher.title,
-        avatar: randomPhilosopher.avatar,
+        avatar: randomPhilosopher.avatar || '/avatars/ai.jpg',
       }
     });
 
@@ -160,14 +175,12 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
 function extractAIInsights(content: string): string[] {
   const insights: string[] = [];
   
-  // Extract key philosophical concepts and insights
   const philosophicalTerms = [
     'virtue', 'wisdom', 'courage', 'justice', 'temperance', 'eudaimonia', 'stoicism',
     'mindfulness', 'resilience', 'growth', 'reflection', 'practice', 'discipline',
     'balance', 'harmony', 'truth', 'knowledge', 'understanding', 'perspective'
   ];
   
-  // Look for sentences that contain philosophical terms
   const sentences = content.split(/[.!?]+/).filter(s => s.trim().length > 10);
   
   sentences.forEach(sentence => {
@@ -181,12 +194,10 @@ function extractAIInsights(content: string): string[] {
     }
   });
   
-  // If no philosophical insights found, create general insights
   if (insights.length === 0) {
     insights.push('This discussion touches on important philosophical themes');
     insights.push('Consider how this relates to your personal growth journey');
   }
   
-  // Limit to 3 insights maximum
   return insights.slice(0, 3);
 } 

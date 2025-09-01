@@ -20,13 +20,13 @@ export default function VirtueRadar({ data }: VirtueRadarProps) {
       className="h-64 w-full"
     >
       <ResponsiveContainer width="100%" height="100%">
-        <RadarChart data={data}>
+        <RadarChart data={data} margin={{ top: 16, right: 16, bottom: 16, left: 16 }} outerRadius="70%">
           <PolarGrid stroke="rgba(255,255,255,0.15)" />
           <PolarAngleAxis 
             dataKey="virtue" 
-            stroke="rgba(255,255,255,0.7)"
-            fontSize={12}
-            fontWeight={500}
+            stroke="rgba(255,255,255,0.85)"
+            tick={{ fill: "rgba(255,255,255,0.9)", fontSize: 12 }}
+            tickLine={false}
           />
           <Radar 
             dataKey="score" 

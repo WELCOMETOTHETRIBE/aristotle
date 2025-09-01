@@ -80,80 +80,106 @@ export function HabitTrackerCard({ className }: HabitTrackerCardProps) {
     defaultFrequency: 'daily',
     defaultTarget: 1,
   });
+  const [isAdding, setIsAdding] = useState(false);
 
   // Load saved data
   useEffect(() => {
-    const savedHabits = localStorage.getItem('habitTrackerHabits');
-    const savedCompletions = localStorage.getItem('habitTrackerCompletions');
-    const savedSettings = localStorage.getItem('habitTrackerSettings');
-    
-    if (savedHabits) {
-      const parsed = JSON.parse(savedHabits);
-      setHabits(parsed.map((habit: any) => ({
-        ...habit,
-        createdAt: new Date(habit.createdAt),
-        lastCompleted: habit.lastCompleted ? new Date(habit.lastCompleted) : undefined
-      })));
-    }
-    
-    if (savedCompletions) {
-      const parsed = JSON.parse(savedCompletions);
-      setCompletions(parsed.map((completion: any) => ({
-        ...completion,
-        timestamp: new Date(completion.timestamp)
-      })));
-    }
-    
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
+    try {
+      const savedHabits = localStorage.getItem('habitTrackerHabits');
+      const savedCompletions = localStorage.getItem('habitTrackerCompletions');
+      const savedSettings = localStorage.getItem('habitTrackerSettings');
+      
+      if (savedHabits) {
+        const parsed = JSON.parse(savedHabits);
+        setHabits(parsed.map((habit: any) => ({
+          ...habit,
+          createdAt: new Date(habit.createdAt),
+          lastCompleted: habit.lastCompleted ? new Date(habit.lastCompleted) : undefined
+        })));
+      }
+      
+      if (savedCompletions) {
+        const parsed = JSON.parse(savedCompletions);
+        setCompletions(parsed.map((completion: any) => ({
+          ...completion,
+          timestamp: new Date(completion.timestamp)
+        })));
+      }
+      
+      if (savedSettings) {
+        setSettings(JSON.parse(savedSettings));
+      }
+    } catch (e) {
+      // Ignore storage parse errors to avoid breaking the widget
+      console.warn('HabitTracker: failed to load saved data');
     }
   }, []);
 
   // Save data
   const saveHabits = (newHabits: Habit[]) => {
     setHabits(newHabits);
-    localStorage.setItem('habitTrackerHabits', JSON.stringify(newHabits));
+    try {
+      localStorage.setItem('habitTrackerHabits', JSON.stringify(newHabits));
+    } catch (e) {
+      console.warn('HabitTracker: failed to save habits');
+    }
   };
 
   const saveCompletions = (newCompletions: HabitCompletion[]) => {
     setCompletions(newCompletions);
-    localStorage.setItem('habitTrackerCompletions', JSON.stringify(newCompletions));
+    try {
+      localStorage.setItem('habitTrackerCompletions', JSON.stringify(newCompletions));
+    } catch (e) {
+      console.warn('HabitTracker: failed to save completions');
+    }
   };
 
   const saveSettings = (newSettings: HabitSettings) => {
     setSettings(newSettings);
-    localStorage.setItem('habitTrackerSettings', JSON.stringify(newSettings));
+    try {
+      localStorage.setItem('habitTrackerSettings', JSON.stringify(newSettings));
+    } catch (e) {
+      console.warn('HabitTracker: failed to save settings');
+    }
   };
 
   const addHabit = () => {
-    if (!newHabit.title.trim()) return;
+    if (isAdding) return;
+    const title = newHabit.title.trim();
+    if (!title) return;
+    const safeTarget = Math.min(10, Math.max(1, Number(newHabit.target) || 1));
 
-    const habit: Habit = {
-      id: Date.now().toString(),
-      title: newHabit.title.trim(),
-      description: newHabit.description.trim() || undefined,
-      category: newHabit.category,
-      frequency: newHabit.frequency,
-      target: newHabit.target,
-      streakCount: 0,
-      totalCompletions: 0,
-      createdAt: new Date(),
-      isActive: true,
-      color: newHabit.color,
-    };
+    setIsAdding(true);
+    try {
+      const habit: Habit = {
+        id: Date.now().toString(),
+        title,
+        description: newHabit.description.trim() || undefined,
+        category: newHabit.category,
+        frequency: newHabit.frequency,
+        target: safeTarget,
+        streakCount: 0,
+        totalCompletions: 0,
+        createdAt: new Date(),
+        isActive: true,
+        color: newHabit.color,
+      };
 
-    const updatedHabits = [habit, ...habits];
-    saveHabits(updatedHabits);
-    
-    setNewHabit({
-      title: '',
-      description: '',
-      category: 'Health',
-      frequency: 'daily',
-      target: 1,
-      color: habitColors[0]
-    });
-    setShowAddHabit(false);
+      const updatedHabits = [habit, ...habits];
+      saveHabits(updatedHabits);
+      
+      setNewHabit({
+        title: '',
+        description: '',
+        category: 'Health',
+        frequency: 'daily',
+        target: 1,
+        color: habitColors[0]
+      });
+      setShowAddHabit(false);
+    } finally {
+      setIsAdding(false);
+    }
   };
 
   const completeHabit = (habitId: string) => {
@@ -252,15 +278,14 @@ export function HabitTrackerCard({ className }: HabitTrackerCardProps) {
             }
           }
           
-          // Clean markdown formatting and parse insights from AI response
           const cleanContent = content
-            .replace(/\*\*(.*?)\*\*/g, '$1') // Remove bold formatting
-            .replace(/\*(.*?)\*/g, '$1') // Remove italic formatting
-            .replace(/`(.*?)`/g, '$1') // Remove code formatting
-            .replace(/\[(.*?)\]\(.*?\)/g, '$1') // Remove links, keep text
-            .replace(/^#+\s*/gm, '') // Remove markdown headers
-            .replace(/^\s*[-*+]\s*/gm, '') // Remove markdown list markers
-            .replace(/^\s*\d+\.\s*/gm, ''); // Remove numbered list markers
+            .replace(/\*\*(.*?)\*\*/g, '$1')
+            .replace(/\*(.*?)\*/g, '$1')
+            .replace(/`(.*?)`/g, '$1')
+            .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+            .replace(/^#+\s*/gm, '')
+            .replace(/^\s*[-*+]\s*/gm, '')
+            .replace(/^\s*\d+\.\s*/gm, '');
           
           const insights = cleanContent.split('\n').filter(line => line.trim().startsWith('•') || line.trim().startsWith('-')).slice(0, 3);
           setAiInsights(insights.length > 0 ? insights : [
@@ -639,10 +664,10 @@ export function HabitTrackerCard({ className }: HabitTrackerCardProps) {
             </button>
             <button
               onClick={addHabit}
-              disabled={!newHabit.title.trim()}
+              disabled={isAdding || !newHabit.title.trim()}
               className="flex-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Add Habit
+              {isAdding ? 'Adding…' : 'Add Habit'}
             </button>
           </div>
         </div>

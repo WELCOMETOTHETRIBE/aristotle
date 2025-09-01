@@ -227,40 +227,8 @@ export default function CommunityPage() {
     }
   };
 
-  // Check if we need to generate a daily AI thread
-  useEffect(() => {
-    const checkAndGenerateAIThread = async () => {
-      try {
-        // Check if there's already an AI thread from today
-        const today = new Date().toDateString();
-        const hasTodayAIThread = threads.some(thread => 
-          thread.type === 'ai' && 
-          new Date(thread.createdAt).toDateString() === today
-        );
-
-        // If no AI thread today and we have threads loaded, generate one
-        if (!hasTodayAIThread && threads.length > 0 && !loading && !generatingAIThread) {
-          console.log('No AI thread found for today, generating one...');
-          console.log('Current threads count:', threads.length);
-          console.log('Current loading state:', loading);
-          console.log('Current generatingAIThread state:', generatingAIThread);
-          await generateDailyAIThread();
-        } else {
-          console.log('AI thread generation conditions not met:', {
-            hasTodayAIThread,
-            threadsLength: threads.length,
-            loading,
-            generatingAIThread
-          });
-        }
-      } catch (error) {
-        console.error('Error in automatic AI thread generation:', error);
-        // Don't set error state for automatic generation to avoid blocking UI
-      }
-    };
-
-    checkAndGenerateAIThread();
-  }, [threads, loading, generatingAIThread]);
+  // Disabled automatic AI thread generation in client
+  // Intentionally left blank to avoid unintended posts from user sessions
 
   const toggleLike = async (threadId: string) => {
     try {
@@ -653,31 +621,6 @@ export default function CommunityPage() {
             </div>
             <div className="flex items-center gap-2">
               <button
-                onClick={generateDailyAIThread}
-                disabled={generatingAIThread}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 bg-gradient-to-r from-primary/10 to-primary/20 border border-primary/30 hover:border-primary/50 text-primary hover:text-primary/80 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-primary/20 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {generatingAIThread ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <Brain className="w-3.5 h-3.5" />
-                )}
-                <span>{generatingAIThread ? 'Generating...' : 'AI Thread'}</span>
-              </button>
-              <button
-                onClick={() => {
-                  console.log('Manual test - Current state:', {
-                    threads: threads.length,
-                    loading,
-                    generatingAIThread,
-                    error
-                  });
-                }}
-                className="px-2 py-1.5 bg-gray-500/20 border border-gray-500/30 text-gray-500 hover:text-gray-400 rounded-lg text-xs transition-all"
-              >
-                Debug
-              </button>
-              <button
                 onClick={() => setShowCreateThread(true)}
                 className="flex items-center gap-1.5 px-2.5 py-1.5 bg-surface border border-border hover:border-primary/30 text-text hover:text-primary rounded-lg text-sm font-medium transition-all duration-200 hover:bg-surface-2 active:scale-95"
               >
@@ -879,9 +822,12 @@ export default function CommunityPage() {
                     {aiComments[thread.id].map((comment, idx) => (
                       <div key={comment.id} className="p-4 bg-gradient-to-r from-primary/5 via-primary/8 to-primary/10 rounded-xl border border-primary/20 shadow-sm">
                         <div className="flex items-center gap-3 mb-3">
-                          <div className="w-10 h-10 bg-gradient-to-br from-primary/20 to-primary/10 rounded-full flex items-center justify-center">
-                            <span className="text-lg">{comment.author.avatar}</span>
-                          </div>
+                          <img
+                            src={comment.author.avatar || '/avatars/ai.jpg'}
+                            alt={comment.author.name}
+                            className="w-10 h-10 rounded-full object-cover border border-primary/20"
+                            onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/logo.svg'; }}
+                          />
                           <div>
                             <div className="font-semibold text-primary text-sm">{comment.author.name}</div>
                             <div className="text-xs text-primary/70 font-medium">{comment.author.persona}</div>
