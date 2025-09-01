@@ -30,7 +30,7 @@ const settings: SettingSection[] = [
     items: [
       {
         id: 'displayName',
-        label: 'Display Name',
+        label: 'First Name',
         description: 'How your name appears in the app',
         type: 'text',
         value: 'John Doe',
@@ -136,12 +136,29 @@ export default function SettingsPage() {
 
   // Load preferences on mount
   useEffect(() => {
-    const loadPreferences = async () => {
+    const loadPreferences = () => {
       try {
-        const response = await fetch('/api/prefs');
-        if (response.ok) {
-          const data = await response.json();
-          setSettingsState(data.preferences);
+        // First try to load from localStorage
+        const savedPreferences = localStorage.getItem('userPreferences');
+        if (savedPreferences) {
+          const parsed = JSON.parse(savedPreferences);
+          setSettingsState(parsed);
+        } else {
+          // Fallback to API if no localStorage data
+          const loadFromAPI = async () => {
+            try {
+              const response = await fetch('/api/prefs');
+              if (response.ok) {
+                const data = await response.json();
+                setSettingsState(data.preferences);
+                // Save to localStorage for future use
+                localStorage.setItem('userPreferences', JSON.stringify(data.preferences));
+              }
+            } catch (error) {
+              console.error('Error loading preferences:', error);
+            }
+          };
+          loadFromAPI();
         }
       } catch (error) {
         console.error('Error loading preferences:', error);

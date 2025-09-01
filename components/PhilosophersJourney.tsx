@@ -80,17 +80,31 @@ export default function PhilosophersJourney() {
   }, [selectedPhilosopher]);
 
   const getPhilosopherGreeting = (philosopher: Philosopher): string => {
+    // Get user's display name from localStorage
+    const userPreferences = localStorage.getItem('userPreferences');
+    let displayName = 'seeker of wisdom';
+    if (userPreferences) {
+      try {
+        const parsed = JSON.parse(userPreferences);
+        if (parsed.displayName && parsed.displayName.trim()) {
+          displayName = parsed.displayName.trim();
+        }
+      } catch (error) {
+        console.error('Error parsing user preferences:', error);
+      }
+    }
+
     const greetings: Record<string, string> = {
-      'aristotle': "Greetings, seeker of wisdom. I am Aristotle, and I am here to guide you on your journey toward eudaimonia - human flourishing. What virtue would you like to explore today, or what challenge brings you to seek philosophical guidance?",
-      'socrates': "Greetings, fellow seeker. I am Socrates, and I know that I know nothing. But together, through questioning and dialogue, we may discover truth. What question burns in your mind today?",
-      'epictetus': "Greetings, friend. I am Epictetus, and I understand that true freedom lies not in controlling the world, but in mastering your own mind. What aspect of your life would you like to examine?",
-      'confucius': "Greetings, noble one. I am Confucius, and I believe that through proper relationships and moral cultivation, we can create harmony in ourselves and society. What aspect of your character would you like to develop?",
-      'laozi': "Greetings, traveler on the Way. I am Laozi, and I understand that the Dao flows naturally. Sometimes the softest approach is the strongest. What brings you to seek the natural way?",
-      'marcus-aurelius': "Greetings, citizen of the world. I am Marcus Aurelius, and I believe that our duty is to serve others and live virtuously regardless of circumstances. What responsibility calls to you today?",
-      'seneca': "Greetings, friend. I am Seneca, and I understand that time is our most precious possession. How are you using your time, and what wisdom do you seek to guide your journey?",
-      'plato': "Greetings, lover of wisdom. I am Plato, and I believe that through philosophical inquiry, we can turn our souls toward the Good and discover the eternal truths that lie beyond appearances. What truth do you seek?"
+      'aristotle': `Greetings, ${displayName}. I am Aristotle, and I am here to guide you on your journey toward eudaimonia - human flourishing. What virtue would you like to explore today, or what challenge brings you to seek philosophical guidance?`,
+      'socrates': `Greetings, ${displayName}. I am Socrates, and I know that I know nothing. But together, through questioning and dialogue, we may discover truth. What question burns in your mind today?`,
+      'epictetus': `Greetings, ${displayName}. I am Epictetus, and I understand that true freedom lies not in controlling the world, but in mastering your own mind. What aspect of your life would you like to examine?`,
+      'confucius': `Greetings, ${displayName}. I am Confucius, and I believe that through proper relationships and moral cultivation, we can create harmony in ourselves and society. What aspect of your character would you like to develop?`,
+      'laozi': `Greetings, ${displayName}. I am Laozi, and I understand that the Dao flows naturally. Sometimes the softest approach is the strongest. What brings you to seek the natural way?`,
+      'marcus-aurelius': `Greetings, ${displayName}. I am Marcus Aurelius, and I believe that our duty is to serve others and live virtuously regardless of circumstances. What responsibility calls to you today?`,
+      'seneca': `Greetings, ${displayName}. I am Seneca, and I understand that time is our most precious possession. How are you using your time, and what wisdom do you seek to guide your journey?`,
+      'plato': `Greetings, ${displayName}. I am Plato, and I believe that through philosophical inquiry, we can turn our souls toward the Good and discover the eternal truths that lie beyond appearances. What truth do you seek?`
     };
-    return greetings[philosopher.id] || "Greetings, seeker of wisdom. I am here to guide you on your philosophical journey.";
+    return greetings[philosopher.id] || `Greetings, ${displayName}. I am here to guide you on your philosophical journey.`;
   };
 
   const sendMessage = async () => {

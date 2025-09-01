@@ -44,14 +44,33 @@ const contextChips = [
 ];
 
 export function GuideModal({ isOpen, onClose }: GuideModalProps) {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: 'Hello! I\'m Aristotle, your guide to flourishing. How can I help you today?',
-      timestamp: new Date(),
-    },
-  ]);
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  // Initialize messages with user's display name
+  useEffect(() => {
+    // Get user's display name from localStorage
+    const userPreferences = localStorage.getItem('userPreferences');
+    let displayName = 'there';
+    if (userPreferences) {
+      try {
+        const parsed = JSON.parse(userPreferences);
+        if (parsed.displayName && parsed.displayName.trim()) {
+          displayName = parsed.displayName.trim();
+        }
+      } catch (error) {
+        console.error('Error parsing user preferences:', error);
+      }
+    }
+
+    setMessages([
+      {
+        id: '1',
+        role: 'assistant',
+        content: `Hello ${displayName}! I'm Aristotle, your guide to flourishing. How can I help you today?`,
+        timestamp: new Date(),
+      },
+    ]);
+  }, []);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
