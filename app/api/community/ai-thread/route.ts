@@ -76,31 +76,9 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     const category = categoryMatch ? categoryMatch[1].trim() : 'Wisdom';
     const tags = tagsMatch ? tagsMatch[1].split(',').map((tag: string) => tag.trim()) : ['daily-wisdom', 'philosophy'];
 
-    // Create the AI thread in the database
-    const threadResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/community`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.AI_SYSTEM_TOKEN || 'ai-system-token'}`,
-      },
-      body: JSON.stringify({
-        title,
-        content,
-        type: 'ai_discussion',
-        category,
-        tags,
-        author: {
-          name: randomPhilosopher.name,
-          avatar: randomPhilosopher.avatar,
-          isAI: true,
-          persona: randomPhilosopher.title,
-        },
-      }),
-    });
-
-    if (!threadResponse.ok) {
-      console.warn('Failed to create AI thread in database, but continuing with response');
-    }
+    // Note: We're not posting to the database here to avoid authentication issues
+    // The frontend will handle adding the AI thread to the state
+    console.log('AI thread generated successfully:', { title, content, category, tags });
 
     return NextResponse.json({
       success: true,
