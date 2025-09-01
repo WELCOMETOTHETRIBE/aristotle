@@ -92,7 +92,7 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
     // Save the AI comment directly to the database
     const savedComment = await prisma.communityReply.create({
       data: {
-        content: aiComment,
+        content: `[AI Comment by ${randomPhilosopher.name}]\n\n${aiComment}`,
         authorId: defaultUserId,
         postId: threadId,
         parentId: null, // Top-level comment

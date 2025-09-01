@@ -186,22 +186,38 @@ export default function CommunityPage() {
           const replies = await response.json();
           // Filter for AI comments and store them
           const aiReplies = replies.filter((reply: any) => 
-            reply.author.username === 'ai' || reply.author.displayName?.includes('AI')
+            reply.author.username === 'ai' || 
+            reply.author.displayName?.includes('AI') ||
+            reply.content.startsWith('[AI Comment by')
           );
           if (aiReplies.length > 0) {
             setAiComments(prev => ({
               ...prev,
-              [thread.id]: aiReplies.map((reply: any) => ({
-                id: reply.id,
-                content: reply.content,
-                author: {
-                  name: reply.author.displayName || reply.author.username,
-                  avatar: reply.author.avatar || '/avatars/ai.jpg',
-                  isAI: true,
-                },
-                createdAt: reply.createdAt,
-                likes: reply.likes,
-              }))
+              [thread.id]: aiReplies.map((reply: any) => {
+                // Extract philosopher name from AI comment content
+                let philosopherName = 'AI Philosopher';
+                let cleanContent = reply.content;
+                
+                if (reply.content.startsWith('[AI Comment by')) {
+                  const match = reply.content.match(/\[AI Comment by (.+?)\]/);
+                  if (match) {
+                    philosopherName = match[1];
+                    cleanContent = reply.content.replace(/\[AI Comment by .+?\]\n\n/, '');
+                  }
+                }
+                
+                return {
+                  id: reply.id,
+                  content: cleanContent,
+                  author: {
+                    name: philosopherName,
+                    avatar: reply.author.avatar || '/avatars/ai.jpg',
+                    isAI: true,
+                  },
+                  createdAt: reply.createdAt,
+                  likes: reply.likes,
+                };
+              })
             }));
           }
         }
