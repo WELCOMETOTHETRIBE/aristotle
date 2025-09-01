@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getAllPhilosophers, getPhilosopher, type Philosopher } from '@/lib/philosophers';
-import { PhilosophicalTerminologyWidget } from '@/components/PhilosophicalTerminologyWidget';
 import { cn } from '@/lib/utils';
 
 interface Message {
@@ -35,7 +34,6 @@ export default function PhilosophersJourney() {
   const [showDropdown, setShowDropdown] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(false);
   const [showWidgetInfo, setShowWidgetInfo] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'chat' | 'terminology'>('chat');
   const [isExpanded, setIsExpanded] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -289,45 +287,9 @@ export default function PhilosophersJourney() {
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="flex bg-surface-2 rounded-lg p-1 border border-border">
-        <button
-          onClick={() => setActiveTab('chat')}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all",
-            activeTab === 'chat'
-              ? "bg-primary text-white shadow-sm"
-              : "text-muted hover:text-text hover:bg-surface-3"
-          )}
-        >
-          <MessageCircle className="w-4 h-4" />
-          Dialogue
-        </button>
-        <button
-          onClick={() => setActiveTab('terminology')}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md transition-all",
-            activeTab === 'terminology'
-              ? "bg-primary text-white shadow-sm"
-              : "text-muted hover:text-text hover:bg-surface-3"
-          )}
-        >
-          <BookOpen className="w-4 h-4" />
-          Terms
-        </button>
-      </div>
-
       {/* Content Area */}
-      <AnimatePresence mode="wait">
-        {activeTab === 'chat' ? (
-          <motion.div
-            key="chat"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-4"
-          >
-            {/* Chat Interface */}
+      <div className="space-y-4">
+        {/* Chat Interface */}
             <div className="bg-surface-2 border border-border rounded-xl h-[500px] flex flex-col">
               {/* Chat Header */}
               <div className="border-b border-border p-4">
@@ -425,18 +387,7 @@ export default function PhilosophersJourney() {
                 </div>
               </div>
             </div>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="terminology"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-          >
-            <PhilosophicalTerminologyWidget />
-          </motion.div>
-        )}
-      </AnimatePresence>
+      </div>
     </motion.div>
   );
 } 
