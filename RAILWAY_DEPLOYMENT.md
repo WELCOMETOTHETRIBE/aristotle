@@ -91,7 +91,7 @@ If you see this error, check:
 
 1. **Connection**
    ```bash
-   # Test database connection
+   # Verify database connection
    npx prisma db push
    ```
 
@@ -143,7 +143,7 @@ curl https://your-app-name.up.railway.app/api/readyz
 ### 2. Runtime Errors
 - Check Railway logs
 - Verify environment variables
-- Test database connection
+- Verify database connection
 
 ### 3. Authentication Redirect Loop
 - Check JWT_SECRET is set
