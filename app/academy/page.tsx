@@ -8,6 +8,7 @@ import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Hea
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import PhilosophersJourney from '@/components/PhilosophersJourney';
+import PhilosophersDialogueModal from '@/components/PhilosophersDialogueModal';
 
 interface VirtueSpotlight {
   id: string;
@@ -172,6 +173,7 @@ export default function AcademyPage() {
   const [currentLesson, setCurrentLesson] = useState<Lesson | null>(null);
   const [userResponse, setUserResponse] = useState('');
   const [spotlights, setSpotlights] = useState<VirtueSpotlight[]>(virtueSpotlights);
+  const [showPhilosophersDialogue, setShowPhilosophersDialogue] = useState(false);
 
   // Load saved progress
   useEffect(() => {
@@ -453,11 +455,7 @@ export default function AcademyPage() {
             </div>
             
             <motion.button
-              onClick={() => {
-                // This will open the Philosopher's Dialogue modal/component
-                // For now, we'll just show a placeholder
-                alert('Philosopher\'s Dialogue coming soon!');
-              }}
+              onClick={() => setShowPhilosophersDialogue(true)}
               className="w-full p-6 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-purple-500/5 border border-purple-500/20 rounded-2xl hover:from-purple-500/15 hover:via-violet-500/15 hover:to-purple-500/10 hover:border-purple-500/30 transition-all duration-300 hover:scale-[1.02] group"
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
@@ -504,6 +502,12 @@ export default function AcademyPage() {
           </div>
         )}
       </main>
+
+      {/* Philosopher's Dialogue Modal */}
+      <PhilosophersDialogueModal 
+        isOpen={showPhilosophersDialogue}
+        onClose={() => setShowPhilosophersDialogue(false)}
+      />
 
       <TabBar />
     </div>
