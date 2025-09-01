@@ -186,7 +186,7 @@ export default function PhilosophersPage() {
             transition={{ duration: 0.6 }}
           >
             <h1 className="text-4xl font-bold text-white mb-3 font-display">
-              Philosopher's Journey
+              Philosopher's Dialogue
             </h1>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
               Engage in dialogue with history's greatest minds and explore timeless wisdom

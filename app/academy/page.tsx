@@ -7,7 +7,6 @@ import { TabBar } from '@/components/nav/TabBar';
 import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
-import PhilosophersJourney from '@/components/PhilosophersJourney';
 import PhilosophersDialogueModal from '@/components/PhilosophersDialogueModal';
 
 interface VirtueSpotlight {
