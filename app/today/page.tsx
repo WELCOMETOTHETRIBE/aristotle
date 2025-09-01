@@ -113,9 +113,11 @@ export default function TodayPage() {
       if (saved) {
         const parsedWidgets = JSON.parse(saved);
         const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
+        console.log('Loading authenticated user widgets:', uniqueWidgets);
         setUserWidgets(uniqueWidgets);
       } else {
         // New authenticated user - start with empty widgets
+        console.log('New authenticated user - starting with empty widgets');
         setUserWidgets([]);
       }
     } else {
@@ -124,10 +126,12 @@ export default function TodayPage() {
       if (saved) {
         const parsedWidgets = JSON.parse(saved);
         const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
+        console.log('Loading demo widgets:', uniqueWidgets);
         setUserWidgets(uniqueWidgets);
       } else {
         // Default demo widgets
         const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
+        console.log('Setting default demo widgets:', defaultWidgets);
         setUserWidgets(defaultWidgets);
         localStorage.setItem('demoWidgets', JSON.stringify(defaultWidgets));
       }
@@ -145,27 +149,48 @@ export default function TodayPage() {
   };
 
   const renderWidget = (widgetId: string) => {
-    switch (widgetId) {
-      case 'breathwork':
-        return <BreathworkCard key={widgetId} />;
-      case 'mood_tracker':
-        return <MoodTrackerCard key={widgetId} />;
-      case 'hydration':
-        return <HydrationTrackerCard key={widgetId} />;
-      case 'focus_timer':
-        return <FocusTimerCard key={widgetId} />;
-      case 'sleep_tracker':
-        return <SleepTrackerCard key={widgetId} />;
-      case 'habit_tracker':
-        return <HabitTrackerCard key={widgetId} />;
-      case 'journal':
-        return <JournalCard key={widgetId} />;
-      case 'goal_tracker':
-        return <GoalTrackerCard key={widgetId} />;
-      case 'wisdom_spotlight':
-        return <WisdomSpotlightCard key={widgetId} />;
-      default:
-        return null;
+    try {
+      switch (widgetId) {
+        case 'breathwork':
+          return <BreathworkCard key={widgetId} />;
+        case 'mood_tracker':
+          return <MoodTrackerCard key={widgetId} />;
+        case 'hydration':
+          return <HydrationTrackerCard key={widgetId} />;
+        case 'focus_timer':
+          return <FocusTimerCard key={widgetId} />;
+        case 'sleep_tracker':
+          return <SleepTrackerCard key={widgetId} />;
+        case 'habit_tracker':
+          return <HabitTrackerCard key={widgetId} />;
+        case 'journal':
+          return <JournalCard key={widgetId} />;
+        case 'goal_tracker':
+          return <GoalTrackerCard key={widgetId} />;
+        case 'wisdom_spotlight':
+          return <WisdomSpotlightCard key={widgetId} />;
+        default:
+          console.warn(`Unknown widget ID: ${widgetId}`);
+          return null;
+      }
+    } catch (error) {
+      console.error(`Error rendering widget ${widgetId}:`, error);
+      return (
+        <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+          <div className="text-center text-muted">
+            <p>Widget "{widgetId}" failed to load</p>
+            <button 
+              onClick={() => {
+                const updatedWidgets = userWidgets.filter(id => id !== widgetId);
+                saveUserWidgets(updatedWidgets);
+              }}
+              className="mt-2 px-3 py-1 bg-error/20 text-error rounded-lg text-sm"
+            >
+              Remove Widget
+            </button>
+          </div>
+        </div>
+      );
     }
   };
 
@@ -433,7 +458,10 @@ export default function TodayPage() {
               </button>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              {userWidgets.map(widgetId => renderWidget(widgetId))}
+              {userWidgets.map(widgetId => {
+                console.log('Rendering widget:', widgetId);
+                return renderWidget(widgetId);
+              })}
             </div>
           </div>
         )}
