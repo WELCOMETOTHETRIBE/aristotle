@@ -20,7 +20,7 @@ import { GoalTrackerCard } from '@/components/cards/GoalTrackerCard';
 import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
 import { TerminologyWidget } from '@/components/cards/TerminologyWidget';
 import AcademyLogo from '@/components/AcademyLogo';
-import VirtueRadar from '@/components/VirtueRadar';
+import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
 import { Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -315,7 +315,7 @@ export default function TodayPage() {
             <div className="text-xs text-muted">7-day average</div>
           </div>
           <div className="bg-surface border border-border rounded-2xl p-6">
-            <VirtueRadar data={virtueData} />
+            <EnhancedVirtueProgress />
           </div>
         </div>
 
