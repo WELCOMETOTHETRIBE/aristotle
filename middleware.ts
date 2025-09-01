@@ -2,11 +2,11 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import * as jose from 'jose';
 
-const JWT_SECRET = 'default-jwt-secret-for-development-only';
+// Use environment variable for JWT secret, fallback for development
+const JWT_SECRET = process.env.JWT_SECRET || 'default-jwt-secret-for-development-only';
 
 async function verifyTokenInMiddleware(token: string) {
   console.log('🔐 Attempting to verify token with secret:', JWT_SECRET ? 'SECRET_SET' : 'SECRET_NOT_SET');
-  console.log('🔐 JWT_SECRET value:', JWT_SECRET);
   try {
     const secret = new TextEncoder().encode(JWT_SECRET);
     const { payload } = await jose.jwtVerify(token, secret);
