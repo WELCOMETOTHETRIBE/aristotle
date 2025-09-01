@@ -47,7 +47,8 @@ class ProductionStorageService implements StorageService {
   private publicUrl: string;
 
   constructor() {
-    this.baseDir = join(process.cwd(), 'temp-uploads');
+    // Use /tmp directory which exists and has write permissions in containerized environments
+    this.baseDir = '/tmp/nature-photos';
     this.publicUrl = '/api/nature-photo/image';
   }
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { createNaturePhotoLog, logToJournal } from '@/lib/journal-logger';
+import { getStorageService, generateUniqueFilename, getFileExtensionFromBase64 } from '@/lib/storage-service';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,12 +11,16 @@ export async function POST(request: NextRequest) {
     // For now, use a default user ID if not provided
     const actualUserId = userId || 1;
 
-    // Save image to uploads folder (simplified for demo)
-    const filename = `nature_${Date.now()}_${Math.random().toString(36).substr(2, 9)}.jpg`;
-    const imagePath = `/uploads/nature-photos/${filename}`;
+    // Generate unique filename and save image using storage service
+    const fileExtension = getFileExtensionFromBase64(imageData);
+    const filename = generateUniqueFilename(actualUserId, fileExtension);
+    
+    const storageService = getStorageService();
+    const imageUrl = await storageService.saveImage(filename, imageData);
+    const imagePath = storageService.getImagePath(filename);
 
     // Create nature photo record
-    const photo = await prisma.NaturePhoto.create({
+    const photo = await prisma.naturePhoto.create({
       data: {
         userId: actualUserId,
         imagePath,
@@ -44,6 +49,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       photo,
+      imageUrl,
       journalEntry: journalResult.entry,
       message: 'Nature photo saved and logged to journal successfully!'
     });
