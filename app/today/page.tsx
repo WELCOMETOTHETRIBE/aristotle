@@ -23,6 +23,7 @@ import AcademyLogo from '@/components/AcademyLogo';
 import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
 import { Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { NaturePhotoLogWidget } from '@/components/ModuleWidgets';
 
 interface Task {
   id: string;
@@ -158,6 +159,8 @@ export default function TodayPage() {
           return <WisdomSpotlightCard key={widgetId} />;
         case 'terminology':
           return <TerminologyWidget key={widgetId} />;
+        case 'nature_photo_log':
+          return <NaturePhotoLogWidget key={widgetId} />;
         default:
           console.warn(`Unknown widget ID: ${widgetId}`);
           return null;
