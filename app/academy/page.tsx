@@ -281,34 +281,6 @@ export default function AcademyPage() {
           <p className="text-muted">Master the four cardinal virtues through guided learning journeys</p>
         </div>
 
-        {/* Philosopher's Journey Introduction */}
-        <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6 text-center">
-          <div className="flex items-center justify-center space-x-3 mb-3">
-            <div className="w-10 h-10 bg-primary/20 rounded-xl flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-primary" />
-            </div>
-            <h2 className="text-lg font-semibold text-text">Philosopher's Journey</h2>
-          </div>
-          <p className="text-sm text-muted mb-4">
-            Embark on a transformative journey with ancient wisdom seekers. Engage in deep philosophical dialogue
-            with Aristotle, Socrates, Epictetus, and other great thinkers to explore virtue, wisdom, and the good life.
-          </p>
-          <div className="flex items-center justify-center space-x-4 text-xs text-muted">
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 bg-primary rounded-full"></span>
-              <span>AI-powered wisdom</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 bg-primary rounded-full"></span>
-              <span>Historical authenticity</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="w-2 h-2 bg-primary rounded-full"></span>
-              <span>Personal transformation</span>
-            </div>
-          </div>
-        </div>
-
         {!selectedVirtue ? (
           /* Virtue Selection */
           <div className="space-y-6">
