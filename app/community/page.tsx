@@ -421,11 +421,10 @@ export default function CommunityPage() {
             </div>
             <button
               onClick={() => setShowCreateThread(true)}
-              className="group relative flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white rounded-xl font-medium transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 active:scale-95"
+              className="flex items-center gap-2 px-3 py-2 bg-surface border border-border hover:border-primary/30 text-text hover:text-primary rounded-lg font-medium transition-all duration-200 hover:bg-surface-2 active:scale-95"
             >
-              <div className="absolute inset-0 bg-white/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-              <Plus className="w-4 h-4 relative z-10" />
-              <span className="relative z-10">New Thread</span>
+              <Plus className="w-4 h-4" />
+              <span>New Thread</span>
             </button>
           </div>
         </div>

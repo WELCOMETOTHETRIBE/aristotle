@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
-import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock } from 'lucide-react';
+import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 
@@ -157,6 +157,39 @@ const virtueSpotlights: VirtueSpotlight[] = [
         title: 'Inner Harmony',
         teaching: 'Temperance leads to inner harmony—a state of peace and balance within ourselves. This involves managing our emotions, thoughts, and actions in ways that promote our well-being and the well-being of others.',
         question: 'What practices help you maintain inner harmony and peace?',
+        completed: false
+      }
+    ]
+  },
+  {
+    id: 'philosophical_practice',
+    name: 'Philosophical Practice',
+    description: 'Applying ancient wisdom to modern daily life',
+    icon: Lightbulb,
+    color: 'bg-amber-500/20 text-amber-600 border-amber-500/30',
+    gradient: 'from-amber-500/20 to-amber-500/5',
+    progress: 0,
+    completed: false,
+    lessons: [
+      {
+        id: 'practice-1',
+        title: 'Daily Reflection',
+        teaching: 'The Stoics practiced daily reflection as a way to examine their actions, thoughts, and character. This practice helps us become more aware of our patterns, learn from our experiences, and align our actions with our values. Set aside time each day to reflect on what went well, what could be improved, and how you lived according to your principles.',
+        question: 'What would a meaningful daily reflection practice look like for you?',
+        completed: false
+      },
+      {
+        id: 'practice-2',
+        title: 'Mindful Decision Making',
+        teaching: 'Philosophical practice involves making decisions with greater awareness and intention. Before making important choices, pause to consider: What are my values? What would wisdom look like here? How does this choice align with the person I want to become? This practice helps us act more deliberately and in accordance with our principles.',
+        question: 'What decision are you currently facing that could benefit from this mindful approach?',
+        completed: false
+      },
+      {
+        id: 'practice-3',
+        title: 'Virtue in Action',
+        teaching: 'True philosophical practice means embodying virtues in our daily actions. It\'s not enough to understand wisdom, courage, justice, and temperance—we must practice them in our relationships, work, and daily choices. This involves seeing every moment as an opportunity to cultivate character and live according to our highest principles.',
+        question: 'How can you practice one of the four virtues in a specific situation today?',
         completed: false
       }
     ]
