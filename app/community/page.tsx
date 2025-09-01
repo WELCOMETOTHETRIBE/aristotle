@@ -99,6 +99,7 @@ export default function CommunityPage() {
         body: JSON.stringify({
           title: newThread.title,
           content: newThread.content,
+          type: 'member_discussion',
           category: newThread.category,
           tags: newThread.tags,
         }),
@@ -106,7 +107,7 @@ export default function CommunityPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setThreads(prev => [data.thread, ...prev]);
+        setThreads(prev => [data, ...prev]);
         setShowCreateThread(false);
         setNewThread({ title: '', content: '', category: 'Stoicism', tags: [] });
         
