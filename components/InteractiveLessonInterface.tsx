@@ -6,8 +6,8 @@ import {
   Compass, ArrowRight, CheckCircle, Circle, Sparkles, 
   PenTool, Palette, FileText, Map, Camera, Mic, Video, 
   Send, Loader2, ChevronDown, ChevronUp, Plus, Minus, 
-  CheckSquare, Square, List, Grid3X3, Target, TrendingUp,
-  Award, Trophy, Fire, HeartHandshake, Lightbulb, Sparkles
+  CheckSquare, Square, List, Grid3X3, TrendingUp,
+  Award, Trophy, Flame, HeartHandshake
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type AcademyLesson } from '@/lib/academy-curriculum';
