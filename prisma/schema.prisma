@@ -451,6 +451,8 @@ model MoodLog {
   mood      Int      // 1..5
   note      String?
   user      User      @relation(fields: [userId], references: [id])
+
+  @@unique([userId, date])
 }
 
 model DailyIntention {
@@ -581,7 +583,7 @@ model JournalEntry {
   id          String   @id @default(cuid())
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
-  type        String   // gratitude, reflection, voice_note, boundaries, community_connections
+  type        String   // gratitude, reflection, voice_note, boundaries, community_connections, mood
   content     String
   prompt      String?  // For reflection entries
   category    String?  // For boundaries and community connections
