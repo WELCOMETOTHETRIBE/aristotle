@@ -49,59 +49,7 @@ export default function TodayPage() {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [userWidgets, setUserWidgets] = useState<string[]>([]);
 
-  // Load mockup data only for demo (unauthenticated users)
-  useEffect(() => {
-    if (!loading && !user) {
-      // Demo data for unauthenticated users
-      setTasks([
-        {
-          id: '1',
-          title: 'Morning meditation',
-          description: '10 minutes of focused breathing',
-          priority: 'H',
-          completed: false,
-        },
-        {
-          id: '2',
-          title: 'Read philosophy',
-          description: 'Continue with Stoic texts',
-          priority: 'M',
-          completed: false,
-        },
-        {
-          id: '3',
-          title: 'Exercise',
-          description: '30 minutes of movement',
-          priority: 'H',
-          completed: false,
-        },
-      ]);
-
-      setHabits([
-        {
-          id: '1',
-          title: 'Meditation',
-          streakCount: 7,
-          lastActivity: new Date(Date.now() - 24 * 60 * 60 * 1000),
-          checkedToday: true,
-        },
-        {
-          id: '2',
-          title: 'Reading',
-          streakCount: 5,
-          lastActivity: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-          checkedToday: true,
-        },
-        {
-          id: '3',
-          title: 'Exercise',
-          streakCount: 3,
-          lastActivity: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
-          checkedToday: false,
-        },
-      ]);
-    }
-  }, [user, loading]);
+  // No longer auto-loading demo data for unauthenticated users
 
   // Load user's added widgets
   useEffect(() => {
@@ -121,20 +69,8 @@ export default function TodayPage() {
         setUserWidgets([]);
       }
     } else {
-      // Demo mode for unauthenticated users
-      const saved = localStorage.getItem('demoWidgets');
-      if (saved) {
-        const parsedWidgets = JSON.parse(saved);
-        const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
-        console.log('Loading demo widgets:', uniqueWidgets);
-        setUserWidgets(uniqueWidgets);
-      } else {
-        // Default demo widgets
-        const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
-        console.log('Setting default demo widgets:', defaultWidgets);
-        setUserWidgets(defaultWidgets);
-        localStorage.setItem('demoWidgets', JSON.stringify(defaultWidgets));
-      }
+      // Unauthenticated users start with empty widgets
+      setUserWidgets([]);
     }
   }, [user, loading]);
 
@@ -142,8 +78,6 @@ export default function TodayPage() {
   const saveUserWidgets = (widgets: string[]) => {
     if (user) {
       localStorage.setItem(`userWidgets_${user.id}`, JSON.stringify(widgets));
-    } else {
-      localStorage.setItem('demoWidgets', JSON.stringify(widgets));
     }
     setUserWidgets(widgets);
   };

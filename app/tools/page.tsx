@@ -218,27 +218,13 @@ export default function ToolsPage() {
         );
       }
     } else {
-      // Demo mode for unauthenticated users
-      const savedWidgets = localStorage.getItem('demoWidgets');
-      if (savedWidgets) {
-        const userWidgets = JSON.parse(savedWidgets);
-        setWidgets(prev => 
-          prev.map(widget => ({
-            ...widget,
-            isAdded: userWidgets.includes(widget.id)
-          }))
-        );
-      } else {
-        // Default demo widgets
-        const defaultWidgets = ['breathwork', 'mood_tracker', 'hydration', 'focus_timer', 'wisdom_spotlight'];
-        setWidgets(prev => 
-          prev.map(widget => ({
-            ...widget,
-            isAdded: defaultWidgets.includes(widget.id)
-          }))
-        );
-        localStorage.setItem('demoWidgets', JSON.stringify(defaultWidgets));
-      }
+      // Unauthenticated users start with no widgets added
+      setWidgets(prev => 
+        prev.map(widget => ({
+          ...widget,
+          isAdded: false
+        }))
+      );
     }
   }, [user, loading]);
 
@@ -258,9 +244,6 @@ export default function ToolsPage() {
       if (user) {
         // Authenticated user - save to user-specific storage
         localStorage.setItem(`userWidgets_${user.id}`, JSON.stringify(addedWidgetIds));
-      } else {
-        // Demo mode - save to demo storage
-        localStorage.setItem('demoWidgets', JSON.stringify(addedWidgetIds));
       }
       
       // Show feedback

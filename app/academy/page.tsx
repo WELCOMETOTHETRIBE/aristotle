@@ -184,14 +184,8 @@ export default function AcademyPage() {
         setSpotlights(virtueSpotlights);
       }
     } else {
-      // Demo mode for unauthenticated users
-      const savedSpotlights = localStorage.getItem('demoAcademySpotlights');
-      if (savedSpotlights) {
-        setSpotlights(JSON.parse(savedSpotlights));
-      } else {
-        // Default demo progress
-        setSpotlights(virtueSpotlights);
-      }
+      // Unauthenticated users start with fresh progress
+      setSpotlights(virtueSpotlights);
     }
   }, [user, loading]);
 
@@ -200,8 +194,6 @@ export default function AcademyPage() {
     setSpotlights(updatedSpotlights);
     if (user) {
       localStorage.setItem(`academySpotlights_${user.id}`, JSON.stringify(updatedSpotlights));
-    } else {
-      localStorage.setItem('demoAcademySpotlights', JSON.stringify(updatedSpotlights));
     }
   };
 
@@ -252,12 +244,6 @@ export default function AcademyPage() {
       const entries = JSON.parse(existingEntries);
       entries.unshift(journalEntry);
       localStorage.setItem(`journalEntries_${user.id}`, JSON.stringify(entries));
-    } else {
-      // Demo mode - save to demo storage
-      const existingEntries = localStorage.getItem('demoJournalEntries') || '[]';
-      const entries = JSON.parse(existingEntries);
-      entries.unshift(journalEntry);
-      localStorage.setItem('demoJournalEntries', JSON.stringify(entries));
     }
 
     setUserResponse('');
