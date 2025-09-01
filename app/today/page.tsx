@@ -47,6 +47,7 @@ export default function TodayPage() {
   const [mood, setMood] = useState<number | null>(null);
   const [intention, setIntention] = useState('');
   const [virtueData, setVirtueData] = useState<Array<{ virtue: string; score: number }>>([]);
+  const [userPreferences, setUserPreferences] = useState<any>(null);
   
   // Initialize empty arrays for authenticated users, mockup data for demo
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -55,7 +56,7 @@ export default function TodayPage() {
 
   // No longer auto-loading demo data for unauthenticated users
 
-  // Load user's added widgets
+  // Load user's added widgets and preferences
   useEffect(() => {
     if (loading) return; // Wait for auth to load
 
@@ -71,6 +72,20 @@ export default function TodayPage() {
         // New authenticated user - start with empty widgets
         console.log('New authenticated user - starting with empty widgets');
         setUserWidgets([]);
+      }
+
+      // Load user preferences
+      const savedPrefs = localStorage.getItem('userPreferences');
+      if (savedPrefs) {
+        try {
+          const prefs = JSON.parse(savedPrefs);
+          setUserPreferences(prefs);
+          if (prefs.focusVirtue) {
+            setFocusVirtue(prefs.focusVirtue);
+          }
+        } catch (error) {
+          console.error('Error parsing user preferences:', error);
+        }
       }
     } else {
       // Unauthenticated users start with empty widgets
@@ -225,7 +240,7 @@ export default function TodayPage() {
                 <div>
                   <h1 className="text-2xl font-bold text-text mb-1">
                     {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
-                    {user?.displayName && `, ${user.displayName.split(' ')[0]}`}
+                    {userPreferences?.displayName && `, ${userPreferences.displayName.split(' ')[0]}`}
                   </h1>
                   <p className="text-muted font-medium">Ready to flourish today?</p>
                 </div>

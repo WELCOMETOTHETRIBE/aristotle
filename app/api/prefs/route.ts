@@ -1,104 +1,72 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
-import { prisma } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
 
-const PrefsRequestSchema = z.object({
-  framework: z.string().optional(),
-  style: z.string().optional(),
-  locale: z.string().optional(),
-});
-
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const body = await request.json();
-    const prefs = PrefsRequestSchema.parse(body);
-
-    // For now, we'll use a demo user approach since we don't have proper auth
-    // In production, this would get the user from the session
-    const demoUser = await prisma.user.findFirst({
-      where: { username: 'demo-user' },
-    });
-
-    if (!demoUser) {
-      return NextResponse.json(
-        { error: 'User not found' },
-        { status: 404 }
-      );
-    }
-
-    // Save preferences to database
-    await prisma.userPreference.upsert({
-      where: {
-        userId: demoUser.id,
-      },
-      update: {
-        framework: prefs.framework || null,
-        style: prefs.style || 'aristotle',
-        locale: prefs.locale || 'en',
-      },
-      create: {
-        userId: demoUser.id,
-        framework: prefs.framework || null,
-        style: prefs.style || 'aristotle',
-        locale: prefs.locale || 'en',
-      },
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Preferences saved successfully',
-      preferences: prefs,
-    });
-
-  } catch (error) {
-    console.error('Preferences API error:', error);
+    // Get token from Authorization header
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.replace('Bearer ', '');
     
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid request format', details: error.errors },
-        { status: 400 }
-      );
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    return NextResponse.json(
-      { error: 'Failed to save preferences' },
-      { status: 500 }
-    );
+    const payload = await verifyToken(token);
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Return default preferences
+    const preferences = {
+      displayName: payload.displayName || 'User',
+      email: payload.email || '',
+      theme: 'dark',
+      focusVirtue: 'wisdom',
+      dailyReminders: true,
+      weeklyInsights: true,
+      communityUpdates: false,
+    };
+
+    return NextResponse.json({ preferences });
+  } catch (error) {
+    console.error('Error fetching preferences:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
-export async function GET() {
+export async function POST(request: NextRequest) {
   try {
-    // For now, we'll use a demo user approach
-    const demoUser = await prisma.user.findFirst({
-      where: { username: 'demo-user' },
-    });
-
-    if (!demoUser) {
-      return NextResponse.json({
-        framework: null,
-        style: 'aristotle',
-        locale: 'en',
-      });
+    // Get token from Authorization header
+    const authHeader = request.headers.get('authorization');
+    const token = authHeader?.replace('Bearer ', '');
+    
+    if (!token) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Get user preferences from database
-    const userPrefs = await prisma.userPreference.findUnique({
-      where: {
-        userId: demoUser.id,
-      },
-    });
+    const payload = await verifyToken(token);
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
 
-    return NextResponse.json({
-      framework: userPrefs?.framework || null,
-      style: userPrefs?.style || 'aristotle',
-      locale: userPrefs?.locale || 'en',
+    const body = await request.json();
+    const { preferences } = body;
+    
+    if (!preferences) {
+      return NextResponse.json({ error: 'Preferences required' }, { status: 400 });
+    }
+
+    // In a real app, you'd save to database
+    // For now, we'll just return success
+    console.log('Saving preferences for user:', payload.userId, preferences);
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Preferences saved successfully',
+      preferences 
     });
   } catch (error) {
-    console.error('Preferences GET error:', error);
-    return NextResponse.json(
-      { error: 'Failed to get preferences' },
-      { status: 500 }
-    );
+    console.error('Error saving preferences:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 } 

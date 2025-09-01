@@ -3,7 +3,7 @@ import { PHILOSOPHERS } from '@/lib/philosophers';
 
 export async function POST(request: NextRequest) {
   try {
-    const { threadId, threadTitle, threadContent, threadCategory } = await request.json();
+    const { threadId, threadTitle, threadContent, threadCategory, userComment } = await request.json();
 
     if (!threadId || !threadTitle || !threadContent) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
@@ -13,21 +13,33 @@ export async function POST(request: NextRequest) {
     const randomPhilosopher = PHILOSOPHERS[Math.floor(Math.random() * PHILOSOPHERS.length)];
 
     // Create the AI comment prompt
-    const prompt = `You are ${randomPhilosopher.name}, ${randomPhilosopher.title}. 
+    let prompt = `You are ${randomPhilosopher.name}, ${randomPhilosopher.title}. 
 
-You are commenting on a community thread in an ancient wisdom wellness app. Read the thread below and provide a thoughtful, philosophical response from your unique perspective.
+You are commenting on a community thread in an ancient wisdom wellness app. Read the thread below and provide a thoughtful, philosophical response from your unique perspective.`;
+
+    if (userComment) {
+      // If this is a response to a user comment, include it in the context
+      prompt += `
+
+A user has just commented: "${userComment}"
+
+Please respond to their comment specifically, while also considering the original thread context.`;
+    }
+
+    prompt += `
 
 Thread Title: "${threadTitle}"
 Thread Content: "${threadContent}"
 Thread Category: ${threadCategory}
 
 Please provide a comment that:
-1. Shows you've read and understood the thread
+1. Shows you've read and understood the thread${userComment ? ' and the user\'s comment' : ''}
 2. Offers insights from your philosophical perspective
 3. Is encouraging and constructive
 4. Relates to the category/topic
 5. Is 2-4 sentences long
 6. Maintains your philosophical voice and style
+${userComment ? '7. Directly addresses the user\'s comment or question' : ''}
 
 Respond as ${randomPhilosopher.name} would, using your unique perspective and wisdom.`;
 
@@ -62,15 +74,14 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
     const aiData = await aiResponse.json();
     const aiComment = aiData.choices[0].message.content.trim();
 
-    // For now, we'll just return the AI comment without posting it to the database
-    // since the replies API requires authentication. In a production system,
-    // you might want to create a special AI user account or modify the replies API
-    // to handle AI comments differently.
-    
-    return NextResponse.json({
-      success: true,
-      comment: {
-        id: `ai-${Date.now()}`,
+    // Post the AI comment to the database
+    const commentResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/community/${threadId}/replies`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.AI_SYSTEM_TOKEN || 'ai-system-token'}`,
+      },
+      body: JSON.stringify({
         content: aiComment,
         author: {
           name: randomPhilosopher.name,
@@ -78,17 +89,12 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
           isAI: true,
           persona: randomPhilosopher.title,
         },
-        createdAt: new Date().toISOString(),
-      },
-      philosopher: {
-        id: randomPhilosopher.id,
-        name: randomPhilosopher.name,
-        title: randomPhilosopher.title,
-        avatar: randomPhilosopher.avatar,
-      }
+      }),
     });
 
-
+    if (!commentResponse.ok) {
+      console.warn('Failed to post AI comment to database, but continuing with response');
+    }
 
     return NextResponse.json({
       success: true,

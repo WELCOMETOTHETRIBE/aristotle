@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
@@ -123,20 +123,70 @@ const settings: SettingSection[] = [
 
 export default function SettingsPage() {
   const [settingsState, setSettingsState] = useState<Record<string, any>>({
-    displayName: 'John Doe',
-    email: 'john@example.com',
+    displayName: 'User',
+    email: '',
     theme: 'dark',
     focusVirtue: 'wisdom',
     dailyReminders: true,
     weeklyInsights: true,
     communityUpdates: false,
   });
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState('');
 
-  const handleSettingChange = (id: string, value: any) => {
-    setSettingsState(prev => ({
-      ...prev,
+  // Load preferences on mount
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const response = await fetch('/api/prefs');
+        if (response.ok) {
+          const data = await response.json();
+          setSettingsState(data.preferences);
+        }
+      } catch (error) {
+        console.error('Error loading preferences:', error);
+      }
+    };
+
+    loadPreferences();
+  }, []);
+
+  const handleSettingChange = async (id: string, value: any) => {
+    const newSettings = {
+      ...settingsState,
       [id]: value,
-    }));
+    };
+    
+    setSettingsState(newSettings);
+    
+    // Save to localStorage for immediate use
+    localStorage.setItem('userPreferences', JSON.stringify(newSettings));
+    
+    // Save to server
+    try {
+      setLoading(true);
+      const response = await fetch('/api/prefs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ preferences: newSettings }),
+      });
+      
+      if (response.ok) {
+        setMessage('Settings saved successfully!');
+        setTimeout(() => setMessage(''), 3000);
+      } else {
+        setMessage('Failed to save settings');
+        setTimeout(() => setMessage(''), 3000);
+      }
+    } catch (error) {
+      console.error('Error saving preferences:', error);
+      setMessage('Failed to save settings');
+      setTimeout(() => setMessage(''), 3000);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const renderSettingItem = (item: SettingItem) => {
@@ -214,6 +264,17 @@ export default function SettingsPage() {
           <h1 className="text-2xl font-bold text-text">Settings</h1>
           <p className="text-muted">Customize your experience</p>
         </div>
+
+        {/* Success Message */}
+        {message && (
+          <div className={`p-3 rounded-lg text-sm font-medium ${
+            message.includes('successfully') 
+              ? 'bg-green-500/10 text-green-500 border border-green-500/30' 
+              : 'bg-red-500/10 text-red-500 border border-red-500/30'
+          }`}>
+            {message}
+          </div>
+        )}
 
         {/* Settings Sections */}
         <div className="space-y-6">

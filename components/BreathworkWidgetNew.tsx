@@ -373,61 +373,61 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
   };
 
   return (
-    <div className="bg-surface border border-border rounded-xl p-6">
+    <div className="bg-surface border border-border rounded-xl p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
           <motion.div 
-            className="p-3 rounded-xl bg-gradient-to-br from-blue-500/20 to-cyan-500/20"
+            className="p-2 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20"
             animate={{ 
               scale: isActive ? [1, 1.1, 1] : 1,
               rotate: isActive ? [0, 5, -5, 0] : 0
             }}
             transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
           >
-            <Wind className="w-6 h-6 text-blue-400" />
+            <Wind className="w-5 h-5 text-blue-400" />
           </motion.div>
           <div>
-            <h3 className="font-bold text-text text-lg">Breathwork</h3>
-            <p className="text-sm text-muted">{sessionStats.totalSessions} sessions • {sessionStats.totalMinutes} min</p>
+            <h3 className="font-bold text-text text-base">Breathwork</h3>
+            <p className="text-xs text-muted">{sessionStats.totalSessions} sessions • {sessionStats.totalMinutes} min</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1">
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="p-2 bg-surface-2 rounded-lg text-muted hover:text-text transition-colors"
+            className="p-1.5 bg-surface-2 rounded-lg text-muted hover:text-text transition-colors"
             title="Pattern Information"
           >
-            <Info className="w-4 h-4" />
+            <Info className="w-3.5 h-3.5" />
           </button>
           
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className="p-2 bg-surface-2 rounded-lg text-muted hover:text-text transition-colors"
+            className="p-1.5 bg-surface-2 rounded-lg text-muted hover:text-text transition-colors"
             title={isMuted ? "Unmute Audio" : "Mute Audio"}
           >
-            {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
           
           <div className="relative">
             <button
               onClick={() => setShowPatterns(!showPatterns)}
-              className="flex items-center gap-2 px-3 py-2 bg-surface-2 rounded-lg text-text hover:bg-surface transition-colors"
+              className="flex items-center gap-1 px-2 py-1.5 bg-surface-2 rounded-lg text-text hover:bg-surface transition-colors text-sm"
             >
-              <span className="truncate max-w-24">{pattern.name}</span>
+              <span className="truncate max-w-20">{pattern.name}</span>
               <motion.div
                 animate={{ rotate: showPatterns ? 180 : 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <ChevronDown className="w-4 h-4" />
+                <ChevronDown className="w-3.5 h-3.5" />
               </motion.div>
             </button>
             
             <AnimatePresence>
               {showPatterns && (
                 <motion.div 
-                  className="absolute top-full right-0 mt-1 w-64 bg-surface border border-border rounded-lg shadow-lg z-10 max-h-60 overflow-y-auto"
+                  className="absolute top-full right-0 mt-1 w-56 bg-surface border border-border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto"
                   initial={{ opacity: 0, scale: 0.95, y: -10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -10 }}
@@ -440,12 +440,12 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                         setShowPatterns(false);
                         resetSession();
                       }}
-                      className={`w-full p-3 text-left hover:bg-surface-2 transition-colors border-b border-border last:border-b-0 ${
+                      className={`w-full p-2 text-left hover:bg-surface-2 transition-colors border-b border-border last:border-b-0 ${
                         selectedPattern === index ? 'bg-primary/10 text-primary' : 'text-text'
                       }`}
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 rounded-lg bg-surface-2">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 rounded-lg bg-surface-2">
                           {p.icon}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -469,51 +469,44 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="mb-6 p-4 bg-surface-2 rounded-lg border border-border"
+            className="mb-4 p-3 bg-surface-2 rounded-lg border border-border"
           >
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
               <div>
-                <h4 className="font-semibold text-text mb-2">About {pattern.name}</h4>
-                <p className="text-sm text-muted mb-3">{pattern.description}</p>
+                <h4 className="font-semibold text-text text-sm mb-1">About {pattern.name}</h4>
+                <p className="text-xs text-muted mb-2">{pattern.description}</p>
                 
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2">
-                    <Target className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-text">Intent: {pattern.intent}</span>
+                <div className="flex flex-wrap gap-3 text-xs">
+                  <div className="flex items-center gap-1">
+                    <Target className="w-3 h-3 text-primary" />
+                    <span className="text-text">{pattern.intent}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Shield className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-text">Virtue: {pattern.primaryVirtue}</span>
+                  <div className="flex items-center gap-1">
+                    <Shield className="w-3 h-3 text-primary" />
+                    <span className="text-text">{pattern.primaryVirtue}</span>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Timer className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-text">~{pattern.bpmApprox} breaths/min</span>
+                  <div className="flex items-center gap-1">
+                    <Timer className="w-3 h-3 text-primary" />
+                    <span className="text-text">~{pattern.bpmApprox} bpm</span>
                   </div>
                 </div>
               </div>
               
               <div>
-                <h4 className="font-semibold text-text mb-2">Guidance</h4>
-                <ul className="text-sm text-muted space-y-1 mb-3">
-                  {pattern.notes.map((note, index) => (
+                <h4 className="font-semibold text-text text-sm mb-1">Guidance</h4>
+                <ul className="text-xs text-muted space-y-1">
+                  {pattern.notes.slice(0, 2).map((note, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <span className="text-primary mt-1">•</span>
+                      <span className="text-primary mt-0.5">•</span>
                       <span>{note}</span>
                     </li>
                   ))}
                 </ul>
                 
                 {pattern.contraindications.length > 0 && (
-                  <div>
-                    <h5 className="font-medium text-text mb-1">Safety Notes</h5>
-                    <ul className="text-sm text-muted space-y-1">
-                      {pattern.contraindications.map((contra, index) => (
-                        <li key={index} className="flex items-start gap-2">
-                          <span className="text-error mt-1">⚠</span>
-                          <span>{contra}</span>
-                        </li>
-                      ))}
-                    </ul>
+                  <div className="mt-2">
+                    <h5 className="font-medium text-text text-xs mb-1">Safety</h5>
+                    <p className="text-xs text-muted">{pattern.contraindications[0]}</p>
                   </div>
                 )}
               </div>
@@ -523,55 +516,48 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       </AnimatePresence>
 
       {/* Main Breath Circle */}
-      <div className="flex justify-center mb-6">
+      <div className="flex justify-center mb-4">
         <div className="relative">
           {/* Outer progress ring */}
-          <svg width="200" height="200" viewBox="0 0 200 200" className="absolute inset-0">
+          <svg width="160" height="160" viewBox="0 0 160 160" className="absolute inset-0">
             <circle
-              cx="100"
-              cy="100"
-              r="90"
+              cx="80"
+              cy="80"
+              r="70"
               stroke="rgba(255,255,255,0.1)"
-              strokeWidth="4"
+              strokeWidth="3"
               fill="none"
             />
             <motion.circle
-              cx="100"
-              cy="100"
-              r="90"
+              cx="80"
+              cy="80"
+              r="70"
               stroke="rgba(59, 130, 246, 0.3)"
-              strokeWidth="4"
+              strokeWidth="3"
               fill="none"
               strokeLinecap="round"
-              initial={{ strokeDasharray: 565, strokeDashoffset: 565 }}
-              animate={{ strokeDashoffset: 565 * (1 - sessionProgress) }}
+              initial={{ strokeDasharray: 440, strokeDashoffset: 440 }}
+              animate={{ strokeDashoffset: 440 * (1 - sessionProgress) }}
               transition={{ duration: 0.5 }}
               style={{ 
                 transform: "rotate(-90deg)", 
-                transformOrigin: "100px 100px" 
+                transformOrigin: "80px 80px" 
               }}
             />
           </svg>
           
           {/* Inner breath circle */}
           <motion.div 
-            className="relative w-32 h-32 rounded-full border-4 border-white/20 flex items-center justify-center"
+            className="relative w-24 h-24 rounded-full border-3 border-white/20 flex items-center justify-center"
             animate={{
-              scale: isActive ? [1, 1.2, 1] : 1,
+              scale: isActive ? [1, 1.15, 1] : 1,
               borderColor: isActive ? ['rgba(255,255,255,0.2)', 'rgba(59,130,246,0.4)', 'rgba(255,255,255,0.2)'] : 'rgba(255,255,255,0.2)'
             }}
             transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
           >
-            <motion.div 
-              className="absolute inset-4 rounded-full bg-gradient-to-br from-white/10 to-white/5"
-              animate={{
-                scale: isActive ? [1, 1.1, 1] : 1,
-              }}
-              transition={{ duration: 2, repeat: isActive ? Infinity : 0 }}
-            />
             <div className="relative z-10 text-center">
               <motion.div 
-                className={`text-2xl font-bold ${getPhaseColor()}`}
+                className={`text-xl font-bold ${getPhaseColor()}`}
                 animate={{ scale: isActive ? [1, 1.1, 1] : 1 }}
                 transition={{ duration: 1, repeat: isActive ? Infinity : 0 }}
               >
@@ -584,14 +570,14 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       </div>
 
       {/* Phase Indicators */}
-      <div className="flex justify-center gap-2 mb-6">
+      <div className="flex justify-center gap-1.5 mb-4">
         {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => {
           if (phase === 'hold2' && pattern.pattern.hold2 === 0) return null;
           return (
             <motion.div
               key={phase}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                currentPhase === phase ? 'w-8' : 'w-4'
+              className={`h-1.5 rounded-full transition-all duration-300 ${
+                currentPhase === phase ? 'w-6' : 'w-3'
               }`}
               style={{
                 backgroundColor: currentPhase === phase 
@@ -609,30 +595,30 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       </div>
 
       {/* Progress and Stats */}
-      <div className="mb-6">
-        <div className="flex justify-between text-sm text-muted mb-2">
+      <div className="mb-4">
+        <div className="flex justify-between text-xs text-muted mb-1">
           <span>Cycle {currentCycle}/{pattern.pattern.cycles}</span>
-          <span>{Math.round(sessionProgress * 100)}% complete</span>
+          <span>{Math.round(sessionProgress * 100)}%</span>
         </div>
-        <div className="w-full bg-surface-2 rounded-full h-2">
+        <div className="w-full bg-surface-2 rounded-full h-1.5">
           <motion.div 
-            className="bg-gradient-to-r from-blue-500 to-cyan-500 h-2 rounded-full"
+            className="bg-gradient-to-r from-blue-500 to-cyan-500 h-1.5 rounded-full"
             initial={{ width: 0 }}
             animate={{ width: `${sessionProgress * 100}%` }}
             transition={{ duration: 0.5 }}
           />
         </div>
-        <div className="flex justify-between text-xs text-muted mt-2">
-          <span>Pattern: {pattern.pattern.inhale}-{pattern.pattern.hold}-{pattern.pattern.exhale}-{pattern.pattern.hold2}</span>
-          <span>~{formatTime(totalSessionTime)} total</span>
+        <div className="flex justify-between text-xs text-muted mt-1">
+          <span>{pattern.pattern.inhale}-{pattern.pattern.hold}-{pattern.pattern.exhale}-{pattern.pattern.hold2}</span>
+          <span>~{formatTime(totalSessionTime)}</span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex justify-center gap-3 mb-4">
+      <div className="flex justify-center gap-2 mb-3">
         <motion.button
           onClick={toggleSession}
-          className={`px-6 py-3 rounded-lg font-medium transition-all flex items-center gap-2 ${
+          className={`px-4 py-2 rounded-lg font-medium transition-all flex items-center gap-1.5 text-sm ${
             isActive 
               ? 'bg-error hover:bg-error/80 text-white' 
               : 'bg-primary hover:bg-primary/80 text-white'
@@ -640,34 +626,34 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
-          {isActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+          {isActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
           <span>{isActive ? 'Pause' : 'Start'}</span>
         </motion.button>
         
         <motion.button
           onClick={resetSession}
-          className="px-4 py-3 rounded-lg bg-surface-2 hover:bg-surface text-text transition-all"
+          className="px-3 py-2 rounded-lg bg-surface-2 hover:bg-surface text-text transition-all"
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           title="Reset Session"
         >
-          <RotateCcw className="w-4 h-4" />
+          <RotateCcw className="w-3.5 h-3.5" />
         </motion.button>
       </div>
 
       {/* Benefits */}
-      <div className="flex flex-wrap gap-2">
-        {pattern.benefits.slice(0, 3).map((benefit, index) => (
+      <div className="flex flex-wrap gap-1.5">
+        {pattern.benefits.slice(0, 2).map((benefit, index) => (
           <span
             key={index}
-            className="px-3 py-1 bg-surface-2 text-text text-xs rounded-full"
+            className="px-2 py-0.5 bg-surface-2 text-text text-xs rounded-full"
           >
             {benefit}
           </span>
         ))}
-        {pattern.benefits.length > 3 && (
-          <span className="px-3 py-1 bg-surface-2 text-text text-xs rounded-full">
-            +{pattern.benefits.length - 3} more
+        {pattern.benefits.length > 2 && (
+          <span className="px-2 py-0.5 bg-surface-2 text-text text-xs rounded-full">
+            +{pattern.benefits.length - 2}
           </span>
         )}
       </div>
