@@ -952,6 +952,8 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [isProcessing, setIsProcessing] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const availableTags = ['dawn', 'dusk', 'tree', 'water', 'earth', 'sky', 'flower', 'animal', 'mountain', 'forest', 'ocean', 'river', 'sunset', 'sunrise', 'clouds', 'rain', 'snow', 'wind'];
 
@@ -1060,9 +1062,10 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       }
       
       // Convert image to base64 for API
-      const base64Image = await new Promise<string>((resolve) => {
+      const base64Image = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => reject(new Error('Failed to read image file'));
         reader.readAsDataURL(uploadedImage);
       });
 
@@ -1085,8 +1088,10 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         }),
       });
 
-      if (response.ok) {
-        const data = await response.json();
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        console.log('Photo uploaded successfully:', data);
         setPhotos(prev => [data.photo, ...prev]);
         
         // Reset form
@@ -1098,14 +1103,18 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         setMood('');
         setUploadedImage(null);
         setImagePreview('');
+        
+        // Show success notification
+        setSuccessMessage('Photo uploaded successfully!');
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
       } else {
-        const errorData = await response.json();
-        console.error('API error:', errorData);
-        alert('Failed to save photo. Please try again.');
+        console.error('API error:', data);
+        alert(`Failed to save photo: ${data.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Error adding photo:', error);
-      alert('Failed to save photo. Please try again.');
+      alert(`Failed to save photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
     }
@@ -1160,6 +1169,18 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           <div className="text-xs text-gray-400">Photos</div>
         </div>
       </div>
+
+      {/* Success Notification */}
+      {showSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          className="mb-4 p-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm text-center"
+        >
+          {successMessage}
+        </motion.div>
+      )}
 
       {/* Add Photo Section */}
       {!isAdding ? (

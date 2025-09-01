@@ -265,16 +265,29 @@ export default function TodayPage() {
       });
 
       if (response.ok) {
+        const data = await response.json();
+        console.log('Intention submitted successfully:', data);
+        
+        // Update submitted intentions state
         setSubmittedIntentions(prev => ({
           ...prev,
           [currentTimePeriod]: true
         }));
+        
         // Reset form
         setMood(null);
         setIntention('');
+        
+        // Show success feedback (optional toast notification)
+        // You could add a toast library here for better UX
+      } else {
+        const errorData = await response.json();
+        console.error('Failed to submit intention:', errorData);
+        alert('Failed to submit intention. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting intention:', error);
+      alert('Error submitting intention. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
