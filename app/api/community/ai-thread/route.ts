@@ -6,7 +6,30 @@ const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
+    console.log('🔍 AI Thread API called');
+    
+    // Test Prisma connection and models
+    try {
+      console.log('🔍 Testing Prisma connection...');
+      const userCount = await prisma.user.count();
+      console.log('✅ User count:', userCount);
+      
+      // Test if communityPost model exists
+      console.log('🔍 Testing communityPost model...');
+      const postCount = await prisma.communityPost.count();
+      console.log('✅ Community post count:', postCount);
+    } catch (prismaError) {
+      console.error('❌ Prisma test failed:', prismaError);
+      return NextResponse.json({ 
+        error: 'Database connection failed',
+        details: prismaError instanceof Error ? prismaError.message : 'Unknown Prisma error',
+        timestamp: new Date().toISOString()
+      }, { status: 500 });
+    }
+
     const body = await request.json();
+    console.log('🔍 Request body:', body);
+    
     const { 
       title, 
       content, 
@@ -20,8 +43,11 @@ export async function POST(request: NextRequest) {
 
     // Check if this is a nature photo thread request
     if (source === 'nature_photo') {
+      console.log('🔍 Creating nature photo thread...');
       return await createNaturePhotoThread(body);
     }
+
+    console.log('🔍 Creating AI philosophical thread...');
 
     // Enforce server-side authorization via shared secret (e.g., cron job)
     // Temporarily allow direct access for testing - remove in production
@@ -36,6 +62,7 @@ export async function POST(request: NextRequest) {
     const endOfDay = new Date();
     endOfDay.setHours(23, 59, 59, 999);
 
+    console.log('🔍 Checking for existing AI threads today...');
     const existingToday = await prisma.communityPost.findFirst({
       where: {
         isAIQuestion: true,
@@ -44,11 +71,13 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingToday) {
+      console.log('✅ AI thread for today already exists');
       return NextResponse.json({ success: true, message: 'AI thread for today already exists' });
     }
 
     // Select a random philosopher for today's thread
     const randomPhilosopher = PHILOSOPHERS[Math.floor(Math.random() * PHILOSOPHERS.length)];
+    console.log('🔍 Selected philosopher:', randomPhilosopher.name);
     
     // Get today's date for context
     const today = new Date();
@@ -78,6 +107,7 @@ Tags: [3-5 relevant tags separated by commas]
 
 Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`;
 
+    console.log('🔍 Calling OpenAI API...');
     // Call the AI API to generate the thread
     const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -103,10 +133,13 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     });
 
     if (!aiResponse.ok) {
-      throw new Error('Failed to generate AI thread');
+      const errorText = await aiResponse.text();
+      console.error('❌ OpenAI API error:', errorText);
+      throw new Error(`OpenAI API failed: ${aiResponse.status} ${errorText}`);
     }
 
     const aiData = await aiResponse.json();
+    console.log('✅ OpenAI API response received');
     const aiThreadContent = aiData.choices[0].message.content.trim();
 
     // Parse the AI response to extract title, content, category, and tags
@@ -120,12 +153,16 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     const generatedCategory = categoryMatch ? categoryMatch[1].trim() : 'Wisdom';
     const generatedTags = tagsMatch ? tagsMatch[1].split(',').map((tag: string) => tag.trim()) : ['daily-wisdom', 'philosophy'];
 
+    console.log('🔍 Generated content:', { title: generatedTitle, category: generatedCategory, tags: generatedTags });
+
     // Extract AI insights from the content
     const aiInsights = extractAIInsights(generatedContent);
 
     // Check if default user exists, create if not
+    console.log('🔍 Checking for default AI user...');
     let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
     if (!defaultUser) {
+      console.log('🔍 Creating default AI user...');
       defaultUser = await prisma.user.create({
         data: {
           id: 1,
@@ -135,9 +172,13 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
           password: 'system_user_no_password',
         }
       });
+      console.log('✅ Default AI user created:', defaultUser.id);
+    } else {
+      console.log('✅ Default AI user found:', defaultUser.id);
     }
 
     // Save the AI thread to the database
+    console.log('🔍 Saving AI thread to database...');
     const savedThread = await prisma.communityPost.create({
       data: {
         title: generatedTitle,
@@ -167,6 +208,8 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
       },
     });
 
+    console.log('✅ AI thread saved successfully:', savedThread.id);
+
     return NextResponse.json({
       success: true,
       thread: {
@@ -195,7 +238,7 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
     });
 
   } catch (error) {
-    console.error('Error generating AI thread:', error);
+    console.error('❌ Error generating AI thread:', error);
     
     // Return more detailed error information for debugging
     const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
