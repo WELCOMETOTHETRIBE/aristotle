@@ -202,9 +202,9 @@ export default function BalanceCard({
     
     const motionLevel = motionHistory.length > 0 ? 
       Math.sqrt(
-        motionHistory[motionHistory.length - 1].x ** 2 + 
-        motionHistory[motionHistory.length - 1].y ** 2 + 
-        motionHistory[motionHistory.length - 1].z ** 2
+        (motionHistory[motionHistory.length - 1]?.x || 0) ** 2 + 
+        (motionHistory[motionHistory.length - 1]?.y || 0) ** 2 + 
+        (motionHistory[motionHistory.length - 1]?.z || 0) ** 2
       ) : 0;
     
     const sensitivityThresholds = {
