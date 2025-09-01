@@ -464,9 +464,9 @@ export default function TodayPage() {
                                    "What's your evening intention?"}
                       className="w-full px-4 py-3 bg-surface-2 border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
                     />
-                    <div className="space-y-3">
-                      <label className="text-sm font-medium text-muted">Quick suggestions:</label>
-                      <div className="flex flex-wrap gap-2">
+                    <div className="space-y-4">
+                      <label className="text-xs font-medium text-muted">Quick suggestions:</label>
+                      <div className="grid grid-cols-2 gap-3">
                         {currentTimePeriod === 'morning' ? [
                           'Practice patience',
                           'Show kindness',
@@ -505,7 +505,7 @@ export default function TodayPage() {
                             key={suggestion}
                             onClick={() => setIntention(suggestion)}
                             className={cn(
-                              "px-4 py-2 bg-surface-2 border border-border rounded-full text-sm text-muted hover:text-text hover:border-primary/30 hover:bg-primary/5 transition-all duration-200",
+                              "px-3 py-2 bg-surface-2 border border-border rounded-lg text-xs text-muted hover:text-text hover:border-primary/30 hover:bg-primary/5 transition-all duration-200 text-center",
                               intention === suggestion && "bg-primary/10 border-primary/30 text-primary font-medium shadow-sm"
                             )}
                           >
