@@ -1106,20 +1106,37 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   };
 
   return (
-    <motion.div
+    <motion.div 
+      className="p-6 rounded-xl bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 backdrop-blur-sm"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
+      whileHover={{ scale: 1.02 }}
+      transition={{ type: "spring", stiffness: 300 }}
     >
       {/* Header */}
-      <div className="text-center">
-        <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <Camera className="w-8 h-8 text-green-500" />
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <motion.div 
+            className="p-3 rounded-xl bg-green-500/20"
+            animate={{ 
+              scale: [1, 1.1, 1],
+              rotate: [0, 5, -5, 0]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <Camera className="w-6 h-6 text-green-400" />
+          </motion.div>
+          <div>
+            <h3 className="font-bold text-white text-lg">Nature Photo Log</h3>
+            <p className="text-sm text-gray-400">
+              Capture moments in nature and reflect on their meaning
+            </p>
+          </div>
         </div>
-        <h3 className="text-xl font-bold text-text mb-2">Nature Photo Log</h3>
-        <p className="text-sm text-muted">
-          Capture moments in nature and reflect on their meaning
-        </p>
+        <div className="text-right">
+          <div className="text-2xl font-bold text-green-400">{photos.length}</div>
+          <div className="text-xs text-gray-400">Photos</div>
+        </div>
       </div>
 
       {/* Add Photo Section */}
@@ -1137,7 +1154,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         </motion.button>
       ) : (
         <motion.div 
-          className="mb-6 space-y-4"
+          className="space-y-4"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
         >
@@ -1278,7 +1295,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       {/* Photo Gallery */}
       {showGallery && (
         <motion.div 
-          className="mb-6"
+          className=""
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: "auto" }}
         >
