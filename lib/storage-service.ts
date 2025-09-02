@@ -41,19 +41,17 @@ class LocalStorageService implements StorageService {
   }
 }
 
-// Production storage implementation - use project-relative path for consistency
+// Production storage implementation - write to /tmp and serve via API route
 class ProductionStorageService implements StorageService {
   private baseDir: string;
   private publicUrl: string;
 
   constructor() {
-    // Use project-relative path that works in both development and production
-    this.baseDir = join(process.cwd(), 'public', 'uploads', 'nature-photos');
+    this.baseDir = '/tmp/nature-photos';
     this.publicUrl = '/api/nature-photo/image';
   }
 
   async saveImage(filename: string, imageData: string): Promise<string> {
-    // Ensure directory exists
     if (!existsSync(this.baseDir)) {
       await mkdir(this.baseDir, { recursive: true });
     }
@@ -77,8 +75,9 @@ class ProductionStorageService implements StorageService {
 
 // Factory function to get the appropriate storage service
 export function getStorageService(): StorageService {
-  // For now, use local storage in both environments for consistency
-  // This ensures images are saved to a predictable location
+  if (process.env.NODE_ENV === 'production') {
+    return new ProductionStorageService();
+  }
   return new LocalStorageService();
 }
 
