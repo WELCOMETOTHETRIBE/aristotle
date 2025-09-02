@@ -290,47 +290,51 @@ export default function PhilosophersCornerPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-20">
-      {/* Header */}
-      <div className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border-b border-primary/20">
-        <div className="px-4 py-6">
+    <div className="min-h-screen bg-bg">
+      {/* Sleek Header */}
+      <div className="sticky top-0 z-20 bg-gradient-to-r from-bg via-bg/95 to-bg/90 backdrop-blur-md border-b border-border/50">
+        <div className="px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/today" className="inline-flex items-center gap-2 text-muted hover:text-text transition-colors">
+              <Link 
+                href="/today" 
+                className="inline-flex items-center gap-2 text-muted hover:text-text transition-colors px-3 py-2 rounded-lg hover:bg-surface/50"
+              >
                 <ArrowLeft size={16} />
-                Back to Today
+                <span className="text-sm">Today</span>
               </Link>
             </div>
-            <div className="text-right">
-              <h1 className="text-2xl font-bold text-text">Philosopher's Corner</h1>
-              <p className="text-sm text-muted">Engage in deep dialogue with history's greatest minds</p>
+            <div className="text-center">
+              <h1 className="text-xl font-bold text-text">Philosopher's Corner</h1>
+              <p className="text-xs text-muted mt-1">Engage with history's greatest minds</p>
             </div>
+            <div className="w-20"></div> {/* Balance the layout */}
           </div>
         </div>
       </div>
 
-      <main className="px-4 py-6 space-y-6">
-        {/* Quote Context Banner - Show if quote is provided */}
+      <main className="px-4 py-4 space-y-4 max-w-7xl mx-auto">
+        {/* Quote Context Banner - Compact and sleek */}
         {quote && author && (
           <motion.div 
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-2xl p-6"
+            className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl p-4"
           >
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center flex-shrink-0">
-                <Quote className="w-6 h-6 text-purple-400" />
+            <div className="flex items-start gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Quote className="w-4 h-4 text-purple-400" />
               </div>
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-text mb-2">Today's Wisdom</h3>
-                <blockquote className="text-lg font-serif italic text-text leading-relaxed mb-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-semibold text-text mb-2">Today's Wisdom</h3>
+                <blockquote className="text-sm font-serif italic text-text leading-relaxed mb-2 line-clamp-2">
                   "{quote}"
                 </blockquote>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between text-xs">
                   <cite className="text-purple-300 font-medium">— {author}</cite>
                   {framework && (
-                    <div className="text-sm text-muted bg-surface/60 px-3 py-1 rounded-full">
-                      {framework} Tradition
+                    <div className="text-muted bg-surface/60 px-2 py-1 rounded-full">
+                      {framework}
                     </div>
                   )}
                 </div>
@@ -339,56 +343,56 @@ export default function PhilosophersCornerPage() {
           </motion.div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          {/* Main Chat Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+          {/* Main Chat Area - More compact */}
           <div className="lg:col-span-3">
-            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl shadow-xl h-[600px] flex flex-col">
-              {/* Chat Header */}
-              <div className="border-b border-border/20 p-6">
+            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-xl shadow-lg h-[500px] flex flex-col">
+              {/* Chat Header - Compact */}
+              <div className="border-b border-border/20 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl flex items-center justify-center">
-                    <MessageCircle className="w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 bg-gradient-to-br from-primary/30 to-primary/10 rounded-lg flex items-center justify-center">
+                    <MessageCircle className="w-4 h-4 text-primary" />
                   </div>
-                  <div>
-                    <h2 className="text-lg font-semibold text-text">Philosophical Dialogue</h2>
-                    <p className="text-sm text-muted">
+                  <div className="flex-1">
+                    <h2 className="text-base font-semibold text-text">Philosophical Dialogue</h2>
+                    <p className="text-xs text-muted">
                       {selectedPhilosopher ? `Engaging with ${selectedPhilosopher.name}` : 'Choose a philosopher to begin'}
                     </p>
                   </div>
                 </div>
               </div>
               
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {/* Messages - Optimized spacing */}
+              <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 {messages.map((message) => (
                   <motion.div
                     key={message.id}
-                    initial={{ opacity: 0, y: 10 }}
+                    initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
                     <div
-                      className={`max-w-[80%] rounded-2xl px-4 py-3 ${
+                      className={`max-w-[85%] rounded-xl px-3 py-2 ${
                         message.sender === 'user'
                           ? 'bg-gradient-to-r from-primary to-courage text-white'
                           : 'bg-surface/60 backdrop-blur-sm text-text border border-border/50'
                       }`}
                     >
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-start gap-2">
                         {message.sender === 'philosopher' && (
-                          <div className={`w-8 h-8 bg-gradient-to-r ${selectedPhilosopher?.color || 'from-primary to-courage'} rounded-full flex items-center justify-center flex-shrink-0`}>
-                            <Bot className="w-4 h-4 text-white" />
+                          <div className={`w-6 h-6 bg-gradient-to-r ${selectedPhilosopher?.color || 'from-primary to-courage'} rounded-full flex items-center justify-center flex-shrink-0`}>
+                            <Bot className="w-3 h-3 text-white" />
                           </div>
                         )}
                         {message.sender === 'user' && (
-                          <div className="w-8 h-8 bg-gradient-to-r from-primary to-courage rounded-full flex items-center justify-center flex-shrink-0">
-                            <User className="w-4 h-4 text-white" />
+                          <div className="w-6 h-6 bg-gradient-to-r from-primary to-courage rounded-full flex items-center justify-center flex-shrink-0">
+                            <User className="w-3 h-3 text-white" />
                           </div>
                         )}
-                        <div className="flex-1">
-                          <p className="text-sm leading-relaxed">{message.content}</p>
-                          <p className="text-xs opacity-70 mt-2">
-                            {message.timestamp.toLocaleTimeString()}
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm leading-relaxed break-words">{message.content}</p>
+                          <p className="text-xs opacity-70 mt-1">
+                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </p>
                         </div>
                       </div>
@@ -402,15 +406,15 @@ export default function PhilosophersCornerPage() {
                     animate={{ opacity: 1 }}
                     className="flex justify-start"
                   >
-                    <div className="bg-surface/60 backdrop-blur-sm rounded-2xl px-4 py-3 border border-border/50">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-8 h-8 bg-gradient-to-r ${selectedPhilosopher?.color || 'from-primary to-courage'} rounded-full flex items-center justify-center`}>
-                          <Bot className="w-4 h-4 text-white" />
+                    <div className="bg-surface/60 backdrop-blur-sm rounded-xl px-3 py-2 border border-border/50">
+                      <div className="flex items-center gap-2">
+                        <div className={`w-6 h-6 bg-gradient-to-r ${selectedPhilosopher?.color || 'from-primary to-courage'} rounded-full flex items-center justify-center`}>
+                          <Bot className="w-3 h-3 text-white" />
                         </div>
                         <div className="flex space-x-1">
-                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
-                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                          <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></div>
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
+                          <div className="w-1.5 h-1.5 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
                         </div>
                       </div>
                     </div>
@@ -420,22 +424,22 @@ export default function PhilosophersCornerPage() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Input Area */}
-              <div className="border-t border-border/20 p-6">
-                <div className="flex items-center gap-3">
+              {/* Input Area - Compact */}
+              <div className="border-t border-border/20 p-4">
+                <div className="flex items-center gap-2">
                   <input
                     ref={inputRef}
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                     placeholder={selectedPhilosopher ? `Ask ${selectedPhilosopher.name} about wisdom, virtue, or life...` : "Choose a philosopher to begin..."}
-                    className="flex-1 px-4 py-3 bg-surface-2 border border-border rounded-xl text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
+                    className="flex-1 px-3 py-2 bg-surface-2 border border-border rounded-lg text-sm text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
                     disabled={isProcessing || !selectedPhilosopher}
                   />
                   <button
                     onClick={startRecording}
                     disabled={isRecording || isProcessing || !selectedPhilosopher}
-                    className={`p-3 rounded-xl transition-all duration-200 ${
+                    className={`p-2 rounded-lg transition-all duration-200 ${
                       isRecording 
                         ? 'bg-red-500/20 text-red-400 border border-red-500/30' 
                         : 'bg-surface/50 text-muted hover:text-text hover:bg-surface border border-border/50'
@@ -446,9 +450,9 @@ export default function PhilosophersCornerPage() {
                   <button
                     onClick={handleSendMessage}
                     disabled={!inputValue.trim() || isProcessing || !selectedPhilosopher}
-                    className="px-4 py-3 bg-gradient-to-r from-primary to-courage text-white rounded-xl hover:from-primary/90 hover:to-courage/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                    className="px-3 py-2 bg-gradient-to-r from-primary to-courage text-white rounded-lg hover:from-primary/90 hover:to-courage/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
                   >
-                    <Send className="w-4 h-4" />
+                    <Send className="w-3 h-3" />
                     Send
                   </button>
                 </div>
@@ -456,39 +460,39 @@ export default function PhilosophersCornerPage() {
             </div>
           </div>
 
-          {/* Sidebar */}
-          <div className="space-y-6">
-            {/* Philosopher Selection */}
-            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl flex items-center justify-center">
-                  <Brain className="w-4 h-4 text-primary" />
+          {/* Sidebar - More compact */}
+          <div className="space-y-4">
+            {/* Philosopher Selection - Compact */}
+            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-primary/30 to-primary/10 rounded-lg flex items-center justify-center">
+                  <Brain className="w-3 h-3 text-primary" />
                 </div>
-                <h2 className="text-lg font-semibold text-text">Choose Your Guide</h2>
+                <h2 className="text-sm font-semibold text-text">Choose Your Guide</h2>
               </div>
-              <p className="text-sm text-muted mb-4">
+              <p className="text-xs text-muted mb-3">
                 Select a philosopher to engage with their unique perspective
               </p>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {philosophers.map((philosopher) => (
                   <motion.button
                     key={philosopher.name}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={`w-full text-left p-4 rounded-xl transition-all duration-200 border ${
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    className={`w-full text-left p-3 rounded-lg transition-all duration-200 border ${
                       selectedPhilosopher?.name === philosopher.name 
                         ? `bg-gradient-to-r ${philosopher.color} text-white border-transparent` 
                         : 'bg-surface/50 text-text hover:bg-surface border-border/50'
                     }`}
                     onClick={() => handlePhilosopherSelect(philosopher)}
                   >
-                    <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 bg-gradient-to-r ${philosopher.color} rounded-lg flex items-center justify-center`}>
-                        <philosopher.icon className="w-4 h-4 text-white" />
+                    <div className="flex items-center gap-2">
+                      <div className={`w-6 h-6 bg-gradient-to-r ${philosopher.color} rounded-lg flex items-center justify-center`}>
+                        <philosopher.icon className="w-3 h-3 text-white" />
                       </div>
-                      <div>
-                        <div className="font-medium">{philosopher.name}</div>
-                        <div className="text-xs opacity-70">{philosopher.description}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="font-medium text-sm">{philosopher.name}</div>
+                        <div className="text-xs opacity-70 truncate">{philosopher.description}</div>
                       </div>
                     </div>
                   </motion.button>
@@ -496,54 +500,57 @@ export default function PhilosophersCornerPage() {
               </div>
             </div>
 
-            {/* Selected Philosopher Info */}
+            {/* Selected Philosopher Info - Compact */}
             {selectedPhilosopher && (
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl p-6"
+                className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-xl p-4"
               >
-                <div className="flex items-center gap-3 mb-4">
-                  <div className={`w-8 h-8 bg-gradient-to-r ${selectedPhilosopher.color} rounded-xl flex items-center justify-center`}>
-                    <selectedPhilosopher.icon className="w-4 h-4 text-white" />
+                <div className="flex items-center gap-2 mb-3">
+                  <div className={`w-6 h-6 bg-gradient-to-r ${selectedPhilosopher.color} rounded-lg flex items-center justify-center`}>
+                    <selectedPhilosopher.icon className="w-3 h-3 text-white" />
                   </div>
-                  <h3 className="text-lg font-semibold text-text">{selectedPhilosopher.name}</h3>
+                  <h3 className="text-sm font-semibold text-text">{selectedPhilosopher.name}</h3>
                 </div>
-                <p className="text-sm text-muted mb-4">{selectedPhilosopher.background}</p>
-                <div className="space-y-3">
+                <p className="text-xs text-muted mb-3">{selectedPhilosopher.background}</p>
+                <div className="space-y-2">
                   <div>
-                    <h4 className="text-sm font-medium text-text mb-2">Writing Style</h4>
+                    <h4 className="text-xs font-medium text-text mb-1">Style</h4>
                     <p className="text-xs text-muted">{selectedPhilosopher.writingStyle}</p>
                   </div>
                   <div>
-                    <h4 className="text-sm font-medium text-text mb-2">Key Works</h4>
+                    <h4 className="text-xs font-medium text-text mb-1">Key Works</h4>
                     <div className="text-xs text-muted space-y-1">
-                      {selectedPhilosopher.keyWorks.map((work, index) => (
-                        <div key={index} className="flex items-center gap-2">
-                          <BookOpen className="w-3 h-3" />
-                          {work}
+                      {selectedPhilosopher.keyWorks.slice(0, 3).map((work, index) => (
+                        <div key={index} className="flex items-center gap-1">
+                          <BookOpen className="w-2.5 h-2.5" />
+                          <span className="truncate">{work}</span>
                         </div>
                       ))}
+                      {selectedPhilosopher.keyWorks.length > 3 && (
+                        <div className="text-xs text-muted/70">+{selectedPhilosopher.keyWorks.length - 3} more</div>
+                      )}
                     </div>
                   </div>
                 </div>
               </motion.div>
             )}
 
-            {/* Quick Prompts */}
-            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-8 h-8 bg-gradient-to-br from-courage/30 to-courage/10 rounded-xl flex items-center justify-center">
-                  <Lightbulb className="w-4 h-4 text-courage" />
+            {/* Quick Prompts - Compact */}
+            <div className="bg-gradient-to-br from-surface via-surface to-surface-2 border border-border rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-6 h-6 bg-gradient-to-br from-courage/30 to-courage/10 rounded-lg flex items-center justify-center">
+                  <Lightbulb className="w-3 h-3 text-courage" />
                 </div>
-                <h3 className="text-lg font-semibold text-text">Conversation Starters</h3>
+                <h3 className="text-sm font-semibold text-text">Conversation Starters</h3>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 {philosophicalPrompts.map((prompt, index) => (
                   <button
                     key={index}
                     onClick={() => handlePromptSelect(prompt)}
-                    className="text-left text-sm text-muted hover:text-text p-3 rounded-lg hover:bg-surface/50 transition-colors w-full border border-transparent hover:border-border/50"
+                    className="text-left text-xs text-muted hover:text-text p-2 rounded-lg hover:bg-surface/50 transition-colors w-full border border-transparent hover:border-border/50 line-clamp-2"
                   >
                     {prompt}
                   </button>
@@ -551,21 +558,21 @@ export default function PhilosophersCornerPage() {
               </div>
             </div>
 
-            {/* Daily Wisdom Link */}
-            <div className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-2xl p-6">
+            {/* Daily Wisdom Link - Compact */}
+            <div className="bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 rounded-xl p-4">
               <div className="text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Sparkles className="w-6 h-6 text-purple-400" />
+                <div className="w-8 h-8 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-lg flex items-center justify-center mx-auto mb-2">
+                  <Sparkles className="w-4 h-4 text-purple-400" />
                 </div>
-                <h3 className="text-lg font-semibold text-text mb-2">Get New Wisdom</h3>
-                <p className="text-sm text-muted mb-4">
+                <h3 className="text-sm font-semibold text-text mb-2">Get New Wisdom</h3>
+                <p className="text-xs text-muted mb-3">
                   Refresh your daily quote and continue the conversation
                 </p>
                 <Link 
                   href="/today"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors text-xs"
                 >
-                  <RotateCcw className="w-4 h-4" />
+                  <RotateCcw className="w-3 h-3" />
                   New Quote
                 </Link>
               </div>
