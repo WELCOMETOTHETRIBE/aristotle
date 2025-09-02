@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion';
+import { useAuth } from '@/lib/auth-context';
 import { 
   Play, Pause, RotateCcw, Timer, Target, BookOpen, Heart, Brain, Zap, 
   Users, Sun, Moon, Coffee, Droplets, Dumbbell, CheckCircle,
@@ -1073,6 +1074,7 @@ interface NaturePhoto {
 }
 
 export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePhotoLogWidgetProps) {
+  const { user } = useAuth();
   const [photos, setPhotos] = useState<NaturePhoto[]>([]);
   const [isAdding, setIsAdding] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -1153,7 +1155,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 1, // Demo user ID - in real app this would come from auth context
+          userId: user?.id ?? 1,
           imageData: base64Image,
           caption: caption || 'Nature moment',
           tags: selectedTags,
@@ -1224,6 +1226,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           tags: ['Nature Logs', ...photo.tags],
           imagePath: photo.imagePath,
           aiComment: aiInsights,
+          userId: user?.id ?? 1,
           source: 'nature_photo',
           sourceId: photo.id
         }),

@@ -270,7 +270,7 @@ async function createNaturePhotoThread(data: any) {
     }
 
     console.log('Creating nature photo thread with data:', data);
-    const { title, content, category, tags, imagePath, aiComment, sourceId } = data;
+    const { title, content, category, tags, imagePath, aiComment, sourceId, userId, philosopher } = data;
     
     // Ensure a system user exists for AI posts
     let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
@@ -286,10 +286,25 @@ async function createNaturePhotoThread(data: any) {
       });
     }
 
+    // Resolve authorId as the real uploader: prefer passed userId; fallback to the nature photo's userId via sourceId
+    let authorId = userId;
+    if (!authorId && sourceId) {
+      try {
+        const photo = await prisma.naturePhoto.findUnique({ where: { id: Number(sourceId) } });
+        if (photo) authorId = photo.userId;
+      } catch (e) {
+        console.warn('Could not resolve uploader from sourceId:', e);
+      }
+    }
+    // Final fallback to a demo user
+    if (!authorId) {
+      authorId = 1;
+    }
+
     console.log('About to create community post with data:', {
       title: title || 'Nature Log: A Moment of Reflection',
       content: content || 'A moment captured in nature that speaks to the soul.',
-      authorId: defaultUser.id,
+      authorId,
       type: 'nature_photo',
       category: category || 'Nature Logs',
       tags: tags || ['Nature Logs', 'reflection', 'nature'],
@@ -307,7 +322,7 @@ async function createNaturePhotoThread(data: any) {
       data: {
         title: title || 'Nature Log: A Moment of Reflection',
         content: content || 'A moment captured in nature that speaks to the soul.',
-        authorId: defaultUser.id,
+        authorId,
         type: 'nature_photo',
         category: category || 'Nature Logs',
         tags: tags || ['Nature Logs', 'reflection', 'nature'],
@@ -344,7 +359,7 @@ async function createNaturePhotoThread(data: any) {
             content: aiComment.trim(),
             authorId: defaultUser.id,
             postId: savedThread.id,
-            philosopher: 'AI Philosopher',
+            philosopher: philosopher || 'AI Philosopher',
             isAI: true,
           },
         });
