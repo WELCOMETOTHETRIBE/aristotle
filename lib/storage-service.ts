@@ -41,14 +41,14 @@ class LocalStorageService implements StorageService {
   }
 }
 
-// Production storage implementation (temporary file-based solution)
+// Production storage implementation - use project-relative path for consistency
 class ProductionStorageService implements StorageService {
   private baseDir: string;
   private publicUrl: string;
 
   constructor() {
-    // Use /tmp directory which exists and has write permissions in containerized environments
-    this.baseDir = '/tmp/nature-photos';
+    // Use project-relative path that works in both development and production
+    this.baseDir = join(process.cwd(), 'public', 'uploads', 'nature-photos');
     this.publicUrl = '/api/nature-photo/image';
   }
 
@@ -77,11 +77,9 @@ class ProductionStorageService implements StorageService {
 
 // Factory function to get the appropriate storage service
 export function getStorageService(): StorageService {
-  if (process.env.NODE_ENV === 'production') {
-    return new ProductionStorageService();
-  } else {
-    return new LocalStorageService();
-  }
+  // For now, use local storage in both environments for consistency
+  // This ensures images are saved to a predictable location
+  return new LocalStorageService();
 }
 
 // Helper function to generate unique filenames

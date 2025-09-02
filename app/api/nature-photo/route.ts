@@ -37,13 +37,14 @@ export async function POST(request: NextRequest) {
     
     const storageService = getStorageService();
     const imageUrl = await storageService.saveImage(filename, imageData);
-    const imagePath = storageService.getImagePath(filename);
+    // Use imageUrl (web-accessible path) instead of imagePath (filesystem path)
+    const imagePath = imageUrl;
 
     // Create nature photo record
     const photo = await prisma.naturePhoto.create({
       data: {
         userId: actualUserId,
-        imagePath,
+        imagePath, // This now contains the web-accessible URL
         caption: caption || 'Nature moment',
         tags: tags || [],
         location: location || null,
