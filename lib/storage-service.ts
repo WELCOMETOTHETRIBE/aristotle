@@ -41,15 +41,14 @@ class LocalStorageService implements StorageService {
   }
 }
 
-// Production storage implementation - store under public uploads for stable serving
+// Production storage implementation - write to /tmp and serve via API route
 class ProductionStorageService implements StorageService {
   private baseDir: string;
   private publicUrl: string;
 
   constructor() {
-    // Use the same public uploads path in production so Next can serve it statically
-    this.baseDir = join(process.cwd(), 'public', 'uploads', 'nature-photos');
-    this.publicUrl = '/uploads/nature-photos';
+    this.baseDir = '/tmp/nature-photos';
+    this.publicUrl = '/api/nature-photo/image';
   }
 
   async saveImage(filename: string, imageData: string): Promise<string> {
