@@ -5,7 +5,18 @@ export async function POST(request: NextRequest) {
   try {
     const { framework, date } = await request.json();
     
-    const prompt = `Generate a daily wisdom quote for ${framework || 'ancient wisdom'} tradition. 
+    // Add variety to the prompt to ensure different quotes
+    const randomElements = [
+      "morning reflection", "evening contemplation", "midday pause", "dawn wisdom", "dusk insight",
+      "workplace application", "personal growth", "relationship wisdom", "health and wellness", "spiritual practice",
+      "emotional balance", "mental clarity", "physical discipline", "social harmony", "inner peace"
+    ];
+    
+    const randomElement = randomElements[Math.floor(Math.random() * randomElements.length)];
+    const currentHour = new Date().getHours();
+    const timeOfDay = currentHour < 12 ? "morning" : currentHour < 17 ? "afternoon" : "evening";
+    
+    const prompt = `Generate a unique daily wisdom quote for ${framework || 'ancient wisdom'} tradition, focusing on ${randomElement} and suitable for ${timeOfDay} reflection.
     
     Requirements:
     - Create a profound, inspiring quote that embodies the essence of ${framework || 'ancient wisdom'}
@@ -13,6 +24,8 @@ export async function POST(request: NextRequest) {
     - Include the name of a relevant historical figure or tradition
     - Make it relevant for daily reflection and practice
     - Focus on practical wisdom that can be applied to modern life
+    - Ensure this quote is different from common, overused philosophical sayings
+    - Draw from lesser-known wisdom or provide a fresh perspective on familiar concepts
     
     Format the response as JSON with:
     - quote: the wisdom quote
@@ -25,7 +38,9 @@ export async function POST(request: NextRequest) {
       { 
         framework: framework || 'general',
         date: date || new Date().toISOString().split('T')[0],
-        type: 'daily_wisdom'
+        type: 'daily_wisdom',
+        randomElement,
+        timeOfDay
       },
       DailyWisdomSchema,
       prompt
@@ -36,7 +51,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error generating daily wisdom:', error);
     
-    // Fallback wisdom
+    // Enhanced fallback wisdom with more variety
     const fallbackWisdom = [
       {
         quote: "The unexamined life is not worth living.",
@@ -55,6 +70,18 @@ export async function POST(request: NextRequest) {
         author: "Bushidō",
         framework: "Samurai",
         reflection: "How can you act with greater clarity and purpose today?"
+      },
+      {
+        quote: "Wisdom grows in the soil of silence.",
+        author: "Monastic Tradition",
+        framework: "Monastic",
+        reflection: "Where can you find moments of silence today?"
+      },
+      {
+        quote: "Balance is not a destination, but a continuous dance.",
+        author: "Yogic Philosophy",
+        framework: "Yogic",
+        reflection: "How can you find balance in today's challenges?"
       }
     ];
     

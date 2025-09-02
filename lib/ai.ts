@@ -71,6 +71,39 @@ export async function generateWithCache<T>(
 ): Promise<T> {
   const keyFingerprint = fingerprint({ scope, ...params });
   
+  // For daily wisdom, we want fresh content each time, so skip caching
+  if (scope === "daily_wisdom") {
+    // Always generate fresh daily wisdom
+    const completion = await getOpenAIClient().chat.completions.create({
+      model: "gpt-4o-mini",
+      temperature: 0.9, // Higher temperature for more variety
+      messages: [
+        { role: "system", content: "You respond with STRICT JSON only. No prose before/after." },
+        { role: "user", content: prompt }
+      ]
+    });
+
+    const text = completion.choices[0].message?.content ?? "{}";
+    let parsed: T;
+    try {
+      parsed = schema.parse(JSON.parse(text));
+    } catch (e) {
+      // simple repair attempt
+      const repair = await getOpenAIClient().chat.completions.create({
+        model: "gpt-4o-mini",
+        temperature: 0.2,
+        messages: [
+          { role: "system", content: "Repair this to valid JSON matching the target schema. Output JSON only." },
+          { role: "user", content: text }
+        ]
+      });
+      parsed = schema.parse(JSON.parse(repair.choices[0].message?.content ?? "{}"));
+    }
+
+    return parsed;
+  }
+  
+  // For other scopes, use normal caching
   // Check if we have a database connection for caching
   if (prisma) {
     const existing = await prisma.generatedContent.findUnique({
