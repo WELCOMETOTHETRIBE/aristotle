@@ -336,6 +336,23 @@ async function createNaturePhotoThread(data: any) {
       },
     });
 
+    // If an AI comment was provided, post it as an AI reply to the thread
+    if (aiComment && aiComment.trim().length > 0) {
+      try {
+        await prisma.communityReply.create({
+          data: {
+            content: aiComment.trim(),
+            authorId: defaultUser.id,
+            postId: savedThread.id,
+            philosopher: 'AI Philosopher',
+            isAI: true,
+          },
+        });
+      } catch (replyError) {
+        console.error('Failed to create AI reply for nature photo thread:', replyError);
+      }
+    }
+
     console.log('Nature photo thread created successfully:', savedThread);
 
     return NextResponse.json({
