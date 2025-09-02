@@ -56,23 +56,30 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Enforce one AI thread per day
-    const startOfDay = new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
+    // Check if force generation is requested
+    const forceGeneration = body.force === true;
+    
+    // Enforce one AI thread per day (unless forced)
+    if (!forceGeneration) {
+      const startOfDay = new Date();
+      startOfDay.setHours(0, 0, 0, 0);
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
 
-    console.log('🔍 Checking for existing AI threads today...');
-    const existingToday = await prisma.communityPost.findFirst({
-      where: {
-        isAIQuestion: true,
-        createdAt: { gte: startOfDay, lte: endOfDay },
-      },
-    });
+      console.log('🔍 Checking for existing AI threads today...');
+      const existingToday = await prisma.communityPost.findFirst({
+        where: {
+          isAIQuestion: true,
+          createdAt: { gte: startOfDay, lte: endOfDay },
+        },
+      });
 
-    if (existingToday) {
-      console.log('✅ AI thread for today already exists');
-      return NextResponse.json({ success: true, message: 'AI thread for today already exists' });
+      if (existingToday) {
+        console.log('✅ AI thread for today already exists');
+        return NextResponse.json({ success: true, message: 'AI thread for today already exists' });
+      }
+    } else {
+      console.log('🔍 Force generation requested - bypassing daily limit');
     }
 
     // Select a random philosopher for today's thread

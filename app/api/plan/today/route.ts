@@ -26,15 +26,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Mock user virtues (in real app, get from database)
+    // Start with zero virtues - real progress tracking begins now
     const userVirtues: VirtueTotals = {
-      wisdom: 45,
-      justice: 32,
-      courage: 28,
-      temperance: 38
+      wisdom: 0,
+      justice: 0,
+      courage: 0,
+      temperance: 0
     };
 
-    // Mock recent completions (in real app, get from database)
+    // No recent completions - starting fresh
     const recentCompletions: string[] = [];
 
     // Generate quests
@@ -83,15 +83,15 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Mock user virtues (in real app, get from database)
+    // Start with zero virtues - real progress tracking begins now
     const userVirtues: VirtueTotals = {
-      wisdom: 45,
-      justice: 32,
-      courage: 28,
-      temperance: 38
+      wisdom: 0,
+      justice: 0,
+      courage: 0,
+      temperance: 0
     };
 
-    // Mock recent completions (in real app, get from database)
+    // No recent completions - starting fresh
     const recentCompletions: string[] = [];
 
     // Generate quests
