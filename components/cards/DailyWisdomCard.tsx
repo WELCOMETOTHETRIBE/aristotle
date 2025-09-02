@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sparkles, RefreshCw, BookOpen, Quote, Brain, RotateCcw, Settings, Info } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Quote, Brain, RotateCcw, Settings, Info, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface DailyWisdomCardProps {
   className?: string;
@@ -292,10 +293,13 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             New Wisdom
           </button>
           
-          <button className="flex items-center gap-2 px-4 py-2 bg-surface/50 border border-border/50 text-muted rounded-lg hover:bg-surface transition-colors">
-            <BookOpen className="w-4 h-4" />
-            Learn More
-          </button>
+          <Link 
+            href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
+            className="flex items-center gap-2 px-4 py-2 bg-surface/50 border border-border/50 text-muted rounded-lg hover:bg-surface transition-colors"
+          >
+            <MessageCircle className="w-4 h-4" />
+            Chat with Philosopher
+          </Link>
         </div>
       </div>
     </motion.div>
