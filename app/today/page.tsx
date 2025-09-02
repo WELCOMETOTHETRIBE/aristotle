@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
-import { TaskCard } from '@/components/cards/TaskCard';
 import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { useAuth } from '@/lib/auth-context';
 
@@ -21,28 +20,11 @@ import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
 import { DailyWisdomCard } from '@/components/cards/DailyWisdomCard';
 import { TerminologyWidget } from '@/components/cards/TerminologyWidget';
 import AcademyLogo from '@/components/AcademyLogo';
-import EnhancedVirtueProgress from '@/components/EnhancedVirtueProgress';
-import { Target, Heart, Brain, BookOpen, Grid3X3 } from 'lucide-react';
+import { Target, Heart, Brain, BookOpen, Grid3X3, MessageCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NaturePhotoLogWidget } from '@/components/ModuleWidgets';
 import BalanceCard from '@/components/widgets/BalanceCard';
-
-interface Task {
-  id: string;
-  title: string;
-  description?: string;
-  priority: 'L' | 'M' | 'H';
-  dueDate?: Date;
-  completed: boolean;
-}
-
-interface Habit {
-  id: string;
-  title: string;
-  streakCount: number;
-  lastActivity: Date;
-  checkedToday: boolean;
-}
+import Link from 'next/link';
 
 export default function TodayPage() {
   const { user, loading } = useAuth();
@@ -54,9 +36,7 @@ export default function TodayPage() {
   const [submittedIntentions, setSubmittedIntentions] = useState<{[key: string]: boolean}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // Initialize empty arrays for authenticated users, mockup data for demo
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [habits, setHabits] = useState<Habit[]>([]);
+  // Initialize empty arrays for authenticated users
   const [userWidgets, setUserWidgets] = useState<string[]>([]);
 
   // No longer auto-loading demo data for unauthenticated users
@@ -214,26 +194,6 @@ export default function TodayPage() {
 
   const currentTimePeriod = getCurrentTimePeriod();
 
-  const handleTaskToggle = (taskId: string) => {
-    setTasks(prev => 
-      prev.map(task => 
-        task.id === taskId 
-          ? { ...task, completed: !task.completed }
-          : task
-      )
-    );
-  };
-
-  const handleHabitToggle = (habitId: string) => {
-    setHabits(prev => 
-      prev.map(habit => 
-        habit.id === habitId 
-          ? { ...habit, checkedToday: !habit.checkedToday }
-          : habit
-      )
-    );
-  };
-
   // Load submitted intentions for today
   useEffect(() => {
     if (!user) return;
@@ -322,9 +282,6 @@ export default function TodayPage() {
     }
   };
 
-  const topTasks = tasks.filter(task => !task.completed).slice(0, 3);
-  const completedTasks = tasks.filter(task => task.completed);
-
   return (
     <div className="min-h-screen bg-bg pb-20">
       <Header focusVirtue={focusVirtue} />
@@ -374,12 +331,12 @@ export default function TodayPage() {
             {/* Stats Row */}
             <div className="grid grid-cols-3 gap-4 mb-6">
               <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-primary mb-1">{completedTasks.length}</div>
+                <div className="text-2xl font-bold text-primary mb-1">0</div>
                 <div className="text-xs text-muted">Tasks Done</div>
               </div>
               <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
                 <div className="text-2xl font-bold text-courage mb-1">
-                  {habits.filter(h => h.checkedToday).length}
+                  0
                 </div>
                 <div className="text-xs text-muted">Habits Today</div>
               </div>
@@ -404,7 +361,7 @@ export default function TodayPage() {
                   </div>
                 </div>
                 <div className="text-sm text-muted">
-                  {Math.round((completedTasks.length / tasks.length) * 100) || 0}% complete
+                  0% complete
                 </div>
               </div>
               
@@ -413,7 +370,7 @@ export default function TodayPage() {
                 <div className="w-full bg-surface/40 rounded-full h-2">
                   <div 
                     className="bg-gradient-to-r from-primary to-courage h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${Math.round((completedTasks.length / tasks.length) * 100) || 0}%` }}
+                    style={{ width: '0%' }}
                   ></div>
                 </div>
               </div>
@@ -421,8 +378,20 @@ export default function TodayPage() {
           </div>
         </div>
 
-        {/* Virtue Progress */}
-        <EnhancedVirtueProgress />
+        {/* Daily Wisdom Widget - Prominently placed */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-text">Daily Wisdom</h2>
+            <Link 
+              href="/coach" 
+              className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-2"
+            >
+              <MessageCircle className="w-4 h-4" />
+              Chat with Philosopher
+            </Link>
+          </div>
+          <DailyWisdomCard />
+        </div>
 
         {/* Dynamic Daily Intention */}
         {!submittedIntentions[currentTimePeriod] ? (
@@ -528,47 +497,6 @@ export default function TodayPage() {
           </div>
         )}
 
-        {/* Top Tasks */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-text">Top 3 Tasks</h2>
-          <div className="space-y-3">
-            {topTasks.map((task) => (
-              <TaskCard
-                key={task.id}
-                task={task}
-                onToggle={handleTaskToggle}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Practice Row */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-text">Practice</h2>
-          
-          {/* Habit Quick Toggles */}
-          <div className="bg-surface border border-border rounded-lg p-4">
-            <h3 className="text-sm font-medium text-text mb-3">Quick Habits</h3>
-            <div className="grid grid-cols-3 gap-2">
-              {habits.map((habit) => (
-                <button
-                  key={habit.id}
-                  onClick={() => handleHabitToggle(habit.id)}
-                  className={cn(
-                    'p-3 rounded-lg border transition-all duration-150',
-                    habit.checkedToday
-                      ? 'bg-success/20 border-success/30 text-success'
-                      : 'bg-surface-2 border-border text-muted hover:text-text hover:border-primary/30'
-                  )}
-                >
-                  <div className="text-sm font-medium">{habit.title}</div>
-                  <div className="text-xs opacity-80">{habit.streakCount} day streak</div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
         {/* Enhanced Widgets Section */}
         {userWidgets.length > 0 && (
           <div className="space-y-4">
@@ -589,10 +517,6 @@ export default function TodayPage() {
             </div>
           </div>
         )}
-
-
-
-
 
         {/* Evening Block */}
         {isEvening && (
@@ -617,15 +541,11 @@ export default function TodayPage() {
         <div className="space-y-4">
           <h2 className="text-lg font-semibold text-text">Your Streaks</h2>
           <div className="grid grid-cols-2 gap-3">
-            {habits.map((habit) => (
-              <StreakCard
-                key={habit.id}
-                title={habit.title}
-                count={habit.streakCount}
-                lastActivity={habit.lastActivity}
-                target={7}
-              />
-            ))}
+            {/* HabitTrackerCard is removed, so this section will be empty or need new data */}
+            {/* For now, we'll just show a placeholder or remove if no habits are tracked */}
+            <div className="bg-surface border border-border rounded-lg p-4 text-center text-muted">
+              <p>No habits tracked yet.</p>
+            </div>
           </div>
         </div>
       </main>
