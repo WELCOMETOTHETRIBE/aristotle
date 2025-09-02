@@ -42,7 +42,23 @@ export async function GET(
       },
     });
 
-    return NextResponse.json({ replies });
+    // Transform to client-facing shape
+    const transformed = replies.map((r) => ({
+      id: r.id,
+      content: r.content,
+      author: {
+        name: r.isAI ? (r.philosopher || 'AI Philosopher') : (r.author.displayName || r.author.username || 'Member'),
+        avatar: r.isAI ? '/avatars/ai.jpg' : '/avatars/user.jpg',
+        isAI: !!r.isAI,
+        persona: r.isAI ? r.philosopher : undefined,
+      },
+      likes: r.likes ?? 0,
+      isLiked: false,
+      createdAt: r.createdAt.toISOString(),
+      parentId: r.parentId || undefined,
+    }));
+
+    return NextResponse.json({ replies: transformed });
   } catch (error) {
     console.error('Community replies GET error:', error);
     return NextResponse.json(
@@ -132,7 +148,22 @@ export async function POST(
       },
     });
 
-    return NextResponse.json(reply, { status: 201 });
+    // Transform to client-facing shape
+    const transformed = {
+      id: reply.id,
+      content: reply.content,
+      author: {
+        name: reply.author.displayName || reply.author.username || 'Member',
+        avatar: '/avatars/user.jpg',
+        isAI: false,
+      },
+      likes: reply.likes ?? 0,
+      isLiked: false,
+      createdAt: reply.createdAt.toISOString(),
+      parentId: reply.parentId || undefined,
+    };
+
+    return NextResponse.json(transformed, { status: 201 });
   } catch (error) {
     console.error('Community reply error:', error);
     return NextResponse.json(

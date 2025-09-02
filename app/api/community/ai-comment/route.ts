@@ -16,12 +16,24 @@ export async function POST(request: NextRequest) {
     // Select a random philosopher persona
     const randomPhilosopher = PHILOSOPHERS[Math.floor(Math.random() * PHILOSOPHERS.length)];
 
-    // Compose prompt
-    const prompt = `You are ${randomPhilosopher.name}, ${randomPhilosopher.title}.
-A community member responded: "${userComment}".
-Thread context: ${threadTitle} — ${threadContent} (Category: ${threadCategory}).
-Offer a short, thoughtful reply (2-5 sentences) that encourages further reflection.
-Respond as ${randomPhilosopher.name} would, using your unique perspective and wisdom.`;
+    // Compose prompt with stricter guidance for focused, personalized replies
+    const prompt = `Role: You are ${randomPhilosopher.name}, ${randomPhilosopher.title}. Respond in your authentic philosophical voice.
+
+Strict style rules:
+- Directly address the user's ideas; do not offer generic encouragements or wellness platitudes
+- Do not mention time of day, seasons, or greetings unless explicitly relevant to the user's content
+- Avoid clichés (e.g., "remember to breathe", "good morning", "keep going") and generic coaching jargon
+- Be specific: reference 1-2 concrete points from the user's comment
+- Keep it concise: 2-4 sentences
+- Optionally end with exactly one probing question only if it meaningfully advances the user's line of thought
+
+Context:
+Thread Title: ${threadTitle}
+Thread Category: ${threadCategory}
+Thread Summary (for you to consider): ${threadContent}
+User Comment (respond to this): ${userComment}
+
+Your task: Write a thoughtful reply that engages the user's ideas with precision and depth, in the voice of ${randomPhilosopher.name}.`;
 
     // Call the AI API to generate the comment
     const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
@@ -42,8 +54,10 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
             content: prompt
           }
         ],
-        max_tokens: 200,
-        temperature: 0.7,
+        max_tokens: 220,
+        temperature: 0.4,
+        presence_penalty: 0,
+        frequency_penalty: 0.2
       }),
     });
 
