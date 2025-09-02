@@ -1089,7 +1089,16 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [successMessage, setSuccessMessage] = useState('');
   const [shareToCommunity, setShareToCommunity] = useState(false);
 
-  const availableTags = ['dawn', 'dusk', 'tree', 'water', 'earth', 'sky', 'flower', 'animal', 'mountain', 'forest', 'ocean', 'river', 'sunset', 'sunrise', 'clouds', 'rain', 'snow', 'wind'];
+  const availableTags = [
+    'dawn','sunrise','morning','midday','afternoon','dusk','sunset','night','stars','moon',
+    'tree','forest','leaf','flower','grass','moss','mushroom',
+    'water','river','stream','lake','ocean','wave','waterfall','rain','snow','ice',
+    'sky','clouds','fog','mist','storm','lightning','rainbow',
+    'mountain','hill','valley','meadow','desert','beach','coast','cliff',
+    'animal','bird','insect','fish','mammal','tracks',
+    'earth','rock','sand','soil',
+    'wind','breeze','calm','serene','vibrant','moody','golden-hour'
+  ];
 
   // Load saved photos from database on component mount
   useEffect(() => {
@@ -1123,78 +1132,12 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     }
   };
 
-  const generateAIInsights = async (imageFile: File, tags: string[], caption: string) => {
-    try {
-      setIsProcessing(true);
-      
-      // For now, we'll generate a simple AI insight based on the tags and caption
-      // In the future, this could be enhanced with actual image analysis
-      const tagDescriptions = {
-        'dawn': 'the gentle awakening of a new day',
-        'dusk': 'the peaceful transition into evening',
-        'tree': 'the strength and wisdom of nature',
-        'water': 'the flow and adaptability of life',
-        'earth': 'the grounding presence of the natural world',
-        'sky': 'the vastness and possibility above us',
-        'flower': 'the beauty and resilience of growth',
-        'animal': 'the wild spirit and freedom of nature',
-        'mountain': 'the enduring strength and majesty',
-        'forest': 'the interconnected web of life',
-        'ocean': 'the depth and mystery of existence',
-        'river': 'the constant flow and change of time',
-        'sunset': 'the beautiful conclusion of another day',
-        'sunrise': 'the promise of new beginnings',
-        'clouds': 'the ever-changing patterns of life',
-        'rain': 'the cleansing and renewal of nature',
-        'snow': 'the quiet beauty of transformation',
-        'wind': 'the unseen force that moves through all things'
-      };
-
-      const selectedTagDescriptions = tags
-        .map(tag => tagDescriptions[tag as keyof typeof tagDescriptions])
-        .filter(Boolean)
-        .slice(0, 3);
-
-      const timeOfDay = new Date().getHours();
-      let timeContext = '';
-      if (timeOfDay < 12) timeContext = 'morning light';
-      else if (timeOfDay < 17) timeContext = 'afternoon warmth';
-      else timeContext = 'evening peace';
-
-      const insights = [
-        `In this moment captured with ${selectedTagDescriptions.join(', ')}, we find ourselves in the presence of nature's timeless wisdom.`,
-        `The ${caption.toLowerCase()} reminds us that beauty exists in the simplest of moments, inviting us to pause and breathe deeply.`,
-        `As we connect with the natural world through this image, we're reminded of our place within the greater tapestry of life - both small and significant, temporary and eternal.`,
-        `This ${timeContext} moment teaches us that nature offers endless opportunities for reflection and renewal, if only we take the time to notice.`
-      ];
-
-      // Randomly select 2-3 insights and combine them
-      const shuffled = insights.sort(() => 0.5 - Math.random());
-      const selectedInsights = shuffled.slice(0, 2 + Math.floor(Math.random() * 2));
-      
-      return selectedInsights.join(' ');
-    } catch (error) {
-      console.error('Failed to generate AI insights:', error);
-      return "This moment in nature reminds us of the beauty and wisdom that surrounds us. Take a moment to breathe and appreciate the simple gifts of the natural world.";
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
   const addPhoto = async () => {
-    if (selectedTags.length === 0 || !uploadedImage) return;
+    if (!uploadedImage) return;
     
     setIsProcessing(true);
     
     try {
-      // Generate AI insights first (with fallback)
-      let aiInsights = "This moment in nature reminds us of the beauty and wisdom that surrounds us. Take a moment to breathe and appreciate the simple gifts of the natural world.";
-      try {
-        aiInsights = await generateAIInsights(uploadedImage, selectedTags, caption);
-      } catch (aiError) {
-        console.error('AI insights generation failed, using fallback:', aiError);
-      }
-      
       // Convert image to base64 for API
       const base64Image = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
@@ -1217,8 +1160,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           location: location || null,
           weather: weather || null,
           mood: mood || null,
-          aiInsights: aiInsights,
-          aiComment: aiInsights,
+          // Let server generate aiInsights/aiComment from the image
         }),
       });
 
@@ -1231,7 +1173,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         // If user chose to share to community, create a community thread
         if (shareToCommunity) {
           try {
-            await createCommunityThread(data.photo, aiInsights);
+            await createCommunityThread(data.photo, data.photo.aiComment || data.photo.aiInsights || '');
             setSuccessMessage('Photo uploaded and shared to community successfully!');
           } catch (communityError) {
             console.error('Failed to share to community:', communityError);
@@ -1431,24 +1373,26 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           {/* Tags */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-text">Tags</label>
-            <div className="flex flex-wrap gap-2">
-              {availableTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setSelectedTags(prev => 
-                    prev.includes(tag) 
-                      ? prev.filter(t => t !== tag)
-                      : [...prev, tag]
-                  )}
-                  className={`px-3 py-1 rounded-full text-xs transition-all ${
-                    selectedTags.includes(tag)
-                      ? 'bg-green-500 text-white'
-                      : 'bg-surface-2 text-muted hover:text-text hover:bg-green-500/10'
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
+            <div className="overflow-x-auto no-scrollbar">
+              <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-2 pr-2">
+                {availableTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setSelectedTags(prev => 
+                      prev.includes(tag) 
+                        ? prev.filter(t => t !== tag)
+                        : [...prev, tag]
+                    )}
+                    className={`px-3 py-1 rounded-full text-xs transition-all ${
+                      selectedTags.includes(tag)
+                        ? 'bg-green-500 text-white'
+                        : 'bg-surface-2 text-muted hover:text-text hover:bg-green-500/10'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1510,7 +1454,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             </button>
             <button
               onClick={addPhoto}
-              disabled={isProcessing || selectedTags.length === 0 || !uploadedImage}
+              disabled={isProcessing || !uploadedImage}
               className="flex-1 px-3 py-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:from-green-600 hover:to-emerald-600 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isProcessing ? (

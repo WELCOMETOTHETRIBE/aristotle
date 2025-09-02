@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db';
 import { createNaturePhotoLog, logToJournal } from '@/lib/journal-logger';
 import { getStorageService, generateUniqueFilename, getFileExtensionFromBase64 } from '@/lib/storage-service';
-
-const prisma = new PrismaClient();
+import OpenAI from 'openai';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+    const db = prisma as any;
     const body = await request.json();
     const { userId, imageData, caption, tags, location, weather, mood, aiInsights, aiComment } = body;
 
@@ -17,9 +20,9 @@ export async function POST(request: NextRequest) {
     // Ensure a default user exists for logging if not provided
     const actualUserId = userId || 1;
     if (!userId) {
-      let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
+      let defaultUser = await db.user.findUnique({ where: { id: 1 } });
       if (!defaultUser) {
-        defaultUser = await prisma.user.create({
+        defaultUser = await db.user.create({
           data: {
             id: 1,
             username: 'system_user',
@@ -40,8 +43,45 @@ export async function POST(request: NextRequest) {
     // Use imageUrl (web-accessible path) instead of imagePath (filesystem path)
     const imagePath = imageUrl;
 
+    // Generate AI insights from the actual image (supplemented by caption/tags)
+    let computedInsights: string | null = null;
+    try {
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (apiKey) {
+        const openai = new OpenAI({ apiKey });
+        const supplemental = [
+          caption ? `Caption: ${caption}` : null,
+          (Array.isArray(tags) && tags.length > 0) ? `Tags: ${tags.join(', ')}` : null,
+          location ? `Location: ${location}` : null,
+          weather ? `Weather: ${weather}` : null,
+          mood ? `Mood: ${mood}` : null,
+        ].filter(Boolean).join('\n');
+
+        const userPrompt = `Look at this nature photo and describe succinctly (2-3 sentences) what you see (e.g., sky, water, trees, light) and the feeling it evokes. If helpful, consider the supplemental details.\n\n${supplemental}`.trim();
+
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: userPrompt },
+                { type: 'image_url', image_url: { url: imagePath } },
+              ] as any,
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 180,
+        });
+        computedInsights = completion.choices?.[0]?.message?.content || null;
+      }
+    } catch (visionError) {
+      console.error('Vision insights generation failed:', visionError);
+      // fall through with null to use fallback below
+    }
+
     // Create nature photo record
-    const photo = await prisma.naturePhoto.create({
+    const photo = await db.naturePhoto.create({
       data: {
         userId: actualUserId,
         imagePath, // This now contains the web-accessible URL
@@ -50,8 +90,8 @@ export async function POST(request: NextRequest) {
         location: location || null,
         weather: weather || null,
         mood: mood || null,
-        aiInsights: aiInsights || null,
-        aiComment: aiComment || null
+        aiInsights: computedInsights || aiInsights || null,
+        aiComment: computedInsights || aiComment || null
       }
     });
 
@@ -65,7 +105,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Create journal entry directly instead of making HTTP call
-    const journalEntry = await prisma.journalEntry.create({
+    const journalEntry = await db.journalEntry.create({
       data: {
         userId: actualUserId,
         type: journalData.type,
@@ -95,10 +135,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+    const db = prisma as any;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId') || '1';
 
-    const photos = await prisma.naturePhoto.findMany({
+    const photos = await db.naturePhoto.findMany({
       where: {
         userId: parseInt(userId)
       },
