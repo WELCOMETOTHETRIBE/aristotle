@@ -1148,7 +1148,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         reader.readAsDataURL(uploadedImage);
       });
 
-      // Upload to API
+      // Upload to API (atomic: server will optionally share to community and post AI reply)
       const response = await fetch('/api/nature-photo', {
         method: 'POST',
         headers: {
@@ -1162,6 +1162,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           location: location || null,
           weather: weather || null,
           mood: mood || null,
+          shareToCommunity: shareToCommunity,
           // Let server generate aiInsights/aiComment from the image
         }),
       });
@@ -1172,18 +1173,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         console.log('Photo uploaded successfully:', data);
         setPhotos(prev => [data.photo, ...prev]);
         
-        // If user chose to share to community, create a community thread
-        if (shareToCommunity) {
-          try {
-            await createCommunityThread(data.photo, data.photo.aiComment || data.photo.aiInsights || '');
-            setSuccessMessage('Photo uploaded and shared to community successfully!');
-          } catch (communityError) {
-            console.error('Failed to share to community:', communityError);
-            setSuccessMessage('Photo uploaded successfully, but failed to share to community.');
-          }
-        } else {
-          setSuccessMessage('Photo uploaded successfully!');
-        }
+        setSuccessMessage(shareToCommunity ? 'Photo uploaded and shared to community successfully!' : 'Photo uploaded successfully!');
         
         // Reset form
         setIsAdding(false);
@@ -1208,40 +1198,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       alert(`Failed to save photo: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
-    }
-  };
-
-  // Function to create community thread from nature photo
-  const createCommunityThread = async (photo: NaturePhoto, aiInsights: string) => {
-    try {
-      const response = await fetch('/api/community/ai-thread', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          title: `Nature Log: ${photo.caption}`,
-          content: `A moment captured in nature that speaks to the soul. ${photo.caption}`,
-          category: 'Nature Logs',
-          tags: ['Nature Logs', ...photo.tags],
-          imagePath: photo.imagePath,
-          aiComment: aiInsights,
-          userId: user?.id ?? 1,
-          source: 'nature_photo',
-          sourceId: photo.id
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to create community thread');
-      }
-
-      const threadData = await response.json();
-      console.log('Community thread created successfully:', threadData);
-      return threadData;
-    } catch (error) {
-      console.error('Error creating community thread:', error);
-      throw error;
     }
   };
 

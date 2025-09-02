@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
     const db = prisma as any;
     const body = await request.json();
-    const { userId, imageData, caption, tags, location, weather, mood, aiInsights, aiComment } = body;
+    const { userId, imageData, caption, tags, location, weather, mood, aiInsights, aiComment, shareToCommunity, philosopher } = body;
 
     if (!imageData || typeof imageData !== 'string') {
       return NextResponse.json({ error: 'imageData (base64) is required' }, { status: 400 });
@@ -116,11 +116,66 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    // Optionally create community thread atomically
+    let thread = null;
+    if (shareToCommunity) {
+      const createdPost = await db.communityPost.create({
+        data: {
+          title: `Nature Log: ${photo.caption}`,
+          content: `A moment captured in nature that speaks to the soul. ${photo.caption}`,
+          authorId: actualUserId,
+          type: 'nature_photo',
+          category: 'Nature Logs',
+          tags: ['Nature Logs', ...(photo.tags || [])],
+          isAIQuestion: false,
+          aiInsights: computedInsights ? [computedInsights] : [],
+          views: 0,
+          imagePath: photo.imagePath,
+          source: 'nature_photo',
+          sourceId: String(photo.id),
+          aiComment: computedInsights || null,
+        },
+      });
+
+      // Post an AI reply if we have an insight
+      if (computedInsights) {
+        try {
+          // Ensure AI user exists
+          let aiUser = await db.user.findUnique({ where: { id: 1 } });
+          if (!aiUser) {
+            aiUser = await db.user.create({
+              data: {
+                id: 1,
+                username: 'ai_philosopher',
+                displayName: 'AI Philosopher',
+                email: 'ai@aristotle.com',
+                password: 'system_user_no_password',
+              }
+            });
+          }
+          await db.communityReply.create({
+            data: {
+              content: computedInsights,
+              authorId: aiUser.id,
+              postId: createdPost.id,
+              philosopher: philosopher || 'AI Philosopher',
+              isAI: true,
+            },
+          });
+        } catch (e) {
+          console.warn('Failed to create AI reply for nature post:', e);
+        }
+      }
+
+      thread = createdPost;
+    }
+
     return NextResponse.json({
       success: true,
       photo,
       imageUrl,
       journalEntry: journalEntry,
+      thread,
       message: 'Nature photo saved and logged to journal successfully!'
     });
 
