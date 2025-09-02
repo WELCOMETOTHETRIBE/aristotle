@@ -1,15 +1,35 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/db';
+import { PrismaClient } from '@prisma/client';
 import { createNaturePhotoLog, logToJournal } from '@/lib/journal-logger';
 import { getStorageService, generateUniqueFilename, getFileExtensionFromBase64 } from '@/lib/storage-service';
+
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { userId, imageData, caption, tags, location, weather, mood, aiInsights, aiComment } = body;
 
-    // For now, use a default user ID if not provided
+    if (!imageData || typeof imageData !== 'string') {
+      return NextResponse.json({ error: 'imageData (base64) is required' }, { status: 400 });
+    }
+
+    // Ensure a default user exists for logging if not provided
     const actualUserId = userId || 1;
+    if (!userId) {
+      let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
+      if (!defaultUser) {
+        defaultUser = await prisma.user.create({
+          data: {
+            id: 1,
+            username: 'system_user',
+            displayName: 'System User',
+            email: 'system@aristotle.com',
+            password: 'system_user_no_password',
+          }
+        });
+      }
+    }
 
     // Generate unique filename and save image using storage service
     const fileExtension = getFileExtensionFromBase64(imageData);
@@ -51,9 +71,7 @@ export async function POST(request: NextRequest) {
         content: journalData.content,
         category: journalData.category,
         date: new Date(),
-        metadata: journalData.metadata,
-        moduleId: journalData.moduleId,
-        widgetId: journalData.widgetId,
+        // Only fields present in schema are used; remove metadata/moduleId/widgetId
       },
     });
 
@@ -68,7 +86,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating nature photo:', error);
     return NextResponse.json(
-      { error: 'Failed to create nature photo' },
+      { error: 'Failed to create nature photo', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }
