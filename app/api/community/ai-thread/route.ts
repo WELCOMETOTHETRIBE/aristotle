@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PHILOSOPHERS } from '@/lib/philosophers';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
     console.log('🔍 AI Thread API called');
     
     // Test Prisma connection and models
@@ -264,16 +265,31 @@ Respond as ${randomPhilosopher.name} would, using your unique voice and wisdom.`
 // Function to create nature photo community threads
 async function createNaturePhotoThread(data: any) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     console.log('Creating nature photo thread with data:', data);
     const { title, content, category, tags, imagePath, aiComment, sourceId } = data;
     
-    // Create a system user for AI posts (or use a default user ID)
-    const defaultUserId = 1; // Ensure this exists in DB
+    // Ensure a system user exists for AI posts
+    let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
+    if (!defaultUser) {
+      defaultUser = await prisma.user.create({
+        data: {
+          id: 1,
+          username: 'ai_philosopher',
+          displayName: 'AI Philosopher',
+          email: 'ai@aristotle.com',
+          password: 'system_user_no_password',
+        }
+      });
+    }
 
     console.log('About to create community post with data:', {
       title: title || 'Nature Log: A Moment of Reflection',
       content: content || 'A moment captured in nature that speaks to the soul.',
-      authorId: defaultUserId,
+      authorId: defaultUser.id,
       type: 'nature_photo',
       category: category || 'Nature Logs',
       tags: tags || ['Nature Logs', 'reflection', 'nature'],
@@ -291,7 +307,7 @@ async function createNaturePhotoThread(data: any) {
       data: {
         title: title || 'Nature Log: A Moment of Reflection',
         content: content || 'A moment captured in nature that speaks to the soul.',
-        authorId: defaultUserId,
+        authorId: defaultUser.id,
         type: 'nature_photo',
         category: category || 'Nature Logs',
         tags: tags || ['Nature Logs', 'reflection', 'nature'],

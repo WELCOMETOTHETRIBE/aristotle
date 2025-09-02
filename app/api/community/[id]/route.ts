@@ -68,7 +68,7 @@ export async function GET(
       data: { views: { increment: 1 } },
     });
 
-    return NextResponse.json(post);
+    return NextResponse.json({ thread: post });
   } catch (error) {
     console.error('Community post GET error:', error);
     return NextResponse.json(

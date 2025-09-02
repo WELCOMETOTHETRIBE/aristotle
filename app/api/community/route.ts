@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     const total = await prisma.communityPost.count({ where });
 
     return NextResponse.json({
-      posts,
+      threads: posts,
       pagination: {
         page,
         limit,

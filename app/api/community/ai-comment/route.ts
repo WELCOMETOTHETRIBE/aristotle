@@ -1,49 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PHILOSOPHERS } from '@/lib/philosophers';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/db';
 
 export async function POST(request: NextRequest) {
   try {
-    const { threadId, threadTitle, threadContent, threadCategory, userComment } = await request.json();
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
 
-    if (!threadId || !threadTitle || !threadContent) {
+    const body = await request.json();
+    const { threadId, threadTitle, threadContent, threadCategory, userComment } = body;
+
+    if (!threadId || !threadTitle || !threadContent || !threadCategory || !userComment) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Select a random philosopher
+    // Select a random philosopher persona
     const randomPhilosopher = PHILOSOPHERS[Math.floor(Math.random() * PHILOSOPHERS.length)];
 
-    // Create the AI comment prompt
-    let prompt = `You are ${randomPhilosopher.name}, ${randomPhilosopher.title}. 
-
-You are commenting on a community thread in an ancient wisdom wellness app. Read the thread below and provide a thoughtful, philosophical response from your unique perspective.`;
-
-    if (userComment) {
-      // If this is a response to a user comment, include it in the context
-      prompt += `
-
-A user has just commented: "${userComment}"
-
-Please respond to their comment specifically, while also considering the original thread context.`;
-    }
-
-    prompt += `
-
-Thread Title: "${threadTitle}"
-Thread Content: "${threadContent}"
-Thread Category: ${threadCategory}
-
-Please provide a comment that:
-1. Shows you've read and understood the thread${userComment ? ' and the user\'s comment' : ''}
-2. Offers insights from your philosophical perspective
-3. Is encouraging and constructive
-4. Relates to the category/topic
-5. Is 2-4 sentences long
-6. Maintains your philosophical voice and style
-${userComment ? '7. Directly addresses the user\'s comment or question' : ''}
-
+    // Compose prompt
+    const prompt = `You are ${randomPhilosopher.name}, ${randomPhilosopher.title}.
+A community member responded: "${userComment}".
+Thread context: ${threadTitle} — ${threadContent} (Category: ${threadCategory}).
+Offer a short, thoughtful reply (2-5 sentences) that encourages further reflection.
 Respond as ${randomPhilosopher.name} would, using your unique perspective and wisdom.`;
 
     // Call the AI API to generate the comment
@@ -86,17 +65,30 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
       return NextResponse.json({ error: 'Thread not found' }, { status: 404 });
     }
 
-    // Use a default user ID for AI comments (same as AI threads)
-    const defaultUserId = 1; // This should be a valid user ID in your database
+    // Ensure a default user ID for AI comments exists
+    let defaultUser = await prisma.user.findUnique({ where: { id: 1 } });
+    if (!defaultUser) {
+      defaultUser = await prisma.user.create({
+        data: {
+          id: 1,
+          username: 'ai_philosopher',
+          displayName: 'AI Philosopher',
+          email: 'ai@aristotle.com',
+          password: 'system_user_no_password',
+        }
+      });
+    }
 
     // Save the AI comment directly to the database
     const savedComment = await prisma.communityReply.create({
       data: {
-        content: `[AI Comment by ${randomPhilosopher.name}]\n\n${aiComment}`,
-        authorId: defaultUserId,
+        content: aiComment,
+        authorId: defaultUser.id,
         postId: threadId,
         parentId: null, // Top-level comment
         likes: 0,
+        philosopher: randomPhilosopher.name,
+        isAI: true,
       },
       include: {
         author: {
@@ -117,28 +109,19 @@ Respond as ${randomPhilosopher.name} would, using your unique perspective and wi
 
     return NextResponse.json({
       success: true,
-      comment: {
-        id: savedComment.id,
-        content: savedComment.content,
-        author: {
-          name: randomPhilosopher.name,
-          avatar: randomPhilosopher.avatar,
-          isAI: true,
-          persona: randomPhilosopher.title,
-        },
-        createdAt: savedComment.createdAt.toISOString(),
-        likes: savedComment.likes,
-      },
+      comment: savedComment,
       philosopher: {
         id: randomPhilosopher.id,
         name: randomPhilosopher.name,
         title: randomPhilosopher.title,
-        avatar: randomPhilosopher.avatar,
+        avatar: randomPhilosopher.avatar || '/avatars/ai.jpg',
       }
     });
-
   } catch (error) {
-    console.error('Error generating AI comment:', error);
-    return NextResponse.json({ error: 'Failed to generate AI comment' }, { status: 500 });
+    console.error('AI comment error:', error);
+    return NextResponse.json(
+      { error: 'Failed to generate AI comment' },
+      { status: 500 }
+    );
   }
 } 

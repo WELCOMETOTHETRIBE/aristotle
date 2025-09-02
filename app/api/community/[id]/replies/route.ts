@@ -1,14 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
+import { prisma } from '@/lib/db';
 import { verifyToken } from '@/lib/auth';
-
-const prisma = new PrismaClient();
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const postId = params.id;
 
     // Check if post exists
@@ -40,7 +42,7 @@ export async function GET(
       },
     });
 
-    return NextResponse.json(replies);
+    return NextResponse.json({ replies });
   } catch (error) {
     console.error('Community replies GET error:', error);
     return NextResponse.json(
@@ -55,6 +57,10 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
+    if (!prisma) {
+      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
+    }
+
     const token = request.cookies.get('auth-token')?.value;
     if (!token) {
       return NextResponse.json(
