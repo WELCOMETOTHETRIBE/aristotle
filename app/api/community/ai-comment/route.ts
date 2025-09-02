@@ -1,13 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PHILOSOPHERS } from '@/lib/philosophers';
-import { prisma } from '@/lib/db';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
   try {
-    if (!prisma) {
-      return NextResponse.json({ error: 'Database not configured' }, { status: 500 });
-    }
-
     const body = await request.json();
     const { threadId, threadTitle, threadContent, threadCategory, userComment } = body;
 

@@ -73,7 +73,33 @@ export default function CommunityPage() {
       const response = await fetch('/api/community');
       if (response.ok) {
         const data = await response.json();
-        setThreads(data.threads || []);
+        // Map API response to Thread interface
+        const mappedThreads = (data.threads || []).map((thread: any) => ({
+          id: thread.id,
+          title: thread.title,
+          content: thread.content,
+          author: {
+            name: thread.author?.displayName || thread.author?.username || 'Unknown User',
+            avatar: thread.author?.avatar || '/avatars/default.jpg',
+            isAI: thread.isAIQuestion || false,
+            persona: thread.author?.persona || undefined,
+          },
+          type: thread.isAIQuestion ? 'ai' : 'user',
+          category: thread.category,
+          tags: thread.tags || [],
+          replies: thread._count?.replies || 0,
+          views: thread.views || 0,
+          likes: thread._count?.likes || 0,
+          isLiked: false,
+          isBookmarked: false,
+          createdAt: thread.createdAt,
+          lastActivity: thread.updatedAt || thread.createdAt,
+          isPinned: thread.isPinned || false,
+          aiInsights: thread.aiInsights || [],
+          imagePath: thread.imagePath || undefined,
+          aiComment: thread.aiComment || undefined,
+        }));
+        setThreads(mappedThreads);
       } else {
         setError('Failed to load threads');
       }
@@ -107,9 +133,41 @@ export default function CommunityPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setThreads(prev => [data, ...prev]);
+        // Map the created thread to Thread interface
+        const newThreadData: Thread = {
+          id: data.id,
+          title: data.title,
+          content: data.content,
+          author: {
+            name: data.author?.displayName || data.author?.username || 'Unknown User',
+            avatar: data.author?.avatar || '/avatars/default.jpg',
+            isAI: false,
+            persona: undefined,
+          },
+          type: 'user',
+          category: data.category,
+          tags: data.tags || [],
+          replies: data._count?.replies || 0,
+          views: data.views || 0,
+          likes: data._count?.likes || 0,
+          isLiked: false,
+          isBookmarked: false,
+          createdAt: data.createdAt,
+          lastActivity: data.updatedAt || data.createdAt,
+          isPinned: false,
+          aiInsights: [],
+          imagePath: undefined,
+          aiComment: undefined,
+        };
+        
+        setThreads(prev => [newThreadData, ...prev]);
         setShowCreateThread(false);
         setNewThread({ title: '', content: '', category: 'Stoicism', tags: [] });
+        
+        // Trigger AI response after a short delay
+        setTimeout(() => {
+          triggerAIResponse(newThreadData);
+        }, 2000);
         
         // Show success message
         setTimeout(() => {
@@ -180,6 +238,36 @@ export default function CommunityPage() {
       setError(error instanceof Error ? error.message : 'Failed to generate AI thread');
     } finally {
       setGeneratingAIThread(false);
+    }
+  };
+
+  const triggerAIResponse = async (userThread: Thread) => {
+    try {
+      const response = await fetch('/api/community/ai-comment', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          threadId: userThread.id,
+          threadTitle: userThread.title,
+          threadContent: userThread.content,
+          threadCategory: userThread.category,
+          userComment: userThread.content, // Use the thread content as the user comment
+        }),
+      });
+
+      if (response.ok) {
+        const aiData = await response.json();
+        console.log('AI response triggered:', aiData);
+        
+        // Refresh threads to show the AI response
+        setTimeout(() => {
+          fetchThreads();
+        }, 1000);
+      }
+    } catch (error) {
+      console.error('Error triggering AI response:', error);
     }
   };
 
