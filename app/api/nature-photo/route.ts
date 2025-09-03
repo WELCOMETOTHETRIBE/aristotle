@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     }
     const db = prisma as any;
     const body = await request.json();
-    const { userId, imageData, caption, tags, location, weather, mood, aiInsights, aiComment, shareToCommunity, philosopher } = body;
+    const { userId, imageData, caption, tags, location, weather, mood, aiInsights, aiComment, shareToCommunity } = body;
 
     if (!imageData || typeof imageData !== 'string') {
       return NextResponse.json({ error: 'imageData (base64) is required' }, { status: 400 });
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
               content: computedInsights,
               authorId: aiUser.id,
               postId: createdPost.id,
-              philosopher: philosopher || 'AI Philosopher',
+              philosopher: 'AI Philosopher', // Default to AI Philosopher
               isAI: true,
             },
           });
@@ -167,33 +167,26 @@ export async function POST(request: NextRequest) {
         }
       }
 
-      // Generate AI philosopher comment using the new endpoint
+      // Generate AI philosopher comment directly instead of making HTTP request
       try {
-        const aiCommentResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/community/ai-philosopher-comment`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            imageUrl: photo.imagePath,
-            caption: photo.caption,
-            tags: photo.tags,
-            location: photo.location,
-            weather: photo.weather,
-            mood: photo.mood,
-            postId: createdPost.id,
-            philosopherId: philosopher || 'aristotle', // Default to Aristotle
-          }),
+        console.log('Generating AI philosopher comment for post:', createdPost.id);
+        
+        // Import and call the AI comment generation logic directly
+        const { generateAIComment } = await import('../community/ai-philosopher-comment/generate');
+        
+        const aiCommentData = await generateAIComment({
+          imageUrl: photo.imagePath,
+          caption: photo.caption,
+          tags: photo.tags,
+          location: photo.location,
+          weather: photo.weather,
+          mood: photo.mood,
+          postId: createdPost.id,
         });
-
-        if (aiCommentResponse.ok) {
-          const aiCommentData = await aiCommentResponse.json();
-          console.log('AI philosopher comment created:', aiCommentData);
-        } else {
-          console.warn('Failed to create AI philosopher comment:', await aiCommentResponse.text());
-        }
+        
+        console.log('AI philosopher comment created successfully:', aiCommentData);
       } catch (aiError) {
-        console.warn('Error calling AI philosopher comment endpoint:', aiError);
+        console.error('Error generating AI philosopher comment:', aiError);
       }
 
       thread = createdPost;
