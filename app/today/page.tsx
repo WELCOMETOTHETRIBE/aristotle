@@ -21,7 +21,7 @@ import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
 import { DailyWisdomCard } from '@/components/cards/DailyWisdomCard';
 import { TerminologyWidget } from '@/components/cards/TerminologyWidget';
 import AcademyLogo from '@/components/AcademyLogo';
-import { Target, Heart, Brain, BookOpen, Grid3X3, MessageCircle, Plus } from 'lucide-react';
+import { Target, Heart, Brain, BookOpen, Grid3X3, MessageCircle, Plus, Activity, Zap, Shield, Camera, Leaf, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NaturePhotoLogWidget } from '@/components/ModuleWidgets';
 import BalanceCard from '@/components/widgets/BalanceCard';
@@ -132,6 +132,22 @@ export default function TodayPage() {
           return <HydrationTrackerCard key={widgetId} />;
         case 'focus_timer':
           return <FocusTimerCard key={widgetId} />;
+        case 'sleep_tracker':
+          return <SleepTrackerCard key={widgetId} />;
+        case 'habit_tracker':
+          return <HabitTrackerCard key={widgetId} />;
+        case 'wisdom_spotlight':
+          return <DailyWisdomCard key={widgetId} />;
+        case 'terminology':
+          return <TerminologyWidget key={widgetId} />;
+        case 'nature_photo':
+          return <NaturePhotoLogWidget key={widgetId} />;
+        case 'gratitude_journal':
+          return <GratitudeJournalCard key={widgetId} />;
+        case 'goal_tracker':
+          return <GoalTrackerCard key={widgetId} />;
+        case 'journal':
+          return <JournalCard key={widgetId} />;
         case 'balance_gyro':
           return (
             <BalanceCard 
@@ -142,22 +158,126 @@ export default function TodayPage() {
               virtueGrantPerCompletion={{ temperance: 2, wisdom: 1 }}
             />
           );
-        case 'sleep_tracker':
-          return <SleepTrackerCard key={widgetId} />;
-        case 'habit_tracker':
-          return <HabitTrackerCard key={widgetId} />;
-        case 'journal':
-          return <JournalCard key={widgetId} />;
-        case 'gratitude_journal':
-          return <GratitudeJournalCard key={widgetId} />;
-        case 'goal_tracker':
-          return <GoalTrackerCard key={widgetId} />;
-        case 'wisdom_spotlight':
-          return <DailyWisdomCard key={widgetId} />;
-        case 'terminology':
-          return <TerminologyWidget key={widgetId} />;
-        case 'nature_photo_log':
-          return <NaturePhotoLogWidget key={widgetId} />;
+        case 'movement_tracker':
+          return (
+            <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center">
+                  <Activity className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Movement Tracker</h3>
+                  <p className="text-sm text-muted">Track your daily physical activity</p>
+                </div>
+              </div>
+              <div className="text-center py-6">
+                <p className="text-muted text-sm mb-3">Track your daily movement and exercise</p>
+                <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Activity className="w-8 h-8 text-emerald-500" />
+                </div>
+              </div>
+            </div>
+          );
+        case 'reading_tracker':
+          return (
+            <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-amber-500 to-orange-500 rounded-xl flex items-center justify-center">
+                  <BookOpen className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Reading Tracker</h3>
+                  <p className="text-sm text-muted">Track your reading progress and goals</p>
+                </div>
+              </div>
+              <div className="text-center py-6">
+                <p className="text-muted text-sm mb-3">Monitor your reading habits and progress</p>
+                <div className="w-16 h-16 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <BookOpen className="w-8 h-8 text-amber-500" />
+                </div>
+              </div>
+            </div>
+          );
+        case 'energy_tracker':
+          return (
+            <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-yellow-500 to-amber-500 rounded-xl flex items-center justify-center">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Energy Tracker</h3>
+                  <p className="text-sm text-muted">Monitor your daily energy levels</p>
+                </div>
+              </div>
+              <div className="text-center py-6">
+                <p className="text-muted text-sm mb-3">Track your energy throughout the day</p>
+                <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Zap className="w-8 h-8 text-yellow-500" />
+                </div>
+              </div>
+            </div>
+          );
+        case 'boundary_tracker':
+          return (
+            <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-slate-500 to-gray-500 rounded-xl flex items-center justify-center">
+                  <Shield className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Boundary Tracker</h3>
+                  <p className="text-sm text-muted">Track and maintain personal boundaries</p>
+                </div>
+              </div>
+              <div className="text-center py-6">
+                <p className="text-muted text-sm mb-3">Set and maintain healthy boundaries</p>
+                <div className="w-16 h-16 bg-slate-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Shield className="w-8 h-8 text-slate-500" />
+                </div>
+              </div>
+            </div>
+          );
+        case 'virtue_balance':
+          return (
+            <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-teal-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                  <Leaf className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Virtue Balance</h3>
+                  <p className="text-sm text-muted">Track your virtue development and balance</p>
+                </div>
+              </div>
+              <div className="text-center py-6">
+                <p className="text-muted text-sm mb-3">Monitor your virtue development</p>
+                <div className="w-16 h-16 bg-teal-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Leaf className="w-8 h-8 text-teal-500" />
+                </div>
+              </div>
+            </div>
+          );
+        case 'fasting_tracker':
+          return (
+            <div key={widgetId} className="bg-surface border border-border rounded-xl p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <Timer className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-text">Fasting Tracker</h3>
+                  <p className="text-sm text-muted">Track your fasting windows and progress</p>
+                </div>
+              </div>
+              <div className="text-center py-6">
+                <p className="text-muted text-sm mb-3">Monitor your fasting schedule</p>
+                <div className="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <Timer className="w-8 h-8 text-red-500" />
+                </div>
+              </div>
+            </div>
+          );
         default:
           console.warn(`Unknown widget ID: ${widgetId}`);
           return null;
