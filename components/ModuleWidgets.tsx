@@ -1109,8 +1109,9 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   useEffect(() => {
     const loadPhotos = async () => {
       try {
-        // For now, we'll use a demo user ID. In a real app, this would come from auth context
-        const response = await fetch('/api/nature-photo?userId=1');
+        // Use actual user ID from auth context
+        const userId = user?.id || 1;
+        const response = await fetch(`/api/nature-photo?userId=${userId}`);
         if (response.ok) {
           const data = await response.json();
           setPhotos(data.photos || []);
@@ -1122,8 +1123,10 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       }
     };
 
-    loadPhotos();
-  }, []);
+    if (user) { // Only load photos when user is authenticated
+      loadPhotos();
+    }
+  }, [user]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1158,7 +1161,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: 1, // Default user for now
+          userId: user?.id || 1, // Use actual user ID if available
           imageData: imagePreview,
           caption,
           tags: selectedTags,

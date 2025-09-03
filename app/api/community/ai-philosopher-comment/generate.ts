@@ -66,6 +66,7 @@ export async function generateAIComment(params: GenerateAICommentParams) {
       }
 
       console.log('Generating AI comment with OpenAI');
+      
       const openai = new OpenAI({ apiKey });
 
       // Build context from photo metadata
@@ -76,6 +77,9 @@ export async function generateAIComment(params: GenerateAICommentParams) {
         weather ? `Weather: ${weather}` : null,
         mood ? `Mood: ${mood}` : null,
       ].filter(Boolean).join('\n');
+
+      console.log('Image URL:', imageUrl);
+      console.log('Context:', context);
 
       // Create the system prompt for the philosopher
       const systemPrompt = `You are ${philosopher.name}, ${philosopher.title}. 
@@ -90,6 +94,8 @@ You are now looking at a nature photo that has been shared in a philosophical co
 4. Speaks in your authentic voice and style
 5. Is concise but meaningful (2-3 sentences)
 
+IMPORTANT: You MUST analyze the actual image content. Look at the visual elements, colors, composition, and mood of the photograph. Do not give generic responses - your reflection must be specific to what you see in this particular image.
+
 Keep your response natural, philosophical, and inspiring. Avoid being overly formal or academic - speak as if you're genuinely moved by what you see and want to share wisdom with fellow seekers.`;
 
       // Create the user prompt
@@ -97,6 +103,8 @@ Keep your response natural, philosophical, and inspiring. Avoid being overly for
 
 Context:
 ${context}
+
+IMPORTANT: Look at the image carefully and describe what you actually see, then connect it to your philosophical wisdom. Be specific about the visual elements you observe.
 
 Respond as ${philosopher.name} with wisdom and inspiration.`;
 
@@ -126,6 +134,10 @@ Respond as ${philosopher.name} with wisdom and inspiration.`;
 
     } catch (aiError) {
       console.error('AI comment generation failed:', aiError);
+      // Only use fallback if there's a critical error, not for vision analysis failures
+      if (aiError instanceof Error && aiError.message.includes('vision')) {
+        throw new Error('Failed to analyze image with AI vision');
+      }
       // Fallback to a generic philosophical response
       aiComment = `As ${philosopher.name}, I find beauty in this moment of nature. It reminds us that wisdom often lies in the simple observation of the world around us, and that every natural scene can teach us something about living well.`;
       console.log('Using fallback comment:', aiComment);
@@ -144,12 +156,11 @@ Respond as ${philosopher.name} with wisdom and inspiration.`;
     });
     console.log('Reply created:', reply.id);
 
-    console.log('Updating community post with AI insights');
-    // Update the community post with AI insights
+    // Update the community post with the philosophical comment
     await prisma.communityPost.update({
       where: { id: postId },
       data: {
-        aiInsights: [aiComment],
+        // Only update aiComment, not aiInsights to avoid duplication
         aiComment: aiComment,
       },
     });

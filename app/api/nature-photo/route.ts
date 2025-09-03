@@ -19,10 +19,18 @@ export async function POST(request: NextRequest) {
 
     // Ensure a default user exists for logging if not provided
     const actualUserId = userId || 1;
-    if (!userId) {
-      let defaultUser = await db.user.findUnique({ where: { id: 1 } });
-      if (!defaultUser) {
-        defaultUser = await db.user.create({
+    let actualUser = null;
+    
+    if (userId) {
+      // Get the actual user's information
+      actualUser = await db.user.findUnique({ where: { id: parseInt(userId) } });
+    }
+    
+    if (!actualUser) {
+      // Fallback to system user if no actual user found
+      actualUser = await db.user.findUnique({ where: { id: 1 } });
+      if (!actualUser) {
+        actualUser = await db.user.create({
           data: {
             id: 1,
             username: 'system_user',
@@ -105,10 +113,14 @@ export async function POST(request: NextRequest) {
     );
 
     // Log to journal using the proper function
+    console.log('Logging nature photo to journal for user:', actualUserId);
     const journalResult = await logToJournal(journalData);
 
     if (!journalResult.success) {
-      console.warn('Failed to log to journal:', journalResult.error);
+      console.error('Failed to log to journal:', journalResult.error);
+      // Continue with the photo creation even if journal logging fails
+    } else {
+      console.log('Successfully logged to journal:', journalResult.entry?.id);
     }
 
     // Community sharing functionality restored
@@ -128,39 +140,9 @@ export async function POST(request: NextRequest) {
           imagePath: photo.imagePath,
           source: 'nature_photo',
           sourceId: String(photo.id),
-          aiComment: computedInsights || null,
+          // Remove aiComment to avoid duplication - only use aiInsights
         },
       });
-
-      // Post an AI reply if we have an insight
-      if (computedInsights) {
-        try {
-          // Ensure AI user exists
-          let aiUser = await db.user.findUnique({ where: { id: 1 } });
-          if (!aiUser) {
-            aiUser = await db.user.create({
-              data: {
-                id: 1,
-                username: 'ai_philosopher',
-                displayName: 'AI Philosopher',
-                email: 'ai@aristotle.com',
-                password: 'system_user_no_password',
-              }
-            });
-          }
-          await db.communityReply.create({
-            data: {
-              content: computedInsights,
-              authorId: aiUser.id,
-              postId: createdPost.id,
-              philosopher: 'AI Philosopher', // Default to AI Philosopher
-              isAI: true,
-            },
-          });
-        } catch (e) {
-          console.warn('Failed to create AI reply for nature post:', e);
-        }
-      }
 
       // Generate AI philosopher comment directly instead of making HTTP request
       try {
