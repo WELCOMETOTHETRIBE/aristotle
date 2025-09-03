@@ -21,7 +21,7 @@ import { WisdomSpotlightCard } from '@/components/cards/WisdomSpotlightCard';
 import { DailyWisdomCard } from '@/components/cards/DailyWisdomCard';
 import { TerminologyWidget } from '@/components/cards/TerminologyWidget';
 import AcademyLogo from '@/components/AcademyLogo';
-import { Target, Heart, Brain, BookOpen, Grid3X3, MessageCircle } from 'lucide-react';
+import { Target, Heart, Brain, BookOpen, Grid3X3, MessageCircle, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NaturePhotoLogWidget } from '@/components/ModuleWidgets';
 import BalanceCard from '@/components/widgets/BalanceCard';
@@ -322,7 +322,7 @@ export default function TodayPage() {
       
       <main className="px-4 py-6 space-y-6">
         {/* Enhanced Hero Section */}
-        <div className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-6 relative overflow-hidden">
+        <div className="bg-gradient-to-br from-primary/15 via-primary/10 to-primary/5 border border-primary/20 rounded-2xl p-4 relative overflow-hidden">
           {/* Background Pattern */}
           <div className="absolute inset-0 opacity-5">
             <div className="absolute top-0 right-0 w-32 h-32 bg-primary rounded-full blur-3xl"></div>
@@ -331,26 +331,26 @@ export default function TodayPage() {
           
           <div className="relative z-10">
             {/* Header Row */}
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <div className="w-14 h-14 bg-gradient-to-br from-primary/30 to-primary/10 rounded-2xl flex items-center justify-center shadow-lg p-2">
+                  <div className="w-12 h-12 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl flex items-center justify-center shadow-lg p-2">
                     <AcademyLogo className="w-full h-full text-primary" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-courage/20 rounded-full flex items-center justify-center">
-                    <div className="w-2 h-2 bg-courage rounded-full animate-pulse"></div>
+                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-courage/20 rounded-full flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 bg-courage rounded-full animate-pulse"></div>
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-text mb-1">
+                  <h1 className="text-xl font-bold text-text mb-1">
                     {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
                     {userPreferences?.displayName && `, ${userPreferences.displayName.split(' ')[0]}`}
                   </h1>
-                  <p className="text-muted font-medium">Ready to flourish today?</p>
+                  <p className="text-sm text-muted font-medium">Ready to flourish today?</p>
                 </div>
               </div>
               
-              {/* Quick Actions */}
+              {/* Tools Link */}
               <div className="flex items-center space-x-2">
                 <button
                   onClick={async () => {
@@ -369,28 +369,27 @@ export default function TodayPage() {
                     await logToJournal(toolsLogData);
                     window.location.href = '/tools';
                   }}
-                  className="flex items-center gap-2 px-4 py-2 bg-surface/50 border border-border/50 text-muted rounded-lg hover:bg-surface transition-colors"
+                  className="text-sm font-medium text-primary hover:text-primary/80 transition-colors underline decoration-primary/30 hover:decoration-primary/60"
                 >
-                  <Grid3X3 className="w-4 h-4" />
-                  Tools
+                  tools
                 </button>
               </div>
             </div>
             
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-primary mb-1">0</div>
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center">
+                <div className="text-xl font-bold text-primary mb-1">0</div>
                 <div className="text-xs text-muted">Tasks Done</div>
               </div>
-              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-courage mb-1">
+              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center">
+                <div className="text-xl font-bold text-courage mb-1">
                   0
                 </div>
                 <div className="text-xs text-muted">Habits Today</div>
               </div>
-              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-xl p-4 text-center">
-                <div className="text-2xl font-bold text-justice mb-1">
+              <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center">
+                <div className="text-xl font-bold text-justice mb-1">
                   {userWidgets.length}
                 </div>
                 <div className="text-xs text-muted">Active Tools</div>
@@ -401,26 +400,23 @@ export default function TodayPage() {
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className={cn(
-                  'px-4 py-2 rounded-xl border text-sm font-semibold shadow-sm',
+                  'px-3 py-1.5 rounded-lg border text-xs font-semibold shadow-sm',
                   'bg-primary/20 text-primary border-primary/30'
                 )}>
                   <div className="flex items-center gap-2">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+                    <div className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse"></div>
                     Focus: {focusVirtue.charAt(0).toUpperCase() + focusVirtue.slice(1)}
                   </div>
                 </div>
-                <div className="text-sm text-muted">
+                <div className="text-xs text-muted">
                   0% complete
                 </div>
               </div>
               
               {/* Progress Bar */}
               <div className="flex-1 max-w-xs ml-4">
-                <div className="w-full bg-surface/40 rounded-full h-2">
-                  <div 
-                    className="bg-gradient-to-r from-primary to-courage h-2 rounded-full transition-all duration-500"
-                    style={{ width: '0%' }}
-                  ></div>
+                <div className="w-full bg-surface/40 rounded-full h-1.5">
+                  <div className="bg-gradient-to-r from-primary to-courage h-1.5 rounded-full" style={{ width: '0%' }}></div>
                 </div>
               </div>
             </div>
@@ -620,6 +616,51 @@ export default function TodayPage() {
             {/* For now, we'll just show a placeholder or remove if no habits are tracked */}
             <div className="bg-surface border border-border rounded-lg p-4 text-center text-muted">
               <p>No habits tracked yet.</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Widget Placeholder */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-text">Add More Tools</h2>
+          </div>
+          <div className="relative">
+            {/* Cut-out effect with dashed border */}
+            <div className="bg-gradient-to-br from-surface/50 to-surface/30 border-2 border-dashed border-border/50 rounded-2xl p-8 text-center group hover:border-primary/50 hover:bg-surface/70 transition-all duration-300">
+              {/* Plus icon */}
+              <div className="w-16 h-16 bg-primary/20 border-2 border-dashed border-primary/30 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:border-primary/50 group-hover:bg-primary/30 transition-all duration-300">
+                <Plus className="w-8 h-8 text-primary group-hover:text-primary/80" />
+              </div>
+              
+              <h3 className="text-lg font-semibold text-text mb-2">Add a New Tool</h3>
+              <p className="text-sm text-muted mb-4 max-w-md mx-auto">
+                Discover and add wellness tools to personalize your daily routine
+              </p>
+              
+              <button
+                onClick={async () => {
+                  // Log widget addition navigation to journal
+                  const widgetAddLogData = {
+                    type: 'navigation',
+                    content: 'Navigated to add new widget',
+                    category: 'navigation',
+                    metadata: {
+                      destination: 'tools',
+                      purpose: 'add_widget',
+                      timestamp: new Date().toISOString(),
+                    },
+                    moduleId: 'navigation',
+                    widgetId: 'add_widget_button',
+                  };
+                  await logToJournal(widgetAddLogData);
+                  window.location.href = '/tools';
+                }}
+                className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors shadow-lg hover:shadow-xl transform hover:scale-105"
+              >
+                <Plus className="w-4 h-4" />
+                Browse Tools
+              </button>
             </div>
           </div>
         </div>
