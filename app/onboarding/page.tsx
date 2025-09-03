@@ -265,12 +265,17 @@ export default function OnboardingPage() {
   };
 
   const toggleFramework = (slug: string) => {
-    setData(prev => ({
-      ...prev,
-      selectedFrameworks: prev.selectedFrameworks.includes(slug)
+    console.log('Toggling framework:', slug, 'Current selection:', data.selectedFrameworks);
+    setData(prev => {
+      const newSelection = prev.selectedFrameworks.includes(slug)
         ? prev.selectedFrameworks.filter(f => f !== slug)
-        : [...prev.selectedFrameworks, slug]
-    }));
+        : [...prev.selectedFrameworks, slug];
+      console.log('New selection:', newSelection);
+      return {
+        ...prev,
+        selectedFrameworks: newSelection
+      };
+    });
   };
 
   const handleComplete = async () => {
@@ -289,7 +294,8 @@ export default function OnboardingPage() {
           framework: data.selectedFrameworks[0], // Primary framework
           name: data.name,
           timezone: data.timezone,
-          secondaryFrameworks: data.selectedFrameworks.slice(1)
+          secondaryFrameworks: data.selectedFrameworks.slice(1),
+          isOnboarding: true
         }),
       });
 
@@ -451,44 +457,48 @@ export default function OnboardingPage() {
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
-                  {frameworks.map((framework) => (
-                    <Card
-                      key={framework.slug}
-                      className={`cursor-pointer border-2 transition-all duration-200 hover:scale-[1.02] ${
-                        data.selectedFrameworks.includes(framework.slug)
-                          ? 'border-primary shadow-xl bg-surface-2 ring-2 ring-primary/20'
-                          : 'border-border bg-surface hover:border-primary/30 hover:shadow-lg'
-                      }`}
-                      onClick={() => toggleFramework(framework.slug)}
-                    >
-                      <CardContent className="p-4 md:p-5">
-                        <div className="flex items-start space-x-3 mb-3 md:mb-4">
-                          <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${framework.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
-                            <framework.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm text-text mb-1 leading-tight">{framework.name}</h3>
-                            <div className="flex items-center space-x-2">
-                              <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                                {framework.virtuePrimary}
-                              </span>
-                              {framework.virtueSecondary && (
-                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
-                                  {framework.virtueSecondary}
+                  {frameworks.map((framework) => {
+                    const isSelected = data.selectedFrameworks.includes(framework.slug);
+                    console.log(`Framework ${framework.slug}: isSelected=${isSelected}, current selection:`, data.selectedFrameworks);
+                    return (
+                      <Card
+                        key={framework.slug}
+                        className={`cursor-pointer border-2 transition-all duration-200 hover:scale-[1.02] ${
+                          isSelected
+                            ? 'border-primary shadow-xl bg-surface-2 ring-2 ring-primary/20'
+                            : 'border-border bg-surface hover:border-primary/30 hover:shadow-lg'
+                        }`}
+                        onClick={() => toggleFramework(framework.slug)}
+                      >
+                        <CardContent className="p-4 md:p-5">
+                          <div className="flex items-start space-x-3 mb-3 md:mb-4">
+                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${framework.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                              <framework.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm text-text mb-1 leading-tight">{framework.name}</h3>
+                              <div className="flex items-center space-x-2">
+                                <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                                  {framework.virtuePrimary}
                                 </span>
-                              )}
+                                {framework.virtueSecondary && (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
+                                    {framework.virtueSecondary}
+                                  </span>
+                                )}
+                              </div>
                             </div>
+                            {isSelected && (
+                              <div className="w-5 h-5 md:w-6 md:h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                                <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-white" />
+                              </div>
+                            )}
                           </div>
-                          {data.selectedFrameworks.includes(framework.slug) && (
-                            <div className="w-5 h-5 md:w-6 md:h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                              <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-white" />
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-xs text-muted leading-relaxed">{framework.description}</p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                          <p className="text-xs text-muted leading-relaxed">{framework.description}</p>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
                 </div>
               </div>
             </CardContent>
