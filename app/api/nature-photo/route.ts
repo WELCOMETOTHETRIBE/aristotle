@@ -167,6 +167,35 @@ export async function POST(request: NextRequest) {
         }
       }
 
+      // Generate AI philosopher comment using the new endpoint
+      try {
+        const aiCommentResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/community/ai-philosopher-comment`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            imageUrl: photo.imagePath,
+            caption: photo.caption,
+            tags: photo.tags,
+            location: photo.location,
+            weather: photo.weather,
+            mood: photo.mood,
+            postId: createdPost.id,
+            philosopherId: philosopher || 'aristotle', // Default to Aristotle
+          }),
+        });
+
+        if (aiCommentResponse.ok) {
+          const aiCommentData = await aiCommentResponse.json();
+          console.log('AI philosopher comment created:', aiCommentData);
+        } else {
+          console.warn('Failed to create AI philosopher comment:', await aiCommentResponse.text());
+        }
+      } catch (aiError) {
+        console.warn('Error calling AI philosopher comment endpoint:', aiError);
+      }
+
       thread = createdPost;
     }
 

@@ -1092,6 +1092,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [shareToCommunity, setShareToCommunity] = useState(false);
+  const [philosopher, setPhilosopher] = useState('');
 
   const availableTags = [
     'dawn','sunrise','morning','midday','afternoon','dusk','sunset','night','stars','moon',
@@ -1138,44 +1139,42 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
 
   const addPhoto = async () => {
     if (!uploadedImage) return;
-    
-    setIsProcessing(true);
-    
-    try {
-      // Convert image to base64 for API
-      const base64Image = await new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = () => reject(new Error('Failed to read image file'));
-        reader.readAsDataURL(uploadedImage);
-      });
 
-      // Upload to API (atomic: server will optionally share to community and post AI reply)
+    setIsProcessing(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', uploadedImage);
+      formData.append('caption', caption);
+      formData.append('tags', JSON.stringify(selectedTags));
+      formData.append('location', location);
+      formData.append('weather', weather);
+      formData.append('mood', mood);
+      formData.append('shareToCommunity', shareToCommunity.toString());
+      formData.append('philosopher', philosopher || 'aristotle'); // Include philosopher selection
+
       const response = await fetch('/api/nature-photo', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: user?.id ?? 1,
-          imageData: base64Image,
-          caption: caption || 'Nature moment',
+          userId: 1, // Default user for now
+          imageData: imagePreview,
+          caption,
           tags: selectedTags,
-          location: location || null,
-          weather: weather || null,
-          mood: mood || null,
-          shareToCommunity: shareToCommunity,
-          // Let server generate aiInsights/aiComment from the image
+          location,
+          weather,
+          mood,
+          shareToCommunity,
+          philosopher: philosopher || 'aristotle', // Include philosopher selection
         }),
       });
 
       const data = await response.json();
 
-      if (response.ok && data.success) {
-        console.log('Photo uploaded successfully:', data);
+      if (data.success) {
+        // Add the new photo to the list
         setPhotos(prev => [data.photo, ...prev]);
-        
-        setSuccessMessage(shareToCommunity ? 'Photo uploaded and shared to community!' : 'Photo uploaded successfully!');
         
         // Log photo upload to journal
         const photoLogData = {
@@ -1206,6 +1205,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         setUploadedImage(null);
         setImagePreview('');
         setShareToCommunity(false);
+        setPhilosopher(''); // Reset philosopher selection
         
         // Show success notification
         setShowSuccess(true);
@@ -1432,6 +1432,26 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             </label>
           </div>
 
+          {/* Philosopher Selection (only show when sharing to community) */}
+          {shareToCommunity && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-text">Choose a Philosopher for AI Comment</label>
+              <select
+                value={philosopher}
+                onChange={(e) => setPhilosopher(e.target.value)}
+                className="w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500"
+              >
+                <option value="aristotle">Aristotle - The Philosopher</option>
+                <option value="socrates">Socrates - The Gadfly of Athens</option>
+                <option value="marcus_aurelius">Marcus Aurelius - The Stoic Emperor</option>
+                <option value="epictetus">Epictetus - The Former Slave</option>
+              </select>
+              <p className="text-xs text-gray-400">
+                An AI philosopher will analyze your photo and leave an inspirational comment
+              </p>
+            </div>
+          )}
+
           {/* Action Buttons */}
           <div className="flex gap-2">
             <button
@@ -1445,6 +1465,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                 setUploadedImage(null);
                 setImagePreview('');
                 setShareToCommunity(false);
+                setPhilosopher(''); // Reset philosopher selection
               }}
               className="flex-1 px-3 py-2 bg-surface-2 border border-border text-text rounded-lg hover:bg-surface transition-colors duration-150"
             >
