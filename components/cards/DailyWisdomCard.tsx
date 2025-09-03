@@ -279,6 +279,21 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         
         <div className="flex items-center gap-2">
           <button
+            onClick={toggleFavorite}
+            className={`flex items-center gap-1.5 p-2 rounded-md transition-all duration-200 ${
+              isFavorite()
+                ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
+                : 'bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface'
+            }`}
+            title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
+          >
+            {isFavorite() ? (
+              <span className="text-yellow-400 text-sm">★</span>
+            ) : (
+              <span className="text-muted text-sm">☆</span>
+            )}
+          </button>
+          <button
             onClick={() => setShowInfo(!showInfo)}
             className="p-2 text-muted hover:text-text transition-colors"
           >
@@ -436,35 +451,13 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             New
           </button>
           
-          <button
-            onClick={toggleFavorite}
-            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-200 text-sm ${
-              isFavorite()
-                ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
-                : 'bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface'
-            }`}
-            title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
-          >
-            {isFavorite() ? (
-              <>
-                <span className="text-yellow-400 text-sm">★</span>
-                <span className="hidden sm:inline">Fav</span>
-              </>
-            ) : (
-              <>
-                <span className="text-muted text-sm">☆</span>
-                <span className="hidden sm:inline">Fav</span>
-              </>
-            )}
-          </button>
-          
           <Link 
             href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
-            title="Chat with philosopher about this quote"
+            title="Ask a Philosopher about this quote"
           >
             <MessageCircle className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Chat</span>
+            <span className="hidden sm:inline">Ask a Philosopher</span>
           </Link>
         </div>
       </div>

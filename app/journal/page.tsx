@@ -9,10 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 interface JournalEntry {
   id: string;
   content: string;
-  type: 'gratitude' | 'reflection' | 'voice_note' | 'boundaries' | 'community_connections' | 'mood';
+  type: 'gratitude' | 'reflection' | 'voice_note' | 'boundaries' | 'community_connections' | 'mood' | 'daily_intention' | 'nature_photo_upload' | 'quote_favorited' | 'quote_unfavorited';
   category?: string;
   date: string;
   aiInsights?: string;
+  metadata?: any;
 }
 
 export default function JournalPage() {
@@ -59,6 +60,10 @@ export default function JournalPage() {
       case 'boundaries': return <Shield className="w-5 h-5 text-orange-400" />;
       case 'community_connections': return <Users className="w-5 h-5 text-purple-400" />;
       case 'mood': return <Smile className="w-5 h-5 text-yellow-400" />;
+      case 'daily_intention': return <Calendar className="w-5 h-5 text-indigo-400" />;
+      case 'nature_photo_upload': return <Plus className="w-5 h-5 text-green-400" />;
+      case 'quote_favorited': return <Heart className="w-5 h-5 text-red-400" />;
+      case 'quote_unfavorited': return <Heart className="w-5 h-5 text-gray-400" />;
       default: return <BookOpen className="w-5 h-5" />;
     }
   };
@@ -71,6 +76,10 @@ export default function JournalPage() {
       case 'boundaries': return 'border-orange-500/20 bg-orange-500/5';
       case 'community_connections': return 'border-purple-500/20 bg-purple-500/5';
       case 'mood': return 'border-yellow-500/20 bg-yellow-500/5';
+      case 'daily_intention': return 'border-indigo-500/20 bg-indigo-500/5';
+      case 'nature_photo_upload': return 'border-green-500/20 bg-green-500/5';
+      case 'quote_favorited': return 'border-red-500/20 bg-red-500/5';
+      case 'quote_unfavorited': return 'border-gray-500/20 bg-gray-500/5';
       default: return 'border-gray-500/20 bg-gray-500/5';
     }
   };
@@ -83,6 +92,10 @@ export default function JournalPage() {
       case 'boundaries': return 'Boundaries';
       case 'community_connections': return 'Community';
       case 'mood': return 'Mood';
+      case 'daily_intention': return 'Daily Intention';
+      case 'nature_photo_upload': return 'Nature Photo';
+      case 'quote_favorited': return 'Quote Favorited';
+      case 'quote_unfavorited': return 'Quote Unfavorited';
       default: return type;
     }
   };
@@ -132,46 +145,62 @@ export default function JournalPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8"
+            className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4 mb-8"
           >
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
                   {entries.filter(e => e.type === 'gratitude').length}
                 </div>
-                <div className="text-gray-300">Gratitude</div>
+                <div className="text-xs text-gray-300">Gratitude</div>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
                   {entries.filter(e => e.type === 'reflection').length}
                 </div>
-                <div className="text-gray-300">Reflections</div>
+                <div className="text-xs text-gray-300">Reflections</div>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
                   {entries.filter(e => e.type === 'mood').length}
                 </div>
-                <div className="text-gray-300">Mood</div>
+                <div className="text-xs text-gray-300">Mood</div>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
+                  {entries.filter(e => e.type === 'daily_intention').length}
+                </div>
+                <div className="text-xs text-gray-300">Intentions</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
+                  {entries.filter(e => e.type === 'nature_photo_upload').length}
+                </div>
+                <div className="text-xs text-gray-300">Nature Photos</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
                   {favoriteQuotes.length}
                 </div>
-                <div className="text-gray-300">Favorite Quotes</div>
+                <div className="text-xs text-gray-300">Favorite Quotes</div>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
-              <CardContent className="p-6 text-center">
-                <div className="text-3xl font-bold text-white mb-2">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
                   {entries.length}
                 </div>
-                <div className="text-gray-300">Total</div>
+                <div className="text-xs text-gray-300">Total</div>
               </CardContent>
             </Card>
           </motion.div>
@@ -197,6 +226,20 @@ export default function JournalPage() {
                 className="bg-yellow-600 hover:bg-yellow-700 text-white"
               >
                 Mood
+              </Button>
+              <Button
+                onClick={() => setFilterType('daily_intention')}
+                variant={filterType === 'daily_intention' ? 'default' : 'outline'}
+                className="bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                Intentions
+              </Button>
+              <Button
+                onClick={() => setFilterType('nature_photo_upload')}
+                variant={filterType === 'nature_photo_upload' ? 'default' : 'outline'}
+                className="bg-green-600 hover:bg-green-700 text-white"
+              >
+                Nature Photos
               </Button>
               <Button
                 onClick={() => setFilterType('reflection')}
