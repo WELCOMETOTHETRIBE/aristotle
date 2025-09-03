@@ -94,6 +94,26 @@ const settings: SettingSection[] = [
     ],
   },
   {
+    title: 'Onboarding',
+    icon: Shield,
+    items: [
+      {
+        id: 'editOnboarding',
+        label: 'Edit Onboarding Preferences',
+        description: 'Modify your name, timezone, and framework selections',
+        type: 'button',
+        action: () => window.location.href = '/onboarding',
+      },
+      {
+        id: 'viewFrameworks',
+        label: 'View Selected Frameworks',
+        description: 'See which frameworks are currently active',
+        type: 'button',
+        action: () => console.log('View frameworks'),
+      },
+    ],
+  },
+  {
     title: 'Notifications',
     icon: Bell,
     items: [

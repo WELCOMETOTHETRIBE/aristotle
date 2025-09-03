@@ -361,6 +361,8 @@ model UserPreference {
   framework String?
   style     String?
   locale    String? @default("en")
+  name      String?
+  timezone  String?
   updatedAt DateTime @default(now())
 }
 

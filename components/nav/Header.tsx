@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bell, User, ChevronDown, Settings } from 'lucide-react';
+import { Bell, User, ChevronDown, Settings, Sparkles, X } from 'lucide-react';
 import AcademyLogo from '@/components/AcademyLogo';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
@@ -26,8 +26,28 @@ const virtueLabels = {
 
 export function Header({ focusVirtue }: HeaderProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showOnboardingAlert, setShowOnboardingAlert] = useState(false);
+  const [onboardingStatus, setOnboardingStatus] = useState<any>(null);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
+
+  useEffect(() => {
+    // Check onboarding status
+    const checkOnboardingStatus = async () => {
+      try {
+        const response = await fetch('/api/onboarding-status');
+        if (response.ok) {
+          const status = await response.json();
+          setOnboardingStatus(status);
+          setShowOnboardingAlert(!status.isComplete);
+        }
+      } catch (error) {
+        console.error('Failed to check onboarding status:', error);
+      }
+    };
+
+    checkOnboardingStatus();
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -55,6 +75,14 @@ export function Header({ focusVirtue }: HeaderProps) {
     window.location.href = '/settings';
   };
 
+  const handleOnboardingClick = () => {
+    window.location.href = '/onboarding';
+  };
+
+  const dismissOnboardingAlert = () => {
+    setShowOnboardingAlert(false);
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-surface border-b border-border">
       <div className="flex items-center justify-between px-4 py-3">
@@ -80,6 +108,31 @@ export function Header({ focusVirtue }: HeaderProps) {
         <button className="p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150">
           <Bell className="w-5 h-5" />
         </button>
+
+        {/* Onboarding Alert - Sleek and Intuitive */}
+        {showOnboardingAlert && onboardingStatus && (
+          <div className="relative">
+            <button
+              onClick={handleOnboardingClick}
+              className="group relative flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-amber-500/10 to-orange-500/10 border border-amber-500/20 rounded-full text-amber-600 hover:from-amber-500/20 hover:to-orange-500/20 hover:border-amber-500/30 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
+            >
+              <div className="relative">
+                <Sparkles className="w-4 h-4 animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-2 h-2 bg-amber-500 rounded-full animate-ping"></div>
+              </div>
+              <span className="text-sm font-medium">Complete Setup</span>
+              <div className="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></div>
+            </button>
+            
+            {/* Dismiss Button */}
+            <button
+              onClick={dismissOnboardingAlert}
+              className="absolute -top-2 -right-2 w-5 h-5 bg-surface border border-border rounded-full flex items-center justify-center text-muted hover:text-text hover:bg-surface-2 transition-colors duration-150 opacity-0 group-hover:opacity-100"
+            >
+              <X className="w-3 h-3" />
+            </button>
+          </div>
+        )}
 
         {/* Profile Menu */}
         <div className="relative" ref={profileMenuRef}>

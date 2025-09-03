@@ -297,6 +297,90 @@
           "cross_disciplinary_learning",
           "coherent_breathing_balance"
         ]
+      },
+      {
+        "id": "celtic_druid",
+        "name": "Celtic Druid",
+        "nav": { "tone": "natural", "badge": "Wisdom", "emoji": "🌿" },
+        "coreModules": [
+          "nature_observation",
+          "seasonal_cycles",
+          "herbal_wisdom",
+          "oral_tradition",
+          "natural_breathing"
+        ],
+        "supportModules": [
+          "meditation",
+          "gratitude_awe",
+          "resource_library",
+          "virtue_cultivation",
+          "creative_spark"
+        ],
+        "featuredPractices": [
+          "nature_walks",
+          "seasonal_tracking",
+          "herbal_research",
+          "storytelling",
+          "natural_breathing",
+          "wisdom_journaling",
+          "lifelong_learning"
+        ]
+      },
+      {
+        "id": "tibetan_monk",
+        "name": "Tibetan Buddhist Monk",
+        "nav": { "tone": "contemplative", "badge": "Enlightenment", "emoji": "🧘" },
+        "coreModules": [
+          "tummo_meditation",
+          "philosophical_debate",
+          "mandala_creation",
+          "compassion_meditation",
+          "tibetan_breathing"
+        ],
+        "supportModules": [
+          "meditation",
+          "philosophy_capsules",
+          "resource_library",
+          "virtue_cultivation",
+          "creative_spark"
+        ],
+        "featuredPractices": [
+          "inner_fire_meditation",
+          "philosophical_discourse",
+          "sacred_art",
+          "compassion_practice",
+          "breath_mastery",
+          "wisdom_journaling",
+          "contemplative_reading"
+        ]
+      },
+      {
+        "id": "viking_berserker",
+        "name": "Viking Berserker",
+        "nav": { "tone": "fierce", "badge": "Rage", "emoji": "⚔️" },
+        "coreModules": [
+          "cold_endurance",
+          "rage_control",
+          "shield_wall_training",
+          "battle_preparation",
+          "viking_breathing"
+        ],
+        "supportModules": [
+          "strength",
+          "movement_posture",
+          "fasting",
+          "virtue_cultivation",
+          "tribal_challenges"
+        ],
+        "featuredPractices": [
+          "cold_exposure_training",
+          "anger_management",
+          "formation_fighting",
+          "strategic_planning",
+          "power_breathing",
+          "adversity_training",
+          "leadership_development"
+        ]
       }
     ],
     "catalog": {
@@ -330,7 +414,22 @@
         "hidden_wisdom",
         "skill_builder",
         "language_memory",
-        "creative_spark"
+        "creative_spark",
+        "nature_observation",
+        "seasonal_cycles",
+        "herbal_wisdom",
+        "oral_tradition",
+        "natural_breathing",
+        "tummo_meditation",
+        "philosophical_debate",
+        "mandala_creation",
+        "compassion_meditation",
+        "tibetan_breathing",
+        "cold_endurance",
+        "rage_control",
+        "shield_wall_training",
+        "battle_preparation",
+        "viking_breathing"
       ],
       "practices": [
         "socratic_dialogue",
@@ -360,7 +459,21 @@
         "box_breathing_temperance",
         "ocean_breath_harmony",
         "coherent_breathing_balance",
-        "triangle_breathing_simplicity"
+        "triangle_breathing_simplicity",
+        "nature_walks",
+        "seasonal_tracking",
+        "herbal_research",
+        "storytelling",
+        "natural_breathing",
+        "inner_fire_meditation",
+        "philosophical_discourse",
+        "sacred_art",
+        "compassion_practice",
+        "breath_mastery",
+        "anger_management",
+        "formation_fighting",
+        "strategic_planning",
+        "power_breathing"
       ]
     }
   }

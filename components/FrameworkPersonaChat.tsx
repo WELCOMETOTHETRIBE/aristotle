@@ -27,7 +27,13 @@ export default function FrameworkPersonaChat({ frameworkId, title }: { framework
       case 'ubuntu':
         return { name: 'Archbishop Tutu', avatar: '🤝', description: 'Nobel Peace Laureate' };
       case 'highperf':
-        return { name: 'Cal Newport', avatar: '🎯', description: 'Deep Work Pioneer' };
+        return { name: 'Cal Newport', avatar: '🚀', description: 'High-Performance Expert' };
+      case 'celtic_druid':
+        return { name: 'Celtic Druid', avatar: '🌿', description: 'Ancient Natural Wisdom' };
+      case 'tibetan_monk':
+        return { name: 'Tibetan Monk', avatar: '🧘', description: 'Himalayan Sage' };
+      case 'viking_berserker':
+        return { name: 'Viking Berserker', avatar: '⚔️', description: 'Norse Warrior' };
       default:
         return { name: 'Ancient Sage', avatar: '🧙', description: 'Wisdom Keeper' };
     }

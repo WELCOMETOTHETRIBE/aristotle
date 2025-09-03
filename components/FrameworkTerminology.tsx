@@ -769,43 +769,20 @@ const frameworkTerminologies: Record<string, {
     ]
   },
   highperf: {
-    overview: "Modern High-Performance methodology combines cutting-edge psychology, neuroscience, and systems thinking to optimize human potential. It teaches that peak performance comes from understanding and leveraging the complex systems that drive human excellence.",
+    overview: "Modern high-performance frameworks emphasize systematic approaches to excellence, deep work, and sustainable achievement. They teach that peak performance comes from focused effort, strategic planning, and continuous improvement.",
     coreConcepts: [
-      "Systems-based optimization",
-      "Evidence-driven practices",
-      "Continuous improvement",
-      "Peak state management"
+      "Deep Work",
+      "Systems Thinking", 
+      "Continuous Improvement",
+      "Strategic Planning",
+      "Performance Optimization"
     ],
     terminology: [
       {
-        term: "Flow State",
-        definition: "Entering a state of complete absorption where time disappears and performance reaches its peak.",
-        category: "concept",
+        term: "Deep Work",
+        definition: "The ability to focus without distraction on a cognitively demanding task, creating value that's hard to replicate.",
+        category: "practice",
         icon: Target
-      },
-      {
-        term: "Continuous Improvement",
-        definition: "Making small, incremental changes that compound over time to create significant improvements.",
-        category: "principle",
-        icon: Lightbulb
-      },
-      {
-        term: "Peak State Management",
-        definition: "Learning to access and maintain optimal mental and physical states for performance.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Habit Optimization",
-        definition: "Designing and implementing systems that make positive behaviors automatic and effortless.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Energy Optimization",
-        definition: "Managing physical, mental, and emotional energy to maintain high performance throughout the day.",
-        category: "practice",
-        icon: Users
       },
       {
         term: "Systems Thinking",
@@ -814,122 +791,99 @@ const frameworkTerminologies: Record<string, {
         icon: Target
       },
       {
-        term: "Evidence-Based Practice",
-        definition: "Using scientific research and data to inform decisions about performance optimization.",
+        term: "Continuous Improvement",
+        definition: "Making small, incremental changes that compound over time to create significant improvements.",
         category: "principle",
-        icon: Target
-      },
-      {
-        term: "Recovery Optimization",
-        definition: "Strategic rest and recovery practices that enhance performance and prevent burnout.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Mental Models",
-        definition: "Developing frameworks for thinking that help you make better decisions and solve problems.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Performance Psychology",
-        definition: "Understanding and optimizing the mental factors that influence performance and achievement.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Deliberate Practice",
-        definition: "Structured, focused practice designed to improve specific aspects of performance.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Sustainable Excellence",
-        definition: "Achieving and maintaining high performance over the long term without burnout or decline.",
-        category: "principle",
-        icon: Target
+        icon: Lightbulb
       }
     ]
   },
-  systems: {
-    overview: "Systems thinking approaches complex problems by understanding the relationships and patterns that connect different parts of a system. It teaches that everything is interconnected and that solutions must address the whole system.",
+  celtic_druid: {
+    overview: "The Celtic Druid tradition emphasizes wisdom through deep connection with nature, seasonal cycles, and oral tradition. It teaches that true wisdom comes from observing natural patterns and living in harmony with the earth's rhythms.",
     coreConcepts: [
-      "Everything is interconnected",
-      "Patterns reveal solutions",
-      "Whole systems thinking",
-      "Emergence from complexity"
+      "Natural Wisdom",
+      "Seasonal Cycles",
+      "Oral Tradition",
+      "Herbal Knowledge",
+      "Nature Connection"
     ],
     terminology: [
       {
-        term: "Systems Thinking",
-        definition: "Understanding how different parts of a system interact and influence each other to create outcomes.",
+        term: "Natural Wisdom",
+        definition: "Knowledge and insight gained through careful observation of natural patterns and cycles.",
         category: "concept",
-        icon: Target
-      },
-      {
-        term: "Emergence",
-        definition: "Recognizing that complex behaviors and properties arise from simple interactions between system components.",
-        category: "concept",
-        icon: Lightbulb
-      },
-      {
-        term: "Feedback Loops",
-        definition: "Understanding how outputs become inputs, creating self-reinforcing or self-correcting patterns.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Leverage Points",
-        definition: "Identifying strategic places where small changes can create large, lasting improvements in a system.",
-        category: "technique",
-        icon: Zap
-      },
-      {
-        term: "Pattern Recognition",
-        definition: "Developing the ability to identify recurring structures and relationships in complex systems.",
-        category: "practice",
         icon: BookOpen
       },
       {
-        term: "Interconnectedness",
-        definition: "Understanding that everything is connected and that changes in one part affect the whole system.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Holistic Problem Solving",
-        definition: "Addressing problems by understanding the entire system rather than just individual symptoms.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "System Dynamics",
-        definition: "Understanding how systems change over time and how to influence those changes effectively.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Boundary Setting",
-        definition: "Defining what is inside and outside a system to understand its scope and influence.",
-        category: "practice",
-        icon: BookOpen
-      },
-      {
-        term: "Complexity Management",
-        definition: "Navigating complex systems by understanding their underlying patterns and principles.",
-        category: "concept",
-        icon: Target
-      },
-      {
-        term: "Systemic Change",
-        definition: "Creating lasting improvements by addressing root causes rather than surface symptoms.",
+        term: "Seasonal Cycles",
+        definition: "Understanding and living in harmony with the natural rhythms of the earth and seasons.",
         category: "principle",
         icon: Target
       },
       {
-        term: "Adaptive Systems",
-        definition: "Designing systems that can learn, evolve, and adapt to changing circumstances.",
+        term: "Oral Tradition",
+        definition: "Preserving and passing down wisdom through storytelling and spoken word across generations.",
+        category: "practice",
+        icon: BookOpen
+      }
+    ]
+  },
+  tibetan_monk: {
+    overview: "Tibetan Buddhist monastic tradition emphasizes inner transformation through advanced meditation, philosophical inquiry, and compassion practice. It teaches that enlightenment comes through inner work, debate, and the cultivation of wisdom and compassion.",
+    coreConcepts: [
+      "Inner Transformation",
+      "Philosophical Debate",
+      "Compassion Practice",
+      "Meditation Mastery",
+      "Spiritual Enlightenment"
+    ],
+    terminology: [
+      {
+        term: "Inner Transformation",
+        definition: "The process of fundamental change in consciousness and character through spiritual practice.",
         category: "concept",
+        icon: Target
+      },
+      {
+        term: "Philosophical Debate",
+        definition: "Using logical argumentation and critical thinking to explore profound questions and reveal truth.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Compassion Practice",
+        definition: "Systematically developing boundless love and compassion for all beings through meditation.",
+        category: "practice",
+        icon: BookOpen
+      }
+    ]
+  },
+  viking_berserker: {
+    overview: "The Viking Berserker tradition emphasizes courage through controlled aggression, battle preparation, and rage mastery. It teaches that true strength comes from mastering one's inner fire and channeling it with discipline and strategy.",
+    coreConcepts: [
+      "Controlled Aggression",
+      "Battle Preparation",
+      "Rage Mastery",
+      "Shield Wall Unity",
+      "Strategic Courage"
+    ],
+    terminology: [
+      {
+        term: "Controlled Aggression",
+        definition: "Channeling fierce energy and strength with discipline and strategic purpose.",
+        category: "practice",
+        icon: Target
+      },
+      {
+        term: "Battle Preparation",
+        definition: "Systematic preparation of mind, body, and strategy before facing challenges.",
+        category: "practice",
+        icon: BookOpen
+      },
+      {
+        term: "Rage Mastery",
+        definition: "Learning to control and direct powerful emotions for constructive purposes.",
+        category: "principle",
         icon: Target
       }
     ]

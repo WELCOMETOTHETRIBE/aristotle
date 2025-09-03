@@ -1088,6 +1088,320 @@ export const FRAMEWORKS: FrameworkConfig[] = [
         'Complete capstone checklist'
       ]
     }
+  },
+  {
+    slug: 'celtic_druid',
+    name: 'Celtic Druid',
+    tone: 'natural',
+    virtuePrimary: 'WISDOM',
+    virtueSecondary: 'TEMPERANCE',
+    teachingChip: 'Wisdom flows from the natural world.',
+    widgets: [
+      {
+        id: 'nature_observation',
+        kind: 'JOURNAL',
+        title: 'Nature Observation',
+        config: {
+          prompt: 'Observe and record what you see in nature today',
+          minWords: 60,
+          aiCoaching: true,
+          teaching: 'Nature is the greatest teacher'
+        },
+        virtueGrantPerCompletion: { wisdom: 2, temperance: 1 }
+      },
+      {
+        id: 'seasonal_cycle_tracker',
+        kind: 'CHECKLIST',
+        title: 'Seasonal Cycle Tracker',
+        config: {
+          items: [
+            { id: 'season_awareness', label: 'What season are we in?', required: true },
+            { id: 'cycle_observation', label: 'What cycles do you observe?', required: true },
+            { id: 'seasonal_action', label: 'What action does this season call for?', required: true }
+          ],
+          teaching: 'Live in harmony with natural cycles'
+        },
+        virtueGrantPerCompletion: { temperance: 2, wisdom: 1 }
+      },
+      {
+        id: 'herbal_wisdom_journal',
+        kind: 'JOURNAL',
+        title: 'Herbal Wisdom Journal',
+        config: {
+          prompt: 'Research and record the properties of one herb or plant',
+          minWords: 80,
+          aiCoaching: true,
+          teaching: 'Plants hold ancient wisdom'
+        },
+        virtueGrantPerCompletion: { wisdom: 2 }
+      },
+      {
+        id: 'oral_tradition_practice',
+        kind: 'AUDIO_NOTE',
+        title: 'Oral Tradition Practice',
+        config: {
+          maxSec: 120,
+          transcribe: true,
+          instruction: 'Tell a story or share wisdom from memory',
+          teaching: 'Oral tradition preserves wisdom across generations'
+        },
+        virtueGrantPerCompletion: { wisdom: 2, temperance: 1 }
+      },
+      {
+        id: 'druid_breath',
+        kind: 'BREATH',
+        title: 'Druid Breath',
+        config: {
+          pattern: 'natural',
+          params: { in: 4, out: 6, minutes: 10 },
+          teaching: 'Breathe with the rhythm of nature'
+        },
+        virtueGrantPerCompletion: { temperance: 2, wisdom: 1 }
+      }
+    ],
+    quests: [
+      {
+        id: 'druid_quest_1',
+        title: 'Nature walk + observation journal',
+        description: 'Take a nature walk and record your observations',
+        widgetIds: ['nature_observation', 'druid_breath'],
+        minutes: 20,
+        virtueGrants: { wisdom: 3, temperance: 2 }
+      },
+      {
+        id: 'druid_quest_2',
+        title: 'Seasonal awareness + herbal research',
+        description: 'Track seasonal cycles and research one herb',
+        widgetIds: ['seasonal_cycle_tracker', 'herbal_wisdom_journal'],
+        minutes: 15,
+        virtueGrants: { wisdom: 3, temperance: 1 }
+      },
+      {
+        id: 'druid_quest_3',
+        title: 'Oral tradition + reflection',
+        description: 'Practice oral storytelling and reflect on wisdom',
+        widgetIds: ['oral_tradition_practice', 'nature_observation'],
+        minutes: 18,
+        virtueGrants: { wisdom: 4, temperance: 1 }
+      }
+    ],
+    capstone: {
+      title: 'Druid Initiation',
+      requirements: [
+        'Complete 7 days of nature observation',
+        'Research and document 5 herbs or plants',
+        'Create a seasonal living plan',
+        'Share wisdom through oral tradition',
+        'Complete capstone checklist'
+      ]
+    }
+  },
+  {
+    slug: 'tibetan_monk',
+    name: 'Tibetan Buddhist Monk',
+    tone: 'contemplative',
+    virtuePrimary: 'WISDOM',
+    virtueSecondary: 'TEMPERANCE',
+    teachingChip: 'Inner peace reveals ultimate wisdom.',
+    widgets: [
+      {
+        id: 'tummo_meditation',
+        kind: 'TIMER',
+        title: 'Tummo Meditation',
+        config: {
+          targetSec: 900, // 15 minutes
+          allowRPE: false,
+          teaching: 'Generate inner heat through meditation'
+        },
+        virtueGrantPerCompletion: { wisdom: 2, temperance: 2 }
+      },
+      {
+        id: 'philosophical_debate',
+        kind: 'JOURNAL',
+        title: 'Philosophical Debate',
+        config: {
+          prompt: 'Engage in a philosophical debate with yourself on a profound question',
+          minWords: 100,
+          aiCoaching: true,
+          teaching: 'Debate sharpens the mind and reveals truth'
+        },
+        virtueGrantPerCompletion: { wisdom: 3 }
+      },
+      {
+        id: 'mandala_creation',
+        kind: 'PHOTO',
+        title: 'Mandala Creation',
+        config: {
+          tags: ['mandala', 'meditation', 'art', 'wisdom'],
+          teaching: 'Create beauty as a form of meditation'
+        },
+        virtueGrantPerCompletion: { wisdom: 2, temperance: 1 }
+      },
+      {
+        id: 'compassion_meditation',
+        kind: 'TIMER',
+        title: 'Compassion Meditation',
+        config: {
+          targetSec: 600, // 10 minutes
+          allowRPE: false,
+          teaching: 'Develop boundless compassion for all beings'
+        },
+        virtueGrantPerCompletion: { wisdom: 1, temperance: 1 }
+      },
+      {
+        id: 'tibetan_breath',
+        kind: 'BREATH',
+        title: 'Tibetan Breath',
+        config: {
+          pattern: 'alternate_nostril',
+          params: { in: 4, hold: 8, out: 8, cycles: 12 },
+          teaching: 'Balance the mind through breath control'
+        },
+        virtueGrantPerCompletion: { temperance: 2, wisdom: 1 }
+      }
+    ],
+    quests: [
+      {
+        id: 'tibetan_quest_1',
+        title: 'Tummo + compassion meditation',
+        description: 'Practice inner fire and compassion meditation',
+        widgetIds: ['tummo_meditation', 'compassion_meditation'],
+        minutes: 25,
+        virtueGrants: { wisdom: 3, temperance: 3 }
+      },
+      {
+        id: 'tibetan_quest_2',
+        title: 'Philosophical debate + mandala',
+        description: 'Engage in debate and create mandala art',
+        widgetIds: ['philosophical_debate', 'mandala_creation'],
+        minutes: 30,
+        virtueGrants: { wisdom: 4, temperance: 1 }
+      },
+      {
+        id: 'tibetan_quest_3',
+        title: 'Breath mastery + deep reflection',
+        description: 'Master Tibetan breathing and reflect deeply',
+        widgetIds: ['tibetan_breath', 'philosophical_debate'],
+        minutes: 20,
+        virtueGrants: { wisdom: 2, temperance: 3 }
+      }
+    ],
+    capstone: {
+      title: 'Monastic Wisdom',
+      requirements: [
+        'Complete 21 days of daily meditation',
+        'Write a philosophical treatise (500+ words)',
+        'Create a personal mandala',
+        'Master Tibetan breathing techniques',
+        'Complete capstone checklist'
+      ]
+    }
+  },
+  {
+    slug: 'viking_berserker',
+    name: 'Viking Berserker',
+    tone: 'fierce',
+    virtuePrimary: 'COURAGE',
+    virtueSecondary: 'TEMPERANCE',
+    teachingChip: 'Master your rage, master your fate.',
+    widgets: [
+      {
+        id: 'cold_endurance_timer',
+        kind: 'TIMER',
+        title: 'Cold Endurance Timer',
+        config: {
+          targetSec: 300, // 5 minutes
+          allowRPE: true,
+          teaching: 'Build resilience through cold exposure'
+        },
+        virtueGrantPerCompletion: { courage: 2, temperance: 1 }
+      },
+      {
+        id: 'berserker_rage_control',
+        kind: 'JOURNAL',
+        title: 'Berserker Rage Control',
+        config: {
+          prompt: 'Describe a situation that triggered anger and how you controlled it',
+          minWords: 80,
+          aiCoaching: true,
+          teaching: 'True strength is controlling your rage'
+        },
+        virtueGrantPerCompletion: { courage: 2, temperance: 2 }
+      },
+      {
+        id: 'shield_wall_training',
+        kind: 'COUNTER',
+        title: 'Shield Wall Training',
+        config: {
+          targetReps: 30,
+          step: 1,
+          exercises: ['shield_raises', 'wall_pushes', 'formation_holds'],
+          teaching: 'Unity and discipline in the shield wall'
+        },
+        virtueGrantPerCompletion: { courage: 2, temperance: 1 }
+      },
+      {
+        id: 'battle_preparation',
+        kind: 'CHECKLIST',
+        title: 'Battle Preparation',
+        config: {
+          items: [
+            { id: 'mental_prep', label: 'Mental preparation complete', required: true },
+            { id: 'physical_prep', label: 'Physical readiness confirmed', required: true },
+            { id: 'strategy_plan', label: 'Strategy planned and reviewed', required: true }
+          ],
+          teaching: 'Preparation is the key to victory'
+        },
+        virtueGrantPerCompletion: { courage: 1, wisdom: 1 }
+      },
+      {
+        id: 'viking_breath',
+        kind: 'BREATH',
+        title: 'Viking Breath',
+        config: {
+          pattern: 'power',
+          params: { in: 3, hold: 2, out: 6, cycles: 10 },
+          teaching: 'Powerful breathing for battle readiness'
+        },
+        virtueGrantPerCompletion: { courage: 2, temperance: 1 }
+      }
+    ],
+    quests: [
+      {
+        id: 'viking_quest_1',
+        title: 'Cold endurance + rage control',
+        description: 'Build cold tolerance and practice rage control',
+        widgetIds: ['cold_endurance_timer', 'berserker_rage_control'],
+        minutes: 15,
+        virtueGrants: { courage: 4, temperance: 3 }
+      },
+      {
+        id: 'viking_quest_2',
+        title: 'Shield wall + battle prep',
+        description: 'Train shield wall techniques and prepare for challenges',
+        widgetIds: ['shield_wall_training', 'battle_preparation'],
+        minutes: 20,
+        virtueGrants: { courage: 3, wisdom: 1, temperance: 1 }
+      },
+      {
+        id: 'viking_quest_3',
+        title: 'Breath mastery + deep reflection',
+        description: 'Master Viking breathing and reflect on courage',
+        widgetIds: ['viking_breath', 'berserker_rage_control'],
+        minutes: 18,
+        virtueGrants: { courage: 3, temperance: 2 }
+      }
+    ],
+    capstone: {
+      title: 'Berserker Mastery',
+      requirements: [
+        'Complete 14 days of cold endurance training',
+        'Master rage control in 5 challenging situations',
+        'Achieve shield wall proficiency',
+        'Create a personal battle strategy',
+        'Complete capstone checklist'
+      ]
+    }
   }
 ];
 

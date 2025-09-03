@@ -37,6 +37,24 @@ const FRAMEWORK_BREATH_MAP: Record<string, BreathPhase[]> = {
     { name: "Exhale", duration: 5, color: "#10b981", audioCue: "exhale" },
     { name: "Hold", duration: 3, color: "#059669", audioCue: "hold" }
   ],
+  'celtic_druid': [
+    { name: "Inhale", duration: 4, color: "#22c55e", audioCue: "inhale" },
+    { name: "Hold", duration: 2, color: "#16a34a", audioCue: "hold" },
+    { name: "Exhale", duration: 6, color: "#22c55e", audioCue: "exhale" },
+    { name: "Hold", duration: 2, color: "#16a34a", audioCue: "hold" }
+  ],
+  'tibetan_monk': [
+    { name: "Inhale", duration: 4, color: "#8b5cf6", audioCue: "inhale" },
+    { name: "Hold", duration: 8, color: "#7c3aed", audioCue: "hold" },
+    { name: "Exhale", duration: 8, color: "#8b5cf6", audioCue: "exhale" },
+    { name: "Hold", duration: 4, color: "#7c3aed", audioCue: "hold" }
+  ],
+  'viking_berserker': [
+    { name: "Inhale", duration: 3, color: "#dc2626", audioCue: "inhale" },
+    { name: "Hold", duration: 2, color: "#b91c1c", audioCue: "hold" },
+    { name: "Exhale", duration: 6, color: "#dc2626", audioCue: "exhale" },
+    { name: "Hold", duration: 2, color: "#b91c1c", audioCue: "hold" }
+  ],
   'default': [
     { name: "Inhale", duration: 4, color: "#7ad7ff", audioCue: "inhale" },
     { name: "Hold", duration: 4, color: "#a78bfa", audioCue: "hold" },

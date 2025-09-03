@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
+import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,10 +17,17 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    // Return default preferences
+    // Get user preferences from database
+    const userPrefs = await prisma.userPreference.findUnique({
+      where: { userId: payload.userId },
+    });
+
+    // Return preferences with defaults
     const preferences = {
-      displayName: payload.displayName || 'User',
+      displayName: userPrefs?.name || payload.displayName || 'User',
       email: payload.email || '',
+      timezone: userPrefs?.timezone || 'UTC',
+      framework: userPrefs?.framework || null,
       theme: 'dark',
       focusVirtue: 'wisdom',
       dailyReminders: true,
@@ -50,19 +58,39 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { preferences } = body;
+    const { framework, name, timezone, secondaryFrameworks, preferences } = body;
     
-    if (!preferences) {
-      return NextResponse.json({ error: 'Preferences required' }, { status: 400 });
+    // Handle onboarding data
+    if (framework || name || timezone) {
+      await prisma.userPreference.upsert({
+        where: { userId: payload.userId },
+        update: {
+          framework: framework || undefined,
+          name: name || undefined,
+          timezone: timezone || undefined,
+          updatedAt: new Date(),
+        },
+        create: {
+          userId: payload.userId,
+          framework: framework || null,
+          name: name || null,
+          timezone: timezone || null,
+        },
+      });
     }
 
-    // In a real app, you'd save to database
-    // For now, we'll just return success
-    console.log('Saving preferences for user:', payload.userId, preferences);
+    // Handle regular preferences
+    if (preferences) {
+      // In a real app, you'd save other preferences to database
+      console.log('Saving preferences for user:', payload.userId, preferences);
+    }
 
     return NextResponse.json({ 
       success: true, 
       message: 'Preferences saved successfully',
+      framework,
+      name,
+      timezone,
       preferences 
     });
   } catch (error) {

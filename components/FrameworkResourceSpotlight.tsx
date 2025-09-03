@@ -103,6 +103,12 @@ export default function FrameworkResourceSpotlight({
                 return title.includes('yogic') || thinker.includes('patanjali') || type.includes('breath');
               case 'monastic':
                 return title.includes('monastic') || thinker.includes('benedict') || type.includes('lifestyle');
+              case 'celtic_druid':
+                return title.includes('celtic') || title.includes('druid') || thinker.includes('druid') || type.includes('nature');
+              case 'tibetan_monk':
+                return title.includes('tibetan') || title.includes('buddhist') || thinker.includes('dalai') || type.includes('meditation');
+              case 'viking_berserker':
+                return title.includes('viking') || title.includes('norse') || thinker.includes('viking') || type.includes('courage');
               default:
                 return false;
             }

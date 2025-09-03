@@ -1092,7 +1092,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [shareToCommunity, setShareToCommunity] = useState(false);
-  const [philosopher, setPhilosopher] = useState('');
 
   const availableTags = [
     'dawn','sunrise','morning','midday','afternoon','dusk','sunset','night','stars','moon',
@@ -1153,7 +1152,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       formData.append('weather', weather);
       formData.append('mood', mood);
       formData.append('shareToCommunity', shareToCommunity.toString());
-      formData.append('philosopher', philosopher || 'aristotle'); // Include philosopher selection
+
 
       const response = await fetch('/api/nature-photo', {
         method: 'POST',
@@ -1169,7 +1168,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           weather,
           mood,
           shareToCommunity,
-          philosopher: philosopher || 'aristotle', // Include philosopher selection
+
         }),
       });
 
@@ -1208,7 +1207,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         setUploadedImage(null);
         setImagePreview('');
         setShareToCommunity(false);
-        setPhilosopher(''); // Reset philosopher selection
+        
         
         // Show success notification
         setShowSuccess(true);
@@ -1422,10 +1421,10 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           </div>
 
           {/* Community Share Checkbox */}
-          <div className="flex items-center mt-4">
+          <div className="flex items-center mb-4">
             <input
-              type="checkbox"
               id="share-to-community"
+              type="checkbox"
               checked={shareToCommunity}
               onChange={(e) => setShareToCommunity(e.target.checked)}
               className="mr-2 h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
@@ -1468,7 +1467,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                 setUploadedImage(null);
                 setImagePreview('');
                 setShareToCommunity(false);
-                setPhilosopher(''); // Reset philosopher selection
+    
               }}
               className="flex-1 px-3 py-2 bg-surface-2 border border-border text-text rounded-lg hover:bg-surface transition-colors duration-150"
             >
