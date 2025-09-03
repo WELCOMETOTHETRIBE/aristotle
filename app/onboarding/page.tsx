@@ -51,11 +51,34 @@ interface FrameworkDisplay {
   virtueSecondary?: string;
 }
 
+// Human-readable timezone options with proper formatting
 const timezones = [
-  'UTC-12:00', 'UTC-11:00', 'UTC-10:00', 'UTC-09:00', 'UTC-08:00', 'UTC-07:00', 'UTC-06:00',
-  'UTC-05:00', 'UTC-04:00', 'UTC-03:00', 'UTC-02:00', 'UTC-01:00', 'UTC+00:00', 'UTC+01:00',
-  'UTC+02:00', 'UTC+03:00', 'UTC+04:00', 'UTC+05:00', 'UTC+05:30', 'UTC+06:00', 'UTC+07:00',
-  'UTC+08:00', 'UTC+09:00', 'UTC+10:00', 'UTC+11:00', 'UTC+12:00'
+  { value: 'UTC-12:00', label: 'Baker Island (UTC-12:00)' },
+  { value: 'UTC-11:00', label: 'Samoa (UTC-11:00)' },
+  { value: 'UTC-10:00', label: 'Hawaii (UTC-10:00)' },
+  { value: 'UTC-09:00', label: 'Alaska (UTC-09:00)' },
+  { value: 'UTC-08:00', label: 'Pacific Time (UTC-08:00)' },
+  { value: 'UTC-07:00', label: 'Mountain Time (UTC-07:00)' },
+  { value: 'UTC-06:00', label: 'Central Time (UTC-06:00)' },
+  { value: 'UTC-05:00', label: 'Eastern Time (UTC-05:00)' },
+  { value: 'UTC-04:00', label: 'Atlantic Time (UTC-04:00)' },
+  { value: 'UTC-03:00', label: 'Brazil (UTC-03:00)' },
+  { value: 'UTC-02:00', label: 'South Georgia (UTC-02:00)' },
+  { value: 'UTC-01:00', label: 'Azores (UTC-01:00)' },
+  { value: 'UTC+00:00', label: 'London (UTC+00:00)' },
+  { value: 'UTC+01:00', label: 'Paris, Berlin (UTC+01:00)' },
+  { value: 'UTC+02:00', label: 'Cairo, Helsinki (UTC+02:00)' },
+  { value: 'UTC+03:00', label: 'Moscow, Istanbul (UTC+03:00)' },
+  { value: 'UTC+04:00', label: 'Dubai, Baku (UTC+04:00)' },
+  { value: 'UTC+05:00', label: 'Mumbai, Tashkent (UTC+05:00)' },
+  { value: 'UTC+05:30', label: 'New Delhi (UTC+05:30)' },
+  { value: 'UTC+06:00', label: 'Dhaka, Almaty (UTC+06:00)' },
+  { value: 'UTC+07:00', label: 'Bangkok, Jakarta (UTC+07:00)' },
+  { value: 'UTC+08:00', label: 'Beijing, Singapore (UTC+08:00)' },
+  { value: 'UTC+09:00', label: 'Tokyo, Seoul (UTC+09:00)' },
+  { value: 'UTC+10:00', label: 'Sydney, Melbourne (UTC+10:00)' },
+  { value: 'UTC+11:00', label: 'Solomon Islands (UTC+11:00)' },
+  { value: 'UTC+12:00', label: 'New Zealand (UTC+12:00)' }
 ];
 
 const frameworks: FrameworkDisplay[] = [
@@ -64,7 +87,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Spartan Agōgē',
     description: 'Discipline through hardship, physical excellence, mental toughness',
     icon: Shield,
-    color: 'from-red-500 to-red-700',
+    color: 'from-[#FFAD44] to-[#E24C43]',
     virtuePrimary: 'Courage',
     virtueSecondary: 'Temperance'
   },
@@ -73,7 +96,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Samurai Bushidō',
     description: 'Honor, etiquette, precision, and the way of the warrior',
     icon: Target,
-    color: 'from-green-500 to-green-700',
+    color: 'from-[#E24C43] to-[#9DCA52]',
     virtuePrimary: 'Justice',
     virtueSecondary: 'Courage'
   },
@@ -82,7 +105,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Stoicism',
     description: 'Rational thinking, emotional control, focus on what you can control',
     icon: Brain,
-    color: 'from-blue-500 to-blue-700',
+    color: 'from-[#6784AD] to-[#78D2BE]',
     virtuePrimary: 'Wisdom',
     virtueSecondary: 'Temperance'
   },
@@ -91,7 +114,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Monastic Rule',
     description: 'Rhythm, order, service, and contemplative living',
     icon: BookOpen,
-    color: 'from-purple-500 to-purple-700',
+    color: 'from-[#C4AC88] to-[#B4A0FF]',
     virtuePrimary: 'Temperance',
     virtueSecondary: 'Wisdom'
   },
@@ -100,7 +123,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Yogic Path',
     description: 'Union of body, mind, and spirit through ancient practices',
     icon: Heart,
-    color: 'from-pink-500 to-pink-700',
+    color: 'from-[#78D2BE] to-[#9DCA52]',
     virtuePrimary: 'Wisdom',
     virtueSecondary: 'Temperance'
   },
@@ -109,7 +132,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Indigenous Wisdom',
     description: 'Connection to nature, community, and ancestral knowledge',
     icon: Leaf,
-    color: 'from-emerald-500 to-emerald-700',
+    color: 'from-[#9DCA52] to-[#78D2BE]',
     virtuePrimary: 'Justice',
     virtueSecondary: 'Wisdom'
   },
@@ -118,7 +141,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Martial Arts Code',
     description: 'Discipline, respect, and the development of inner strength',
     icon: Zap,
-    color: 'from-orange-500 to-orange-700',
+    color: 'from-[#777777] to-[#FF915C]',
     virtuePrimary: 'Courage',
     virtueSecondary: 'Temperance'
   },
@@ -127,7 +150,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Sufi Practice',
     description: 'Love, devotion, and the path to divine union',
     icon: Star,
-    color: 'from-indigo-500 to-indigo-700',
+    color: 'from-[#FFC46E] to-[#B4A0FF]',
     virtuePrimary: 'Wisdom',
     virtueSecondary: 'Temperance'
   },
@@ -136,7 +159,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Ubuntu',
     description: 'Community, interconnectedness, and human dignity',
     icon: Users,
-    color: 'from-teal-500 to-teal-700',
+    color: 'from-[#66BAFF] to-[#9DCA52]',
     virtuePrimary: 'Justice',
     virtueSecondary: 'Wisdom'
   },
@@ -145,7 +168,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Modern High-Performance',
     description: 'Systematic approaches to excellence and peak performance',
     icon: GraduationCap,
-    color: 'from-cyan-500 to-cyan-700',
+    color: 'from-[#FF73B3] to-[#7EB4FF]',
     virtuePrimary: 'Wisdom',
     virtueSecondary: 'Courage'
   },
@@ -154,7 +177,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Celtic Druid',
     description: 'Natural wisdom, seasonal cycles, and oral tradition',
     icon: Eye,
-    color: 'from-lime-500 to-lime-700',
+    color: 'from-[#9DCA52] to-[#78D2BE]',
     virtuePrimary: 'Wisdom',
     virtueSecondary: 'Temperance'
   },
@@ -163,7 +186,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Tibetan Buddhist Monk',
     description: 'Inner transformation, philosophical debate, and compassion',
     icon: Compass,
-    color: 'from-amber-500 to-amber-700',
+    color: 'from-[#F2B34C] to-[#B4A0FF]',
     virtuePrimary: 'Wisdom',
     virtueSecondary: 'Temperance'
   },
@@ -172,7 +195,7 @@ const frameworks: FrameworkDisplay[] = [
     name: 'Viking Berserker',
     description: 'Controlled aggression, battle preparation, and rage mastery',
     icon: Shield,
-    color: 'from-red-600 to-red-800',
+    color: 'from-[#E24C43] to-[#777777]',
     virtuePrimary: 'Courage',
     virtueSecondary: 'Temperance'
   }
@@ -325,7 +348,7 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <div className="space-y-4">
               <div className="space-y-2">
-                <label htmlFor="name" className="text-lg font-medium">
+                <label htmlFor="name" className="text-lg font-medium text-text">
                   What should I call you?
                 </label>
                 <Input
@@ -333,22 +356,24 @@ export default function OnboardingPage() {
                   value={data.name}
                   onChange={(e) => updateData('name', e.target.value)}
                   placeholder="Enter your name"
-                  className="text-lg py-3"
+                  className="text-lg py-3 bg-surface-2 border-border text-text placeholder:text-muted focus:ring-2 focus:ring-primary/50"
                 />
               </div>
               
               <div className="space-y-2">
-                <label htmlFor="timezone" className="text-lg font-medium">
+                <label htmlFor="timezone" className="text-lg font-medium text-text">
                   What's your timezone?
                 </label>
                 <select
                   id="timezone"
                   value={data.timezone}
                   onChange={(e) => updateData('timezone', e.target.value)}
-                  className="w-full p-3 border border-border rounded-lg bg-background text-foreground"
+                  className="w-full p-3 border border-border rounded-lg bg-surface-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
                 >
                   {timezones.map(tz => (
-                    <option key={tz} value={tz}>{tz}</option>
+                    <option key={tz.value} value={tz.value} className="bg-surface-2 text-text">
+                      {tz.label}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -361,24 +386,24 @@ export default function OnboardingPage() {
           <div className="space-y-6">
             <div className="space-y-6">
               {questions.map((question, index) => (
-                <Card key={question.id} className="border-2 hover:border-primary/30 transition-colors">
+                <Card key={question.id} className="border-2 border-border bg-surface hover:border-primary/30 transition-colors duration-200">
                   <CardContent className="p-6">
                     <div className="flex items-center space-x-3 mb-4">
                       <question.icon className="w-6 h-6 text-primary" />
-                      <h3 className="text-lg font-medium">{question.text}</h3>
+                      <h3 className="text-lg font-medium text-text">{question.text}</h3>
                     </div>
                     <div className="flex space-x-3">
                       <Button
                         variant={data[question.id as keyof OnboardingData] === true ? "default" : "outline"}
                         onClick={() => updateData(question.id as keyof OnboardingData, true)}
-                        className="flex-1 h-12"
+                        className="flex-1 h-12 bg-primary hover:bg-primary/90 text-white border-primary"
                       >
                         {question.trueLabel}
                       </Button>
                       <Button
                         variant={data[question.id as keyof OnboardingData] === false ? "default" : "outline"}
                         onClick={() => updateData(question.id as keyof OnboardingData, false)}
-                        className="flex-1 h-12"
+                        className="flex-1 h-12 bg-surface-2 hover:bg-surface text-text border-border hover:border-primary/50"
                       >
                         {question.falseLabel}
                       </Button>
@@ -394,7 +419,7 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center mb-6">
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-muted">
                 Choose the frameworks that resonate with you. You can select multiple frameworks to create a personalized experience.
               </p>
             </div>
@@ -405,8 +430,8 @@ export default function OnboardingPage() {
                   key={framework.slug}
                   className={`cursor-pointer border-2 transition-all duration-200 hover:scale-105 ${
                     data.selectedFrameworks.includes(framework.slug)
-                      ? 'border-primary shadow-lg'
-                      : 'border-border hover:border-primary/30'
+                      ? 'border-primary shadow-lg bg-surface-2'
+                      : 'border-border bg-surface hover:border-primary/30'
                   }`}
                   onClick={() => toggleFramework(framework.slug)}
                 >
@@ -416,8 +441,8 @@ export default function OnboardingPage() {
                         <framework.icon className="w-5 h-5 text-white" />
                       </div>
                       <div className="flex-1">
-                        <h3 className="font-medium text-sm">{framework.name}</h3>
-                        <p className="text-xs text-muted-foreground">
+                        <h3 className="font-medium text-sm text-text">{framework.name}</h3>
+                        <p className="text-xs text-muted">
                           {framework.virtuePrimary} + {framework.virtueSecondary || 'None'}
                         </p>
                       </div>
@@ -425,7 +450,7 @@ export default function OnboardingPage() {
                         <CheckCircle className="w-5 h-5 text-primary" />
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground">{framework.description}</p>
+                    <p className="text-xs text-muted">{framework.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -437,24 +462,24 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6 text-center">
             <div className="space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full flex items-center justify-center mx-auto">
+              <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto">
                 <Sparkles className="w-8 h-8 text-white" />
               </div>
-              <h2 className="text-2xl font-bold">Ready to Begin Your Journey?</h2>
-              <p className="text-muted-foreground">
+              <h2 className="text-2xl font-bold text-text">Ready to Begin Your Journey?</h2>
+              <p className="text-muted">
                 You've selected {data.selectedFrameworks.length} framework{data.selectedFrameworks.length !== 1 ? 's' : ''} that will shape your personalized experience.
               </p>
             </div>
             
-            <div className="bg-muted/50 rounded-lg p-4">
-              <h3 className="font-medium mb-2">Selected Frameworks:</h3>
+            <div className="bg-surface-2 rounded-lg p-4 border border-border">
+              <h3 className="font-medium mb-2 text-text">Selected Frameworks:</h3>
               <div className="flex flex-wrap gap-2 justify-center">
                 {data.selectedFrameworks.map(slug => {
                   const framework = frameworks.find(f => f.slug === slug);
                   return (
                     <span
                       key={slug}
-                      className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium"
+                      className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium border border-primary/30"
                     >
                       {framework?.name}
                     </span>
@@ -471,18 +496,18 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+    <div className="min-h-screen bg-bg">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-amber-500 to-orange-600 rounded-full mb-4">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-4">
               <Sparkles className="w-8 h-8 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-4xl font-bold text-text mb-4">
               Welcome to Aristotle
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-muted">
               Let's personalize your journey toward wisdom and virtue
             </p>
           </div>
@@ -494,7 +519,7 @@ export default function OnboardingPage() {
                 <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
                   index <= currentStep 
                     ? 'bg-primary border-primary text-white' 
-                    : 'border-border text-muted-foreground'
+                    : 'border-border text-muted bg-surface'
                 }`}>
                   {index < currentStep ? (
                     <CheckCircle className="w-5 h-5" />
@@ -513,16 +538,16 @@ export default function OnboardingPage() {
 
           {/* Current Step Title */}
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl font-bold text-text">
               {steps[currentStep].title}
             </h2>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-muted">
               {steps[currentStep].description}
             </p>
           </div>
 
           {/* Step Content */}
-          <Card className="glass-effect mb-8">
+          <Card className="bg-surface border-border mb-8">
             <CardContent className="p-8">
               {renderStep()}
             </CardContent>
@@ -534,7 +559,7 @@ export default function OnboardingPage() {
               variant="outline"
               onClick={handleBack}
               disabled={currentStep === 0}
-              className="px-6 py-2"
+              className="px-6 py-2 bg-surface-2 hover:bg-surface text-text border-border hover:border-primary/50"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back
@@ -547,7 +572,7 @@ export default function OnboardingPage() {
                   (currentStep === 0 && !data.name) ||
                   (currentStep === 2 && data.selectedFrameworks.length === 0)
                 }
-                className="px-6 py-2"
+                className="px-6 py-2 bg-primary hover:bg-primary/90 text-white"
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -556,7 +581,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={handleComplete}
                 disabled={isProcessing || data.selectedFrameworks.length === 0}
-                className="px-6 py-2"
+                className="px-6 py-2 bg-primary hover:bg-primary/90 text-white"
               >
                 {isProcessing ? (
                   <>
