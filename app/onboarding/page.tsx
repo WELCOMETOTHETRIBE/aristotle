@@ -241,6 +241,11 @@ export default function OnboardingPage() {
   });
   const [isProcessing, setIsProcessing] = useState(false);
 
+  // Debug: Monitor selectedFrameworks changes
+  useEffect(() => {
+    console.log('selectedFrameworks state changed:', data.selectedFrameworks);
+  }, [data.selectedFrameworks]);
+
   const steps = [
     { title: 'Personal Details', description: 'Tell us about yourself' },
     { title: 'Learning Preferences', description: 'Answer 5 quick questions' },
@@ -454,6 +459,9 @@ export default function OnboardingPage() {
                   <p className="text-base md:text-lg text-muted leading-relaxed max-w-2xl mx-auto px-4">
                     Choose the frameworks that resonate with you. You can select multiple frameworks to create a personalized experience.
                   </p>
+                  <div className="mt-4 text-sm text-primary font-medium">
+                    Selected: {data.selectedFrameworks.length} framework{data.selectedFrameworks.length !== 1 ? 's' : ''}
+                  </div>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-96 overflow-y-auto">
@@ -462,7 +470,7 @@ export default function OnboardingPage() {
                     console.log(`Framework ${framework.slug}: isSelected=${isSelected}, current selection:`, data.selectedFrameworks);
                     return (
                       <Card
-                        key={framework.slug}
+                        key={`${framework.slug}-${isSelected}`}
                         className={`cursor-pointer border-2 transition-all duration-200 hover:scale-[1.02] ${
                           isSelected
                             ? 'border-primary shadow-xl bg-surface-2 ring-2 ring-primary/20'
