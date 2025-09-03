@@ -184,6 +184,36 @@ const availableWidgets: Widget[] = [
     color: 'from-rose-500 to-pink-500',
     isActive: true,
     isAdded: false,
+  },
+  {
+    id: 'journal',
+    name: 'Journal',
+    description: 'Personal journal for daily thoughts and reflections',
+    icon: BookOpen,
+    category: 'mindfulness',
+    color: 'from-blue-500 to-indigo-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'goal_tracker',
+    name: 'Goal Tracker',
+    description: 'Track and monitor your personal goals and progress',
+    icon: Target,
+    category: 'productivity',
+    color: 'from-green-500 to-teal-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'balance_gyro',
+    name: 'Balance Challenge',
+    description: 'Test your balance and mindfulness with gyroscope challenges',
+    icon: Activity,
+    category: 'mindfulness',
+    color: 'from-teal-500 to-cyan-500',
+    isActive: true,
+    isAdded: false,
   }
 ];
 
