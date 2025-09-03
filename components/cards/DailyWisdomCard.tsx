@@ -294,6 +294,21 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             )}
           </button>
           <button
+            onClick={() => {
+              // Show favorites modal or navigate to favorites page
+              const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+              if (favorites.length > 0) {
+                alert(`You have ${favorites.length} favorite quotes. This feature will be expanded soon!`);
+              } else {
+                alert('No favorite quotes yet. Add some by clicking the star icon!');
+              }
+            }}
+            className="flex items-center gap-1.5 p-2 rounded-md bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface transition-all duration-200"
+            title="View your favorite quotes"
+          >
+            <BookOpen className="w-4 h-4" />
+          </button>
+          <button
             onClick={() => setShowInfo(!showInfo)}
             className="p-2 text-muted hover:text-text transition-colors"
           >
@@ -454,10 +469,10 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           <Link 
             href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
-            title="Add AI to discuss this quote"
+            title="Ask AI to discuss this quote"
           >
             <MessageCircle className="w-3.5 h-3.5" />
-            Add AI
+            Ask AI
           </Link>
         </div>
       </div>

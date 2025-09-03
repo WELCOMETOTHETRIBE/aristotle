@@ -545,9 +545,6 @@ export default function TodayPage() {
 
         {/* Daily Wisdom Widget - Prominently placed */}
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-text">Daily Wisdom</h2>
-          </div>
           <DailyWisdomCard />
         </div>
 
@@ -555,7 +552,6 @@ export default function TodayPage() {
         {!submittedIntentions[currentTimePeriod] ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text">{getTimePeriodTitle()}</h2>
               <div className="text-xs text-muted">
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
@@ -675,8 +671,7 @@ export default function TodayPage() {
         {/* Enhanced Widgets Section */}
         {userWidgets.length > 0 && (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text">Your Wellness Tools</h2>
+            <div className="flex items-center justify-end">
               <button
                 onClick={async () => {
                   // Log widget management navigation to journal
@@ -727,18 +722,6 @@ export default function TodayPage() {
             </div>
           </div>
         )}
-
-        {/* Streaks */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-text">Your Streaks</h2>
-          <div className="grid grid-cols-2 gap-3">
-            {/* HabitTrackerCard is removed, so this section will be empty or need new data */}
-            {/* For now, we'll just show a placeholder or remove if no habits are tracked */}
-            <div className="bg-surface border border-border rounded-lg p-4 text-center text-muted">
-              <p>No habits tracked yet.</p>
-            </div>
-          </div>
-        </div>
 
         {/* Widget Placeholder */}
         <div className="space-y-4">
