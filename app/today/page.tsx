@@ -568,7 +568,7 @@ export default function TodayPage() {
                     </div>
                     <h3 className="font-semibold text-text">How are you feeling?</h3>
                   </div>
-                  <div className="grid grid-cols-5 gap-3">
+                  <div className="grid grid-cols-5 gap-2">
                     {[
                       { value: 1, emoji: '😞', label: 'Struggling' },
                       { value: 2, emoji: '😐', label: 'Neutral' },
@@ -597,14 +597,14 @@ export default function TodayPage() {
                           await logToJournal(moodLogData);
                         }}
                         className={cn(
-                          'p-4 rounded-xl border transition-all duration-200 hover:scale-105',
+                          'p-3 rounded-xl border transition-all duration-200 hover:scale-105',
                           mood === value
                             ? 'bg-courage/20 border-courage/30 text-courage shadow-lg'
                             : 'bg-surface-2 border-border text-muted hover:text-text hover:border-courage/30 hover:bg-courage/5'
                         )}
                       >
-                        <div className="text-2xl mb-1">{emoji}</div>
-                        <div className="text-xs font-medium">{label}</div>
+                        <div className="text-xl mb-1">{emoji}</div>
+                        <div className="text-xs font-medium leading-tight">{label}</div>
                       </button>
                     ))}
                   </div>
@@ -645,7 +645,6 @@ export default function TodayPage() {
         ) : (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold text-text">{getTimePeriodTitle()} - Completed</h2>
               <div className="text-xs text-muted">
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>

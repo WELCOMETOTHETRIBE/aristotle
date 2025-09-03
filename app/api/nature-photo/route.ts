@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    // Create comprehensive journal entry directly in the database
+    // Create comprehensive journal entry using the journal logger
     const journalData = createNaturePhotoLog(
       caption || 'Nature moment',
       tags || [],
@@ -104,17 +104,12 @@ export async function POST(request: NextRequest) {
       mood
     );
 
-    // Create journal entry directly instead of making HTTP call
-    const journalEntry = await db.journalEntry.create({
-      data: {
-        userId: actualUserId,
-        type: journalData.type,
-        content: journalData.content,
-        category: journalData.category,
-        date: new Date(),
-        // Only fields present in schema are used; remove metadata/moduleId/widgetId
-      },
-    });
+    // Log to journal using the proper function
+    const journalResult = await logToJournal(journalData);
+
+    if (!journalResult.success) {
+      console.warn('Failed to log to journal:', journalResult.error);
+    }
 
     // Community sharing functionality restored
     let thread = null;
@@ -196,7 +191,7 @@ export async function POST(request: NextRequest) {
       success: true,
       photo,
       imageUrl,
-      journalEntry: journalEntry,
+      journalEntry: journalResult.entry, // Assuming journalResult.entry is the new entry
       thread,
       message: 'Nature photo saved and logged to journal successfully!'
     });

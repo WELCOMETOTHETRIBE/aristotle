@@ -468,10 +468,16 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           
           <Link 
             href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
+            onClick={() => {
+              // Scroll to top when navigating to coach page
+              if (typeof window !== 'undefined') {
+                window.scrollTo(0, 0);
+              }
+            }}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
             title="Ask AI to discuss this quote"
           >
-            <MessageCircle className="w-3.5 h-3.5" />
+            <MessageCircle className="w-3.5 h-5" />
             Ask AI
           </Link>
         </div>

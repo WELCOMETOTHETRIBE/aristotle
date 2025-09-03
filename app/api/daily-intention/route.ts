@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { logToJournal } from '@/lib/journal-logger';
 
 const prisma = new PrismaClient();
 
@@ -69,6 +70,22 @@ export async function POST(request: NextRequest) {
           submittedAt: new Date()
         }
       });
+
+      // Log to journal
+      await logToJournal({
+        type: 'daily_intention',
+        content: `Updated ${timePeriod} intention: ${intention}`,
+        category: 'goal_setting',
+        metadata: {
+          timePeriod,
+          mood,
+          intention,
+          timestamp: new Date().toISOString(),
+        },
+        moduleId: 'daily_intention',
+        widgetId: 'intention_setter',
+      });
+
       return NextResponse.json({ intention: updatedIntention });
     } else {
       // Create new intention
@@ -82,6 +99,22 @@ export async function POST(request: NextRequest) {
           submittedAt: new Date()
         }
       });
+
+      // Log to journal
+      await logToJournal({
+        type: 'daily_intention',
+        content: `Set ${timePeriod} intention: ${intention}`,
+        category: 'goal_setting',
+        metadata: {
+          timePeriod,
+          mood,
+          intention,
+          timestamp: new Date().toISOString(),
+        },
+        moduleId: 'daily_intention',
+        widgetId: 'intention_setter',
+      });
+
       return NextResponse.json({ intention: newIntention });
     }
   } catch (error) {
