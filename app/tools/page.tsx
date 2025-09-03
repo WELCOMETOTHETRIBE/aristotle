@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Wrench, Plus, Check, Sparkles, Wind, Heart, Droplets, Moon, 
   Target, Timer, Brain, Activity, BookOpen, Zap, Shield, Leaf,
-  Settings, Palette, Grid3X3, Star, Eye, EyeOff, Camera
+  Settings, Palette, Grid3X3, Star, Eye, EyeOff, Camera, X
 } from 'lucide-react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
@@ -98,10 +98,80 @@ const availableWidgets: Widget[] = [
   {
     id: 'movement_tracker',
     name: 'Movement Tracker',
-    description: 'Track your daily movement and exercise',
+    description: 'Track physical activity and movement',
     icon: Activity,
     category: 'health',
-    color: 'from-emerald-500 to-teal-500',
+    color: 'from-emerald-500 to-green-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'reading_tracker',
+    name: 'Reading Tracker',
+    description: 'Track your reading progress and goals',
+    icon: BookOpen,
+    category: 'learning',
+    color: 'from-amber-500 to-orange-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'energy_tracker',
+    name: 'Energy Tracker',
+    description: 'Monitor your daily energy levels',
+    icon: Zap,
+    category: 'wellness',
+    color: 'from-yellow-500 to-amber-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'boundary_tracker',
+    name: 'Boundary Tracker',
+    description: 'Track and maintain personal boundaries',
+    icon: Shield,
+    category: 'mindfulness',
+    color: 'from-slate-500 to-gray-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'nature_photo',
+    name: 'Nature Photo Log',
+    description: 'Log and reflect on nature experiences',
+    icon: Camera,
+    category: 'mindfulness',
+    color: 'from-green-500 to-emerald-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'virtue_balance',
+    name: 'Virtue Balance',
+    description: 'Track your virtue development and balance',
+    icon: Leaf,
+    category: 'learning',
+    color: 'from-teal-500 to-cyan-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'terminology',
+    name: 'Terminology',
+    description: 'Learn philosophical terms and concepts',
+    icon: Brain,
+    category: 'learning',
+    color: 'from-violet-500 to-purple-500',
+    isActive: true,
+    isAdded: false,
+  },
+  {
+    id: 'fasting_tracker',
+    name: 'Fasting Tracker',
+    description: 'Track your fasting windows and progress',
+    icon: Timer,
+    category: 'health',
+    color: 'from-red-500 to-pink-500',
     isActive: true,
     isAdded: false,
   },
@@ -109,92 +179,12 @@ const availableWidgets: Widget[] = [
     id: 'gratitude_journal',
     name: 'Gratitude Journal',
     description: 'Daily gratitude practice and reflection',
-    icon: BookOpen,
-    category: 'wellness',
-    color: 'from-yellow-500 to-orange-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'energy_tracker',
-    name: 'Energy Tracker',
-    description: 'Monitor your energy levels throughout the day',
-    icon: Zap,
-    category: 'wellness',
-    color: 'from-amber-500 to-yellow-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'strength_tracker',
-    name: 'Strength Tracker',
-    description: 'Track your strength training progress',
-    icon: Shield,
-    category: 'health',
-    color: 'from-red-500 to-pink-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'flexibility_tracker',
-    name: 'Flexibility Tracker',
-    description: 'Track your flexibility and mobility progress',
-    icon: Leaf,
-    category: 'health',
-    color: 'from-green-500 to-lime-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'journal',
-    name: 'Journal',
-    description: 'Daily reflection and mood tracking with AI insights',
-    icon: BookOpen,
+    icon: Heart,
     category: 'mindfulness',
-    color: 'from-blue-500 to-indigo-500',
+    color: 'from-rose-500 to-pink-500',
     isActive: true,
     isAdded: false,
-  },
-  {
-    id: 'goal_tracker',
-    name: 'Goal Tracker',
-    description: 'Set and track progress towards your personal goals',
-    icon: Target,
-    category: 'productivity',
-    color: 'from-purple-500 to-violet-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'terminology',
-    name: 'Terminology',
-    description: 'Explore philosophical terms and concepts from various traditions',
-    icon: BookOpen,
-    category: 'learning',
-    color: 'from-indigo-500 to-purple-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'balance_gyro',
-    name: 'Balance Training',
-    description: 'Physical balance and coordination exercises using device motion sensors. Improve stability and body awareness.',
-    icon: Activity,
-    category: 'health',
-    color: 'from-teal-500 to-cyan-500',
-    isActive: true,
-    isAdded: false,
-  },
-  {
-    id: 'nature_photo_log',
-    name: 'Nature Photo Log',
-    description: 'Capture and reflect on nature moments with AI interpretation',
-    icon: Camera,
-    category: 'mindfulness',
-    color: 'from-green-500 to-emerald-500',
-    isActive: true,
-    isAdded: false,
-  },
+  }
 ];
 
 const categories = [
@@ -212,6 +202,8 @@ export default function ToolsPage() {
   const [widgets, setWidgets] = useState<Widget[]>(availableWidgets);
   const [showAddedOnly, setShowAddedOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
+  const [showModal, setShowModal] = useState(false);
 
   // Load user's added widgets from localStorage
   useEffect(() => {
@@ -275,6 +267,16 @@ export default function ToolsPage() {
       
       return updatedWidgets;
     });
+  };
+
+  const openWidgetModal = (widget: Widget) => {
+    setSelectedWidget(widget);
+    setShowModal(true);
+  };
+
+  const closeWidgetModal = () => {
+    setShowModal(false);
+    setSelectedWidget(null);
   };
 
   const filteredWidgets = widgets.filter(widget => {
@@ -370,7 +372,7 @@ export default function ToolsPage() {
           </div>
         </div>
 
-        {/* Widgets Grid */}
+        {/* Widgets Gallery Grid */}
         <div className="space-y-4">
           {filteredWidgets.length === 0 ? (
             <div className="text-center py-12">
@@ -384,59 +386,43 @@ export default function ToolsPage() {
               </p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredWidgets.map((widget) => (
-                <motion.div
+                <motion.button
                   key={widget.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="bg-surface border border-border rounded-xl p-4 hover:shadow-2 transition-all duration-200"
+                  onClick={() => openWidgetModal(widget)}
+                  className="group bg-surface border border-border rounded-2xl p-4 hover:shadow-lg hover:border-primary/30 transition-all duration-200 text-left"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-4 flex-1">
-                      {/* Widget Icon */}
-                      <div className={`w-12 h-12 bg-gradient-to-r ${widget.color} rounded-xl flex items-center justify-center shadow-sm`}>
-                        <widget.icon className="w-6 h-6 text-white" />
-                      </div>
-
-                      {/* Widget Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-text">{widget.name}</h3>
-                          {widget.isAdded && (
-                            <div className="px-2 py-0.5 bg-success/10 text-success text-xs rounded-full">
-                              Added
-                            </div>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted mb-2">{widget.description}</p>
-                        
-                        {/* Category Badge */}
-                        <div className="flex items-center gap-2">
-                          <span className="px-2 py-1 bg-surface-2 text-muted text-xs rounded-full">
-                            {categories.find(c => c.id === widget.category)?.name}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Add/Remove Button */}
-                    <button
-                      onClick={() => toggleWidget(widget.id)}
-                      className={`ml-4 p-2 rounded-lg transition-all duration-200 ${
-                        widget.isAdded
-                          ? 'bg-success/20 text-success hover:bg-success/30'
-                          : 'bg-primary/20 text-primary hover:bg-primary/30'
-                      }`}
-                    >
-                      {widget.isAdded ? (
-                        <Check className="w-5 h-5" />
-                      ) : (
-                        <Plus className="w-5 h-5" />
-                      )}
-                    </button>
+                  {/* Widget Icon */}
+                  <div className={`w-16 h-16 bg-gradient-to-r ${widget.color} rounded-2xl flex items-center justify-center shadow-sm mb-3 mx-auto group-hover:shadow-lg transition-shadow`}>
+                    <widget.icon className="w-8 h-8 text-white" />
                   </div>
-                </motion.div>
+
+                  {/* Widget Info */}
+                  <div className="text-center">
+                    <h3 className="font-semibold text-text text-sm mb-1 line-clamp-2">{widget.name}</h3>
+                    <p className="text-xs text-muted line-clamp-2 mb-2">{widget.description}</p>
+                    
+                    {/* Status Badge */}
+                    <div className="flex items-center justify-center">
+                      {widget.isAdded ? (
+                        <div className="px-2 py-1 bg-success/10 text-success text-xs rounded-full flex items-center gap-1">
+                          <Check className="w-3 h-3" />
+                          Added
+                        </div>
+                      ) : (
+                        <div className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full flex items-center gap-1">
+                          <Plus className="w-3 h-3" />
+                          Add
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </motion.button>
               ))}
             </div>
           )}
@@ -452,7 +438,7 @@ export default function ToolsPage() {
               <div>
                 <h3 className="font-semibold text-text mb-1">How to use widgets</h3>
                 <p className="text-sm text-muted">
-                  Add widgets to your Today page to customize your daily experience. 
+                  Click on any widget to view details and add it to your Today page. 
                   Each widget provides specific functionality to help you track, practice, and grow.
                 </p>
               </div>
@@ -460,6 +446,82 @@ export default function ToolsPage() {
           </div>
         )}
       </main>
+
+      {/* Full-Screen Widget Modal */}
+      <AnimatePresence>
+        {showModal && selectedWidget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={closeWidgetModal}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 300 }}
+              className="bg-surface border border-border rounded-3xl w-full max-w-md max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={closeWidgetModal}
+                className="absolute top-4 right-4 w-8 h-8 bg-surface-2 hover:bg-surface-3 rounded-full flex items-center justify-center text-muted hover:text-text transition-colors z-10"
+              >
+                <X className="w-4 h-4" />
+              </button>
+
+              {/* Widget Content */}
+              <div className="p-6">
+                {/* Widget Icon */}
+                <div className={`w-20 h-20 bg-gradient-to-r ${selectedWidget.color} rounded-2xl flex items-center justify-center shadow-lg mb-6 mx-auto`}>
+                  <selectedWidget.icon className="w-10 h-10 text-white" />
+                </div>
+
+                {/* Widget Info */}
+                <div className="text-center mb-6">
+                  <h2 className="text-2xl font-bold text-text mb-2">{selectedWidget.name}</h2>
+                  <p className="text-muted leading-relaxed">{selectedWidget.description}</p>
+                </div>
+
+                {/* Category */}
+                <div className="text-center mb-6">
+                  <span className="px-3 py-1 bg-surface-2 text-muted text-sm rounded-full">
+                    {categories.find(c => c.id === selectedWidget.category)?.name}
+                  </span>
+                </div>
+
+                {/* Action Button */}
+                <button
+                  onClick={() => {
+                    toggleWidget(selectedWidget.id);
+                    closeWidgetModal();
+                  }}
+                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 ${
+                    selectedWidget.isAdded
+                      ? 'bg-success/20 text-success hover:bg-success/30 border border-success/30'
+                      : 'bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-xl'
+                  }`}
+                >
+                  {selectedWidget.isAdded ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Check className="w-5 h-5" />
+                      Remove from Homepage
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center gap-2">
+                      <Plus className="w-5 h-5" />
+                      Add to Homepage
+                    </span>
+                  )}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <TabBar />
       <GuideFAB />
