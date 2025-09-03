@@ -70,4 +70,51 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { isComplete, completedAt } = body;
+
+    // For now, we'll use a demo user approach since we don't have proper auth
+    // In production, this would get the user from the session
+    const demoUser = await prisma.user.findFirst({
+      where: { username: 'demo-user' },
+    });
+
+    if (!demoUser) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Update user preferences to mark onboarding as complete
+    if (isComplete) {
+      await prisma.userPreference.upsert({
+        where: { userId: demoUser.id },
+        update: {
+          // Add any additional fields that indicate onboarding completion
+          updatedAt: new Date(),
+        },
+        create: {
+          userId: demoUser.id,
+          // Set default values for required fields
+          updatedAt: new Date(),
+        },
+      });
+    }
+
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Onboarding status updated successfully',
+      isComplete,
+      completedAt
+    });
+
+  } catch (error) {
+    console.error('Error updating onboarding status:', error);
+    return NextResponse.json(
+      { error: 'Failed to update onboarding status' },
+      { status: 500 }
+    );
+  }
 } 

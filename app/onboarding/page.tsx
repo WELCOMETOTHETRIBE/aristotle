@@ -281,7 +281,7 @@ export default function OnboardingPage() {
 
     setIsProcessing(true);
     try {
-      // Save user preferences
+      // First, save user preferences to database
       const prefsResponse = await fetch('/api/prefs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -294,10 +294,11 @@ export default function OnboardingPage() {
       });
 
       if (!prefsResponse.ok) {
-        throw new Error('Failed to save preferences');
+        const errorData = await prefsResponse.json();
+        throw new Error(`Failed to save preferences: ${errorData.error || 'Unknown error'}`);
       }
 
-      // Save user facts
+      // Save user facts for AI personalization
       const facts = [
         { kind: 'bio', content: `Name: ${data.name}` },
         { kind: 'preference', content: `Timezone: ${data.timezone}` },
@@ -315,14 +316,50 @@ export default function OnboardingPage() {
       });
 
       if (!factsResponse.ok) {
-        console.error('Failed to save user facts');
+        console.error('Failed to save user facts, but continuing with onboarding');
       }
+
+      // Save onboarding completion status
+      const onboardingStatusResponse = await fetch('/api/onboarding-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          isComplete: true,
+          completedAt: new Date().toISOString()
+        }),
+      });
+
+      if (!onboardingStatusResponse.ok) {
+        console.error('Failed to update onboarding status, but continuing');
+      }
+
+      // Store in localStorage for immediate use
+      localStorage.setItem('userPreferences', JSON.stringify({
+        name: data.name,
+        timezone: data.timezone,
+        framework: data.selectedFrameworks[0],
+        secondaryFrameworks: data.selectedFrameworks.slice(1),
+        onboardingCompleted: true,
+        completedAt: new Date().toISOString()
+      }));
+
+      // Store personality profile for AI personalization
+      localStorage.setItem('personalityProfile', JSON.stringify({
+        structuredLearning: data.question1,
+        achievementFocused: data.question2,
+        directConfrontation: data.question3,
+        individualPractice: data.question4,
+        physicalDiscipline: data.question5
+      }));
+
+      // Success message
+      alert('Onboarding completed successfully! Your preferences have been saved.');
 
       // Redirect to dashboard
       router.push('/dashboard');
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error completing onboarding:', error);
-      alert('There was an error completing your setup. Please try again.');
+      alert(`There was an error completing your setup: ${error.message}. Please try again.`);
     } finally {
       setIsProcessing(false);
     }
