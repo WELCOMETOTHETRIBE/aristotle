@@ -332,7 +332,7 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case 0:
         return (
-          <div className="space-y-8">
+          <div className="space-y-6">
             <div className="space-y-6">
               <div className="space-y-3">
                 <label htmlFor="name" className="block text-lg font-semibold text-text">
@@ -343,7 +343,7 @@ export default function OnboardingPage() {
                   value={data.name}
                   onChange={(e) => updateData('name', e.target.value)}
                   placeholder="Enter your name"
-                  className="h-12 text-lg bg-surface-2 border-2 border-border text-text placeholder:text-muted/60 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                  className="h-12 text-lg bg-white text-gray-900 placeholder:text-gray-500 border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-medium"
                 />
               </div>
               
@@ -355,10 +355,10 @@ export default function OnboardingPage() {
                   id="timezone"
                   value={data.timezone}
                   onChange={(e) => updateData('timezone', e.target.value)}
-                  className="w-full h-12 px-4 border-2 border-border rounded-lg bg-surface-2 text-text text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
+                  className="w-full h-12 px-4 border-2 border-gray-300 rounded-lg bg-white text-gray-900 text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-medium"
                 >
                   {timezones.map(tz => (
-                    <option key={tz.value} value={tz.value} className="bg-surface-2 text-text py-2">
+                    <option key={tz.value} value={tz.value} className="bg-white text-gray-900 py-2">
                       {tz.label}
                     </option>
                   ))}
@@ -370,28 +370,28 @@ export default function OnboardingPage() {
 
       case 1:
         return (
-          <div className="space-y-6">
+          <div className="space-y-4 md:space-y-6">
             {questions.map((question, index) => (
               <Card key={question.id} className="border-2 border-border bg-surface hover:border-primary/30 transition-all duration-200 hover:shadow-lg">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3 mb-6">
-                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                      <question.icon className="w-5 h-5 text-primary" />
+                <CardContent className="p-4 md:p-6">
+                  <div className="flex items-center space-x-3 mb-4 md:mb-6">
+                    <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <question.icon className="w-4 h-4 md:w-5 h-5 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-text flex-1">{question.text}</h3>
+                    <h3 className="text-base md:text-lg font-semibold text-text flex-1 leading-tight">{question.text}</h3>
                   </div>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <Button
                       variant={data[question.id as keyof OnboardingData] === true ? "default" : "outline"}
                       onClick={() => updateData(question.id as keyof OnboardingData, true)}
-                      className="h-12 text-base font-medium bg-primary hover:bg-primary/90 text-white border-primary shadow-sm"
+                      className="h-10 md:h-12 text-sm md:text-base font-medium bg-primary hover:bg-primary/90 text-white border-primary shadow-sm"
                     >
                       {question.trueLabel}
                     </Button>
                     <Button
                       variant={data[question.id as keyof OnboardingData] === false ? "default" : "outline"}
                       onClick={() => updateData(question.id as keyof OnboardingData, false)}
-                      className="h-12 text-base font-medium bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm"
+                      className="h-10 md:h-12 text-sm md:text-base font-medium bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm"
                     >
                       {question.falseLabel}
                     </Button>
@@ -405,13 +405,13 @@ export default function OnboardingPage() {
       case 2:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-8">
-              <p className="text-lg text-muted leading-relaxed max-w-2xl mx-auto">
+            <div className="text-center mb-6">
+              <p className="text-base md:text-lg text-muted leading-relaxed max-w-2xl mx-auto px-4">
                 Choose the frameworks that resonate with you. You can select multiple frameworks to create a personalized experience.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4 max-h-[400px] md:max-h-[500px] overflow-y-auto pr-2">
               {frameworks.map((framework) => (
                 <Card
                   key={framework.slug}
@@ -422,10 +422,10 @@ export default function OnboardingPage() {
                   }`}
                   onClick={() => toggleFramework(framework.slug)}
                 >
-                  <CardContent className="p-5">
-                    <div className="flex items-start space-x-3 mb-4">
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${framework.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
-                        <framework.icon className="w-6 h-6 text-white" />
+                  <CardContent className="p-4 md:p-5">
+                    <div className="flex items-start space-x-3 mb-3 md:mb-4">
+                      <div className={`w-10 h-10 md:w-12 md:h-12 rounded-lg md:rounded-xl bg-gradient-to-br ${framework.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                        <framework.icon className="w-5 h-5 md:w-6 md:h-6 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm text-text mb-1 leading-tight">{framework.name}</h3>
@@ -441,8 +441,8 @@ export default function OnboardingPage() {
                         </div>
                       </div>
                       {data.selectedFrameworks.includes(framework.slug) && (
-                        <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
-                          <CheckCircle className="w-4 h-4 text-white" />
+                        <div className="w-5 h-5 md:w-6 md:h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-3 h-3 md:w-4 md:h-4 text-white" />
                         </div>
                       )}
                     </div>
@@ -494,38 +494,38 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg flex items-center justify-center py-8">
-      <div className="w-full max-w-4xl mx-auto px-4">
+    <div className="min-h-screen bg-bg flex items-center justify-center py-4 px-4">
+      <div className="w-full max-w-4xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-6 shadow-xl">
-            <Sparkles className="w-10 h-10 text-white" />
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-4 shadow-xl">
+            <Sparkles className="w-8 h-8 text-white" />
           </div>
-          <h1 className="text-5xl font-bold text-text mb-4">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-3">
             Welcome to Aristotle
           </h1>
-          <p className="text-xl text-muted leading-relaxed max-w-2xl mx-auto">
+          <p className="text-lg md:text-xl text-muted leading-relaxed max-w-2xl mx-auto px-4">
             Let's personalize your journey toward wisdom and virtue
           </p>
         </div>
 
         {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-12">
+        <div className="flex items-center justify-center mb-8 overflow-x-auto px-4">
           {steps.map((step, index) => (
-            <div key={index} className="flex items-center">
-              <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200 ${
+            <div key={index} className="flex items-center flex-shrink-0">
+              <div className={`flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all duration-200 ${
                 index <= currentStep 
                   ? 'bg-primary border-primary text-white shadow-lg' 
                   : 'border-border text-muted bg-surface'
               }`}>
                 {index < currentStep ? (
-                  <CheckCircle className="w-6 h-6" />
+                  <CheckCircle className="w-4 h-4 md:w-6 md:h-6" />
                 ) : (
-                  <span className="text-sm font-semibold">{index + 1}</span>
+                  <span className="text-xs md:text-sm font-semibold">{index + 1}</span>
                 )}
               </div>
               {index < steps.length - 1 && (
-                <div className={`w-20 h-0.5 mx-3 transition-all duration-200 ${
+                <div className={`w-12 md:w-20 h-0.5 mx-2 md:mx-3 transition-all duration-200 ${
                   index < currentStep ? 'bg-primary' : 'bg-border'
                 }`} />
               )}
@@ -534,31 +534,31 @@ export default function OnboardingPage() {
         </div>
 
         {/* Current Step Title */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-text mb-2">
+        <div className="text-center mb-6 px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-text mb-2">
             {steps[currentStep].title}
           </h2>
-          <p className="text-lg text-muted">
+          <p className="text-base md:text-lg text-muted">
             {steps[currentStep].description}
           </p>
         </div>
 
         {/* Step Content */}
-        <Card className="bg-surface border-2 border-border mb-8 shadow-xl">
-          <CardContent className="p-8">
+        <Card className="bg-surface border-2 border-border mb-6 shadow-xl mx-4">
+          <CardContent className="p-6 md:p-8">
             {renderStep()}
           </CardContent>
         </Card>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center">
+        <div className="flex justify-between items-center px-4">
           <Button
             variant="outline"
             onClick={handleBack}
             disabled={currentStep === 0}
-            className="px-8 py-3 h-12 bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 font-medium transition-all duration-200"
+            className="px-6 md:px-8 py-2 md:py-3 h-10 md:h-12 bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 font-medium transition-all duration-200 text-sm md:text-base"
           >
-            <ArrowLeft className="w-5 h-5 mr-2" />
+            <ArrowLeft className="w-4 h-4 md:w-5 md:h-5 mr-2" />
             Back
           </Button>
 
@@ -569,26 +569,26 @@ export default function OnboardingPage() {
                 (currentStep === 0 && !data.name) ||
                 (currentStep === 2 && data.selectedFrameworks.length === 0)
               }
-              className="px-8 py-3 h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              className="px-6 md:px-8 py-2 md:py-3 h-10 md:h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-sm md:text-base"
             >
               Next
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2" />
             </Button>
           ) : (
             <Button
               onClick={handleComplete}
               disabled={isProcessing || data.selectedFrameworks.length === 0}
-              className="px-8 py-3 h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+              className="px-6 md:px-8 py-2 md:py-3 h-10 md:h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200 text-sm md:text-base"
             >
               {isProcessing ? (
                 <>
-                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  <Loader2 className="w-4 h-4 md:w-5 md:h-5 mr-2 animate-spin" />
                   Setting up...
                 </>
               ) : (
                 <>
                   Complete Setup
-                  <CheckCircle className="w-5 h-5 ml-2" />
+                  <CheckCircle className="w-4 h-4 md:w-5 md:h-5 ml-2" />
                 </>
               )}
             </Button>
