@@ -167,7 +167,7 @@ const availableWidgets: Widget[] = [
   },
   {
     id: 'terminology',
-    name: 'Philosophical Terminology',
+    name: 'Terminology',
     description: 'Explore philosophical terms and concepts from various traditions',
     icon: BookOpen,
     category: 'learning',

@@ -5,6 +5,7 @@ import { Sparkles, RefreshCw, BookOpen, Quote, Brain, RotateCcw, Settings, Info,
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { logToJournal } from '@/lib/journal-logger';
 
 interface DailyWisdomCardProps {
   className?: string;
@@ -78,6 +79,22 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       if (response.ok) {
         const newWisdom = await response.json();
         setWisdom(newWisdom);
+        
+        // Log new wisdom to journal
+        const wisdomLogData = {
+          type: 'daily_wisdom_refresh',
+          content: `Refreshed daily wisdom: "${newWisdom.quote}" - ${newWisdom.author} (${newWisdom.framework})`,
+          category: 'wisdom',
+          metadata: {
+            quote: newWisdom.quote,
+            author: newWisdom.author,
+            framework: newWisdom.framework,
+            timestamp: new Date().toISOString(),
+          },
+          moduleId: 'daily_wisdom',
+          widgetId: 'daily_wisdom_card',
+        };
+        await logToJournal(wisdomLogData);
       }
     } catch (error) {
       console.error('Error loading daily wisdom:', error);
@@ -86,10 +103,91 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     }
   };
 
-  // Load wisdom on mount
+  // Load wisdom on mount and every 6 hours
   useEffect(() => {
-    loadDailyWisdom();
+    const loadWisdomIfNeeded = () => {
+      if (typeof window === 'undefined') return;
+      
+      const now = new Date();
+      const currentHour = now.getHours();
+      const currentTimeSlot = Math.floor(currentHour / 6); // 0-3 for 6-hour slots
+      const lastLoadTime = localStorage.getItem('lastWisdomLoadTime');
+      const lastTimeSlot = lastLoadTime ? Math.floor(new Date(lastLoadTime).getHours() / 6) : -1;
+      
+      // Load wisdom if it's a new 6-hour time slot or if never loaded
+      if (lastTimeSlot !== currentTimeSlot) {
+        loadDailyWisdom();
+        localStorage.setItem('lastWisdomLoadTime', now.toISOString());
+      }
+    };
+
+    loadWisdomIfNeeded();
+    
+    // Set up interval to check every hour
+    const interval = setInterval(loadWisdomIfNeeded, 60 * 60 * 1000);
+    
+    return () => clearInterval(interval);
   }, []);
+
+  // Check if current quote is in favorites
+  const isFavorite = () => {
+    if (typeof window === 'undefined') return false;
+    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+    return favorites.some((fav: any) => fav.quote === wisdom.quote && fav.author === wisdom.author);
+  };
+
+  // Toggle favorite status
+  const toggleFavorite = async () => {
+    if (typeof window === 'undefined') return;
+    
+    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+    const currentQuote = { quote: wisdom.quote, author: wisdom.author, framework: wisdom.framework, timestamp: new Date().toISOString() };
+    
+    if (isFavorite()) {
+      // Remove from favorites
+      const newFavorites = favorites.filter((fav: any) => !(fav.quote === wisdom.quote && fav.author === wisdom.author));
+      localStorage.setItem('favoriteQuotes', JSON.stringify(newFavorites));
+      
+      // Log removal to journal
+      const removeLogData = {
+        type: 'quote_unfavorited',
+        content: `Removed from favorites: "${wisdom.quote}" - ${wisdom.author}`,
+        category: 'wisdom',
+        metadata: {
+          quote: wisdom.quote,
+          author: wisdom.author,
+          framework: wisdom.framework,
+          timestamp: new Date().toISOString(),
+        },
+        moduleId: 'daily_wisdom',
+        widgetId: 'daily_wisdom_card',
+      };
+      await logToJournal(removeLogData);
+    } else {
+      // Add to favorites
+      favorites.push(currentQuote);
+      localStorage.setItem('favoriteQuotes', JSON.stringify(favorites));
+      
+      // Log addition to journal
+      const addLogData = {
+        type: 'quote_favorited',
+        content: `Added to favorites: "${wisdom.quote}" - ${wisdom.author}`,
+        category: 'wisdom',
+        metadata: {
+          quote: wisdom.quote,
+          author: wisdom.author,
+          framework: wisdom.framework,
+          timestamp: new Date().toISOString(),
+        },
+        moduleId: 'daily_wisdom',
+        widgetId: 'daily_wisdom_card',
+      };
+      await logToJournal(addLogData);
+    }
+    
+    // Force re-render
+    setWisdom({ ...wisdom });
+  };
 
   const getFrameworkColor = (framework: string) => {
     const colors: { [key: string]: string } = {
@@ -117,6 +215,31 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       'Taoist': '☯️',
     };
     return emojis[framework] || '🧠';
+  };
+
+  const getNextRefreshTime = () => {
+    if (typeof window === 'undefined') return 'Loading...';
+    
+    const lastLoadTime = localStorage.getItem('lastWisdomLoadTime');
+    if (!lastLoadTime) {
+      return 'Never loaded';
+    }
+    const lastLoadDate = new Date(lastLoadTime);
+    const now = new Date();
+
+    // Calculate the next 6-hour slot
+    const nextSlot = Math.ceil(now.getHours() / 6);
+    const nextHour = nextSlot * 6;
+    const nextDate = new Date(lastLoadDate);
+    nextDate.setHours(nextHour, 0, 0, 0);
+
+    if (nextDate <= now) {
+      // If the next slot is in the past (e.g., if it was 5:30 AM and now is 6:00 AM)
+      // The next refresh will be in the next 6-hour period.
+      nextDate.setHours(nextHour + 6, 0, 0, 0);
+    }
+
+    return nextDate.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
   };
 
   return (
@@ -252,12 +375,17 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         {/* Author and Framework */}
         <div className="flex items-center justify-between">
           <cite className="text-purple-300 font-medium">— {wisdom.author}</cite>
-          <div className={cn(
-            "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium",
-            `bg-gradient-to-r ${getFrameworkColor(wisdom.framework)} text-white`
-          )}>
-            <span>{getFrameworkEmoji(wisdom.framework)}</span>
-            <span>{wisdom.framework} Tradition</span>
+          <div className="flex items-center gap-2">
+            <div className={cn(
+              "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium",
+              `bg-gradient-to-r ${getFrameworkColor(wisdom.framework)} text-white`
+            )}>
+              <span>{getFrameworkEmoji(wisdom.framework)}</span>
+              <span>{wisdom.framework} Tradition</span>
+            </div>
+            <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
+              Next refresh: {getNextRefreshTime()}
+            </div>
           </div>
         </div>
 
@@ -293,9 +421,30 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             New Wisdom
           </button>
           
+          <button
+            onClick={toggleFavorite}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+              isFavorite()
+                ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
+                : 'bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface'
+            }`}
+          >
+            {isFavorite() ? (
+              <>
+                <span className="text-yellow-400">★</span>
+                Favorited
+              </>
+            ) : (
+              <>
+                <span className="text-muted">☆</span>
+                Favorite
+              </>
+            )}
+          </button>
+          
           <Link 
             href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
-            className="flex items-center gap-2 px-4 py-2 bg-surface/50 border border-border/50 text-muted rounded-lg hover:bg-surface transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-courage text-white rounded-lg hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
           >
             <MessageCircle className="w-4 h-4" />
             Chat with Philosopher

@@ -463,7 +463,7 @@ export function TerminologyWidget() {
             <BookOpen className="w-6 h-6 text-indigo-400" />
           </motion.div>
           <div>
-            <h3 className="font-bold text-white text-lg">Philosophical Terminology</h3>
+            <h3 className="font-bold text-white text-lg">Terminology</h3>
             <p className="text-sm text-gray-400">Term {currentTermIndex + 1} of {totalTerms}</p>
           </div>
         </div>

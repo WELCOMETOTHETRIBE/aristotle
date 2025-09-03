@@ -6,6 +6,7 @@ import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
 import { BreathworkWidgetNew } from '@/components/BreathworkWidgetNew';
 import { useAuth } from '@/lib/auth-context';
+import { logToJournal, createMoodLog } from '@/lib/journal-logger';
 
 import { StreakCard } from '@/components/cards/StreakCard';
 import { MoodTrackerCard } from '@/components/cards/MoodTrackerCard';
@@ -47,29 +48,31 @@ export default function TodayPage() {
 
     if (user) {
       // Authenticated user - load their personal widgets
-      const saved = localStorage.getItem(`userWidgets_${user.id}`);
-      if (saved) {
-        const parsedWidgets = JSON.parse(saved);
-        const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
-        console.log('Loading authenticated user widgets:', uniqueWidgets);
-        setUserWidgets(uniqueWidgets);
-      } else {
-        // New authenticated user - start with empty widgets
-        console.log('New authenticated user - starting with empty widgets');
-        setUserWidgets([]);
-      }
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem(`userWidgets_${user.id}`);
+        if (saved) {
+          const parsedWidgets = JSON.parse(saved);
+          const uniqueWidgets = Array.from(new Set(parsedWidgets)) as string[];
+          console.log('Loading authenticated user widgets:', uniqueWidgets);
+          setUserWidgets(uniqueWidgets);
+        } else {
+          // New authenticated user - start with empty widgets
+          console.log('New authenticated user - starting with empty widgets');
+          setUserWidgets([]);
+        }
 
-      // Load user preferences
-      const savedPrefs = localStorage.getItem('userPreferences');
-      if (savedPrefs) {
-        try {
-          const prefs = JSON.parse(savedPrefs);
-          setUserPreferences(prefs);
-          if (prefs.focusVirtue) {
-            setFocusVirtue(prefs.focusVirtue);
+        // Load user preferences
+        const savedPrefs = localStorage.getItem('userPreferences');
+        if (savedPrefs) {
+          try {
+            const prefs = JSON.parse(savedPrefs);
+            setUserPreferences(prefs);
+            if (prefs.focusVirtue) {
+              setFocusVirtue(prefs.focusVirtue);
+            }
+          } catch (error) {
+            console.error('Error parsing user preferences:', error);
           }
-        } catch (error) {
-          console.error('Error parsing user preferences:', error);
         }
       }
     } else {
@@ -222,6 +225,7 @@ export default function TodayPage() {
 
     setIsSubmitting(true);
     try {
+      // Submit intention to API
       const response = await fetch('/api/daily-intention', {
         method: 'POST',
         headers: {
@@ -238,6 +242,36 @@ export default function TodayPage() {
       if (response.ok) {
         const data = await response.json();
         console.log('Intention submitted successfully:', data);
+        
+        // Log mood to journal
+        const moodLogData = {
+          type: 'mood',
+          content: `Mood check: ${mood}/5 during ${currentTimePeriod}`,
+          category: 'wellness',
+          metadata: {
+            mood: mood,
+            timePeriod: currentTimePeriod,
+            timestamp: new Date().toISOString(),
+          },
+          moduleId: 'mood_tracker',
+          widgetId: 'mood_widget',
+        };
+        await logToJournal(moodLogData);
+        
+        // Log intention to journal
+        const intentionLogData = {
+          type: 'daily_intention',
+          content: `Set ${currentTimePeriod} intention: ${intention.trim()}`,
+          category: 'goal_setting',
+          metadata: {
+            timePeriod: currentTimePeriod,
+            mood: mood,
+            timestamp: new Date().toISOString(),
+          },
+          moduleId: 'daily_intention',
+          widgetId: 'intention_setter',
+        };
+        await logToJournal(intentionLogData);
         
         // Update submitted intentions state
         setSubmittedIntentions(prev => ({
@@ -319,11 +353,26 @@ export default function TodayPage() {
               {/* Quick Actions */}
               <div className="flex items-center space-x-2">
                 <button
-                  onClick={() => window.location.href = '/tools'}
-                  className="flex items-center gap-2 px-4 py-2 bg-surface/80 backdrop-blur-sm border border-border rounded-xl hover:bg-surface transition-all duration-200 hover:scale-105"
+                  onClick={async () => {
+                    // Log tools navigation to journal
+                    const toolsLogData = {
+                      type: 'navigation',
+                      content: 'Navigated to tools section',
+                      category: 'navigation',
+                      metadata: {
+                        destination: 'tools',
+                        timestamp: new Date().toISOString(),
+                      },
+                      moduleId: 'navigation',
+                      widgetId: 'tools_button',
+                    };
+                    await logToJournal(toolsLogData);
+                    window.location.href = '/tools';
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 bg-surface/50 border border-border/50 text-muted rounded-lg hover:bg-surface transition-colors"
                 >
-                  <Grid3X3 className="w-4 h-4 text-muted" />
-                  <span className="text-sm font-medium text-text">Widgets</span>
+                  <Grid3X3 className="w-4 h-4" />
+                  Tools
                 </button>
               </div>
             </div>
@@ -382,13 +431,6 @@ export default function TodayPage() {
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-text">Daily Wisdom</h2>
-            <Link 
-              href="/coach" 
-              className="text-sm text-primary hover:text-primary/80 transition-colors flex items-center gap-2"
-            >
-              <MessageCircle className="w-4 h-4" />
-              Chat with Philosopher
-            </Link>
           </div>
           <DailyWisdomCard />
         </div>
@@ -424,7 +466,24 @@ export default function TodayPage() {
                     ].map(({ value, emoji, label }) => (
                       <button
                         key={value}
-                        onClick={() => setMood(value)}
+                        onClick={async () => {
+                          setMood(value);
+                          // Log mood selection to journal
+                          const moodLogData = {
+                            type: 'mood_selection',
+                            content: `Selected mood: ${label} (${value}/5)`,
+                            category: 'wellness',
+                            metadata: {
+                              mood: value,
+                              moodLabel: label,
+                              timePeriod: currentTimePeriod,
+                              timestamp: new Date().toISOString(),
+                            },
+                            moduleId: 'mood_tracker',
+                            widgetId: 'mood_selector',
+                          };
+                          await logToJournal(moodLogData);
+                        }}
                         className={cn(
                           'p-4 rounded-xl border transition-all duration-200 hover:scale-105',
                           mood === value
@@ -503,7 +562,23 @@ export default function TodayPage() {
             <div className="flex items-center justify-between">
               <h2 className="text-lg font-semibold text-text">Your Wellness Tools</h2>
               <button
-                onClick={() => window.location.href = '/tools'}
+                onClick={async () => {
+                  // Log widget management navigation to journal
+                  const widgetLogData = {
+                    type: 'navigation',
+                    content: 'Navigated to widget management',
+                    category: 'navigation',
+                    metadata: {
+                      destination: 'tools',
+                      purpose: 'widget_management',
+                      timestamp: new Date().toISOString(),
+                    },
+                    moduleId: 'navigation',
+                    widgetId: 'widget_management_button',
+                  };
+                  await logToJournal(widgetLogData);
+                  window.location.href = '/tools';
+                }}
                 className="text-xs text-primary hover:underline"
               >
                 Manage Widgets

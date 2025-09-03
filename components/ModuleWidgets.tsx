@@ -5,8 +5,10 @@ import { useAuth } from '@/lib/auth-context';
 import { 
   Play, Pause, RotateCcw, Timer, Target, BookOpen, Heart, Brain, Zap, 
   Users, Sun, Moon, Coffee, Droplets, Dumbbell, CheckCircle,
-  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera, Minus, Plus
+  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera, Minus, Plus, X, MapPin, Cloud, Heart as HeartIcon, Tag, Check, Trash2, Eye, Share2, MessageCircle, ArrowRight
 } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { logToJournal } from '@/lib/journal-logger';
 import { BreathworkWidgetNew } from './BreathworkWidgetNew';
 import BalanceCard from './widgets/BalanceCard';
 
@@ -89,7 +91,7 @@ export function FocusTimerWidget({ frameworkTone = "stoic" }: FocusTimerWidgetPr
       
       try {
         // Create focus log using the new journal system
-        const { createFocusLog, logToJournal } = await import('@/lib/journal-logger');
+        const { createFocusLog } = await import('@/lib/journal-logger');
         
         const sessionDuration = 25 * 60 - timeLeft; // Calculate actual duration
         
@@ -418,7 +420,7 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
       
       try {
         // Create gratitude log using the new journal system
-        const { createGratitudeLog, logToJournal } = await import('@/lib/journal-logger');
+        const { createGratitudeLog } = await import('@/lib/journal-logger');
         
         const journalData = createGratitudeLog(
           currentEntry.trim(),
@@ -642,7 +644,7 @@ export function MovementWidget({ frameworkTone = "stoic" }: MovementWidgetProps)
       
       try {
         // Create movement log using the new journal system
-        const { createMovementLog, logToJournal } = await import('@/lib/journal-logger');
+        const { createMovementLog } = await import('@/lib/journal-logger');
         
         const activityName = activities.find(a => a.id === selectedActivity)?.name || selectedActivity;
         
@@ -871,7 +873,7 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
       
       try {
         // Create hydration log using the new journal system
-        const { createHydrationLog, logToJournal } = await import('@/lib/journal-logger');
+        const { createHydrationLog } = await import('@/lib/journal-logger');
         
         const journalData = createHydrationLog(
           amount,
@@ -1175,6 +1177,25 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         
         setSuccessMessage(shareToCommunity ? 'Photo uploaded and shared to community!' : 'Photo uploaded successfully!');
         
+        // Log photo upload to journal
+        const photoLogData = {
+          type: 'nature_photo_upload',
+          content: `Uploaded nature photo: ${caption || 'Nature moment'}${location ? ` at ${location}` : ''}${weather ? ` (${weather})` : ''}`,
+          category: 'nature',
+          metadata: {
+            caption: caption || 'Nature moment',
+            tags: selectedTags,
+            location: location,
+            weather: weather,
+            mood: mood,
+            shareToCommunity: shareToCommunity,
+            timestamp: new Date().toISOString(),
+          },
+          moduleId: 'nature_photo',
+          widgetId: 'nature_photo_widget',
+        };
+        await logToJournal(photoLogData);
+        
         // Reset form
         setIsAdding(false);
         setSelectedTags([]);
@@ -1201,7 +1222,25 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     }
   };
 
-  const removePhoto = (photoId: number) => {
+  const removePhoto = async (photoId: number) => {
+    // Log photo removal to journal
+    const photoToRemove = photos.find(photo => photo.id === photoId);
+    if (photoToRemove) {
+      const removeLogData = {
+        type: 'nature_photo_removal',
+        content: `Removed nature photo: ${photoToRemove.caption || 'Nature moment'}`,
+        category: 'nature',
+        metadata: {
+          photoId: photoId,
+          caption: photoToRemove.caption,
+          timestamp: new Date().toISOString(),
+        },
+        moduleId: 'nature_photo',
+        widgetId: 'nature_photo_widget',
+      };
+      await logToJournal(removeLogData);
+    }
+    
     setPhotos(prev => prev.filter(photo => photo.id !== photoId));
   };
 
@@ -1582,7 +1621,7 @@ export function SleepTrackerWidget({ frameworkTone = "stoic" }: SleepTrackerWidg
       
       try {
         // Create sleep log using the new journal system
-        const { createSleepLog, logToJournal } = await import('@/lib/journal-logger');
+        const { createSleepLog } = await import('@/lib/journal-logger');
         
         const journalData = createSleepLog(
           sleepHours,

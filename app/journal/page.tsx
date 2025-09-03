@@ -20,10 +20,18 @@ export default function JournalPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<string>('all');
+  const [favoriteQuotes, setFavoriteQuotes] = useState<any[]>([]);
 
   useEffect(() => {
     fetchJournalEntries();
+    loadFavoriteQuotes();
   }, []);
+
+  const loadFavoriteQuotes = () => {
+    if (typeof window === 'undefined') return;
+    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+    setFavoriteQuotes(favorites);
+  };
 
   const fetchJournalEntries = async () => {
     try {
@@ -124,7 +132,7 @@ export default function JournalPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8"
+            className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8"
           >
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardContent className="p-6 text-center">
@@ -148,6 +156,14 @@ export default function JournalPage() {
                   {entries.filter(e => e.type === 'mood').length}
                 </div>
                 <div className="text-gray-300">Mood</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-6 text-center">
+                <div className="text-3xl font-bold text-white mb-2">
+                  {favoriteQuotes.length}
+                </div>
+                <div className="text-gray-300">Favorite Quotes</div>
               </CardContent>
             </Card>
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
@@ -196,6 +212,13 @@ export default function JournalPage() {
               >
                 Gratitude
               </Button>
+              <Button
+                onClick={() => setFilterType('favorite_quotes')}
+                variant={filterType === 'favorite_quotes' ? 'default' : 'outline'}
+                className="bg-purple-600 hover:bg-purple-700 text-white"
+              >
+                Favorite Quotes ({favoriteQuotes.length})
+              </Button>
             </div>
           </motion.div>
 
@@ -206,7 +229,47 @@ export default function JournalPage() {
             transition={{ duration: 0.6, delay: 0.4 }}
             className="space-y-6"
           >
-            {filteredEntries.length === 0 ? (
+            {filterType === 'favorite_quotes' ? (
+              // Display favorite quotes
+              favoriteQuotes.length === 0 ? (
+                <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+                  <CardContent className="p-12 text-center">
+                    <Heart className="w-16 h-16 text-purple-400 mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-white mb-2">
+                      No favorite quotes yet
+                    </h3>
+                    <p className="text-gray-400">
+                      Start favoriting quotes from the Daily Wisdom widget to see them here
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                favoriteQuotes.map((quote, index) => (
+                  <Card key={index} className="backdrop-blur-sm border border-purple-500/20 bg-purple-500/5">
+                    <CardHeader>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <Heart className="w-5 h-5 text-purple-400" />
+                          <div>
+                            <CardTitle className="text-white">Favorite Quote</CardTitle>
+                            <p className="text-sm text-gray-400">{quote.framework} Tradition</p>
+                          </div>
+                        </div>
+                        <div className="text-sm text-gray-400">
+                          {new Date(quote.timestamp).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <blockquote className="text-gray-300 italic text-lg mb-4 border-l-4 border-purple-400 pl-4">
+                        "{quote.quote}"
+                      </blockquote>
+                      <p className="text-purple-300 font-medium">— {quote.author}</p>
+                    </CardContent>
+                  </Card>
+                ))
+              )
+            ) : filteredEntries.length === 0 ? (
               <Card className="bg-white/10 backdrop-blur-sm border-white/20">
                 <CardContent className="p-12 text-center">
                   <BookOpen className="w-16 h-16 text-gray-400 mx-auto mb-4" />
