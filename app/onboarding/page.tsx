@@ -51,34 +51,21 @@ interface FrameworkDisplay {
   virtueSecondary?: string;
 }
 
-// Human-readable timezone options with proper formatting
+// Clean, professional timezone options
 const timezones = [
-  { value: 'UTC-12:00', label: 'Baker Island (UTC-12:00)' },
-  { value: 'UTC-11:00', label: 'Samoa (UTC-11:00)' },
-  { value: 'UTC-10:00', label: 'Hawaii (UTC-10:00)' },
-  { value: 'UTC-09:00', label: 'Alaska (UTC-09:00)' },
-  { value: 'UTC-08:00', label: 'Pacific Time (UTC-08:00)' },
-  { value: 'UTC-07:00', label: 'Mountain Time (UTC-07:00)' },
-  { value: 'UTC-06:00', label: 'Central Time (UTC-06:00)' },
-  { value: 'UTC-05:00', label: 'Eastern Time (UTC-05:00)' },
-  { value: 'UTC-04:00', label: 'Atlantic Time (UTC-04:00)' },
-  { value: 'UTC-03:00', label: 'Brazil (UTC-03:00)' },
-  { value: 'UTC-02:00', label: 'South Georgia (UTC-02:00)' },
-  { value: 'UTC-01:00', label: 'Azores (UTC-01:00)' },
-  { value: 'UTC+00:00', label: 'London (UTC+00:00)' },
-  { value: 'UTC+01:00', label: 'Paris, Berlin (UTC+01:00)' },
-  { value: 'UTC+02:00', label: 'Cairo, Helsinki (UTC+02:00)' },
-  { value: 'UTC+03:00', label: 'Moscow, Istanbul (UTC+03:00)' },
-  { value: 'UTC+04:00', label: 'Dubai, Baku (UTC+04:00)' },
-  { value: 'UTC+05:00', label: 'Mumbai, Tashkent (UTC+05:00)' },
-  { value: 'UTC+05:30', label: 'New Delhi (UTC+05:30)' },
-  { value: 'UTC+06:00', label: 'Dhaka, Almaty (UTC+06:00)' },
-  { value: 'UTC+07:00', label: 'Bangkok, Jakarta (UTC+07:00)' },
-  { value: 'UTC+08:00', label: 'Beijing, Singapore (UTC+08:00)' },
-  { value: 'UTC+09:00', label: 'Tokyo, Seoul (UTC+09:00)' },
-  { value: 'UTC+10:00', label: 'Sydney, Melbourne (UTC+10:00)' },
-  { value: 'UTC+11:00', label: 'Solomon Islands (UTC+11:00)' },
-  { value: 'UTC+12:00', label: 'New Zealand (UTC+12:00)' }
+  { value: 'UTC-08:00', label: 'Pacific Time' },
+  { value: 'UTC-07:00', label: 'Mountain Time' },
+  { value: 'UTC-06:00', label: 'Central Time' },
+  { value: 'UTC-05:00', label: 'Eastern Time' },
+  { value: 'UTC-04:00', label: 'Atlantic Time' },
+  { value: 'UTC+00:00', label: 'London' },
+  { value: 'UTC+01:00', label: 'Central Europe' },
+  { value: 'UTC+02:00', label: 'Eastern Europe' },
+  { value: 'UTC+03:00', label: 'Moscow' },
+  { value: 'UTC+05:30', label: 'India' },
+  { value: 'UTC+08:00', label: 'China' },
+  { value: 'UTC+09:00', label: 'Japan' },
+  { value: 'UTC+10:00', label: 'Australia' }
 ];
 
 const frameworks: FrameworkDisplay[] = [
@@ -345,10 +332,10 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case 0:
         return (
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label htmlFor="name" className="text-lg font-medium text-text">
+          <div className="space-y-8">
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <label htmlFor="name" className="block text-lg font-semibold text-text">
                   What should I call you?
                 </label>
                 <Input
@@ -356,22 +343,22 @@ export default function OnboardingPage() {
                   value={data.name}
                   onChange={(e) => updateData('name', e.target.value)}
                   placeholder="Enter your name"
-                  className="text-lg py-3 bg-surface-2 border-border text-text placeholder:text-muted focus:ring-2 focus:ring-primary/50"
+                  className="h-12 text-lg bg-surface-2 border-2 border-border text-text placeholder:text-muted/60 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                 />
               </div>
               
-              <div className="space-y-2">
-                <label htmlFor="timezone" className="text-lg font-medium text-text">
+              <div className="space-y-3">
+                <label htmlFor="timezone" className="block text-lg font-semibold text-text">
                   What's your timezone?
                 </label>
                 <select
                   id="timezone"
                   value={data.timezone}
                   onChange={(e) => updateData('timezone', e.target.value)}
-                  className="w-full p-3 border border-border rounded-lg bg-surface-2 text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                  className="w-full h-12 px-4 border-2 border-border rounded-lg bg-surface-2 text-text text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200"
                 >
                   {timezones.map(tz => (
-                    <option key={tz.value} value={tz.value} className="bg-surface-2 text-text">
+                    <option key={tz.value} value={tz.value} className="bg-surface-2 text-text py-2">
                       {tz.label}
                     </option>
                   ))}
@@ -384,73 +371,82 @@ export default function OnboardingPage() {
       case 1:
         return (
           <div className="space-y-6">
-            <div className="space-y-6">
-              {questions.map((question, index) => (
-                <Card key={question.id} className="border-2 border-border bg-surface hover:border-primary/30 transition-colors duration-200">
-                  <CardContent className="p-6">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <question.icon className="w-6 h-6 text-primary" />
-                      <h3 className="text-lg font-medium text-text">{question.text}</h3>
+            {questions.map((question, index) => (
+              <Card key={question.id} className="border-2 border-border bg-surface hover:border-primary/30 transition-all duration-200 hover:shadow-lg">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3 mb-6">
+                    <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                      <question.icon className="w-5 h-5 text-primary" />
                     </div>
-                    <div className="flex space-x-3">
-                      <Button
-                        variant={data[question.id as keyof OnboardingData] === true ? "default" : "outline"}
-                        onClick={() => updateData(question.id as keyof OnboardingData, true)}
-                        className="flex-1 h-12 bg-primary hover:bg-primary/90 text-white border-primary"
-                      >
-                        {question.trueLabel}
-                      </Button>
-                      <Button
-                        variant={data[question.id as keyof OnboardingData] === false ? "default" : "outline"}
-                        onClick={() => updateData(question.id as keyof OnboardingData, false)}
-                        className="flex-1 h-12 bg-surface-2 hover:bg-surface text-text border-border hover:border-primary/50"
-                      >
-                        {question.falseLabel}
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    <h3 className="text-lg font-semibold text-text flex-1">{question.text}</h3>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant={data[question.id as keyof OnboardingData] === true ? "default" : "outline"}
+                      onClick={() => updateData(question.id as keyof OnboardingData, true)}
+                      className="h-12 text-base font-medium bg-primary hover:bg-primary/90 text-white border-primary shadow-sm"
+                    >
+                      {question.trueLabel}
+                    </Button>
+                    <Button
+                      variant={data[question.id as keyof OnboardingData] === false ? "default" : "outline"}
+                      onClick={() => updateData(question.id as keyof OnboardingData, false)}
+                      className="h-12 text-base font-medium bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm"
+                    >
+                      {question.falseLabel}
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
           </div>
         );
 
       case 2:
         return (
           <div className="space-y-6">
-            <div className="text-center mb-6">
-              <p className="text-lg text-muted">
+            <div className="text-center mb-8">
+              <p className="text-lg text-muted leading-relaxed max-w-2xl mx-auto">
                 Choose the frameworks that resonate with you. You can select multiple frameworks to create a personalized experience.
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-2">
               {frameworks.map((framework) => (
                 <Card
                   key={framework.slug}
-                  className={`cursor-pointer border-2 transition-all duration-200 hover:scale-105 ${
+                  className={`cursor-pointer border-2 transition-all duration-200 hover:scale-[1.02] ${
                     data.selectedFrameworks.includes(framework.slug)
-                      ? 'border-primary shadow-lg bg-surface-2'
-                      : 'border-border bg-surface hover:border-primary/30'
+                      ? 'border-primary shadow-xl bg-surface-2 ring-2 ring-primary/20'
+                      : 'border-border bg-surface hover:border-primary/30 hover:shadow-lg'
                   }`}
                   onClick={() => toggleFramework(framework.slug)}
                 >
-                  <CardContent className="p-4">
-                    <div className="flex items-center space-x-3 mb-3">
-                      <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${framework.color} flex items-center justify-center`}>
-                        <framework.icon className="w-5 h-5 text-white" />
+                  <CardContent className="p-5">
+                    <div className="flex items-start space-x-3 mb-4">
+                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${framework.color} flex items-center justify-center shadow-lg flex-shrink-0`}>
+                        <framework.icon className="w-6 h-6 text-white" />
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium text-sm text-text">{framework.name}</h3>
-                        <p className="text-xs text-muted">
-                          {framework.virtuePrimary} + {framework.virtueSecondary || 'None'}
-                        </p>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm text-text mb-1 leading-tight">{framework.name}</h3>
+                        <div className="flex items-center space-x-2">
+                          <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
+                            {framework.virtuePrimary}
+                          </span>
+                          {framework.virtueSecondary && (
+                            <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/10 text-secondary border border-secondary/20">
+                              {framework.virtueSecondary}
+                            </span>
+                          )}
+                        </div>
                       </div>
                       {data.selectedFrameworks.includes(framework.slug) && (
-                        <CheckCircle className="w-5 h-5 text-primary" />
+                        <div className="w-6 h-6 bg-primary rounded-full flex items-center justify-center flex-shrink-0">
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
                       )}
                     </div>
-                    <p className="text-xs text-muted">{framework.description}</p>
+                    <p className="text-xs text-muted leading-relaxed">{framework.description}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -460,26 +456,28 @@ export default function OnboardingPage() {
 
       case 3:
         return (
-          <div className="space-y-6 text-center">
-            <div className="space-y-4">
-              <div className="w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto">
-                <Sparkles className="w-8 h-8 text-white" />
+          <div className="space-y-8 text-center">
+            <div className="space-y-6">
+              <div className="w-20 h-20 bg-gradient-to-r from-primary to-primary/80 rounded-full flex items-center justify-center mx-auto shadow-xl">
+                <Sparkles className="w-10 h-10 text-white" />
               </div>
-              <h2 className="text-2xl font-bold text-text">Ready to Begin Your Journey?</h2>
-              <p className="text-muted">
-                You've selected {data.selectedFrameworks.length} framework{data.selectedFrameworks.length !== 1 ? 's' : ''} that will shape your personalized experience.
-              </p>
+              <div>
+                <h2 className="text-3xl font-bold text-text mb-3">Ready to Begin Your Journey?</h2>
+                <p className="text-lg text-muted leading-relaxed max-w-2xl mx-auto">
+                  You've selected {data.selectedFrameworks.length} framework{data.selectedFrameworks.length !== 1 ? 's' : ''} that will shape your personalized experience.
+                </p>
+              </div>
             </div>
             
-            <div className="bg-surface-2 rounded-lg p-4 border border-border">
-              <h3 className="font-medium mb-2 text-text">Selected Frameworks:</h3>
-              <div className="flex flex-wrap gap-2 justify-center">
+            <div className="bg-surface-2 rounded-xl p-6 border border-border max-w-2xl mx-auto">
+              <h3 className="font-semibold text-lg mb-4 text-text">Selected Frameworks</h3>
+              <div className="flex flex-wrap gap-3 justify-center">
                 {data.selectedFrameworks.map(slug => {
                   const framework = frameworks.find(f => f.slug === slug);
                   return (
                     <span
                       key={slug}
-                      className="px-3 py-1 bg-primary/20 text-primary rounded-full text-sm font-medium border border-primary/30"
+                      className="inline-flex items-center px-4 py-2 bg-primary/10 text-primary rounded-full text-sm font-medium border border-primary/30 shadow-sm"
                     >
                       {framework?.name}
                     </span>
@@ -496,107 +494,105 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-4">
-              <Sparkles className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl font-bold text-text mb-4">
-              Welcome to Aristotle
-            </h1>
-            <p className="text-xl text-muted">
-              Let's personalize your journey toward wisdom and virtue
-            </p>
+    <div className="min-h-screen bg-bg flex items-center justify-center py-8">
+      <div className="w-full max-w-4xl mx-auto px-4">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-6 shadow-xl">
+            <Sparkles className="w-10 h-10 text-white" />
           </div>
+          <h1 className="text-5xl font-bold text-text mb-4">
+            Welcome to Aristotle
+          </h1>
+          <p className="text-xl text-muted leading-relaxed max-w-2xl mx-auto">
+            Let's personalize your journey toward wisdom and virtue
+          </p>
+        </div>
 
-          {/* Progress Steps */}
-          <div className="flex items-center justify-center mb-8">
-            {steps.map((step, index) => (
-              <div key={index} className="flex items-center">
-                <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 ${
-                  index <= currentStep 
-                    ? 'bg-primary border-primary text-white' 
-                    : 'border-border text-muted bg-surface'
-                }`}>
-                  {index < currentStep ? (
-                    <CheckCircle className="w-5 h-5" />
-                  ) : (
-                    <span className="text-sm font-medium">{index + 1}</span>
-                  )}
-                </div>
-                {index < steps.length - 1 && (
-                  <div className={`w-16 h-0.5 mx-2 ${
-                    index < currentStep ? 'bg-primary' : 'bg-border'
-                  }`} />
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center mb-12">
+          {steps.map((step, index) => (
+            <div key={index} className="flex items-center">
+              <div className={`flex items-center justify-center w-12 h-12 rounded-full border-2 transition-all duration-200 ${
+                index <= currentStep 
+                  ? 'bg-primary border-primary text-white shadow-lg' 
+                  : 'border-border text-muted bg-surface'
+              }`}>
+                {index < currentStep ? (
+                  <CheckCircle className="w-6 h-6" />
+                ) : (
+                  <span className="text-sm font-semibold">{index + 1}</span>
                 )}
               </div>
-            ))}
-          </div>
+              {index < steps.length - 1 && (
+                <div className={`w-20 h-0.5 mx-3 transition-all duration-200 ${
+                  index < currentStep ? 'bg-primary' : 'bg-border'
+                }`} />
+              )}
+            </div>
+          ))}
+        </div>
 
-          {/* Current Step Title */}
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-text">
-              {steps[currentStep].title}
-            </h2>
-            <p className="text-muted">
-              {steps[currentStep].description}
-            </p>
-          </div>
+        {/* Current Step Title */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl font-bold text-text mb-2">
+            {steps[currentStep].title}
+          </h2>
+          <p className="text-lg text-muted">
+            {steps[currentStep].description}
+          </p>
+        </div>
 
-          {/* Step Content */}
-          <Card className="bg-surface border-border mb-8">
-            <CardContent className="p-8">
-              {renderStep()}
-            </CardContent>
-          </Card>
+        {/* Step Content */}
+        <Card className="bg-surface border-2 border-border mb-8 shadow-xl">
+          <CardContent className="p-8">
+            {renderStep()}
+          </CardContent>
+        </Card>
 
-          {/* Navigation */}
-          <div className="flex justify-between">
+        {/* Navigation */}
+        <div className="flex justify-between items-center">
+          <Button
+            variant="outline"
+            onClick={handleBack}
+            disabled={currentStep === 0}
+            className="px-8 py-3 h-12 bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 font-medium transition-all duration-200"
+          >
+            <ArrowLeft className="w-5 h-5 mr-2" />
+            Back
+          </Button>
+
+          {currentStep < steps.length - 1 ? (
             <Button
-              variant="outline"
-              onClick={handleBack}
-              disabled={currentStep === 0}
-              className="px-6 py-2 bg-surface-2 hover:bg-surface text-text border-border hover:border-primary/50"
+              onClick={handleNext}
+              disabled={
+                (currentStep === 0 && !data.name) ||
+                (currentStep === 2 && data.selectedFrameworks.length === 0)
+              }
+              className="px-8 py-3 h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Back
+              Next
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-
-            {currentStep < steps.length - 1 ? (
-              <Button
-                onClick={handleNext}
-                disabled={
-                  (currentStep === 0 && !data.name) ||
-                  (currentStep === 2 && data.selectedFrameworks.length === 0)
-                }
-                className="px-6 py-2 bg-primary hover:bg-primary/90 text-white"
-              >
-                Next
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleComplete}
-                disabled={isProcessing || data.selectedFrameworks.length === 0}
-                className="px-6 py-2 bg-primary hover:bg-primary/90 text-white"
-              >
-                {isProcessing ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Setting up...
-                  </>
-                ) : (
-                  <>
-                    Complete Setup
-                    <CheckCircle className="w-4 h-4 ml-2" />
-                  </>
-                )}
-              </Button>
-            )}
-          </div>
+          ) : (
+            <Button
+              onClick={handleComplete}
+              disabled={isProcessing || data.selectedFrameworks.length === 0}
+              className="px-8 py-3 h-12 bg-primary hover:bg-primary/90 text-white font-medium shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              {isProcessing ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                  Setting up...
+                </>
+              ) : (
+                <>
+                  Complete Setup
+                  <CheckCircle className="w-5 h-5 ml-2" />
+                </>
+              )}
+            </Button>
+          )}
         </div>
       </div>
     </div>
