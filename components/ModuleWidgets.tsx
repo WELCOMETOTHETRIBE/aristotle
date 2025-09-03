@@ -1162,7 +1162,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           location: location || null,
           weather: weather || null,
           mood: mood || null,
-          // shareToCommunity: shareToCommunity, // Temporarily disabled
+          shareToCommunity: shareToCommunity,
           // Let server generate aiInsights/aiComment from the image
         }),
       });
@@ -1173,7 +1173,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         console.log('Photo uploaded successfully:', data);
         setPhotos(prev => [data.photo, ...prev]);
         
-        setSuccessMessage('Photo uploaded successfully!');
+        setSuccessMessage(shareToCommunity ? 'Photo uploaded and shared to community!' : 'Photo uploaded successfully!');
         
         // Reset form
         setIsAdding(false);
@@ -1379,8 +1379,8 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             </div>
           </div>
 
-          {/* Community Share Checkbox - Temporarily disabled */}
-          {/* <div className="flex items-center mt-4">
+          {/* Community Share Checkbox */}
+          <div className="flex items-center mt-4">
             <input
               type="checkbox"
               id="share-to-community"
@@ -1391,7 +1391,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             <label htmlFor="share-to-community" className="text-sm text-gray-400">
               Share this photo to the community?
             </label>
-          </div> */}
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-2">

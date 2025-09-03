@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { createNaturePhotoLog, logToJournal } from '@/lib/journal-logger';
 import { getStorageService, generateUniqueFilename, getFileExtensionFromBase64 } from '@/lib/storage-service';
-// import OpenAI from 'openai'; // Commented out for now
+import OpenAI from 'openai';
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,42 +43,42 @@ export async function POST(request: NextRequest) {
     // Use imageUrl (web-accessible path) instead of imagePath (filesystem path)
     const imagePath = imageUrl;
 
-    // AI insights generation temporarily disabled
-    // let computedInsights: string | null = null;
-    // try {
-    //   const apiKey = process.env.OPENAI_API_KEY;
-    //   if (apiKey) {
-    //     const openai = new OpenAI({ apiKey });
-    //     const supplemental = [
-    //       caption ? `Caption: ${caption}` : null,
-    //       (Array.isArray(tags) && tags.length > 0) ? `Tags: ${tags.join(', ')}` : null,
-    //       location ? `Location: ${location}` : null,
-    //       weather ? `Weather: ${weather}` : null,
-    //       mood ? `Mood: ${mood}` : null,
-    //     ].filter(Boolean).join('\n');
+    // Generate AI insights from the actual image
+    let computedInsights: string | null = null;
+    try {
+      const apiKey = process.env.OPENAI_API_KEY;
+      if (apiKey) {
+        const openai = new OpenAI({ apiKey });
+        const supplemental = [
+          caption ? `Caption: ${caption}` : null,
+          (Array.isArray(tags) && tags.length > 0) ? `Tags: ${tags.join(', ')}` : null,
+          location ? `Location: ${location}` : null,
+          weather ? `Weather: ${weather}` : null,
+          mood ? `Mood: ${mood}` : null,
+        ].filter(Boolean).join('\n');
 
-    //     const userPrompt = `Look at this nature photo and describe succinctly (2-3 sentences) what you see (e.g., sky, water, trees, light) and the feeling it evokes. If helpful, consider the supplemental details.\n\n${supplemental}`.trim();
+        const userPrompt = `Look at this nature photo and describe succinctly (2-3 sentences) what you see (e.g., sky, water, trees, light) and the feeling it evokes. If helpful, consider the supplemental details.\n\n${supplemental}`.trim();
 
-    //     const completion = await openai.chat.completions.create({
-    //       model: 'gpt-4o',
-    //       messages: [
-    //         {
-    //           role: 'user',
-    //           content: [
-    //             { type: 'text', text: userPrompt },
-    //             { type: 'image_url', image_url: { url: imagePath } },
-    //           ] as any,
-    //         },
-    //       ],
-    //       temperature: 0.7,
-    //       max_tokens: 180,
-    //     });
-    //     computedInsights = completion.choices?.[0]?.message?.content || null;
-    //   }
-    // } catch (visionError) {
-    //   console.error('Vision insights generation failed:', visionError);
-    //   // fall through with null to use fallback below
-    // }
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o',
+          messages: [
+            {
+              role: 'user',
+              content: [
+                { type: 'text', text: userPrompt },
+                { type: 'image_url', image_url: { url: imagePath } },
+              ] as any,
+            },
+          ],
+          temperature: 0.7,
+          max_tokens: 180,
+        });
+        computedInsights = completion.choices?.[0]?.message?.content || null;
+      }
+    } catch (visionError) {
+      console.error('Vision insights generation failed:', visionError);
+      // fall through with null to use fallback below
+    }
 
     // Create nature photo record
     const photo = await db.naturePhoto.create({
@@ -90,8 +90,8 @@ export async function POST(request: NextRequest) {
         location: location || null,
         weather: weather || null,
         mood: mood || null,
-        aiInsights: null, // Temporarily disabled
-        aiComment: null    // Temporarily disabled
+        aiInsights: computedInsights || aiInsights || null,
+        aiComment: computedInsights || aiComment || null
       }
     });
 
@@ -116,65 +116,66 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    // Community sharing temporarily disabled
-    // let thread = null;
-    // if (shareToCommunity) {
-    //   const createdPost = await db.communityPost.create({
-    //     data: {
-    //       title: `Nature Log: ${photo.caption}`,
-    //       content: `A moment captured in nature that speaks to the soul. ${photo.caption}`,
-    //       authorId: actualUserId,
-    //       type: 'nature_photo',
-    //       category: 'Nature Logs',
-    //       tags: ['Nature Logs', ...(photo.tags || [])],
-    //       isAIQuestion: false,
-    //       aiInsights: computedInsights ? [computedInsights] : [],
-    //       views: 0,
-    //       imagePath: photo.imagePath,
-    //       source: 'nature_photo',
-    //       sourceId: String(photo.id),
-    //       aiComment: computedInsights || null,
-    //     },
-    //   });
+    // Community sharing functionality restored
+    let thread = null;
+    if (shareToCommunity) {
+      const createdPost = await db.communityPost.create({
+        data: {
+          title: `Nature Log: ${photo.caption}`,
+          content: `A moment captured in nature that speaks to the soul. ${photo.caption}`,
+          authorId: actualUserId,
+          type: 'nature_photo',
+          category: 'Nature Logs',
+          tags: ['Nature Logs', ...(photo.tags || [])],
+          isAIQuestion: false,
+          aiInsights: computedInsights ? [computedInsights] : [],
+          views: 0,
+          imagePath: photo.imagePath,
+          source: 'nature_photo',
+          sourceId: String(photo.id),
+          aiComment: computedInsights || null,
+        },
+      });
 
-    //   // Post an AI reply if we have an insight
-    //   if (computedInsights) {
-    //     try {
-    //       // Ensure AI user exists
-    //       let aiUser = await db.user.findUnique({ where: { id: 1 } });
-    //       if (!aiUser) {
-    //       aiUser = await db.user.create({
-    //         data: {
-    //           id: 1,
-    //           username: 'ai_philosopher',
-    //           displayName: 'AI Philosopher',
-    //           email: 'ai@aristotle.com',
-    //           password: 'system_user_no_password',
-    //         }
-    //       });
-    //       await db.communityReply.create({
-    //         data: {
-    //           content: computedInsights,
-    //           authorId: aiUser.id,
-    //           postId: createdPost.id,
-    //           philosopher: philosopher || 'AI Philosopher',
-    //           isAI: true,
-    //         },
-    //       });
-    //     } catch (e) {
-    //       console.warn('Failed to create AI reply for nature post:', e);
-    //     }
-    //   }
+      // Post an AI reply if we have an insight
+      if (computedInsights) {
+        try {
+          // Ensure AI user exists
+          let aiUser = await db.user.findUnique({ where: { id: 1 } });
+          if (!aiUser) {
+            aiUser = await db.user.create({
+              data: {
+                id: 1,
+                username: 'ai_philosopher',
+                displayName: 'AI Philosopher',
+                email: 'ai@aristotle.com',
+                password: 'system_user_no_password',
+              }
+            });
+          }
+          await db.communityReply.create({
+            data: {
+              content: computedInsights,
+              authorId: aiUser.id,
+              postId: createdPost.id,
+              philosopher: philosopher || 'AI Philosopher',
+              isAI: true,
+            },
+          });
+        } catch (e) {
+          console.warn('Failed to create AI reply for nature post:', e);
+        }
+      }
 
-    //   thread = createdPost;
-    // }
+      thread = createdPost;
+    }
 
     return NextResponse.json({
       success: true,
       photo,
       imageUrl,
       journalEntry: journalEntry,
-      // thread, // Temporarily disabled
+      thread,
       message: 'Nature photo saved and logged to journal successfully!'
     });
 
