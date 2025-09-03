@@ -217,6 +217,20 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     return emojis[framework] || '🧠';
   };
 
+  const getShortFrameworkName = (framework: string) => {
+    const shortNames: { [key: string]: string } = {
+      'Stoic': 'Stoic',
+      'Spartan': 'Spartan',
+      'Samurai': 'Samurai',
+      'Monastic': 'Monastic',
+      'Yogic': 'Yogic',
+      'Buddhist': 'Buddhist',
+      'Confucian': 'Confucian',
+      'Taoist': 'Taoist',
+    };
+    return shortNames[framework] || 'Tradition';
+  };
+
   const getNextRefreshTime = () => {
     if (typeof window === 'undefined') return 'Loading...';
     
@@ -377,14 +391,14 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           <cite className="text-purple-300 font-medium">— {wisdom.author}</cite>
           <div className="flex items-center gap-2">
             <div className={cn(
-              "inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium",
+              "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
               `bg-gradient-to-r ${getFrameworkColor(wisdom.framework)} text-white`
             )}>
               <span>{getFrameworkEmoji(wisdom.framework)}</span>
-              <span>{wisdom.framework} Tradition</span>
+              <span>{getShortFrameworkName(wisdom.framework)}</span>
             </div>
             <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
-              Next refresh: {getNextRefreshTime()}
+              Next: {getNextRefreshTime()}
             </div>
           </div>
         </div>
@@ -406,48 +420,51 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           </motion.div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3 pt-2">
+        {/* Action Buttons - Compact Design */}
+        <div className="flex items-center gap-2 pt-3">
           <button
             onClick={loadDailyWisdom}
             disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-lg hover:bg-purple-500/30 transition-colors disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md hover:bg-purple-500/30 transition-colors disabled:opacity-50 text-sm"
+            title="Get new wisdom"
           >
             {isLoading ? (
-              <RotateCcw className="w-4 h-4 animate-spin" />
+              <RotateCcw className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <RefreshCw className="w-4 h-4" />
+              <RefreshCw className="w-3.5 h-3.5" />
             )}
-            New Wisdom
+            New
           </button>
           
           <button
             onClick={toggleFavorite}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md transition-all duration-200 text-sm ${
               isFavorite()
                 ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
                 : 'bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface'
             }`}
+            title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
           >
             {isFavorite() ? (
               <>
-                <span className="text-yellow-400">★</span>
-                Favorited
+                <span className="text-yellow-400 text-sm">★</span>
+                <span className="hidden sm:inline">Fav</span>
               </>
             ) : (
               <>
-                <span className="text-muted">☆</span>
-                Favorite
+                <span className="text-muted text-sm">☆</span>
+                <span className="hidden sm:inline">Fav</span>
               </>
             )}
           </button>
           
           <Link 
             href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-primary to-courage text-white rounded-lg hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
+            title="Chat with philosopher about this quote"
           >
-            <MessageCircle className="w-4 h-4" />
-            Chat with Philosopher
+            <MessageCircle className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Chat</span>
           </Link>
         </div>
       </div>
