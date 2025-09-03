@@ -655,19 +655,19 @@ export default function TodayPage() {
               </div>
             </div>
             
-            <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-2xl p-6">
-              <div className="flex items-center gap-3 mb-4">
+            <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4">
+              <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
                   <Target className="w-4 h-4 text-green-500" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-text">Intention Set</h3>
-                  <p className="text-sm text-muted">Your {currentTimePeriod} intention has been recorded</p>
+                <div className="flex-1">
+                  <h3 className="font-semibold text-text text-sm">Intention Set</h3>
+                  <p className="text-xs text-muted">Your {currentTimePeriod} intention has been recorded</p>
+                </div>
+                <div className="text-xs text-green-400 bg-green-500/10 px-2 py-1 rounded-full">
+                  ✓ Complete
                 </div>
               </div>
-              <p className="text-sm text-green-400">
-                Check back for your next time period or review your intentions in your daily journal.
-              </p>
             </div>
           </div>
         )}

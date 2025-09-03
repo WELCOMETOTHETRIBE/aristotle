@@ -33,7 +33,15 @@ const JournalEntrySchema = z.object({
     'productivity_session',
     'creative_expression',
     'social_connection',
-    'self_care_activity'
+    'self_care_activity',
+    'daily_intention',
+    'mood_selection',
+    'daily_wisdom_refresh',
+    'quote_favorited',
+    'quote_unfavorited',
+    'nature_photo_upload',
+    'nature_photo_removal',
+    'navigation'
   ]),
   content: z.string().min(1, 'Content is required'),
   prompt: z.string().optional(),

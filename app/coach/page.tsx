@@ -42,7 +42,7 @@ const philosophers: PhilosopherPersona[] = [
       'What evidence supports your belief?',
       'What would someone who disagrees with you say?'
     ],
-    greeting: "Greetings, seeker of truth. I am Socrates, and I believe that 'the unexamined life is not worth living.' Through thoughtful questioning, let us explore your ideas together. What would you like to examine today?"
+    greeting: "I am Socrates. What would you like to examine?"
   },
   {
     name: 'Aristotle',
@@ -58,7 +58,7 @@ const philosophers: PhilosopherPersona[] = [
       'What is the golden mean between excess and deficiency here?',
       'How can we apply this principle practically in daily life?'
     ],
-    greeting: "Greetings, seeker of wisdom. I am Aristotle, and I believe that 'we are what we repeatedly do. Excellence, then, is not an act, but a habit.' What aspect of virtue or human flourishing would you like to explore?"
+    greeting: "I am Aristotle. What aspect of virtue or human flourishing would you like to explore?"
   },
   {
     name: 'Marcus Aurelius',
@@ -74,7 +74,7 @@ const philosophers: PhilosopherPersona[] = [
       'What would a wise person do in your position?',
       'How can you find meaning in this challenge?'
     ],
-    greeting: "Greetings, fellow traveler. I am Marcus Aurelius, and I believe that 'the happiness of your life depends upon the quality of your thoughts.' What challenge or situation would you like to examine through the lens of Stoic wisdom?"
+    greeting: "I am Marcus Aurelius. What challenge or situation would you like to examine?"
   },
   {
     name: 'Epictetus',
@@ -90,16 +90,19 @@ const philosophers: PhilosopherPersona[] = [
       'What would it mean to accept this situation with equanimity?',
       'How can you turn this obstacle into an opportunity for growth?'
     ],
-    greeting: "Greetings, seeker of inner freedom. I am Epictetus, and I believe that 'freedom is not procured by a full enjoyment of what is desired, but by controlling the desire.' What desire or attachment would you like to examine?"
+    greeting: "I am Epictetus. What would you like to examine?"
   }
 ];
 
 const philosophicalPrompts = [
-  "Tell me about a challenge you're facing, and let's explore it philosophically.",
-  "What virtue would you like to cultivate today?",
-  "Share a recent decision you made, and let's examine it through wisdom.",
-  "What does living a good life mean to you?",
-  "How can we apply ancient wisdom to your modern situation?"
+  "What challenge are you facing?",
+  "What virtue do you want to cultivate?",
+  "What decision did you make recently?",
+  "What obstacle are you working through?",
+  "What habit are you trying to build?",
+  "What relationship needs attention?",
+  "What goal are you pursuing?",
+  "What fear are you confronting?"
 ];
 
 export default function PhilosophersCornerPage() {
@@ -202,28 +205,28 @@ export default function PhilosophersCornerPage() {
   const getFallbackResponse = (philosopher: PhilosopherPersona, userMessage: string): string => {
     const responses = {
       'Socrates': [
-        "That's an interesting perspective. Let me ask you this: how do you know that to be true?",
-        "I wonder if we might examine this more carefully. What evidence supports your belief?",
-        "This reminds me of a question I often ask: what do you think you know about this topic?",
-        "Let's explore this together through questioning. What would someone who disagrees with you say?"
+        "How do you know that to be true?",
+        "What evidence supports your belief?",
+        "What do you think you know about this topic?",
+        "What would someone who disagrees with you say?"
       ],
       'Aristotle': [
-        "This brings to mind a fundamental principle I discovered: that virtue lies in the golden mean between excess and deficiency.",
-        "Consider this: every action we take is either moving us toward eudaimonia or away from it. How does this apply to your situation?",
-        "In my studies, I found that 'we are what we repeatedly do. Excellence, then, is not an act, but a habit.'",
-        "Let us examine this through the lens of practical wisdom. What is the purpose or end goal here?"
+        "Virtue lies in the golden mean between excess and deficiency.",
+        "Every action moves us toward or away from eudaimonia. How does this apply?",
+        "We are what we repeatedly do. Excellence is a habit.",
+        "What is the purpose or end goal here?"
       ],
       'Marcus Aurelius': [
-        "This challenge you face is not an obstacle, but a teacher. What is it trying to teach you about yourself?",
-        "Remember, the quality of your thoughts determines the quality of your life. How can you respond with virtue?",
-        "What is within your control in this situation? Focus on that, and accept what you cannot change.",
-        "Every difficulty is an opportunity to practice wisdom and resilience. How can you grow from this?"
+        "This challenge is a teacher. What is it teaching you?",
+        "Your thoughts determine your life quality. How can you respond with virtue?",
+        "What is within your control? Focus on that.",
+        "Every difficulty is an opportunity to practice wisdom."
       ],
       'Epictetus': [
-        "What is truly under your control in this matter? Focus on that, and let go of what you cannot change.",
-        "This situation is not good or bad in itself - it's your judgment that makes it so. How can you choose differently?",
-        "Freedom comes from controlling your desires, not from fulfilling them. What desire can you examine?",
-        "Turn this obstacle into an opportunity. How can you use this challenge to strengthen your character?"
+        "What is truly under your control? Focus on that.",
+        "The situation isn't good or bad - your judgment makes it so.",
+        "Freedom comes from controlling desires, not fulfilling them.",
+        "Turn this obstacle into an opportunity."
       ]
     };
     
