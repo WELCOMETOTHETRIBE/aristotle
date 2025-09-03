@@ -113,6 +113,33 @@ const frameworks: Framework[] = [
     coreModules: ['focus_deepwork', 'sleep_circadian', 'hydration', 'skill_builder', 'resource_library'],
     supportModules: ['breathwork', 'mood_regulation', 'movement_posture', 'fasting', 'language_memory', 'creative_spark'],
     featuredPractices: ['risk_assessment', 'leadership_development', 'boundary_setting', 'public_speaking', 'lifelong_learning']
+  },
+  {
+    id: 'celtic_druid',
+    name: 'Celtic Druid',
+    description: 'Ancient Celtic spiritual tradition emphasizing connection to nature, seasonal wisdom, and herbal knowledge through natural observation.',
+    nav: { tone: 'natural', badge: 'Wisdom', emoji: '🌳' },
+    coreModules: ['nature_observation', 'seasonal_cycles', 'herbal_wisdom', 'oral_tradition', 'natural_breathing'],
+    supportModules: ['meditation', 'gratitude_awe', 'resource_library', 'virtue_cultivation', 'creative_spark'],
+    featuredPractices: ['nature_walks', 'seasonal_tracking', 'herbal_research', 'storytelling', 'natural_breathing']
+  },
+  {
+    id: 'tibetan_monk',
+    name: 'Tibetan Buddhist Monk',
+    description: 'Tibetan Buddhist practices focused on inner fire meditation, compassion cultivation, and philosophical discourse for enlightenment.',
+    nav: { tone: 'contemplative', badge: 'Compassion', emoji: '🕉️' },
+    coreModules: ['tummo_meditation', 'philosophical_debate', 'mandala_creation', 'compassion_meditation', 'tibetan_breathing'],
+    supportModules: ['meditation', 'philosophy_capsules', 'resource_library', 'virtue_cultivation', 'creative_spark'],
+    featuredPractices: ['inner_fire_meditation', 'philosophical_discourse', 'sacred_art', 'compassion_practice', 'breath_mastery']
+  },
+  {
+    id: 'viking_berserker',
+    name: 'Viking Berserker',
+    description: 'Norse warrior tradition emphasizing cold endurance, rage control, and strategic battle preparation through intense physical training.',
+    nav: { tone: 'fierce', badge: 'Courage', emoji: '⚔️' },
+    coreModules: ['cold_endurance', 'rage_control', 'shield_wall_training', 'battle_preparation', 'viking_breathing'],
+    supportModules: ['strength', 'movement_posture', 'fasting', 'virtue_cultivation', 'tribal_challenges'],
+    featuredPractices: ['cold_exposure_training', 'anger_management', 'formation_fighting', 'strategic_planning', 'power_breathing']
   }
 ];
 
@@ -143,7 +170,10 @@ const getToneGradient = (tone: string) => {
     disciplined: 'from-red-600 to-red-800',
     devotional: 'from-blue-600 to-cyan-600',
     communal: 'from-green-600 to-teal-600',
-    crisp: 'from-indigo-500 to-purple-600'
+    crisp: 'from-indigo-500 to-purple-600',
+    natural: 'from-green-600 to-emerald-700',
+    contemplative: 'from-purple-600 to-violet-700',
+    fierce: 'from-red-700 to-orange-800'
   };
   return gradients[tone as keyof typeof gradients] || 'from-gray-500 to-gray-600';
 };
