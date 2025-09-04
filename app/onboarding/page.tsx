@@ -1,12 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Brain, Shield, Scale, Heart, Target, Users, Zap, Moon, Sun, Flame, Leaf, Droplets, Wind, Sparkles, ArrowRight, Check } from 'lucide-react';
-import { useAuth } from '@/lib/auth-context';
 
 interface OnboardingData {
   name: string;
@@ -25,7 +24,7 @@ const frameworks = [
     name: 'Stoicism',
     description: 'Ancient wisdom for modern resilience',
     icon: Shield,
-    color: 'from-blue-500 to-cyan-500',
+    color: 'from-fw-stoic to-blue-400',
     benefits: ['Emotional control', 'Mental resilience', 'Practical wisdom']
   },
   {
@@ -33,7 +32,7 @@ const frameworks = [
     name: 'Spartan Agōgē',
     description: 'Discipline and strength through adversity',
     icon: Target,
-    color: 'from-red-500 to-orange-500',
+    color: 'from-fw-spartan to-orange-400',
     benefits: ['Physical discipline', 'Mental toughness', 'Leadership skills']
   },
   {
@@ -41,7 +40,7 @@ const frameworks = [
     name: 'Samurai Bushidō',
     description: 'Honor, loyalty, and martial excellence',
     icon: Scale,
-    color: 'from-purple-500 to-pink-500',
+    color: 'from-fw-bushido to-red-400',
     benefits: ['Honor and integrity', 'Loyalty and duty', 'Martial discipline']
   },
   {
@@ -49,7 +48,7 @@ const frameworks = [
     name: 'Monastic Rule',
     description: 'Contemplation and spiritual growth',
     icon: Moon,
-    color: 'from-indigo-500 to-purple-500',
+    color: 'from-fw-monastic to-indigo-400',
     benefits: ['Spiritual growth', 'Inner peace', 'Mindful living']
   },
   {
@@ -57,7 +56,7 @@ const frameworks = [
     name: 'Yogic Path',
     description: 'Balance and harmony through practice',
     icon: Leaf,
-    color: 'from-green-500 to-emerald-500',
+    color: 'from-fw-yogic to-emerald-400',
     benefits: ['Physical health', 'Mental balance', 'Spiritual connection']
   },
   {
@@ -65,7 +64,7 @@ const frameworks = [
     name: 'Indigenous Wisdom',
     description: 'Connection to nature and community',
     icon: Wind,
-    color: 'from-amber-500 to-yellow-500',
+    color: 'from-fw-indigenous to-green-400',
     benefits: ['Nature connection', 'Community values', 'Traditional wisdom']
   },
   {
@@ -73,7 +72,7 @@ const frameworks = [
     name: 'Martial Arts Code',
     description: 'Discipline through physical mastery',
     icon: Flame,
-    color: 'from-red-500 to-pink-500',
+    color: 'from-fw-martial to-red-400',
     benefits: ['Physical mastery', 'Mental discipline', 'Self-defense']
   },
   {
@@ -81,7 +80,7 @@ const frameworks = [
     name: 'Sufi Practice',
     description: 'Mystical wisdom and inner transformation',
     icon: Sparkles,
-    color: 'from-violet-500 to-purple-500',
+    color: 'from-fw-sufi to-purple-400',
     benefits: ['Inner transformation', 'Mystical wisdom', 'Spiritual insight']
   },
   {
@@ -89,7 +88,7 @@ const frameworks = [
     name: 'Ubuntu Philosophy',
     description: 'Humanity and community connection',
     icon: Users,
-    color: 'from-orange-500 to-red-500',
+    color: 'from-fw-ubuntu to-blue-400',
     benefits: ['Community values', 'Human connection', 'Shared humanity']
   },
   {
@@ -97,7 +96,7 @@ const frameworks = [
     name: 'Modern High-Performance',
     description: 'Evidence-based optimization',
     icon: Zap,
-    color: 'from-blue-500 to-indigo-500',
+    color: 'from-fw-highperf to-pink-400',
     benefits: ['Performance optimization', 'Evidence-based methods', 'Modern tools']
   },
   {
@@ -105,7 +104,7 @@ const frameworks = [
     name: 'Celtic Druid',
     description: 'Nature wisdom and seasonal cycles',
     icon: Leaf,
-    color: 'from-green-500 to-blue-500',
+    color: 'from-fw-indigenous to-green-400',
     benefits: ['Nature wisdom', 'Seasonal awareness', 'Ancient knowledge']
   },
   {
@@ -113,7 +112,7 @@ const frameworks = [
     name: 'Tibetan Buddhist Monk',
     description: 'Inner peace and spiritual awakening',
     icon: Sun,
-    color: 'from-yellow-500 to-orange-500',
+    color: 'from-fw-monastic to-yellow-400',
     benefits: ['Inner peace', 'Spiritual awakening', 'Compassion']
   },
   {
@@ -121,7 +120,7 @@ const frameworks = [
     name: 'Viking Berserker',
     description: 'Courage and strength in battle',
     icon: Flame,
-    color: 'from-red-500 to-yellow-500',
+    color: 'from-fw-spartan to-red-400',
     benefits: ['Courage and bravery', 'Physical strength', 'Battle wisdom']
   }
 ];
@@ -181,7 +180,6 @@ const questions = [
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { user } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [data, setData] = useState<OnboardingData>({
@@ -245,17 +243,16 @@ export default function OnboardingPage() {
     setIsProcessing(true);
 
     try {
-      // Get auth headers
-      const token = localStorage.getItem('auth-token') || sessionStorage.getItem('auth-token');
-      const authHeaders = {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      };
+      console.log('🚀 Starting onboarding completion...');
+      console.log('📝 Data to save:', data);
 
       // Step 1: Save user preferences to database
+      console.log('💾 Step 1: Saving user preferences...');
       const prefsResponse = await fetch('/api/prefs', {
         method: 'POST',
-        headers: authHeaders,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           isOnboarding: true,
           name: data.name,
@@ -267,12 +264,15 @@ export default function OnboardingPage() {
 
       if (!prefsResponse.ok) {
         const errorData = await prefsResponse.json();
+        console.error('❌ Failed to save preferences:', errorData);
         throw new Error(`Failed to save preferences: ${errorData.error || 'Unknown error'}`);
       }
 
-      console.log('✅ User preferences saved successfully');
+      const prefsData = await prefsResponse.json();
+      console.log('✅ User preferences saved successfully:', prefsData);
 
       // Step 2: Save user facts for AI personalization
+      console.log('🧠 Step 2: Saving user facts...');
       const facts = [
         { kind: 'bio', content: `Name: ${data.name}` },
         { kind: 'preference', content: `Timezone: ${data.timezone}` },
@@ -285,20 +285,25 @@ export default function OnboardingPage() {
 
       const factsResponse = await fetch('/api/user-facts', {
         method: 'POST',
-        headers: authHeaders,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ facts }),
       });
 
       if (!factsResponse.ok) {
-        console.error('Failed to save user facts, but continuing with onboarding');
+        console.error('⚠️ Failed to save user facts, but continuing with onboarding');
       } else {
         console.log('✅ User facts saved successfully');
       }
 
       // Step 3: Mark onboarding task as completed
+      console.log('✅ Step 3: Marking onboarding task as completed...');
       const taskResponse = await fetch('/api/tasks', {
         method: 'POST',
-        headers: authHeaders,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           action: 'complete',
           tag: 'onboarding'
@@ -306,15 +311,18 @@ export default function OnboardingPage() {
       });
 
       if (!taskResponse.ok) {
-        console.error('Failed to mark onboarding task as completed, but continuing');
+        console.error('⚠️ Failed to mark onboarding task as completed, but continuing');
       } else {
         console.log('✅ Onboarding task marked as completed');
       }
 
       // Step 4: Update onboarding status
+      console.log('📊 Step 4: Updating onboarding status...');
       const onboardingStatusResponse = await fetch('/api/onboarding-status', {
         method: 'POST',
-        headers: authHeaders,
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({ 
           isComplete: true,
           completedAt: new Date().toISOString()
@@ -322,20 +330,24 @@ export default function OnboardingPage() {
       });
 
       if (!onboardingStatusResponse.ok) {
-        console.error('Failed to update onboarding status, but continuing');
+        console.error('⚠️ Failed to update onboarding status, but continuing');
       } else {
         console.log('✅ Onboarding status updated successfully');
       }
 
       // Store in localStorage for immediate use
-      localStorage.setItem('userPreferences', JSON.stringify({
+      const userPrefs = {
+        displayName: data.name,
         name: data.name,
         timezone: data.timezone,
         framework: data.selectedFrameworks[0],
         secondaryFrameworks: data.selectedFrameworks.slice(1),
         onboardingCompleted: true,
         completedAt: new Date().toISOString()
-      }));
+      };
+      
+      localStorage.setItem('userPreferences', JSON.stringify(userPrefs));
+      console.log('💾 User preferences saved to localStorage:', userPrefs);
 
       // Store personality profile for AI personalization
       localStorage.setItem('personalityProfile', JSON.stringify({
@@ -347,12 +359,13 @@ export default function OnboardingPage() {
       }));
 
       // Success message
+      console.log('🎉 Onboarding completed successfully!');
       alert('Onboarding completed successfully! Your preferences have been saved.');
 
       // Redirect to today page
       router.push('/today');
     } catch (error: any) {
-      console.error('Error completing onboarding:', error);
+      console.error('❌ Error completing onboarding:', error);
       alert(`There was an error completing your setup: ${error.message}. Please try again.`);
     } finally {
       setIsProcessing(false);
@@ -363,7 +376,7 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case 0:
         return (
-          <Card className="bg-surface border-2 border-border shadow-xl">
+          <Card className="bg-surface border border-border shadow-card">
             <CardContent className="p-6 md:p-8">
               <div className="space-y-6">
                 <div className="space-y-3">
@@ -375,7 +388,7 @@ export default function OnboardingPage() {
                     value={data.name}
                     onChange={(e) => updateData('name', e.target.value)}
                     placeholder="Enter your name"
-                    className="h-12 text-lg bg-white text-gray-900 placeholder:text-gray-500 border-2 border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-medium"
+                    className="h-12 text-lg bg-surface-2 text-text placeholder:text-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-fast"
                   />
                 </div>
                 
@@ -387,10 +400,10 @@ export default function OnboardingPage() {
                     id="timezone"
                     value={data.timezone}
                     onChange={(e) => updateData('timezone', e.target.value)}
-                    className="w-full h-12 px-4 border-2 border-gray-300 rounded-lg bg-white text-gray-900 text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-200 font-medium"
+                    className="w-full h-12 px-4 border border-border rounded-lg bg-surface-2 text-text text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-fast"
                   >
                     {timezones.map(tz => (
-                      <option key={tz.value} value={tz.value} className="bg-white text-gray-900 py-2">
+                      <option key={tz.value} value={tz.value} className="bg-surface-2 text-text py-2">
                         {tz.label}
                       </option>
                     ))}
@@ -405,9 +418,9 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-4 md:space-y-6">
             {questions.map((question, index) => (
-              <div key={question.id} className={`border-2 rounded-lg p-4 md:p-6 transition-all duration-200 hover:shadow-lg ${
+              <div key={question.id} className={`border border-border rounded-lg p-4 md:p-6 transition-all duration-fast hover:shadow-card ${
                 data[question.id as keyof OnboardingData] === null
-                  ? 'border-orange-400 bg-orange-50/10 hover:border-orange-300'
+                  ? 'border-warning bg-warning/10'
                   : 'border-border bg-surface hover:border-primary/30'
               }`}>
                 <div className="flex items-center space-x-3 mb-4 md:mb-6">
@@ -417,33 +430,27 @@ export default function OnboardingPage() {
                   <div className="flex-1">
                     <h3 className="text-base md:text-lg font-semibold text-text leading-tight">{question.text}</h3>
                     {data[question.id as keyof OnboardingData] === null && (
-                      <p className="text-sm text-orange-400 mt-1">Please select an option</p>
+                      <p className="text-sm text-warning mt-1">Please select an option</p>
                     )}
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Button
-                    onClick={() => {
-                      console.log('Clicking true for question:', question.id, 'current value:', data[question.id as keyof OnboardingData]);
-                      updateData(question.id as keyof OnboardingData, true);
-                    }}
-                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-200 ${
+                    onClick={() => updateData(question.id as keyof OnboardingData, true)}
+                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-fast ${
                       data[question.id as keyof OnboardingData] === true
-                        ? 'bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm'
-                        : 'bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm'
+                        ? 'bg-primary hover:bg-primary/90 text-text border-primary shadow-card'
+                        : 'bg-surface-2 hover:bg-surface text-text border border-border hover:border-primary/50'
                     }`}
                   >
                     {question.trueLabel}
                   </Button>
                   <Button
-                    onClick={() => {
-                      console.log('Clicking false for question:', question.id, 'current value:', data[question.id as keyof OnboardingData]);
-                      updateData(question.id as keyof OnboardingData, false);
-                    }}
-                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-200 ${
+                    onClick={() => updateData(question.id as keyof OnboardingData, false)}
+                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-fast ${
                       data[question.id as keyof OnboardingData] === false
-                        ? 'bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm'
-                        : 'bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm'
+                        ? 'bg-primary hover:bg-primary/90 text-text border-primary shadow-card'
+                        : 'bg-surface-2 hover:bg-surface text-text border border-border hover:border-primary/50'
                     }`}
                   >
                     {question.falseLabel}
@@ -467,15 +474,15 @@ export default function OnboardingPage() {
                 <div
                   key={framework.id}
                   onClick={() => toggleFramework(framework.id)}
-                  className={`cursor-pointer border-2 rounded-lg p-4 transition-all duration-200 hover:shadow-lg ${
+                  className={`cursor-pointer border border-border rounded-lg p-4 transition-all duration-fast hover:shadow-card ${
                     data.selectedFrameworks.includes(framework.id)
-                      ? 'border-primary bg-primary/5 shadow-lg'
+                      ? 'border-primary bg-primary/5 shadow-card'
                       : 'border-border bg-surface hover:border-primary/30'
                   }`}
                 >
                   <div className="flex items-center space-x-3 mb-3">
                     <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${framework.color} flex items-center justify-center`}>
-                      <framework.icon className="w-5 h-5 text-white" />
+                      <framework.icon className="w-5 h-5 text-text" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-text">{framework.name}</h4>
@@ -532,7 +539,7 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
+    <div className="min-h-screen bg-bg">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
@@ -553,7 +560,7 @@ export default function OnboardingPage() {
             </div>
             <div className="w-full bg-surface-2 rounded-full h-2">
               <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300"
+                className="bg-primary h-2 rounded-full transition-all duration-slow"
                 style={{ width: `${((currentStep + 1) / 4) * 100}%` }}
               />
             </div>
@@ -570,7 +577,7 @@ export default function OnboardingPage() {
               onClick={prevStep}
               disabled={currentStep === 0}
               variant="outline"
-              className="px-6 py-3"
+              className="px-6 py-3 border-border text-text hover:bg-surface-2"
             >
               Previous
             </Button>
@@ -579,7 +586,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={nextStep}
                 disabled={!canProceed()}
-                className="px-6 py-3 bg-primary hover:bg-primary/90"
+                className="px-6 py-3 bg-primary hover:bg-primary/90 text-text"
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -588,7 +595,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={handleComplete}
                 disabled={!canProceed() || isProcessing}
-                className="px-6 py-3 bg-primary hover:bg-primary/90"
+                className="px-6 py-3 bg-primary hover:bg-primary/90 text-text"
               >
                 {isProcessing ? 'Setting up...' : 'Complete Setup'}
                 <Check className="w-4 h-4 ml-2" />
