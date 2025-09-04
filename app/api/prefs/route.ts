@@ -82,33 +82,9 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // If still no user ID, create a demo user for onboarding
-    if (!userId && isOnboarding) {
-      let demoUser = await prisma.user.findFirst({
-        where: { username: 'demo-user' },
-      });
-
-      // If demo user doesn't exist, create one
-      if (!demoUser) {
-        demoUser = await prisma.user.create({
-          data: {
-            username: 'demo-user',
-            email: 'demo@aristotle.app',
-            password: 'demo-password-hash', // Required field
-            displayName: 'Demo User',
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        });
-      }
-
-      if (demoUser) {
-        userId = demoUser.id;
-      }
-    }
-    
+    // Require authentication for all operations
     if (!userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Handle onboarding data

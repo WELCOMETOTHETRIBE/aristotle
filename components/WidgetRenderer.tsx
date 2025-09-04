@@ -857,7 +857,12 @@ function TaskManagerWidget() {
       const response = await fetch('/api/tasks');
       if (response.ok) {
         const data = await response.json();
-        setTasks(data || []);
+        // Handle both old format (array) and new format (object with tasks array)
+        if (Array.isArray(data)) {
+          setTasks(data || []);
+        } else {
+          setTasks(data.tasks || []);
+        }
       }
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -882,49 +887,84 @@ function TaskManagerWidget() {
     }
   };
 
-  const dueTasks = tasks.filter(task => !task.completedAt && task.dueAt);
+  const dueTasks = tasks.filter(task => !task.completedAt && task.dueDate);
 
   if (loading) {
     return <div className="text-center py-4">Loading tasks...</div>;
   }
 
+  // Separate onboarding tasks from regular tasks
+  const onboardingTasks = dueTasks.filter(task => task.tag === 'onboarding');
+  const regularTasks = dueTasks.filter(task => task.tag !== 'onboarding');
+
   return (
     <div className="space-y-3">
-      {dueTasks.length === 0 ? (
+      {/* Show onboarding tasks first with special styling */}
+      {onboardingTasks.map((task) => (
+        <div key={task.id} className="flex items-center gap-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleTaskComplete(task.id, true)}
+            className="h-6 w-6 p-0 text-primary hover:text-primary/80"
+          >
+            <CheckCircle className="h-4 w-4" />
+          </Button>
+          <div className="flex-1">
+            <h4 className="font-medium text-sm text-primary">{task.title}</h4>
+            {task.description && (
+              <p className="text-xs text-primary/70 mt-1">
+                {task.description}
+              </p>
+            )}
+            <div className="flex gap-2 mt-2">
+              <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
+                {task.tag}
+              </span>
+              <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
+                {task.priority}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Show regular tasks */}
+      {regularTasks.map((task) => (
+        <div key={task.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => handleTaskComplete(task.id, true)}
+            className="h-6 w-6 p-0"
+          >
+            <CheckCircle className="h-4 w-4" />
+          </Button>
+          <div className="flex-1">
+            <h4 className="font-medium text-sm">{task.title}</h4>
+            {task.description && (
+              <p className="text-xs text-muted-foreground mt-1">
+                {task.description}
+              </p>
+            )}
+            <div className="flex gap-2 mt-2">
+              {task.tag && (
+                <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
+                  {task.tag}
+                </span>
+              )}
+              <span className="text-xs bg-secondary px-2 py-1 rounded">
+                {task.priority}
+              </span>
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {dueTasks.length === 0 && (
         <p className="text-muted-foreground text-center py-4">
           No tasks due today. Great job staying on top of things!
         </p>
-      ) : (
-        dueTasks.map((task) => (
-          <div key={task.id} className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => handleTaskComplete(task.id, true)}
-              className="h-6 w-6 p-0"
-            >
-              <CheckCircle className="h-4 w-4" />
-            </Button>
-            <div className="flex-1">
-              <h4 className="font-medium text-sm">{task.title}</h4>
-              {task.description && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {task.description}
-                </p>
-              )}
-              <div className="flex gap-2 mt-2">
-                {task.tag && (
-                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded">
-                    {task.tag}
-                  </span>
-                )}
-                <span className="text-xs bg-secondary px-2 py-1 rounded">
-                  {task.priority}
-                </span>
-              </div>
-            </div>
-          </div>
-        ))
       )}
     </div>
   );

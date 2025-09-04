@@ -23,145 +23,6 @@ interface SettingItem {
   action?: () => void;
 }
 
-const settings: SettingSection[] = [
-  {
-    title: 'Profile',
-    icon: User,
-    items: [
-      {
-        id: 'displayName',
-        label: 'First Name',
-        description: 'How your name appears in the app',
-        type: 'text',
-        value: 'John Doe',
-      },
-      {
-        id: 'email',
-        label: 'Email',
-        description: 'Your email address',
-        type: 'text',
-        value: 'john@example.com',
-      },
-      {
-        id: 'timezone',
-        label: 'Timezone',
-        description: 'Your local timezone for accurate AI content',
-        type: 'select',
-        value: 'UTC',
-        options: [
-          'UTC',
-          'America/New_York',
-          'America/Chicago',
-          'America/Denver',
-          'America/Los_Angeles',
-          'Europe/London',
-          'Europe/Paris',
-          'Europe/Berlin',
-          'Asia/Tokyo',
-          'Asia/Shanghai',
-          'Australia/Sydney',
-          'Pacific/Auckland'
-        ],
-      },
-    ],
-  },
-  {
-    title: 'Appearance',
-    icon: Monitor,
-    items: [
-      {
-        id: 'theme',
-        label: 'Theme',
-        description: 'Choose your preferred theme',
-        type: 'select',
-        value: 'dark',
-        options: ['light', 'dark', 'system'],
-      },
-    ],
-  },
-  {
-    title: 'Focus',
-    icon: Shield,
-    items: [
-      {
-        id: 'focusVirtue',
-        label: 'Focus Virtue',
-        description: 'Your primary virtue for this period',
-        type: 'select',
-        value: 'wisdom',
-        options: ['wisdom', 'courage', 'justice', 'temperance'],
-      },
-    ],
-  },
-  {
-    title: 'Onboarding',
-    icon: Shield,
-    items: [
-      {
-        id: 'editOnboarding',
-        label: 'Edit Onboarding Preferences',
-        description: 'Modify your name, timezone, and framework selections',
-        type: 'button',
-        action: () => window.location.href = '/onboarding',
-      },
-      {
-        id: 'viewFrameworks',
-        label: 'View Selected Frameworks',
-        description: 'See which frameworks are currently active',
-        type: 'button',
-        action: () => console.log('View frameworks'),
-      },
-    ],
-  },
-  {
-    title: 'Notifications',
-    icon: Bell,
-    items: [
-      {
-        id: 'dailyReminders',
-        label: 'Daily Reminders',
-        description: 'Get reminded to practice daily',
-        type: 'toggle',
-        value: true,
-      },
-      {
-        id: 'weeklyInsights',
-        label: 'Weekly Insights',
-        description: 'Receive weekly progress summaries',
-        type: 'toggle',
-        value: true,
-      },
-      {
-        id: 'communityUpdates',
-        label: 'Community Updates',
-        description: 'Notifications about community activity',
-        type: 'toggle',
-        value: false,
-      },
-    ],
-  },
-  {
-    title: 'Data',
-    icon: Download,
-    items: [
-      {
-        id: 'exportData',
-        label: 'Export Data',
-        description: 'Download your data as JSON',
-        type: 'button',
-        action: () => console.log('Export data'),
-      },
-      {
-        id: 'deleteAccount',
-        label: 'Delete Account',
-        description: 'Permanently delete your account and data',
-        type: 'button',
-        action: () => console.log('Delete account'),
-      },
-    ],
-  },
-];
-
 export default function SettingsPage() {
   const [settingsState, setSettingsState] = useState<Record<string, any>>({
     displayName: 'User',
@@ -175,6 +36,8 @@ export default function SettingsPage() {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   // Load preferences on mount
   useEffect(() => {
@@ -247,6 +110,180 @@ export default function SettingsPage() {
       setLoading(false);
     }
   };
+
+  const handleDeleteAccount = async () => {
+    if (!showDeleteConfirm) {
+      setShowDeleteConfirm(true);
+      return;
+    }
+
+    try {
+      setDeleteLoading(true);
+      const response = await fetch('/api/auth/delete-account', {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        setMessage('Account deleted successfully. Redirecting...');
+        // Clear localStorage
+        localStorage.clear();
+        // Redirect to auth page after a short delay
+        setTimeout(() => {
+          window.location.href = '/auth';
+        }, 2000);
+      } else {
+        const errorData = await response.json();
+        setMessage(errorData.error || 'Failed to delete account');
+        setTimeout(() => setMessage(''), 5000);
+      }
+    } catch (error) {
+      console.error('Error deleting account:', error);
+      setMessage('Failed to delete account');
+      setTimeout(() => setMessage(''), 5000);
+    } finally {
+      setDeleteLoading(false);
+      setShowDeleteConfirm(false);
+    }
+  };
+
+  const settings: SettingSection[] = [
+    {
+      title: 'Profile',
+      icon: User,
+      items: [
+        {
+          id: 'displayName',
+          label: 'First Name',
+          description: 'How your name appears in the app',
+          type: 'text',
+          value: 'John Doe',
+        },
+        {
+          id: 'email',
+          label: 'Email',
+          description: 'Your email address',
+          type: 'text',
+          value: 'john@example.com',
+        },
+        {
+          id: 'timezone',
+          label: 'Timezone',
+          description: 'Your local timezone for accurate AI content',
+          type: 'select',
+          value: 'UTC',
+          options: [
+            'UTC',
+            'America/New_York',
+            'America/Chicago',
+            'America/Denver',
+            'America/Los_Angeles',
+            'Europe/London',
+            'Europe/Paris',
+            'Europe/Berlin',
+            'Asia/Tokyo',
+            'Asia/Shanghai',
+            'Australia/Sydney',
+            'Pacific/Auckland'
+          ],
+        },
+      ],
+    },
+    {
+      title: 'Appearance',
+      icon: Monitor,
+      items: [
+        {
+          id: 'theme',
+          label: 'Theme',
+          description: 'Choose your preferred theme',
+          type: 'select',
+          value: 'dark',
+          options: ['light', 'dark', 'system'],
+        },
+      ],
+    },
+    {
+      title: 'Focus',
+      icon: Shield,
+      items: [
+        {
+          id: 'focusVirtue',
+          label: 'Focus Virtue',
+          description: 'Your primary virtue for this period',
+          type: 'select',
+          value: 'wisdom',
+          options: ['wisdom', 'courage', 'justice', 'temperance'],
+        },
+      ],
+    },
+    {
+      title: 'Onboarding',
+      icon: Shield,
+      items: [
+        {
+          id: 'editOnboarding',
+          label: 'Edit Onboarding Preferences',
+          description: 'Modify your name, timezone, and framework selections',
+          type: 'button',
+          action: () => window.location.href = '/onboarding',
+        },
+        {
+          id: 'viewFrameworks',
+          label: 'View Selected Frameworks',
+          description: 'See which frameworks are currently active',
+          type: 'button',
+          action: () => console.log('View frameworks'),
+        },
+      ],
+    },
+    {
+      title: 'Notifications',
+      icon: Bell,
+      items: [
+        {
+          id: 'dailyReminders',
+          label: 'Daily Reminders',
+          description: 'Get reminded to practice daily',
+          type: 'toggle',
+          value: true,
+        },
+        {
+          id: 'weeklyInsights',
+          label: 'Weekly Insights',
+          description: 'Receive weekly progress summaries',
+          type: 'toggle',
+          value: true,
+        },
+        {
+          id: 'communityUpdates',
+          label: 'Community Updates',
+          description: 'Notifications about community activity',
+          type: 'toggle',
+          value: false,
+        },
+      ],
+    },
+    {
+      title: 'Data',
+      icon: Download,
+      items: [
+        {
+          id: 'exportData',
+          label: 'Export Data',
+          description: 'Download your data as JSON',
+          type: 'button',
+          action: () => console.log('Export data'),
+        },
+        {
+          id: 'deleteAccount',
+          label: 'Delete Account',
+          description: 'Permanently delete your account and data',
+          type: 'button',
+          action: () => handleDeleteAccount(),
+        },
+      ],
+    },
+  ];
 
   const renderSettingItem = (item: SettingItem) => {
     switch (item.type) {
@@ -374,6 +411,34 @@ export default function SettingsPage() {
             <p className="text-xs text-muted">© 2024 Aristotle App</p>
           </div>
         </div>
+
+        {/* Delete Account Confirmation Modal */}
+        {showDeleteConfirm && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className="bg-surface border border-border rounded-lg p-6 max-w-md w-full">
+              <h3 className="text-lg font-semibold text-text mb-4">Delete Account</h3>
+              <p className="text-muted mb-6">
+                Are you sure you want to delete your account? This action cannot be undone and will permanently remove all your data.
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowDeleteConfirm(false)}
+                  className="flex-1 px-4 py-2 bg-surface-2 text-text rounded-lg hover:bg-surface-3 transition-colors"
+                  disabled={deleteLoading}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteAccount}
+                  className="flex-1 px-4 py-2 bg-error text-white rounded-lg hover:bg-error/90 transition-colors disabled:opacity-50"
+                  disabled={deleteLoading}
+                >
+                  {deleteLoading ? 'Deleting...' : 'Delete Account'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       <GuideFAB />

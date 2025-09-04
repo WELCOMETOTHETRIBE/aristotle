@@ -36,9 +36,15 @@ export async function POST(request: NextRequest) {
 
     // Use a transaction to prevent race conditions
     const user = await prisma.$transaction(async (tx) => {
-      // Check if username already exists
-      const existingUser = await tx.user.findUnique({
-        where: { username }
+      // Check if username already exists (case-insensitive)
+      const normalizedUsername = username.toLowerCase();
+      const existingUser = await tx.user.findFirst({
+        where: { 
+          username: {
+            equals: normalizedUsername,
+            mode: 'insensitive'
+          }
+        }
       });
 
       if (existingUser) {
@@ -64,7 +70,7 @@ export async function POST(request: NextRequest) {
       
       return tx.user.create({
         data: {
-          username,
+          username: normalizedUsername, // Store in lowercase
           password: hashedPassword,
           email,
           displayName: displayName || username
@@ -77,6 +83,24 @@ export async function POST(request: NextRequest) {
       userId: user.id,
       username: user.username
     });
+
+    // Create onboarding task for new user
+    try {
+      await prisma.task.create({
+        data: {
+          userId: user.id,
+          title: 'Complete Onboarding',
+          description: 'Set up your profile, choose your framework, and get started with Aristotle',
+          tag: 'onboarding',
+          priority: 'H', // High priority
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Due in 7 days
+        },
+      });
+      console.log('✅ Onboarding task created for new user:', user.username);
+    } catch (taskError) {
+      console.error('⚠️ Failed to create onboarding task:', taskError);
+      // Don't fail the signup if task creation fails
+    }
 
     const response = NextResponse.json({
       message: 'User created successfully',

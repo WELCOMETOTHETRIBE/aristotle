@@ -296,9 +296,9 @@ async function createNaturePhotoThread(data: any) {
         console.warn('Could not resolve uploader from sourceId:', e);
       }
     }
-    // Final fallback to a demo user
+    // Final fallback - require authentication
     if (!authorId) {
-      authorId = 1;
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     console.log('About to create community post with data:', {

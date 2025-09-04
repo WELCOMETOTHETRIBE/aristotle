@@ -38,9 +38,17 @@ export async function verifyToken(token: string): Promise<JWTPayload | null> {
 }
 
 export async function authenticateUser(username: string, password: string) {
-  // Try to find user by username first
-  let user = await prisma.user.findUnique({
-    where: { username }
+  // Convert username to lowercase for case-insensitive search
+  const normalizedUsername = username.toLowerCase();
+  
+  // Try to find user by username (case-insensitive)
+  let user = await prisma.user.findFirst({
+    where: { 
+      username: {
+        equals: normalizedUsername,
+        mode: 'insensitive'
+      }
+    }
   });
 
   // If not found by username, try by email
@@ -65,9 +73,12 @@ export async function authenticateUser(username: string, password: string) {
 export async function createUser(username: string, password: string, email?: string, displayName?: string) {
   const hashedPassword = await hashPassword(password);
   
+  // Store username in lowercase for consistency
+  const normalizedUsername = username.toLowerCase();
+  
   return prisma.user.create({
     data: {
-      username,
+      username: normalizedUsername,
       password: hashedPassword,
       email,
       displayName: displayName || username

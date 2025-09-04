@@ -21,73 +21,29 @@ export const prisma = globalForPrisma.prisma ?? createPrismaClient();
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
 /**
- * Get or create a user
- * In production, this would integrate with proper auth
- */
-export async function getOrCreateUser(username: string) {
-  try {
-    // Try to find existing user first
-    let user = await prisma.user.findFirst({
-      where: { username },
-    });
-
-    if (!user) {
-      // Create new user
-      user = await prisma.user.create({
-        data: {
-          username,
-          password: 'demo-password', // In production, this would be properly hashed
-          displayName: username,
-          tz: 'UTC',
-        },
-      });
-    }
-
-    return user;
-  } catch (error) {
-    console.error('Error in getOrCreateUser:', error);
-    // Return a mock user with integer ID for development
-    return {
-      id: 1, // Use integer ID instead of string
-      username: username,
-      email: null,
-      password: 'demo-password',
-      displayName: username,
-      tz: 'UTC',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    };
-  }
-}
-
-/**
  * Get user state for coach context
  */
 export async function getUserState(userId: number) {
   const [activeGoals, dueTasks, habits] = await Promise.all([
     prisma.goal.findMany({
-      where: { userId, status: 'active' },
-      select: { id: true, title: true, category: true, status: true },
+      where: { userId, status: 'active' }
     }),
     prisma.task.findMany({
       where: { 
         userId, 
         completedAt: null,
-        dueDate: { lte: new Date(Date.now() + 24 * 60 * 60 * 1000) } // Due within 24 hours
-      },
-      select: { id: true, title: true, tag: true, priority: true, dueDate: true },
+        dueDate: { lte: new Date() }
+      }
     }),
     prisma.habit.findMany({
-      where: { userId },
-      select: { id: true, name: true, frequency: true },
-    }),
+      where: { userId }
+    })
   ]);
 
   return {
     activeGoals,
     dueTasks,
-    habits,
-    rollingSummary: null, // Removed conversationSummary as it doesn't exist
+    habits
   };
 }
 

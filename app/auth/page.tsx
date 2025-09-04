@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Eye, EyeOff, Sparkles, Shield, Users, ArrowRight, CheckCircle, AlertCircle, Loader2, Brain, Target, TrendingUp, BookOpen, Zap } from 'lucide-react';
+import { Eye, EyeOff, Shield, Users, ArrowRight, CheckCircle, AlertCircle, Loader2, Brain, Target, TrendingUp, BookOpen, Zap } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import PageLayout from '@/components/PageLayout';
 import AuroraBackground from '@/components/AuroraBackground';
@@ -93,33 +93,6 @@ export default function AuthPage() {
     } catch (err) {
       console.error('Auth submission error:', err);
       setError(err instanceof Error ? err.message : 'An unexpected error occurred. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async () => {
-    setIsLoading(true);
-    setError('');
-    
-    try {
-      if (!signIn) {
-        setError('Authentication system not available. Please refresh the page.');
-        return;
-      }
-
-      const result = await signIn('demo', 'password123');
-      if (result.success) {
-        setSuccess('Welcome to the demo!');
-        setTimeout(() => {
-          router.push('/');
-        }, 1000);
-      } else {
-        setError(result.error || 'Demo login failed. Please try again.');
-      }
-    } catch (err) {
-      console.error('Demo login error:', err);
-      setError('Demo login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -331,37 +304,6 @@ export default function AuthPage() {
                 )}
               </button>
             </form>
-
-            {/* Demo Login Button */}
-            {!isSignUp && (
-              <div className="mt-4">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t border-border" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-bg px-2 text-muted">Or</span>
-                  </div>
-                </div>
-                <button
-                  onClick={handleDemoLogin}
-                  disabled={isLoading}
-                  className="w-full mt-4 py-3 bg-surface border border-border text-text rounded-lg font-medium hover:bg-surface-2 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Signing In...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      Try Demo Account
-                    </>
-                  )}
-                </button>
-              </div>
-            )}
 
             {/* Toggle Sign Up/Sign In */}
             <div className="mt-6 text-center">

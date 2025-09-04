@@ -1,16 +1,53 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { GoalSchema } from '@/lib/validators';
-import { getOrCreateUser } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
 import { prisma } from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
-    const user = await getOrCreateUser('User');
+    // Get user ID from authentication
+    let userId: number | null = null;
+    
+    // Try Bearer token first
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = await verifyToken(token);
+      if (payload) {
+        userId = payload.userId;
+      }
+    }
+    
+    // If no Bearer token, try cookie-based auth
+    if (!userId) {
+      try {
+        const cookieHeader = request.headers.get('cookie');
+        if (cookieHeader) {
+          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+            headers: { cookie: cookieHeader }
+          });
+          
+          if (response.ok) {
+            const authData = await response.json();
+            if (authData.user && authData.user.id) {
+              userId = authData.user.id;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Cookie auth check failed:', error);
+      }
+    }
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     
     const goals = await prisma.goal.findMany({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' }, // This field exists in the Goal model
+      where: { userId: userId },
+      orderBy: { createdAt: 'desc' },
     });
 
     return NextResponse.json(goals);
@@ -28,16 +65,51 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const goalData = GoalSchema.parse(body);
     
-    const user = await getOrCreateUser('User');
+    // Get user ID from authentication
+    let userId: number | null = null;
+    
+    // Try Bearer token first
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = await verifyToken(token);
+      if (payload) {
+        userId = payload.userId;
+      }
+    }
+    
+    // If no Bearer token, try cookie-based auth
+    if (!userId) {
+      try {
+        const cookieHeader = request.headers.get('cookie');
+        if (cookieHeader) {
+          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+            headers: { cookie: cookieHeader }
+          });
+          
+          if (response.ok) {
+            const authData = await response.json();
+            if (authData.user && authData.user.id) {
+              userId = authData.user.id;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Cookie auth check failed:', error);
+      }
+    }
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
+    }
     
     const goal = await prisma.goal.create({
       data: {
-        userId: user.id,
+        userId: userId,
         title: goalData.title,
         description: goalData.description,
         category: goalData.category,
-        cadence: goalData.cadence,
-        targetMetric: goalData.targetMetric ? JSON.stringify(goalData.targetMetric) : null,
       },
     });
 

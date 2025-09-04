@@ -1,29 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
 
 export async function GET(request: NextRequest) {
   try {
-    // For now, we'll use a demo user approach since we don't have proper auth
-    // In production, this would get the user from the session
-    const demoUser = await prisma.user.findFirst({
-      where: { username: 'demo-user' },
-    });
-
-    if (!demoUser) {
-      return NextResponse.json({
-        isComplete: false,
-        hasUserFacts: false,
-        hasFrameworkPreference: false,
-        hasName: false,
-        hasTimezone: false,
-        shouldShowPrompt: true,
-        completionPercentage: 0,
-      });
+    // Get user ID from authentication
+    let userId: number | null = null;
+    
+    // Try Bearer token first
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = await verifyToken(token);
+      if (payload) {
+        userId = payload.userId;
+      }
+    }
+    
+    // If no Bearer token, try cookie-based auth
+    if (!userId) {
+      try {
+        const cookieHeader = request.headers.get('cookie');
+        if (cookieHeader) {
+          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+            headers: { cookie: cookieHeader }
+          });
+          
+          if (response.ok) {
+            const authData = await response.json();
+            if (authData.user && authData.user.id) {
+              userId = authData.user.id;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Cookie auth check failed:', error);
+      }
+    }
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Check for framework preference
     const userPrefs = await prisma.userPreference.findUnique({
-      where: { userId: demoUser.id },
+      where: { userId: userId },
     });
     
     const hasFrameworkPreference = userPrefs?.framework && userPrefs.framework !== null;
@@ -77,30 +99,76 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { isComplete, completedAt } = body;
 
-    // For now, we'll use a demo user approach since we don't have proper auth
-    // In production, this would get the user from the session
-    const demoUser = await prisma.user.findFirst({
-      where: { username: 'demo-user' },
-    });
-
-    if (!demoUser) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    // Get user ID from authentication
+    let userId: number | null = null;
+    
+    // Try Bearer token first
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      const token = authHeader.replace('Bearer ', '');
+      const payload = await verifyToken(token);
+      if (payload) {
+        userId = payload.userId;
+      }
+    }
+    
+    // If no Bearer token, try cookie-based auth
+    if (!userId) {
+      try {
+        const cookieHeader = request.headers.get('cookie');
+        if (cookieHeader) {
+          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+            headers: { cookie: cookieHeader }
+          });
+          
+          if (response.ok) {
+            const authData = await response.json();
+            if (authData.user && authData.user.id) {
+              userId = authData.user.id;
+            }
+          }
+        }
+      } catch (error) {
+        console.error('Cookie auth check failed:', error);
+      }
+    }
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Update user preferences to mark onboarding as complete
     if (isComplete) {
       await prisma.userPreference.upsert({
-        where: { userId: demoUser.id },
+        where: { userId: userId },
         update: {
           // Add any additional fields that indicate onboarding completion
           updatedAt: new Date(),
         },
         create: {
-          userId: demoUser.id,
+          userId: userId,
           // Set default values for required fields
           updatedAt: new Date(),
         },
       });
+
+      // Mark onboarding task as completed
+      try {
+        await prisma.task.updateMany({
+          where: {
+            userId: userId,
+            tag: 'onboarding'
+          },
+          data: {
+            completedAt: new Date()
+          }
+        });
+        console.log('✅ Onboarding task marked as completed for user:', userId);
+      } catch (taskError) {
+        console.error('⚠️ Failed to mark onboarding task as completed:', taskError);
+        // Don't fail the onboarding completion if task update fails
+      }
     }
 
     return NextResponse.json({ 

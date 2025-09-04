@@ -1,17 +1,63 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
-import { getOrCreateUser } from '@/lib/db';
+import { verifyToken } from '@/lib/auth';
+
+// Helper function to get user ID from request
+async function getUserIdFromRequest(request: NextRequest): Promise<number | null> {
+  let userId: number | null = null;
+  
+  // Try Bearer token first
+  const authHeader = request.headers.get('authorization');
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '');
+    const payload = await verifyToken(token);
+    if (payload) {
+      userId = payload.userId;
+    }
+  }
+  
+  // If no Bearer token, try cookie-based auth
+  if (!userId) {
+    try {
+      const cookieHeader = request.headers.get('cookie');
+      if (cookieHeader) {
+        const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+          headers: { cookie: cookieHeader }
+        });
+        
+        if (response.ok) {
+          const authData = await response.json();
+          if (authData.user && authData.user.id) {
+            userId = authData.user.id;
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Cookie auth check failed:', error);
+    }
+  }
+  
+  return userId;
+}
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { automationId, userId } = body;
+    const { automationId, userId: bodyUserId } = body;
 
     if (!automationId) {
       return NextResponse.json(
         { error: 'Automation ID is required' },
         { status: 400 }
       );
+    }
+
+    // Get user ID from authentication
+    const userId = await getUserIdFromRequest(request);
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
     // Get the automation
@@ -27,8 +73,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Verify user owns the automation
-    const user = await getOrCreateUser('User');
-    if (automation.userId !== user.id) {
+    if (automation.userId !== userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }
@@ -60,7 +105,7 @@ export async function POST(request: NextRequest) {
     // Log the automation run
     await prisma.skillRunLog.create({
       data: {
-        userId: user.id,
+        userId: userId,
         skillKey: `automation.${automation.type}`,
         inputJson: JSON.stringify({ automationId, config: automation.config }),
         outputJson: JSON.stringify(result),

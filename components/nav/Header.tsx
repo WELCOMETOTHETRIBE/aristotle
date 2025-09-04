@@ -28,6 +28,7 @@ export function Header({ focusVirtue }: HeaderProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showOnboardingAlert, setShowOnboardingAlert] = useState(false);
   const [onboardingStatus, setOnboardingStatus] = useState<any>(null);
+  const [pendingTaskCount, setPendingTaskCount] = useState(0);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
 
@@ -46,7 +47,27 @@ export function Header({ focusVirtue }: HeaderProps) {
       }
     };
 
+    // Fetch pending task count
+    const fetchTaskCount = async () => {
+      try {
+        const response = await fetch('/api/tasks');
+        if (response.ok) {
+          const data = await response.json();
+          // Handle both old format (array) and new format (object with pendingCount)
+          if (Array.isArray(data)) {
+            const pending = data.filter((task: any) => !task.completedAt).length;
+            setPendingTaskCount(pending);
+          } else {
+            setPendingTaskCount(data.pendingCount || 0);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch task count:', error);
+      }
+    };
+
     checkOnboardingStatus();
+    fetchTaskCount();
   }, []);
 
   useEffect(() => {
@@ -111,8 +132,13 @@ export function Header({ focusVirtue }: HeaderProps) {
         )}
 
         {/* Notifications */}
-        <button className="p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150">
+        <button className="relative p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150">
           <Bell className="w-5 h-5" />
+          {pendingTaskCount > 0 && (
+            <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center font-medium animate-pulse">
+              {pendingTaskCount > 9 ? '9+' : pendingTaskCount}
+            </div>
+          )}
         </button>
 
         {/* Onboarding Alert - Sleek and Intuitive */}

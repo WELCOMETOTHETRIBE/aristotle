@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { z } from 'zod';
 import { verifyToken } from '@/lib/auth';
-import { generateEmbedding } from '@/lib/embeddings';
-
-const UserFactsRequestSchema = z.object({
-  facts: z.array(z.object({
-    kind: z.enum(['bio', 'value', 'constraint', 'preference', 'insight']),
-    content: z.string().min(1),
-  })),
-});
+import { prisma } from '@/lib/db';
 
 // Helper function to get user ID from request
 async function getUserIdFromRequest(request: NextRequest): Promise<number | null> {
@@ -50,10 +42,6 @@ async function getUserIdFromRequest(request: NextRequest): Promise<number | null
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const { facts } = UserFactsRequestSchema.parse(body);
-
-    // Get user ID from authentication
     const userId = await getUserIdFromRequest(request);
     
     // Require authentication
@@ -61,36 +49,44 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Generate embeddings for each fact
-    const factsWithEmbeddings = await Promise.all(
-      facts.map(async (fact) => ({
-        kind: fact.kind,
-        content: fact.content,
-        embedding: await generateEmbedding(fact.content),
-      }))
-    );
+    // Check if onboarding task already exists
+    const existingTask = await prisma.task.findFirst({
+      where: {
+        userId: userId,
+        tag: 'onboarding'
+      }
+    });
 
-    // Save to database (placeholder - implement when userFact model is available)
-    console.log('User facts to save:', factsWithEmbeddings);
+    if (existingTask) {
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Onboarding task already exists',
+        task: existingTask
+      });
+    }
+
+    // Create onboarding task
+    const onboardingTask = await prisma.task.create({
+      data: {
+        userId: userId,
+        title: 'Complete Onboarding',
+        description: 'Set up your profile, choose your framework, and get started with Aristotle',
+        tag: 'onboarding',
+        priority: 'H', // High priority
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // Due in 7 days
+      },
+    });
 
     return NextResponse.json({
       success: true,
-      message: `Saved ${facts.length} user facts`,
-      userId: userId,
+      message: 'Onboarding task created successfully',
+      task: onboardingTask
     });
 
   } catch (error) {
-    console.error('User facts API error:', error);
-    
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: 'Invalid request format', details: error.errors },
-        { status: 400 }
-      );
-    }
-
+    console.error('Error creating onboarding task:', error);
     return NextResponse.json(
-      { error: 'Failed to save user facts' },
+      { error: 'Failed to create onboarding task' },
       { status: 500 }
     );
   }
