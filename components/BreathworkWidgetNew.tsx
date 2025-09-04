@@ -209,6 +209,47 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   };
 
+  // Helper function to get next phase
+  const getNextPhase = (currentPhase: string) => {
+    switch (currentPhase) {
+      case 'inhale':
+        return pattern.pattern.hold > 0 ? 'hold' : 'exhale';
+      case 'hold':
+        return 'exhale';
+      case 'exhale':
+        return pattern.pattern.hold2 > 0 ? 'hold2' : 'inhale';
+      case 'hold2':
+        return 'inhale';
+      default:
+        return 'inhale';
+    }
+  };
+
+  // Get phase transition animation
+  const getPhaseTransition = (phase: string) => {
+    switch (phase) {
+      case 'inhale':
+        return { scale: [1, 1.1, 1], borderColor: ['rgba(59, 130, 246, 0.3)', 'rgba(59, 130, 246, 0.6)', 'rgba(59, 130, 246, 0.3)'] };
+      case 'hold':
+        return { scale: [1, 1.05, 1], borderColor: ['rgba(245, 158, 11, 0.3)', 'rgba(245, 158, 11, 0.6)', 'rgba(245, 158, 11, 0.3)'] };
+      case 'exhale':
+        return { scale: [1, 0.95, 1], borderColor: ['rgba(16, 185, 129, 0.3)', 'rgba(16, 185, 129, 0.6)', 'rgba(16, 185, 129, 0.3)'] };
+      case 'hold2':
+        return { scale: [1, 1.02, 1], borderColor: ['rgba(139, 92, 246, 0.3)', 'rgba(139, 92, 246, 0.6)', 'rgba(139, 92, 246, 0.3)'] };
+      default:
+        return { scale: 1, borderColor: 'rgba(255,255,255,0.15)' };
+    }
+  };
+
+  // Add haptic-like feedback for phase transitions
+  const [phaseTransitionKey, setPhaseTransitionKey] = useState(0);
+  
+  useEffect(() => {
+    if (isActive) {
+      setPhaseTransitionKey(prev => prev + 1);
+    }
+  }, [currentPhase, isActive]);
+
   // Audio cue system
   const playAudioCue = async (phase: string) => {
     if (isMuted || !audioEnabled) return;
@@ -242,6 +283,46 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   };
 
+  // Play counting audio for longer phases
+  const playCountingAudio = async (count: number) => {
+    if (isMuted || !audioEnabled || count < 1 || count > 15) return;
+    
+    try {
+      const audioUrl = `/audio/breathwork/count-${count}.mp3`;
+      if (audioRef.current) {
+        audioRef.current.src = audioUrl;
+        audioRef.current.volume = 0.5;
+        await audioRef.current.play();
+      }
+    } catch (error) {
+      console.log('Counting audio not available');
+    }
+  };
+
+  // Play counting audio for longer phases
+  useEffect(() => {
+    if (isActive && timeLeft > 3 && timeLeft <= 15) {
+      // Play counting audio for phases longer than 3 seconds
+      const timer = setTimeout(() => {
+        playCountingAudio(timeLeft);
+      }, 1000); // Wait 1 second before playing the count
+      
+      return () => clearTimeout(timer);
+    }
+  }, [timeLeft, isActive, isMuted, audioEnabled]);
+
+  // Play pattern change audio
+  useEffect(() => {
+    if (!isMuted && audioEnabled && audioRef.current) {
+      // Play a subtle pattern change sound
+      audioRef.current.src = '/audio/breathwork/session-start.mp3';
+      audioRef.current.volume = 0.3;
+      audioRef.current.play().catch(() => {
+        // Ignore errors for pattern change audio
+      });
+    }
+  }, [selectedPattern, isMuted, audioEnabled]);
+
   // Preparation phase countdown
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -273,14 +354,22 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           if (prev <= 1) {
             // Phase completed, move to next phase
             if (currentPhase === 'inhale') {
-              setCurrentPhase('hold');
-              playAudioCue('hold');
-              return pattern.pattern.hold;
+              // Check if hold phase has duration, otherwise skip to exhale
+              if (pattern.pattern.hold > 0) {
+                setCurrentPhase('hold');
+                playAudioCue('hold');
+                return pattern.pattern.hold;
+              } else {
+                setCurrentPhase('exhale');
+                playAudioCue('exhale');
+                return pattern.pattern.exhale;
+              }
             } else if (currentPhase === 'hold') {
               setCurrentPhase('exhale');
               playAudioCue('exhale');
               return pattern.pattern.exhale;
             } else if (currentPhase === 'exhale') {
+              // Check if hold2 phase has duration, otherwise complete cycle
               if (pattern.pattern.hold2 > 0) {
                 setCurrentPhase('hold2');
                 playAudioCue('hold2');
@@ -298,7 +387,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                   return pattern.pattern.inhale;
                 }
               }
-            } else {
+            } else if (currentPhase === 'hold2') {
               // hold2 completed, start new cycle
               if (currentCycle < pattern.pattern.cycles) {
                 setCurrentCycle(prev => prev + 1);
@@ -534,6 +623,13 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-sm truncate">{p.name}</div>
                           <div className="text-xs text-muted truncate">{p.description}</div>
+                          <div className="text-xs text-primary font-mono mt-1">
+                            {p.pattern.inhale}
+                            {p.pattern.hold > 0 ? `-${p.pattern.hold}` : ''}
+                            -{p.pattern.exhale}
+                            {p.pattern.hold2 > 0 ? `-${p.pattern.hold2}` : ''}
+                            {' '}× {p.pattern.cycles}
+                          </div>
                         </div>
                       </div>
                     </button>
@@ -601,6 +697,22 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       {/* Main Breath Circle */}
       <div className="flex justify-center mb-6">
         <div className="relative w-48 h-48 flex items-center justify-center">
+          {/* Background pattern animation */}
+          <motion.div
+            className="absolute inset-0 rounded-full opacity-10"
+            style={{
+              background: `conic-gradient(from 0deg, ${pattern.gradient.replace('bg-gradient-to-br ', '').replace(' ', ', ')} 0deg, transparent 360deg)`
+            }}
+            animate={{
+              rotate: isActive ? 360 : 0
+            }}
+            transition={{
+              duration: 20,
+              repeat: isActive ? Infinity : 0,
+              ease: "linear"
+            }}
+          />
+          
           {/* Outer cycle progress ring */}
           <svg width="192" height="192" viewBox="0 0 192 192" className="absolute inset-0">
             <defs>
@@ -675,10 +787,11 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           
           {/* Inner breath circle */}
           <motion.div 
+            key={phaseTransitionKey}
             className={`relative w-36 h-36 rounded-full border-4 flex items-center justify-center bg-gradient-to-br ${getPhaseBgColor(currentPhase)} shadow-2xl`}
             animate={{
-              scale: isActive ? [1, 1.05, 1] : 1,
-              borderColor: isActive ? [getPhaseRingColor(currentPhase) + '30', getPhaseRingColor(currentPhase) + '60', getPhaseRingColor(currentPhase) + '30'] : 'rgba(255,255,255,0.15)',
+              scale: isActive ? getPhaseTransition(currentPhase).scale : 1,
+              borderColor: isActive ? getPhaseTransition(currentPhase).borderColor : 'rgba(255,255,255,0.15)',
               boxShadow: isActive ? [
                 `0 0 20px ${getPhaseRingColor(currentPhase)}20`,
                 `0 0 30px ${getPhaseRingColor(currentPhase)}30`,
@@ -703,12 +816,27 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                 <>
                   <motion.div 
                     className={`text-3xl font-bold ${getPhaseColor()} drop-shadow-sm`}
-                    animate={{ scale: isActive ? [1, 1.08, 1] : 1 }}
-                    transition={{ duration: 1.2, repeat: isActive ? Infinity : 0 }}
+                    animate={{ 
+                      scale: isActive ? [1, 1.08, 1] : 1,
+                      color: currentCycle === pattern.pattern.cycles ? ['#fbbf24', '#f59e0b', '#fbbf24'] : undefined
+                    }}
+                    transition={{ 
+                      duration: currentCycle === pattern.pattern.cycles ? 1.5 : 1.2, 
+                      repeat: isActive ? Infinity : 0 
+                    }}
                   >
                     {timeLeft}
                   </motion.div>
                   <div className="text-sm text-muted mt-2 font-medium">{getPhaseText()}</div>
+                  {currentCycle === pattern.pattern.cycles && (
+                    <motion.div
+                      className="text-xs text-amber-400 font-medium mt-1"
+                      animate={{ opacity: [0.5, 1, 0.5] }}
+                      transition={{ duration: 2, repeat: Infinity }}
+                    >
+                      Final Cycle
+                    </motion.div>
+                  )}
                 </>
               )}
             </div>
@@ -741,6 +869,8 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       {/* Phase Indicators */}
       <div className="flex justify-center gap-2 mb-4">
         {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => {
+          // Skip phases with 0 duration
+          if (phase === 'hold' && pattern.pattern.hold === 0) return null;
           if (phase === 'hold2' && pattern.pattern.hold2 === 0) return null;
           return (
             <motion.div
@@ -754,7 +884,13 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                   : 'rgba(255,255,255,0.2)'
               }}
               animate={{
-                scale: currentPhase === phase ? 1.2 : 1,
+                scale: currentPhase === phase ? [1, 1.2, 1] : 1,
+                opacity: currentPhase === phase ? [1, 0.8, 1] : 0.6
+              }}
+              transition={{ 
+                duration: 1.5, 
+                repeat: currentPhase === phase ? Infinity : 0,
+                ease: "easeInOut"
               }}
             />
           );
@@ -776,7 +912,12 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
           />
         </div>
         <div className="flex justify-between text-xs text-muted mt-1">
-          <span>{pattern.pattern.inhale}-{pattern.pattern.hold}-{pattern.pattern.exhale}-{pattern.pattern.hold2}</span>
+          <span>
+            {pattern.pattern.inhale}
+            {pattern.pattern.hold > 0 ? `-${pattern.pattern.hold}` : ''}
+            -{pattern.pattern.exhale}
+            {pattern.pattern.hold2 > 0 ? `-${pattern.pattern.hold2}` : ''}
+          </span>
           <span>~{formatTime(totalSessionTime)}</span>
         </div>
       </div>

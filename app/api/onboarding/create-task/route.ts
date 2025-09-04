@@ -18,22 +18,12 @@ async function getUserIdFromRequest(request: NextRequest): Promise<number | null
   
   // If no Bearer token, try cookie-based auth
   if (!userId) {
-    try {
-      const cookieHeader = request.headers.get('cookie');
-      if (cookieHeader) {
-        const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
-          headers: { cookie: cookieHeader }
-        });
-        
-        if (response.ok) {
-          const authData = await response.json();
-          if (authData.user && authData.user.id) {
-            userId = authData.user.id;
-          }
-        }
+    const token = request.cookies.get('auth-token')?.value;
+    if (token) {
+      const payload = await verifyToken(token);
+      if (payload) {
+        userId = payload.userId;
       }
-    } catch (error) {
-      console.error('Cookie auth check failed:', error);
     }
   }
   

@@ -24,9 +24,9 @@ export async function GET(request: NextRequest) {
 
     // Return preferences with defaults
     const preferences = {
-      displayName: userPrefs?.name || payload.displayName || 'User',
+      displayName: (userPrefs as any)?.name || payload.displayName || 'User',
       email: payload.email || '',
-      timezone: userPrefs?.timezone || 'UTC',
+      timezone: (userPrefs as any)?.timezone || 'UTC',
       framework: userPrefs?.framework || null,
       theme: 'dark',
       focusVirtue: 'wisdom',
@@ -62,23 +62,12 @@ export async function POST(request: NextRequest) {
     
     // If no Bearer token, try cookie-based auth (for logged in users)
     if (!userId) {
-      try {
-        const cookieHeader = request.headers.get('cookie');
-        if (cookieHeader) {
-          // Check if user is authenticated via cookies
-          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
-            headers: { cookie: cookieHeader }
-          });
-          
-          if (response.ok) {
-            const authData = await response.json();
-            if (authData.user && authData.user.id) {
-              userId = authData.user.id;
-            }
-          }
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
         }
-      } catch (error) {
-        console.error('Cookie auth check failed:', error);
       }
     }
     
@@ -89,7 +78,8 @@ export async function POST(request: NextRequest) {
 
     // Handle onboarding data
     if (isOnboarding && (framework || name || timezone)) {
-      await prisma.userPreference.upsert({
+      // Update or create user preferences
+      await (prisma.userPreference as any).upsert({
         where: { userId: userId },
         update: {
           framework: framework || undefined,
@@ -102,6 +92,7 @@ export async function POST(request: NextRequest) {
           framework: framework || null,
           name: name || null,
           timezone: timezone || null,
+          updatedAt: new Date(),
         },
       });
 

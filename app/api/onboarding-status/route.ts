@@ -19,22 +19,12 @@ export async function GET(request: NextRequest) {
     
     // If no Bearer token, try cookie-based auth
     if (!userId) {
-      try {
-        const cookieHeader = request.headers.get('cookie');
-        if (cookieHeader) {
-          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
-            headers: { cookie: cookieHeader }
-          });
-          
-          if (response.ok) {
-            const authData = await response.json();
-            if (authData.user && authData.user.id) {
-              userId = authData.user.id;
-            }
-          }
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
         }
-      } catch (error) {
-        console.error('Cookie auth check failed:', error);
       }
     }
     
@@ -49,8 +39,8 @@ export async function GET(request: NextRequest) {
     });
     
     const hasFrameworkPreference = userPrefs?.framework && userPrefs.framework !== null;
-    const hasName = userPrefs?.name && userPrefs.name !== null;
-    const hasTimezone = userPrefs?.timezone && userPrefs.timezone !== null;
+    const hasName = (userPrefs as any)?.name && (userPrefs as any).name !== null;
+    const hasTimezone = (userPrefs as any)?.timezone && (userPrefs as any).timezone !== null;
 
     // Calculate completion percentage
     let completionPercentage = 0;
@@ -114,22 +104,12 @@ export async function POST(request: NextRequest) {
     
     // If no Bearer token, try cookie-based auth
     if (!userId) {
-      try {
-        const cookieHeader = request.headers.get('cookie');
-        if (cookieHeader) {
-          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
-            headers: { cookie: cookieHeader }
-          });
-          
-          if (response.ok) {
-            const authData = await response.json();
-            if (authData.user && authData.user.id) {
-              userId = authData.user.id;
-            }
-          }
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
         }
-      } catch (error) {
-        console.error('Cookie auth check failed:', error);
       }
     }
     
