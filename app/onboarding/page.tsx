@@ -33,11 +33,11 @@ import { getAllFrameworks, FrameworkConfig } from '@/lib/frameworks.config';
 interface OnboardingData {
   name: string;
   timezone: string;
-  question1: boolean; // Do you prefer structured learning or intuitive exploration?
-  question2: boolean; // Are you more motivated by personal achievement or community connection?
-  question3: boolean; // Do you tend to confront challenges directly or adapt around them?
-  question4: boolean; // Do you prefer individual practice or group activities?
-  question5: boolean; // Are you more focused on physical discipline or mental cultivation?
+  question1: boolean | null; // Do you prefer structured learning or intuitive exploration?
+  question2: boolean | null; // Are you more motivated by personal achievement or community connection?
+  question3: boolean | null; // Do you tend to confront challenges directly or adapt around them?
+  question4: boolean | null; // Do you prefer individual practice or group activities?
+  question5: boolean | null; // Are you more focused on physical discipline or mental cultivation?
   selectedFrameworks: string[];
 }
 
@@ -232,11 +232,11 @@ export default function OnboardingPage() {
   const [data, setData] = useState<OnboardingData>({
     name: '',
     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC+00:00',
-    question1: true,
-    question2: true,
-    question3: true,
-    question4: true,
-    question5: true,
+    question1: null,
+    question2: null,
+    question3: null,
+    question4: null,
+    question5: null,
     selectedFrameworks: []
   });
   const [isProcessing, setIsProcessing] = useState(false);
@@ -263,6 +263,18 @@ export default function OnboardingPage() {
   };
 
   const handleNext = () => {
+    if (currentStep === 1) {
+      // Check if all questions are answered
+      const unansweredQuestions = ['question1', 'question2', 'question3', 'question4', 'question5'].filter(
+        q => data[q as keyof OnboardingData] === null
+      );
+      
+      if (unansweredQuestions.length > 0) {
+        alert(`Please answer all questions before continuing.`);
+        return;
+      }
+    }
+    
     if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     }
@@ -427,31 +439,46 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-4 md:space-y-6">
             {questions.map((question, index) => (
-              <div key={question.id} className="border-2 border-border bg-surface rounded-lg p-4 md:p-6 hover:border-primary/30 transition-all duration-200 hover:shadow-lg">
+              <div key={question.id} className={`border-2 rounded-lg p-4 md:p-6 transition-all duration-200 hover:shadow-lg ${
+                data[question.id as keyof OnboardingData] === null
+                  ? 'border-orange-400 bg-orange-50/10 hover:border-orange-300'
+                  : 'border-border bg-surface hover:border-primary/30'
+              }`}>
                 <div className="flex items-center space-x-3 mb-4 md:mb-6">
                   <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <question.icon className="w-4 h-4 md:w-5 h-5 text-primary" />
+                    <question.icon className="w-4 h-4 md:w-5 md:h-5 text-primary" />
                   </div>
-                  <h3 className="text-base md:text-lg font-semibold text-text flex-1 leading-tight">{question.text}</h3>
+                  <div className="flex-1">
+                    <h3 className="text-base md:text-lg font-semibold text-text leading-tight">{question.text}</h3>
+                    {data[question.id as keyof OnboardingData] === null && (
+                      <p className="text-sm text-orange-400 mt-1">Please select an option</p>
+                    )}
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Button
-                    variant={data[question.id as keyof OnboardingData] === true ? "default" : "outline"}
                     onClick={() => {
                       console.log('Clicking true for question:', question.id, 'current value:', data[question.id as keyof OnboardingData]);
                       updateData(question.id as keyof OnboardingData, true);
                     }}
-                    className="h-10 md:h-12 text-sm md:text-base font-medium bg-primary hover:bg-primary/90 text-white border-primary shadow-sm"
+                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-200 ${
+                      data[question.id as keyof OnboardingData] === true
+                        ? 'bg-primary hover:bg-primary/90 text-white border-primary shadow-sm'
+                        : 'bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm'
+                    }`}
                   >
                     {question.trueLabel}
                   </Button>
                   <Button
-                    variant={data[question.id as keyof OnboardingData] === false ? "default" : "outline"}
                     onClick={() => {
                       console.log('Clicking false for question:', question.id, 'current value:', data[question.id as keyof OnboardingData]);
                       updateData(question.id as keyof OnboardingData, false);
                     }}
-                    className="h-10 md:h-12 text-sm md:text-base font-medium bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm"
+                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-200 ${
+                      data[question.id as keyof OnboardingData] === false
+                        ? 'bg-primary hover:bg-primary/90 text-white border-primary shadow-sm'
+                        : 'bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm'
+                    }`}
                   >
                     {question.falseLabel}
                   </Button>
