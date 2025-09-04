@@ -590,8 +590,19 @@ export default function OnboardingPage() {
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center py-4 px-4">
       <div className="w-full max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-8">
+        {/* Header with Close Button */}
+        <div className="relative text-center mb-8">
+          {/* Close Button */}
+          <button
+            onClick={() => window.location.href = '/'}
+            className="absolute top-0 right-0 p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+            title="Exit onboarding"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
           <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-4 shadow-xl">
             <Sparkles className="w-8 h-8 text-white" />
           </div>

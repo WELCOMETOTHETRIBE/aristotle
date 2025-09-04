@@ -84,6 +84,9 @@ export async function DELETE(request: NextRequest) {
       await tx.communityPost.deleteMany({ where: { authorId: userId } });
       await tx.communityReply.deleteMany({ where: { authorId: userId } });
       await tx.communityNotification.deleteMany({ where: { userId } });
+      await tx.communityLike.deleteMany({ where: { userId } });
+      await tx.communityBookmark.deleteMany({ where: { userId } });
+      await tx.journalEntry.deleteMany({ where: { userId } });
       await tx.userPreference.deleteMany({ where: { userId } });
       
       // Finally delete the user
