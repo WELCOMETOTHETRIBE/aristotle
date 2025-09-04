@@ -52,8 +52,19 @@ function WisdomSpotlightWidget() {
   useEffect(() => {
     const loadDailyWisdom = async () => {
       try {
-        const frameworks = ['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic'];
-        const randomFramework = frameworks[Math.floor(Math.random() * frameworks.length)];
+        // Try to get user's framework preference from localStorage or use default
+        let userFramework = 'Stoic'; // Default fallback
+        try {
+          const userPrefs = localStorage.getItem('userPreferences');
+          if (userPrefs) {
+            const parsed = JSON.parse(userPrefs);
+            userFramework = parsed.framework || 'Stoic';
+          }
+        } catch (error) {
+          console.log('Using default framework for wisdom');
+        }
+        
+        console.log(`🎯 Loading wisdom for user's framework: ${userFramework}`);
         
         const response = await fetch('/api/generate/daily-wisdom', {
           method: 'POST',
@@ -61,7 +72,7 @@ function WisdomSpotlightWidget() {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            framework: randomFramework,
+            framework: userFramework,
             date: new Date().toISOString().split('T')[0]
           }),
         });

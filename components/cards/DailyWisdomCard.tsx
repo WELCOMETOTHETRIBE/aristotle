@@ -108,10 +108,12 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const loadDailyWisdom = async () => {
     setIsLoading(true);
     try {
-      // Use the first preferred framework or fall back to a random one from available frameworks
-      const selectedFramework = settings.preferredFrameworks.length > 0 
+      // Use the user's preferred framework from settings
+      const selectedFramework = settings.preferredFrameworks && settings.preferredFrameworks.length > 0 
         ? settings.preferredFrameworks[0]
-        : availableFrameworks[Math.floor(Math.random() * availableFrameworks.length)] || 'Stoic';
+        : 'Stoic'; // Fallback to Stoic if no preference
+      
+      console.log(`🎯 Loading daily wisdom for user's preferred framework: ${selectedFramework}`);
       
       const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
