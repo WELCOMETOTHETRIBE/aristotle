@@ -557,8 +557,15 @@ export default function TodayPage() {
             <div className="grid grid-cols-3 gap-3 mb-4">
               <button 
                 onClick={() => setShowTasksModal(true)}
-                className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center hover:bg-surface/80 transition-colors cursor-pointer"
+                className="relative bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center hover:bg-surface/80 transition-colors cursor-pointer"
               >
+                {/* Task Count Blip */}
+                {pendingTaskCount > 0 && (
+                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse shadow-lg">
+                    {pendingTaskCount > 9 ? '9+' : pendingTaskCount}
+                  </div>
+                )}
+                
                 <div className="text-xl font-bold text-primary mb-1">
                   {Math.max(1, pendingTaskCount)}
                 </div>

@@ -308,10 +308,31 @@ export default function OnboardingPage() {
 
     setIsProcessing(true);
     try {
+      // Get auth token from cookies
+      const getAuthHeaders = () => {
+        const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+        
+        // Try to get auth token from cookies
+        if (typeof document !== 'undefined') {
+          const cookies = document.cookie;
+          if (cookies.includes('auth-token=')) {
+            // Extract the token from cookies
+            const tokenMatch = cookies.match(/auth-token=([^;]+)/);
+            if (tokenMatch) {
+              headers['Authorization'] = `Bearer ${tokenMatch[1]}`;
+            }
+          }
+        }
+        
+        return headers;
+      };
+
+      const authHeaders = getAuthHeaders();
+
       // First, save user preferences to database
       const prefsResponse = await fetch('/api/prefs', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({ 
           framework: data.selectedFrameworks[0], // Primary framework
           name: data.name,
@@ -339,7 +360,7 @@ export default function OnboardingPage() {
 
       const factsResponse = await fetch('/api/user-facts', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({ facts }),
       });
 
@@ -350,7 +371,7 @@ export default function OnboardingPage() {
       // Save onboarding completion status
       const onboardingStatusResponse = await fetch('/api/onboarding-status', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: authHeaders,
         body: JSON.stringify({ 
           isComplete: true,
           completedAt: new Date().toISOString()
