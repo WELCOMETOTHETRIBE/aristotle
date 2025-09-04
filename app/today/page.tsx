@@ -514,9 +514,6 @@ export default function TodayPage() {
                   <div className="w-12 h-12 bg-gradient-to-br from-primary/30 to-primary/10 rounded-xl flex items-center justify-center shadow-lg p-2">
                     <AcademyLogo className="w-full h-full text-primary" />
                   </div>
-                  <div className="absolute -top-1 -right-1 w-5 h-5 bg-courage/20 rounded-full flex items-center justify-center">
-                    <div className="w-1.5 h-1.5 bg-courage rounded-full animate-pulse"></div>
-                  </div>
                 </div>
                 <div>
                   <h1 className="text-xl font-bold text-text mb-1">
@@ -559,12 +556,10 @@ export default function TodayPage() {
                 onClick={() => setShowTasksModal(true)}
                 className="relative bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center hover:bg-surface/80 transition-colors cursor-pointer"
               >
-                {/* Task Count Blip */}
-                {pendingTaskCount > 0 && (
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse shadow-lg">
-                    {pendingTaskCount > 9 ? '9+' : pendingTaskCount}
-                  </div>
-                )}
+                {/* Task Count Blip - Always show for new users, enhanced styling */}
+                <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse shadow-lg border-2 border-white">
+                  {Math.max(1, pendingTaskCount)}
+                </div>
                 
                 <div className="text-xl font-bold text-primary mb-1">
                   {Math.max(1, pendingTaskCount)}
