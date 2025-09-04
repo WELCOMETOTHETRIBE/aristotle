@@ -65,8 +65,14 @@ export function Header({ focusVirtue }: HeaderProps) {
   const handleSignOut = async () => {
     try {
       await signOut();
+      // Close profile menu
+      setShowProfileMenu(false);
+      // Redirect to auth page
+      window.location.href = '/auth';
     } catch (error) {
       console.error('Sign out error:', error);
+      // Even on error, redirect to auth page
+      window.location.href = '/auth';
     }
   };
 

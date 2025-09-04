@@ -96,13 +96,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     try {
-      await fetch('/api/auth/signout', {
+      const response = await fetch('/api/auth/signout', {
         method: 'POST',
         credentials: 'include',
       });
+      
+      if (!response.ok) {
+        throw new Error('Signout failed');
+      }
+      
+      // Clear user state
       setUser(null);
+      
+      // Clear any stored preferences or data
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('userPreferences');
+        localStorage.removeItem('personalityProfile');
+        localStorage.removeItem('activeWidgets');
+        localStorage.removeItem('onboarding-notification-dismissed');
+        localStorage.removeItem('onboarding-dismissed');
+      }
+      
+      console.log('User signed out successfully');
     } catch (error) {
       console.error('Sign out failed:', error);
+      // Even if the API call fails, clear local state
+      setUser(null);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('userPreferences');
+        localStorage.removeItem('personalityProfile');
+        localStorage.removeItem('activeWidgets');
+        localStorage.removeItem('onboarding-notification-dismissed');
+        localStorage.removeItem('onboarding-dismissed');
+      }
     }
   };
 
