@@ -25,8 +25,6 @@ interface WisdomSettings {
   enableNotifications: boolean;
 }
 
-const frameworks = ['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic', 'Buddhist', 'Confucian', 'Taoist'];
-
 export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const [wisdom, setWisdom] = useState<DailyWisdom>({
     quote: "The unexamined life is not worth living.",
@@ -37,6 +35,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [availableFrameworks, setAvailableFrameworks] = useState<string[]>([]);
   const [settings, setSettings] = useState<WisdomSettings>({
     autoRefresh: true,
     preferredFrameworks: ['Stoic', 'Spartan', 'Samurai'],
@@ -44,26 +43,75 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     enableNotifications: true,
   });
 
-  // Load saved settings
+  // Load saved settings and available frameworks
   useEffect(() => {
-    const savedSettings = localStorage.getItem('dailyWisdomSettings');
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
+    const loadSettingsAndFrameworks = async () => {
+      // Load saved settings
+      const savedSettings = localStorage.getItem('dailyWisdomSettings');
+      if (savedSettings) {
+        setSettings(JSON.parse(savedSettings));
+      }
+
+      // Load available frameworks from user preferences
+      try {
+        const response = await fetch('/api/prefs');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.preferences?.framework) {
+            // If user has a specific framework, use that
+            setAvailableFrameworks([data.preferences.framework]);
+            setSettings(prev => ({
+              ...prev,
+              preferredFrameworks: [data.preferences.framework]
+            }));
+          } else {
+            // Use all available frameworks
+            setAvailableFrameworks(['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic', 'Buddhist', 'Confucian', 'Taoist', 'Indigenous', 'Martial', 'Sufi', 'Ubuntu', 'HighPerf']);
+          }
+        }
+      } catch (error) {
+        console.error('Error loading frameworks:', error);
+        // Fall back to default frameworks
+        setAvailableFrameworks(['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic', 'Buddhist', 'Confucian', 'Taoist', 'Indigenous', 'Martial', 'Sufi', 'Ubuntu', 'HighPerf']);
+      }
+    };
+
+    loadSettingsAndFrameworks();
   }, []);
 
   // Save settings
-  const saveSettings = (newSettings: WisdomSettings) => {
+  const saveSettings = async (newSettings: WisdomSettings) => {
     setSettings(newSettings);
     localStorage.setItem('dailyWisdomSettings', JSON.stringify(newSettings));
+    
+    // Also save framework preference to user profile if it's different
+    try {
+      const response = await fetch('/api/prefs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+          framework: newSettings.preferredFrameworks[0] || null,
+          preferences: newSettings 
+        }),
+      });
+      
+      if (response.ok) {
+        console.log('Framework preferences saved to profile');
+      }
+    } catch (error) {
+      console.error('Error saving framework preferences:', error);
+    }
   };
 
   const loadDailyWisdom = async () => {
     setIsLoading(true);
     try {
-      const randomFramework = settings.preferredFrameworks[
-        Math.floor(Math.random() * settings.preferredFrameworks.length)
-      ] || 'Stoic';
+      // Use the first preferred framework or fall back to a random one from available frameworks
+      const selectedFramework = settings.preferredFrameworks.length > 0 
+        ? settings.preferredFrameworks[0]
+        : availableFrameworks[Math.floor(Math.random() * availableFrameworks.length)] || 'Stoic';
       
       const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
@@ -71,7 +119,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          framework: randomFramework,
+          framework: selectedFramework,
           date: new Date().toISOString().split('T')[0]
         }),
       });
@@ -219,16 +267,21 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
 
   const getShortFrameworkName = (framework: string) => {
     const shortNames: { [key: string]: string } = {
-      'Stoic': 'Stoic',
-      'Spartan': 'Spartan',
-      'Samurai': 'Samurai',
-      'Monastic': 'Monastic',
-      'Yogic': 'Yogic',
+      'Stoic': 'Stoicism',
+      'Spartan': 'Spartan Agōgē',
+      'Samurai': 'Samurai Bushidō',
+      'Monastic': 'Monastic Rule',
+      'Yogic': 'Yogic Path',
       'Buddhist': 'Buddhist',
       'Confucian': 'Confucian',
       'Taoist': 'Taoist',
+      'Indigenous': 'Indigenous Wisdom',
+      'Martial': 'Martial Arts Code',
+      'Sufi': 'Sufi Practice',
+      'Ubuntu': 'Ubuntu',
+      'HighPerf': 'Modern High-Performance',
     };
-    return shortNames[framework] || 'Tradition';
+    return shortNames[framework] || framework;
   };
 
   const getNextRefreshTime = () => {
@@ -351,10 +404,10 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           >
             <div>
               <label className="text-sm font-medium text-text mb-2 block">
-                Preferred Traditions
+                Preferred Frameworks
               </label>
               <div className="flex flex-wrap gap-2">
-                {frameworks.map((framework) => (
+                {availableFrameworks.map((framework) => (
                   <button
                     key={framework}
                     onClick={() => {
