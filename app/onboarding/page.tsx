@@ -362,6 +362,9 @@ export default function OnboardingPage() {
       console.log('🎉 Onboarding completed successfully!');
       alert('Onboarding completed successfully! Your preferences have been saved.');
 
+      // Dispatch custom event to notify header to update task count
+      window.dispatchEvent(new CustomEvent('taskCompleted'));
+
       // Redirect to today page
       router.push('/today');
     } catch (error: any) {
@@ -376,11 +379,11 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case 0:
         return (
-          <Card className="bg-surface border border-border shadow-card">
+          <Card className="bg-gray-800/50 border border-gray-600 shadow-xl backdrop-blur-sm">
             <CardContent className="p-6 md:p-8">
               <div className="space-y-6">
                 <div className="space-y-3">
-                  <label htmlFor="name" className="block text-lg font-semibold text-text">
+                  <label htmlFor="name" className="block text-lg font-semibold text-white">
                     What should I call you?
                   </label>
                   <Input
@@ -388,22 +391,22 @@ export default function OnboardingPage() {
                     value={data.name}
                     onChange={(e) => updateData('name', e.target.value)}
                     placeholder="Enter your name"
-                    className="h-12 text-lg bg-surface-2 text-text placeholder:text-muted border border-border focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-fast"
+                    className="h-12 text-lg bg-gray-700 text-white placeholder:text-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-fast"
                   />
                 </div>
                 
                 <div className="space-y-3">
-                  <label htmlFor="timezone" className="block text-lg font-semibold text-text">
+                  <label htmlFor="timezone" className="block text-lg font-semibold text-white">
                     What's your timezone?
                   </label>
                   <select
                     id="timezone"
                     value={data.timezone}
                     onChange={(e) => updateData('timezone', e.target.value)}
-                    className="w-full h-12 px-4 border border-border rounded-lg bg-surface-2 text-text text-lg focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all duration-fast"
+                    className="w-full h-12 px-4 border border-gray-600 rounded-lg bg-gray-700 text-white text-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-fast"
                   >
                     {timezones.map(tz => (
-                      <option key={tz.value} value={tz.value} className="bg-surface-2 text-text py-2">
+                      <option key={tz.value} value={tz.value} className="bg-gray-700 text-white py-2">
                         {tz.label}
                       </option>
                     ))}
@@ -418,19 +421,19 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-4 md:space-y-6">
             {questions.map((question, index) => (
-              <div key={question.id} className={`border border-border rounded-lg p-4 md:p-6 transition-all duration-fast hover:shadow-card ${
+              <div key={question.id} className={`border border-gray-600 rounded-lg p-4 md:p-6 transition-all duration-fast hover:shadow-xl backdrop-blur-sm ${
                 data[question.id as keyof OnboardingData] === null
-                  ? 'border-warning bg-warning/10'
-                  : 'border-border bg-surface hover:border-primary/30'
+                  ? 'border-yellow-500 bg-yellow-500/10'
+                  : 'border-gray-600 bg-gray-800/50 hover:border-blue-500/50'
               }`}>
                 <div className="flex items-center space-x-3 mb-4 md:mb-6">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-primary/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <question.icon className="w-4 h-4 md:w-5 h-5 text-primary" />
+                  <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <question.icon className="w-4 h-4 md:w-5 h-5 text-blue-400" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-base md:text-lg font-semibold text-text leading-tight">{question.text}</h3>
+                    <h3 className="text-base md:text-lg font-semibold text-white leading-tight">{question.text}</h3>
                     {data[question.id as keyof OnboardingData] === null && (
-                      <p className="text-sm text-warning mt-1">Please select an option</p>
+                      <p className="text-sm text-yellow-400 mt-1">Please select an option</p>
                     )}
                   </div>
                 </div>
@@ -439,8 +442,8 @@ export default function OnboardingPage() {
                     onClick={() => updateData(question.id as keyof OnboardingData, true)}
                     className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-fast ${
                       data[question.id as keyof OnboardingData] === true
-                        ? 'bg-primary hover:bg-primary/90 text-text border-primary shadow-card'
-                        : 'bg-surface-2 hover:bg-surface text-text border border-border hover:border-primary/50'
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-blue-500 shadow-xl'
+                        : 'bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 hover:border-blue-500/50'
                     }`}
                   >
                     {question.trueLabel}
@@ -449,8 +452,8 @@ export default function OnboardingPage() {
                     onClick={() => updateData(question.id as keyof OnboardingData, false)}
                     className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-fast ${
                       data[question.id as keyof OnboardingData] === false
-                        ? 'bg-primary hover:bg-primary/90 text-text border-primary shadow-card'
-                        : 'bg-surface-2 hover:bg-surface text-text border border-border hover:border-primary/50'
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-blue-500 shadow-xl'
+                        : 'bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 hover:border-blue-500/50'
                     }`}
                   >
                     {question.falseLabel}
@@ -465,8 +468,8 @@ export default function OnboardingPage() {
         return (
           <div className="space-y-6">
             <div className="text-center">
-              <h3 className="text-xl font-semibold text-text mb-2">Choose Your Primary Framework</h3>
-              <p className="text-muted">Select the philosophical framework that resonates most with you</p>
+              <h3 className="text-xl font-semibold text-white mb-2">Choose Your Primary Framework</h3>
+              <p className="text-gray-300">Select the philosophical framework that resonates most with you</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -474,27 +477,27 @@ export default function OnboardingPage() {
                 <div
                   key={framework.id}
                   onClick={() => toggleFramework(framework.id)}
-                  className={`cursor-pointer border border-border rounded-lg p-4 transition-all duration-fast hover:shadow-card ${
+                  className={`cursor-pointer border border-gray-600 rounded-lg p-4 transition-all duration-fast hover:shadow-xl backdrop-blur-sm ${
                     data.selectedFrameworks.includes(framework.id)
-                      ? 'border-primary bg-primary/5 shadow-card'
-                      : 'border-border bg-surface hover:border-primary/30'
+                      ? 'border-blue-500 bg-blue-500/10 shadow-xl'
+                      : 'border-gray-600 bg-gray-800/50 hover:border-blue-500/50'
                   }`}
                 >
                   <div className="flex items-center space-x-3 mb-3">
                     <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${framework.color} flex items-center justify-center`}>
-                      <framework.icon className="w-5 h-5 text-text" />
+                      <framework.icon className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-text">{framework.name}</h4>
-                      <p className="text-sm text-muted">{framework.description}</p>
+                      <h4 className="font-semibold text-white">{framework.name}</h4>
+                      <p className="text-sm text-gray-300">{framework.description}</p>
                     </div>
                   </div>
                   
                   <div className="space-y-2">
                     {framework.benefits.map((benefit, index) => (
                       <div key={index} className="flex items-center space-x-2">
-                        <Check className="w-4 h-4 text-primary" />
-                        <span className="text-sm text-text">{benefit}</span>
+                        <Check className="w-4 h-4 text-blue-400" />
+                        <span className="text-sm text-gray-300">{benefit}</span>
                       </div>
                     ))}
                   </div>
@@ -507,21 +510,21 @@ export default function OnboardingPage() {
       case 3:
         return (
           <div className="text-center space-y-6">
-            <div className="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto">
-              <Check className="w-10 h-10 text-primary" />
+            <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto">
+              <Check className="w-10 h-10 text-blue-400" />
             </div>
             
             <div>
-              <h3 className="text-2xl font-bold text-text mb-2">Ready to Begin Your Journey</h3>
-              <p className="text-muted text-lg">
+              <h3 className="text-2xl font-bold text-white mb-2">Ready to Begin Your Journey</h3>
+              <p className="text-gray-300 text-lg">
                 You've chosen the {data.selectedFrameworks[0]} framework. 
                 Let's get you started with your personalized experience.
               </p>
             </div>
 
-            <div className="bg-surface-2 rounded-lg p-4 border border-border">
-              <h4 className="font-semibold text-text mb-2">Your Setup Summary</h4>
-              <div className="text-sm text-muted space-y-1">
+            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600 backdrop-blur-sm">
+              <h4 className="font-semibold text-white mb-2">Your Setup Summary</h4>
+              <div className="text-sm text-gray-300 space-y-1">
                 <p><strong>Name:</strong> {data.name}</p>
                 <p><strong>Timezone:</strong> {data.timezone}</p>
                 <p><strong>Primary Framework:</strong> {frameworks.find(f => f.id === data.selectedFrameworks[0])?.name}</p>
@@ -539,15 +542,15 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
           <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-text mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
               Welcome to Aristotle
             </h1>
-            <p className="text-xl text-muted max-w-2xl mx-auto">
+            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
               Let's personalize your journey through ancient wisdom and modern practice
             </p>
           </div>
@@ -555,12 +558,12 @@ export default function OnboardingPage() {
           {/* Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted">Step {currentStep + 1} of 4</span>
-              <span className="text-sm text-muted">{Math.round(((currentStep + 1) / 4) * 100)}%</span>
+              <span className="text-sm text-gray-300">Step {currentStep + 1} of 4</span>
+              <span className="text-sm text-gray-300">{Math.round(((currentStep + 1) / 4) * 100)}%</span>
             </div>
-            <div className="w-full bg-surface-2 rounded-full h-2">
+            <div className="w-full bg-gray-700 rounded-full h-2">
               <div 
-                className="bg-primary h-2 rounded-full transition-all duration-slow"
+                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-slow"
                 style={{ width: `${((currentStep + 1) / 4) * 100}%` }}
               />
             </div>
@@ -577,7 +580,7 @@ export default function OnboardingPage() {
               onClick={prevStep}
               disabled={currentStep === 0}
               variant="outline"
-              className="px-6 py-3 border-border text-text hover:bg-surface-2"
+              className="px-6 py-3 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
             >
               Previous
             </Button>
@@ -586,7 +589,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={nextStep}
                 disabled={!canProceed()}
-                className="px-6 py-3 bg-primary hover:bg-primary/90 text-text"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
               >
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -595,7 +598,7 @@ export default function OnboardingPage() {
               <Button
                 onClick={handleComplete}
                 disabled={!canProceed() || isProcessing}
-                className="px-6 py-3 bg-primary hover:bg-primary/90 text-text"
+                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
               >
                 {isProcessing ? 'Setting up...' : 'Complete Setup'}
                 <Check className="w-4 h-4 ml-2" />

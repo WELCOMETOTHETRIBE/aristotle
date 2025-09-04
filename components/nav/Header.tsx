@@ -50,7 +50,34 @@ export function Header({ focusVirtue }: HeaderProps) {
       }
     };
 
+    // Initial fetch
     fetchTaskCount();
+
+    // Set up real-time updates every 5 seconds
+    const interval = setInterval(fetchTaskCount, 5000);
+
+    // Listen for storage events (when localStorage changes in other tabs)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'userPreferences' || e.key === 'activeWidgets') {
+        // Refresh task count when user preferences change
+        fetchTaskCount();
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    // Listen for custom events (when tasks are completed in the same tab)
+    const handleTaskCompleted = () => {
+      fetchTaskCount();
+    };
+
+    window.addEventListener('taskCompleted', handleTaskCompleted);
+
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('taskCompleted', handleTaskCompleted);
+    };
   }, []);
 
   useEffect(() => {

@@ -108,12 +108,22 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const loadDailyWisdom = async () => {
     setIsLoading(true);
     try {
-      // Use the user's preferred framework from settings
-      const selectedFramework = settings.preferredFrameworks && settings.preferredFrameworks.length > 0 
-        ? settings.preferredFrameworks[0]
-        : 'Stoic'; // Fallback to Stoic if no preference
+      // Get user's framework preference from localStorage
+      let userFramework = 'Stoic'; // Default fallback
+      try {
+        const userPrefs = localStorage.getItem('userPreferences');
+        if (userPrefs) {
+          const parsed = JSON.parse(userPrefs);
+          userFramework = parsed.framework || 'Stoic';
+          console.log(`🎯 Using user's framework preference: ${userFramework}`);
+        } else {
+          console.log('⚠️ No user preferences found, using default framework');
+        }
+      } catch (error) {
+        console.error('Error parsing user preferences:', error);
+      }
       
-      console.log(`🎯 Loading daily wisdom for user's preferred framework: ${selectedFramework}`);
+      console.log(`🎯 Loading daily wisdom for user's framework: ${userFramework}`);
       
       const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
@@ -121,7 +131,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          framework: selectedFramework,
+          framework: userFramework,
           date: new Date().toISOString().split('T')[0]
         }),
       });
