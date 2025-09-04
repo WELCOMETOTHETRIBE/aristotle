@@ -254,7 +254,12 @@ export default function OnboardingPage() {
   ];
 
   const updateData = (field: keyof OnboardingData, value: any) => {
-    setData(prev => ({ ...prev, [field]: value }));
+    console.log('Updating data:', field, 'to:', value, 'current data:', data);
+    setData(prev => {
+      const newData = { ...prev, [field]: value };
+      console.log('New data:', newData);
+      return newData;
+    });
   };
 
   const handleNext = () => {
@@ -432,14 +437,20 @@ export default function OnboardingPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <Button
                     variant={data[question.id as keyof OnboardingData] === true ? "default" : "outline"}
-                    onClick={() => updateData(question.id as keyof OnboardingData, true)}
+                    onClick={() => {
+                      console.log('Clicking true for question:', question.id, 'current value:', data[question.id as keyof OnboardingData]);
+                      updateData(question.id as keyof OnboardingData, true);
+                    }}
                     className="h-10 md:h-12 text-sm md:text-base font-medium bg-primary hover:bg-primary/90 text-white border-primary shadow-sm"
                   >
                     {question.trueLabel}
                   </Button>
                   <Button
                     variant={data[question.id as keyof OnboardingData] === false ? "default" : "outline"}
-                    onClick={() => updateData(question.id as keyof OnboardingData, false)}
+                    onClick={() => {
+                      console.log('Clicking false for question:', question.id, 'current value:', data[question.id as keyof OnboardingData]);
+                      updateData(question.id as keyof OnboardingData, false);
+                    }}
                     className="h-10 md:h-12 text-sm md:text-base font-medium bg-surface-2 hover:bg-surface text-text border-2 border-border hover:border-primary/50 shadow-sm"
                   >
                     {question.falseLabel}

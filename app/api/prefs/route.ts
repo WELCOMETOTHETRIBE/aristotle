@@ -47,43 +47,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { framework, name, timezone, secondaryFrameworks, preferences, isOnboarding } = body;
     
-    // Handle onboarding data without authentication
-    if (isOnboarding && (framework || name || timezone)) {
-      // For onboarding, we'll use a demo user approach
-      // In production, this would create a new user account
-      const demoUser = await prisma.user.findFirst({
-        where: { username: 'demo-user' },
-      });
-
-      if (!demoUser) {
-        return NextResponse.json({ error: 'Demo user not found' }, { status: 404 });
-      }
-
-      await prisma.userPreference.upsert({
-        where: { userId: demoUser.id },
-        update: {
-          framework: framework || undefined,
-          name: name || undefined,
-          timezone: timezone || undefined,
-          updatedAt: new Date(),
-        },
-        create: {
-          userId: demoUser.id,
-          framework: framework || null,
-          name: name || null,
-          timezone: timezone || null,
-        },
-      });
-
-      return NextResponse.json({ 
-        success: true, 
-        message: 'Onboarding preferences saved successfully',
-        framework,
-        name,
-        timezone
-      });
-    }
-
     // Handle authenticated user preferences - try both cookie and Bearer token
     let userId: number | null = null;
     
@@ -97,18 +60,21 @@ export async function POST(request: NextRequest) {
       }
     }
     
-    // If no Bearer token, try cookie-based auth (for demo users)
+    // If no Bearer token, try cookie-based auth (for logged in users)
     if (!userId) {
       try {
         const cookieHeader = request.headers.get('cookie');
         if (cookieHeader) {
-          // For demo users, we'll check if they're authenticated via cookies
-          // This is a simplified approach - in production you'd verify the session
-          const demoUser = await prisma.user.findFirst({
-            where: { username: 'demo-user' },
+          // Check if user is authenticated via cookies
+          const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+            headers: { cookie: cookieHeader }
           });
-          if (demoUser) {
-            userId = demoUser.id;
+          
+          if (response.ok) {
+            const authData = await response.json();
+            if (authData.user && authData.user.id) {
+              userId = authData.user.id;
+            }
           }
         }
       } catch (error) {
@@ -116,8 +82,60 @@ export async function POST(request: NextRequest) {
       }
     }
     
+    // If still no user ID, create a demo user for onboarding
+    if (!userId && isOnboarding) {
+      let demoUser = await prisma.user.findFirst({
+        where: { username: 'demo-user' },
+      });
+
+      // If demo user doesn't exist, create one
+      if (!demoUser) {
+        demoUser = await prisma.user.create({
+          data: {
+            username: 'demo-user',
+            email: 'demo@aristotle.app',
+            password: 'demo-password-hash', // Required field
+            displayName: 'Demo User',
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          },
+        });
+      }
+
+      if (demoUser) {
+        userId = demoUser.id;
+      }
+    }
+    
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    // Handle onboarding data
+    if (isOnboarding && (framework || name || timezone)) {
+      await prisma.userPreference.upsert({
+        where: { userId: userId },
+        update: {
+          framework: framework || undefined,
+          name: name || undefined,
+          timezone: timezone || undefined,
+          updatedAt: new Date(),
+        },
+        create: {
+          userId: userId,
+          framework: framework || null,
+          name: name || null,
+          timezone: timezone || null,
+        },
+      });
+
+      return NextResponse.json({ 
+        success: true, 
+        message: 'Onboarding preferences saved successfully',
+        framework,
+        name,
+        timezone
+      });
     }
 
     // Handle regular preferences
