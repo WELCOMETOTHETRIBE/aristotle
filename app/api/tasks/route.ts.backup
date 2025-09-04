@@ -20,12 +20,22 @@ async function getUserIdFromRequest(request: NextRequest): Promise<number | null
   
   // If no Bearer token, try cookie-based auth
   if (!userId) {
-    const token = request.cookies.get('auth-token')?.value;
-    if (token) {
-      const payload = await verifyToken(token);
-      if (payload) {
-        userId = payload.userId;
+    try {
+      const cookieHeader = request.headers.get('cookie');
+      if (cookieHeader) {
+        const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
+          headers: { cookie: cookieHeader }
+        });
+        
+        if (response.ok) {
+          const authData = await response.json();
+          if (authData.user && authData.user.id) {
+            userId = authData.user.id;
+          }
+        }
       }
+    } catch (error) {
+      console.error('Cookie auth check failed:', error);
     }
   }
   
@@ -79,7 +89,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { action, tag, ...taskData } = body;
+    const taskData = TaskSchema.parse(body);
     
     const userId = await getUserIdFromRequest(request);
     
@@ -88,39 +98,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
     
-    // Handle completing tasks by tag (for onboarding completion)
-    if (action === 'complete' && tag) {
-      const updatedTasks = await prisma.task.updateMany({
-        where: {
-          userId: userId,
-          tag: tag,
-          completedAt: null // Only update uncompleted tasks
-        },
-        data: {
-          completedAt: new Date(),
-        },
-      });
-      
-      console.log(`✅ Marked ${updatedTasks.count} task(s) with tag '${tag}' as completed for user ${userId}`);
-      
-      return NextResponse.json({
-        success: true,
-        message: `Marked ${updatedTasks.count} task(s) as completed`,
-        updatedCount: updatedTasks.count
-      });
-    }
-    
-    // Handle creating new tasks
-    const validatedTaskData = TaskSchema.parse(taskData);
-    
     const task = await prisma.task.create({
       data: {
         userId: userId,
-        title: validatedTaskData.title,
-        description: validatedTaskData.description,
-        dueDate: validatedTaskData.dueAt ? new Date(validatedTaskData.dueAt) : null,
-        tag: validatedTaskData.tag,
-        priority: validatedTaskData.priority,
+        title: taskData.title,
+        description: taskData.description,
+        dueDate: taskData.dueAt ? new Date(taskData.dueAt) : null,
+        tag: taskData.tag,
+        priority: taskData.priority,
       },
     });
 
@@ -179,4 +164,4 @@ export async function PATCH(request: NextRequest) {
       { status: 500 }
     );
   }
-}
+} 
