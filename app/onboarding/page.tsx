@@ -405,7 +405,7 @@ export default function OnboardingPage() {
       alert('Onboarding completed successfully! Your preferences have been saved.');
 
       // Redirect to dashboard
-      router.push('/dashboard');
+      router.push('/today');
     } catch (error: any) {
       console.error('Error completing onboarding:', error);
       alert(`There was an error completing your setup: ${error.message}. Please try again.`);
