@@ -282,7 +282,7 @@ export default function DashboardPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto mb-4"></div>
-          <p className="text-[rgb(var(--muted))] font-medium">Loading your sacred space...</p>
+          <p className="text-[rgb(var(--muted))] font-medium">Loading your dashboard...</p>
         </div>
       </div>
     );
@@ -291,7 +291,8 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="max-w-7xl mx-auto">
-        {/* Hero Section */}
+        {/* Hero Section - Temporarily disabled for cleaner UX */}
+        {/* 
         <div className="text-center mb-12">
           <div className="mb-6">
             <h1 className="text-5xl font-bold mb-4 font-display text-[rgb(var(--text))]">
@@ -318,6 +319,7 @@ export default function DashboardPage() {
             Customize Your Space
           </Button>
         </div>
+        */}
 
         {/* Active Widgets Section */}
         {activeWidgets.length > 0 && (
