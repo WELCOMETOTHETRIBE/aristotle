@@ -332,36 +332,6 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         
         <div className="flex items-center gap-2">
           <button
-            onClick={toggleFavorite}
-            className={`flex items-center gap-1.5 p-2 rounded-md transition-all duration-200 ${
-              isFavorite()
-                ? 'bg-yellow-500/20 border border-yellow-500/30 text-yellow-300'
-                : 'bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface'
-            }`}
-            title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
-          >
-            {isFavorite() ? (
-              <span className="text-yellow-400 text-sm">★</span>
-            ) : (
-              <span className="text-muted text-sm">☆</span>
-            )}
-          </button>
-          <button
-            onClick={() => {
-              // Show favorites modal or navigate to favorites page
-              const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
-              if (favorites.length > 0) {
-                alert(`You have ${favorites.length} favorite quotes. This feature will be expanded soon!`);
-              } else {
-                alert('No favorite quotes yet. Add some by clicking the star icon!');
-              }
-            }}
-            className="flex items-center gap-1.5 p-2 rounded-md bg-surface/50 border border-border/50 text-muted hover:text-text hover:bg-surface transition-all duration-200"
-            title="View your favorite quotes"
-          >
-            <BookOpen className="w-4 h-4" />
-          </button>
-          <button
             onClick={() => setShowInfo(!showInfo)}
             className="p-2 text-muted hover:text-text transition-colors"
           >
@@ -463,9 +433,26 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             className="relative"
           >
             <Quote className="absolute -top-2 -left-2 w-6 h-6 text-purple-400/50" />
-            <blockquote className="text-lg font-serif italic text-text leading-relaxed pl-6">
-              "{wisdom.quote}"
-            </blockquote>
+            <div className="flex items-start justify-between pl-6">
+              <blockquote className="text-lg font-serif italic text-text leading-relaxed flex-1">
+                "{wisdom.quote}"
+              </blockquote>
+              <button
+                onClick={toggleFavorite}
+                className={`ml-3 p-1.5 rounded-full transition-all duration-200 flex-shrink-0 ${
+                  isFavorite()
+                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                    : 'text-muted hover:text-yellow-400 hover:bg-yellow-500/10'
+                }`}
+                title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
+              >
+                {isFavorite() ? (
+                  <span className="text-lg">★</span>
+                ) : (
+                  <span className="text-lg">☆</span>
+                )}
+              </button>
+            </div>
           </motion.div>
         </AnimatePresence>
 
@@ -517,6 +504,23 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
               <RefreshCw className="w-3.5 h-3.5" />
             )}
             New
+          </button>
+          
+          <button
+            onClick={() => {
+              // Show favorites modal or navigate to favorites page
+              const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+              if (favorites.length > 0) {
+                alert(`You have ${favorites.length} favorite quotes. This feature will be expanded soon!`);
+              } else {
+                alert('No favorite quotes yet. Add some by clicking the star icon!');
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-surface/60 border border-border/50 text-muted hover:text-text hover:bg-surface transition-colors text-sm"
+            title="View your favorite quotes"
+          >
+            <BookOpen className="w-3.5 h-3.5" />
+            Favorites
           </button>
           
           <Link 
