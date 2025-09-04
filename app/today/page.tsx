@@ -36,6 +36,7 @@ export default function TodayPage() {
   const [userPreferences, setUserPreferences] = useState<any>(null);
   const [submittedIntentions, setSubmittedIntentions] = useState<{[key: string]: boolean}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [dismissedMoodModal, setDismissedMoodModal] = useState<{[key: string]: boolean}>({});
   
   // Initialize empty arrays for authenticated users
   const [userWidgets, setUserWidgets] = useState<string[]>([]);
@@ -340,6 +341,31 @@ export default function TodayPage() {
     loadIntentions();
   }, [user]);
 
+  // Load dismissed mood modal state
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('dismissedMoodModal');
+      if (saved) {
+        try {
+          const dismissed = JSON.parse(saved);
+          // Check if we need to reset dismiss state for new time period
+          const currentDate = new Date().toDateString();
+          const lastDismissDate = dismissed.lastDate;
+          
+          if (lastDismissDate !== currentDate) {
+            // New day, reset all dismiss states
+            setDismissedMoodModal({});
+            localStorage.setItem('dismissedMoodModal', JSON.stringify({ lastDate: currentDate, dismissed: {} }));
+          } else {
+            setDismissedMoodModal(dismissed.dismissed || {});
+          }
+        } catch (error) {
+          console.error('Error parsing dismissed mood modal state:', error);
+        }
+      }
+    }
+  }, [currentTimePeriod]);
+
   const handleIntentionSubmit = async () => {
     if (!user || !mood || !intention.trim()) return;
 
@@ -402,20 +428,29 @@ export default function TodayPage() {
         // Reset form
         setMood(null);
         setIntention('');
-        
-        // Show success feedback (optional toast notification)
-        // You could add a toast library here for better UX
       } else {
-        const errorData = await response.json();
-        console.error('Failed to submit intention:', errorData);
-        alert('Failed to submit intention. Please try again.');
+        console.error('Failed to submit intention');
       }
     } catch (error) {
       console.error('Error submitting intention:', error);
-      alert('Error submitting intention. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleDismissMoodModal = () => {
+    const newDismissedState = {
+      ...dismissedMoodModal,
+      [currentTimePeriod]: true
+    };
+    setDismissedMoodModal(newDismissedState);
+    
+    // Save to localStorage with date tracking
+    const currentDate = new Date().toDateString();
+    localStorage.setItem('dismissedMoodModal', JSON.stringify({
+      lastDate: currentDate,
+      dismissed: newDismissedState
+    }));
   };
 
   const getTimePeriodTitle = () => {
@@ -549,12 +584,18 @@ export default function TodayPage() {
         </div>
 
         {/* Dynamic Daily Intention */}
-        {!submittedIntentions[currentTimePeriod] ? (
+        {!submittedIntentions[currentTimePeriod] && !dismissedMoodModal[currentTimePeriod] ? (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="text-xs text-muted">
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
               </div>
+              <button
+                onClick={handleDismissMoodModal}
+                className="text-xs text-muted hover:text-text transition-colors duration-200 px-2 py-1 rounded hover:bg-surface-2"
+              >
+                Dismiss
+              </button>
             </div>
             
             {/* Mood & Intention Card */}
@@ -597,14 +638,16 @@ export default function TodayPage() {
                           await logToJournal(moodLogData);
                         }}
                         className={cn(
-                          'p-3 rounded-xl border transition-all duration-200 hover:scale-105',
+                          'p-2 rounded-xl border transition-all duration-200 hover:scale-105 min-h-[4rem] flex flex-col items-center justify-center',
                           mood === value
                             ? 'bg-courage/20 border-courage/30 text-courage shadow-lg'
                             : 'bg-surface-2 border-border text-muted hover:text-text hover:border-courage/30 hover:bg-courage/5'
                         )}
                       >
-                        <div className="text-xl mb-1">{emoji}</div>
-                        <div className="text-xs font-medium leading-tight">{label}</div>
+                        <div className="text-lg mb-1">{emoji}</div>
+                        <div className="text-[10px] font-medium leading-tight text-center break-words max-w-full">
+                          {label}
+                        </div>
                       </button>
                     ))}
                   </div>
