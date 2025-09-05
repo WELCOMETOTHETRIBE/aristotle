@@ -276,7 +276,7 @@ export default function OnboardingPage() {
 
       // Step 5: Redirect directly to dashboard (no completion page)
       console.log('🏠 Step 5: Redirecting to dashboard...');
-      router.push('/dashboard');
+      router.push('/today');
       
     } catch (error) {
       console.error('❌ Onboarding completion failed:', error);
