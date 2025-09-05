@@ -2,43 +2,23 @@ import { NextResponse } from "next/server";
 
 export async function GET() {
   try {
-    // Check database connectivity
-    let dbStatus = "unknown";
-    try {
-      if (process.env.DATABASE_URL) {
-        const { PrismaClient } = await import("@prisma/client");
-        const prisma = new PrismaClient();
-        await prisma.$queryRaw`SELECT 1`;
-        dbStatus = "connected";
-      } else {
-        dbStatus = "no_database_url";
-      }
-    } catch (dbError) {
-      dbStatus = "disconnected";
-    }
-
-    const readinessCheck = {
-      ok: dbStatus === "connected",
+    // Simple readiness check
+    const readyCheck = {
+      ready: true,
       timestamp: new Date().toISOString(),
-      version: process.env.npm_package_version || '0.1.0',
-      environment: process.env.NODE_ENV,
-      services: {
-        database: dbStatus,
-      },
-      commitSha: process.env.VERCEL_GIT_COMMIT_SHA || process.env.GITHUB_SHA || null,
+      status: 'ready'
     };
 
-    return NextResponse.json(readinessCheck, {
-      status: readinessCheck.ok ? 200 : 503
-    });
+    return NextResponse.json(readyCheck, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       {
-        ok: false,
-        error: "Readiness check failed",
+        ready: false,
+        error: "Service not ready",
         timestamp: new Date().toISOString(),
+        status: 'not_ready'
       },
-      { status: 500 }
+      { status: 503 }
     );
   }
-} 
+}

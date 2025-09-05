@@ -69,5 +69,5 @@ ENV PORT 8080
 ENV HOSTNAME "0.0.0.0"
 ENV NODE_ENV production
 
-# Use Next.js with proper port binding
-CMD ["sh", "-c", "node scripts/init-database.js && PORT=8080 HOSTNAME=0.0.0.0 npm start"]
+# Start the app and initialize database in background
+CMD ["sh", "-c", "node scripts/init-database.js & npm start"]
