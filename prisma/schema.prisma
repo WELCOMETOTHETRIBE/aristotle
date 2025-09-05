@@ -1,81 +1,55 @@
-// prisma/schema.prisma
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-enum Virtue { 
-  WISDOM 
-  JUSTICE 
-  COURAGE 
-  TEMPERANCE 
-}
-
-enum WidgetKind { 
-  TIMER 
-  COUNTER 
-  DRAG_BOARD 
-  CHECKLIST 
-  JOURNAL 
-  AUDIO_NOTE 
-  PHOTO 
-  BREATH 
-  BALANCE_GYRO 
-  WHEEL 
-  SLIDERS 
-}
-
-// New Framework System Models
 model Framework {
-  id            String   @id @default(cuid())
-  slug          String   @unique
-  name          String
-  tone          String
-  virtuePrimary Virtue
+  id              String                 @id @default(cuid())
+  name            String
+  config          Json
+  createdAt       DateTime               @default(now())
+  slug            String                 @unique
+  tone            String
+  updatedAt       DateTime               @updatedAt
+  virtuePrimary   Virtue
   virtueSecondary Virtue?
-  config        Json     // widgets, breath, quests, copy, KPIs
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  widgets       Widget[]
-  quests        Quest[]
-  capstones     Capstone[]
-  
-  // Legacy relations
+  capstones       Capstone[]
+  challenges      Challenge[]
   moduleMaps      FrameworkModuleMap[]
   practiceMaps    FrameworkPracticeMap[]
+  quests          Quest[]
   sessions        Session[]
-  challenges      Challenge[]
+  widgets         Widget[]
 }
 
 model Widget {
-  id           String    @id @default(cuid())
-  frameworkId  String
-  framework    Framework @relation(fields: [frameworkId], references: [id])
-  kind         WidgetKind
-  title        String
-  config       Json      // per-widget UI & logic params
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-
-  kpis         KPIReading[]
+  id          String       @id @default(cuid())
+  frameworkId String
+  title       String
+  config      Json
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  kind        WidgetKind
+  kpis        KPIReading[]
+  framework   Framework    @relation(fields: [frameworkId], references: [id])
 }
 
 model Quest {
   id           String    @id @default(cuid())
   frameworkId  String
-  framework    Framework @relation(fields: [frameworkId], references: [id])
   title        String
   description  String
-  widgetIds    String[]  // 1..N
-  minutes      Int       // 2..6
-  virtueGrants Json      // { wisdom?:number, justice?:number, courage?:number, temperance?:number }
+  widgetIds    String[]
+  minutes      Int
+  virtueGrants Json
   active       Boolean   @default(true)
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  framework    Framework @relation(fields: [frameworkId], references: [id])
 }
 
 model Checkin {
@@ -84,8 +58,8 @@ model Checkin {
   questId       String?
   widgetId      String
   frameworkSlug String
-  payload       Json     // raw completion data (duration, reps, files, choices)
-  virtues       Json     // XP granted at time of checkin
+  payload       Json
+  virtues       Json
   createdAt     DateTime @default(now())
 }
 
@@ -93,177 +67,167 @@ model KPIReading {
   id        String   @id @default(cuid())
   widgetId  String
   userId    String
-  metric    String   // e.g., "duration_sec", "reps", "rpe", "balance_sec"
+  metric    String
   value     Float
-  unit      String?  // "sec", "count", "score"
+  unit      String?
   createdAt DateTime @default(now())
-  
   widget    Widget   @relation(fields: [widgetId], references: [id])
 }
 
 model Capstone {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   frameworkId  String
-  framework    Framework @relation(fields: [frameworkId], references: [id])
   title        String
-  requirements Json      // checklist array
+  requirements Json
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
+  framework    Framework @relation(fields: [frameworkId], references: [id])
 }
 
 model VirtueTotals {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  wisdom    Int      @default(0)
-  justice   Int      @default(0)
-  courage   Int      @default(0)
-  temperance Int     @default(0)
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  userId     String   @unique
+  wisdom     Int      @default(0)
+  justice    Int      @default(0)
+  courage    Int      @default(0)
+  temperance Int      @default(0)
+  updatedAt  DateTime @updatedAt
 }
 
-// Legacy models (keeping for backward compatibility)
 model Module {
-  id             String         @id
-  name           String
-  domain         String
-  defaultVirtue  String
-  description    String?
-  philosophy     String?
-  scienceNotes   String?
-  contraindications String?
-  commonMistakes String?
-  coachingPrompts String?
-  measurement    String?
-  meta           String?        @default("{}")
-
-  levels         ModuleLevel[]
-  practices      Practice[]
-  virtueMaps     ModuleVirtueMap[]
+  id                  String               @id
+  name                String
+  domain              String
+  defaultVirtue       String
+  description         String?
+  philosophy          String?
+  scienceNotes        String?
+  contraindications   String?
+  commonMistakes      String?
+  coachingPrompts     String?
+  measurement         String?
+  meta                String?              @default("{}")
+  challenges          Challenge[]
   frameworkModuleMaps FrameworkModuleMap[]
-  sessions       Session[]
-  streaks        Streak[]
-  challenges     Challenge[]
+  levels              ModuleLevel[]
+  virtueMaps          ModuleVirtueMap[]
+  practices           Practice[]
+  sessions            Session[]
+  streaks             Streak[]
 }
 
 model ModuleLevel {
-  id           Int       @id @default(autoincrement())
-  module       Module    @relation(fields: [moduleId], references: [id])
+  id           Int        @id @default(autoincrement())
   moduleId     String
   level        String
   durationHint String?
-
+  module       Module     @relation(fields: [moduleId], references: [id])
   practices    Practice[]
 
   @@unique([moduleId, level])
 }
 
 model Practice {
-  id            Int          @id @default(autoincrement())
-  module        Module?      @relation(fields: [moduleId], references: [id])
-  moduleId      String?
-  level         ModuleLevel? @relation(fields: [levelId], references: [id])
-  levelId       Int?
-  name          String
-  instructions  String
-  rationale     String?
-  metrics       String?
-  safetyNotes   String?
-  coachPrompts  String?
-  meta          String?      @default("{}")
-
+  id                    Int                    @id @default(autoincrement())
+  moduleId              String?
+  levelId               Int?
+  name                  String
+  instructions          String
+  rationale             String?
+  metrics               String?
+  safetyNotes           String?
+  coachPrompts          String?
+  meta                  String?                @default("{}")
   frameworkPracticeMaps FrameworkPracticeMap[]
-  sessions      Session[]
+  level                 ModuleLevel?           @relation(fields: [levelId], references: [id])
+  module                Module?                @relation(fields: [moduleId], references: [id])
+  sessions              Session[]
 }
 
 model ModuleVirtueMap {
-  module     Module     @relation(fields: [moduleId], references: [id])
-  moduleId   String
-  virtue     String
-  weight     Int        @default(10)
+  moduleId String
+  virtue   String
+  weight   Int    @default(10)
+  module   Module @relation(fields: [moduleId], references: [id])
 
   @@id([moduleId, virtue])
 }
 
 model Resource {
-  id            String         @id
-  title         String
-  thinker       String?
-  era           String?
-  type          String
-  estMinutes    Int?
-  keyIdeas      String?        @default("[]")
-  microPractices String?       @default("[]")
-  reflections   String?        @default("[]")
-  level         String?
-  audioUrl      String?
-  meta          String?        @default("{}")
+  id             String  @id
+  title          String
+  thinker        String?
+  era            String?
+  type           String
+  estMinutes     Int?
+  keyIdeas       String? @default("[]")
+  microPractices String? @default("[]")
+  reflections    String? @default("[]")
+  level          String?
+  audioUrl       String?
+  meta           String? @default("{}")
 }
 
 model FrameworkModuleMap {
-  framework   Framework @relation(fields: [frameworkId], references: [id])
   frameworkId String
-  module      Module    @relation(fields: [moduleId], references: [id])
   moduleId    String
   emphasis    String?   @default("{}")
+  framework   Framework @relation(fields: [frameworkId], references: [id])
+  module      Module    @relation(fields: [moduleId], references: [id])
 
   @@id([frameworkId, moduleId])
 }
 
 model FrameworkPracticeMap {
-  framework   Framework @relation(fields: [frameworkId], references: [id])
-  frameworkId String
-  practice    Practice  @relation(fields: [practiceId], references: [id])
-  practiceId  Int
+  frameworkId    String
+  practiceId     Int
   adaptationNote String?
+  framework      Framework @relation(fields: [frameworkId], references: [id])
+  practice       Practice  @relation(fields: [practiceId], references: [id])
 
   @@id([frameworkId, practiceId])
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  username    String   @unique
-  email       String?  @unique
-  password    String   // Hashed password
-  displayName String?
-  tz          String?  @default("America/Los_Angeles")
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  sessions    Session[]
-  streaks     Streak[]
-  virtueScores VirtueScore[]
-  feeds       Feed[]
-  preferences UserPreference?
-  tasks       Task[]
-  goals       Goal[]
-  habits      Habit[]
-  fastingSessions FastingSession[]
-  hydrationLogs HydrationLog[]
-  moodLogs    MoodLog[]
+  id              Int                     @id @default(autoincrement())
+  username        String                  @unique
+  email           String?                 @unique
+  password        String
+  displayName     String?
+  tz              String?                 @default("America/Los_Angeles")
+  createdAt       DateTime                @default(now())
+  updatedAt       DateTime                @updatedAt
+  bookmarks       CommunityBookmark[]
+  likes           CommunityLike[]
+  notifications   CommunityNotification[]
+  posts           CommunityPost[]
+  replies         CommunityReply[]
   dailyIntentions DailyIntention[]
-  naturePhotos NaturePhoto[]
-  timerSessions TimerSession[]
-  
-  // Community relations
-  posts       CommunityPost[]
-  replies     CommunityReply[]
-  likes       CommunityLike[]
-  bookmarks   CommunityBookmark[]
-  notifications CommunityNotification[]
-  
-  // Journal relations
-  journalEntries JournalEntry[]
+  fastingSessions FastingSession[]
+  feeds           Feed[]
+  goals           Goal[]
+  habits          Habit[]
+  hydrationLogs   HydrationLog[]
+  journalEntries  JournalEntry[]
+  moodLogs        MoodLog[]
+  naturePhotos    NaturePhoto[]
+  sessions        Session[]
+  streaks         Streak[]
+  tasks           Task[]
+  timerSessions   TimerSession[]
+  preferences     UserPreference?
+  virtueScores    VirtueScore[]
+  // Academy relations
+  lessonProgress LessonProgress[]
+  academyMilestones AcademyMilestone[]
+  academyModuleProgress AcademyModuleProgress[]
 }
 
 model Session {
   id          Int        @id @default(autoincrement())
-  user        User       @relation(fields: [userId], references: [id])
   userId      Int
-  module      Module?    @relation(fields: [moduleId], references: [id])
   moduleId    String?
-  practice    Practice?  @relation(fields: [practiceId], references: [id])
   practiceId  Int?
-  framework   Framework? @relation(fields: [frameworkId], references: [id])
   frameworkId String?
   startedAt   DateTime   @default(now())
   endedAt     DateTime?
@@ -271,103 +235,106 @@ model Session {
   moodPre     Int?
   moodPost    Int?
   notes       String?
+  framework   Framework? @relation(fields: [frameworkId], references: [id])
+  module      Module?    @relation(fields: [moduleId], references: [id])
+  practice    Practice?  @relation(fields: [practiceId], references: [id])
+  user        User       @relation(fields: [userId], references: [id])
 }
 
 model Streak {
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
-  module      Module   @relation(fields: [moduleId], references: [id])
-  moduleId    String
-  count       Int      @default(0)
-  lastDate    DateTime
+  userId   Int
+  moduleId String
+  count    Int      @default(0)
+  lastDate DateTime
+  module   Module   @relation(fields: [moduleId], references: [id])
+  user     User     @relation(fields: [userId], references: [id])
 
   @@id([userId, moduleId])
 }
 
 model VirtueScore {
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
-  date        DateTime
-  wisdom      Int      @default(0)
-  courage     Int      @default(0)
-  temperance  Int      @default(0)
-  justice     Int      @default(0)
-  note        String?
+  userId     Int
+  date       DateTime
+  wisdom     Int      @default(0)
+  courage    Int      @default(0)
+  temperance Int      @default(0)
+  justice    Int      @default(0)
+  note       String?
+  user       User     @relation(fields: [userId], references: [id])
 
   @@id([userId, date])
 }
 
 model Challenge {
-  id            Int        @id @default(autoincrement())
-  title         String
-  module        Module?    @relation(fields: [moduleId], references: [id])
-  moduleId      String?
-  framework     Framework? @relation(fields: [frameworkId], references: [id])
-  frameworkId   String?
-  durationDays  Int
-  rules         String?     @default("{}")
-  rewardBadge   String?
+  id           Int        @id @default(autoincrement())
+  title        String
+  moduleId     String?
+  frameworkId  String?
+  durationDays Int
+  rules        String?    @default("{}")
+  rewardBadge  String?
+  framework    Framework? @relation(fields: [frameworkId], references: [id])
+  module       Module?    @relation(fields: [moduleId], references: [id])
 }
 
 model Feed {
-  user        User     @relation(fields: [userId], references: [id])
-  userId      Int
-  date        DateTime
-  items       String
+  userId Int
+  date   DateTime
+  items  String
+  user   User     @relation(fields: [userId], references: [id])
 
   @@id([userId, date])
 }
 
 model GeneratedContent {
-  id             Int        @id @default(autoincrement())
-  scope          String
-  keyFingerprint String
-  moduleId       String?
+  id               Int      @id @default(autoincrement())
+  scope            String
+  keyFingerprint   String
+  moduleId         String?
   virtuePracticeId Int?
-  frameworkId    String?
-  level          String?
-  locale         String      @default("en")
-  style          String?
-  payload        String
-  createdAt      DateTime    @default(now())
+  frameworkId      String?
+  level            String?
+  locale           String   @default("en")
+  style            String?
+  payload          String
+  createdAt        DateTime @default(now())
 
   @@unique([scope, keyFingerprint])
 }
 
 model VirtuePractice {
-  id            Int       @id @default(autoincrement())
-  slug          String?   @unique
-  title         String
-  virtue        String
-  shortDesc     String?
+  id             Int      @id @default(autoincrement())
+  slug           String?  @unique
+  title          String
+  virtue         String
+  shortDesc      String?
   targetModuleId String?
-  tags          String?   @default("[]")
-  safety        String?
-  measurement   String?
-  description   String?
-  instructions  String?
-  rationale     String?
-  metrics       String?
-  safetyNotes   String?
-  coachPrompts  String?
-  meta          String?   @default("{}")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  tags           String?  @default("[]")
+  safety         String?
+  measurement    String?
+  description    String?
+  instructions   String?
+  rationale      String?
+  metrics        String?
+  safetyNotes    String?
+  coachPrompts   String?
+  meta           String?  @default("{}")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model UserPreference {
-  userId    Int     @id
-  user      User    @relation(fields: [userId], references: [id])
-  framework String?
+  userId     Int      @id
+  framework  String?
+  style      String?
+  locale     String?  @default("en")
+  updatedAt  DateTime @default(now())
+  name       String?
+  timezone   String?
   frameworks String?
-  style     String?
-  locale    String? @default("en")
-  name      String?
-  timezone  String?
-  updatedAt DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
 }
 
-// New models for dashboard widgets
 model Task {
   id          Int       @id @default(autoincrement())
   userId      Int
@@ -375,7 +342,7 @@ model Task {
   description String?
   completedAt DateTime?
   dueDate     DateTime?
-  priority    String    @default("M") // L/M/H
+  priority    String    @default("M")
   tag         String?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -396,14 +363,14 @@ model Goal {
 }
 
 model Habit {
-  id          Int       @id @default(autoincrement())
-  userId      Int
-  name        String
-  frequency   String    // e.g. daily, 3x/week
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  user        User      @relation(fields: [userId], references: [id])
-  checks      HabitCheck[]
+  id        Int          @id @default(autoincrement())
+  userId    Int
+  name      String
+  frequency String
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  user      User         @relation(fields: [userId], references: [id])
+  checks    HabitCheck[]
 }
 
 model HabitCheck {
@@ -417,181 +384,325 @@ model HabitCheck {
 }
 
 model FastingSession {
-  id          Int       @id @default(autoincrement())
+  id          Int              @id @default(autoincrement())
   userId      Int
-  startTime   DateTime  @default(now())
+  startTime   DateTime         @default(now())
   endTime     DateTime?
-  status      String    @default("active") // active|completed
-  protocol    String    // 16:8, 18:6, etc.
+  status      String           @default("active")
+  protocol    String
   targetHours Int
   notes       String?
-  user        User      @relation(fields: [userId], references: [id])
   benefits    FastingBenefit[]
+  user        User             @relation(fields: [userId], references: [id])
 }
 
 model FastingBenefit {
-  id               Int             @id @default(autoincrement())
+  id               Int            @id @default(autoincrement())
   fastingSessionId Int
   type             String
   intensity        Int
-  recordedAt       DateTime        @default(now())
-  session          FastingSession  @relation(fields: [fastingSessionId], references: [id])
+  recordedAt       DateTime       @default(now())
+  session          FastingSession @relation(fields: [fastingSessionId], references: [id])
 }
 
 model HydrationLog {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  date      DateTime @default(now())
-  ml        Int
-  source    String?  // water, tea, etc.
-  user      User      @relation(fields: [userId], references: [id])
+  id     Int      @id @default(autoincrement())
+  userId Int
+  date   DateTime @default(now())
+  ml     Int
+  source String?
+  user   User     @relation(fields: [userId], references: [id])
 }
 
 model MoodLog {
-  id        Int      @id @default(autoincrement())
-  userId    Int
-  date      DateTime @default(now())
-  mood      Int      // 1..5
-  note      String?
-  user      User      @relation(fields: [userId], references: [id])
+  id     Int      @id @default(autoincrement())
+  userId Int
+  date   DateTime @default(now())
+  mood   Int
+  note   String?
+  user   User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, date])
 }
 
 model DailyIntention {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   userId      Int
-  date        DateTime @default(now())
-  timePeriod  String   // "morning", "afternoon", "evening"
-  mood        Int      // 1..5
+  date        DateTime  @default(now())
+  timePeriod  String
+  mood        Int
   intention   String
-  submitted   Boolean  @default(false)
+  submitted   Boolean   @default(false)
   submittedAt DateTime?
-  user        User     @relation(fields: [userId], references: [id])
+  user        User      @relation(fields: [userId], references: [id])
 
   @@unique([userId, date, timePeriod])
 }
 
 model NaturePhoto {
-  id          Int      @id @default(autoincrement())
-  userId      Int
-  date        DateTime @default(now())
-  imagePath   String   // Path to stored image file
-  caption     String
-  tags        String[] // Array of tags
-  location    String?
-  weather     String?
-  mood        String?
-  aiInsights  String?
-  aiComment   String?
-  user        User     @relation(fields: [userId], references: [id])
+  id         Int      @id @default(autoincrement())
+  userId     Int
+  date       DateTime @default(now())
+  imagePath  String
+  caption    String
+  tags       String[]
+  location   String?
+  weather    String?
+  mood       String?
+  aiInsights String?
+  aiComment  String?
+  user       User     @relation(fields: [userId], references: [id])
 }
 
 model TimerSession {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   userId    Int
-  type      String   // focus, breathwork, cold, etc.
+  type      String
   label     String?
-  startedAt DateTime @default(now())
+  startedAt DateTime  @default(now())
   endedAt   DateTime?
   meta      Json?
   user      User      @relation(fields: [userId], references: [id])
 }
 
-// Community Forum Models
 model CommunityPost {
-  id            String   @id @default(cuid())
+  id            String                  @id @default(cuid())
   title         String
   content       String
   authorId      Int
-  author        User     @relation(fields: [authorId], references: [id])
-  type          String   // ai_question, member_discussion, resource_share, nature_photo
+  type          String
   category      String
-  tags          String[] // Array of tags
-  isPinned      Boolean  @default(false)
-  isAIQuestion  Boolean  @default(false)
-  aiInsights    String[] // Array of AI insights
-  views         Int      @default(0)
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  
-  // Nature photo specific fields
-  imagePath     String?  // Path to the nature photo image
-  aiComment     String?  // AI-generated comment for nature photos
-  source        String?  // Source of the post (e.g., 'nature_photo')
-  sourceId      String?  // ID from the source system
-
-  replies       CommunityReply[]
-  likes         CommunityLike[]
+  tags          String[]
+  isPinned      Boolean                 @default(false)
+  isAIQuestion  Boolean                 @default(false)
+  aiInsights    String[]
+  views         Int                     @default(0)
+  createdAt     DateTime                @default(now())
+  updatedAt     DateTime                @updatedAt
+  aiComment     String?
+  imagePath     String?
+  source        String?
+  sourceId      String?
   bookmarks     CommunityBookmark[]
+  likes         CommunityLike[]
   notifications CommunityNotification[]
+  author        User                    @relation(fields: [authorId], references: [id])
+  replies       CommunityReply[]
 }
 
 model CommunityReply {
-  id        String   @id @default(cuid())
-  content   String
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
-  postId    String
-  post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  parentId  String?  // For nested replies
-  parent    CommunityReply? @relation("ReplyReplies", fields: [parentId], references: [id])
-  replies   CommunityReply[] @relation("ReplyReplies")
-  likes     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  // AI comment specific fields
-  philosopher String? // Name of the philosopher for AI comments
-  isAI       Boolean @default(false) // Whether this is an AI-generated comment
+  id          String           @id @default(cuid())
+  content     String
+  authorId    Int
+  postId      String
+  parentId    String?
+  likes       Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  isAI        Boolean          @default(false)
+  philosopher String?
+  author      User             @relation(fields: [authorId], references: [id])
+  parent      CommunityReply?  @relation("ReplyReplies", fields: [parentId], references: [id])
+  replies     CommunityReply[] @relation("ReplyReplies")
+  post        CommunityPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
 }
 
 model CommunityLike {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
   postId    String
+  createdAt DateTime      @default(now())
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  user      User          @relation(fields: [userId], references: [id])
 
   @@unique([userId, postId])
 }
 
 model CommunityBookmark {
-  id        String   @id @default(cuid())
+  id        String        @id @default(cuid())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
   postId    String
+  createdAt DateTime      @default(now())
   post      CommunityPost @relation(fields: [postId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
+  user      User          @relation(fields: [userId], references: [id])
 
   @@unique([userId, postId])
 }
 
 model CommunityNotification {
-  id        String   @id @default(cuid())
+  id        String         @id @default(cuid())
   userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  type      String   // new_reply, new_question, like, mention
+  type      String
   title     String
   message   String
   postId    String?
+  isRead    Boolean        @default(false)
+  createdAt DateTime       @default(now())
   post      CommunityPost? @relation(fields: [postId], references: [id], onDelete: Cascade)
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  user      User           @relation(fields: [userId], references: [id])
 }
 
-// Journal Entry Model
 model JournalEntry {
-  id          String   @id @default(cuid())
-  userId      Int
-  user        User     @relation(fields: [userId], references: [id])
-  type        String   // gratitude, reflection, voice_note, boundaries, community_connections, mood
-  content     String
-  prompt      String?  // For reflection entries
-  category    String?  // For boundaries and community connections
-  date        DateTime @default(now())
-  aiInsights  String?  // AI-generated insights
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-} 
+  id         String   @id @default(cuid())
+  userId     Int
+  type       String
+  content    String
+  prompt     String?
+  category   String?
+  date       DateTime @default(now())
+  aiInsights String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  user       User     @relation(fields: [userId], references: [id])
+}
+
+enum Virtue {
+  WISDOM
+  JUSTICE
+  COURAGE
+  TEMPERANCE
+}
+
+enum WidgetKind {
+  TIMER
+  COUNTER
+  DRAG_BOARD
+  CHECKLIST
+  JOURNAL
+  AUDIO_NOTE
+  PHOTO
+  BREATH
+  BALANCE_GYRO
+  WHEEL
+  SLIDERS
+}
+
+// ===== ARISTOTLE ACADEMY MODELS =====
+
+// Academy Module - represents one of the 4 virtues (Wisdom, Justice, Courage, Temperance)
+model AcademyModule {
+  id                String   @id @default(cuid())
+  name              String   // e.g., "Wisdom", "Justice", "Courage", "Temperance"
+  greekName         String   // e.g., "Σοφία (Sophia)"
+  description       String
+  longDescription   String
+  virtue            Virtue   // Primary virtue this module teaches
+  icon              String?  // Icon identifier
+  color             String?  // Color theme
+  gradient          String?  // Gradient theme
+  totalLessons      Int      @default(0)
+  estimatedTime     Int      @default(0) // Total estimated time in minutes
+  prerequisites     String[] // Array of prerequisite module IDs
+  capstoneTitle     String?
+  capstoneDescription String?
+  capstoneRequirements Json? // Array of capstone requirements
+  capstoneTime      Int?     // Estimated time for capstone
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  lessons           AcademyLesson[]
+  userProgress      AcademyModuleProgress[]
+}
+
+// Academy Lesson - individual lessons within a module
+model AcademyLesson {
+  id                String   @id @default(cuid())
+  moduleId          String
+  module            AcademyModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title             String
+  subtitle          String
+  teaching          String   // Main teaching content
+  question          String   // Reflection question
+  practice          String   // Practice exercise
+  reading           String   // Reading material
+  quote             String   // Wisdom quote
+  author            String   // Quote author
+  difficulty        String   // BEGINNER, INTERMEDIATE, ADVANCED
+  estimatedTime     Int      // Time in minutes
+  prerequisites     String[] // Array of prerequisite lesson IDs
+  virtueGrants      Json     // { wisdom?: number, justice?: number, courage?: number, temperance?: number }
+  
+  // Interactive elements configuration
+  interactiveElements Json   // Configuration for teaching, question, practice, reading, quote sections
+  
+  // AI guidance prompts
+  aiGuidance        Json     // AI prompts for different sections
+  
+  isActive          Boolean  @default(true)
+  order             Int      // Order within the module
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  userProgress      LessonProgress[]
+  milestones        AcademyMilestone[]
+}
+
+// User's progress through academy modules
+model AcademyModuleProgress {
+  id                String   @id @default(cuid())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  moduleId          String
+  module            AcademyModule @relation(fields: [moduleId], references: [id])
+  progress          Int      @default(0) // Percentage complete (0-100)
+  completedLessons  Int      @default(0)
+  totalLessons      Int      @default(0)
+  isCompleted       Boolean  @default(false)
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  lastAccessedAt    DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, moduleId])
+}
+
+// User's progress through individual lessons
+model LessonProgress {
+  id                String   @id @default(cuid())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  lessonId          String
+  lesson            AcademyLesson @relation(fields: [lessonId], references: [id])
+  isCompleted       Boolean  @default(false)
+  startedAt         DateTime @default(now())
+  completedAt       DateTime?
+  lastAccessedAt    DateTime @default(now())
+  
+  // Individual section completion
+  teachingCompleted Boolean  @default(false)
+  questionCompleted Boolean  @default(false)
+  practiceCompleted Boolean  @default(false)
+  readingCompleted  Boolean  @default(false)
+  quoteCompleted    Boolean  @default(false)
+  
+  // User responses and AI interactions
+  userResponses     Json?    // User's responses to different sections
+  aiInteractions    Json?    // AI responses and guidance received
+  
+  // Practice evidence (photos, files, etc.)
+  practiceEvidence  Json?    // Evidence of practice completion
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([userId, lessonId])
+}
+
+// Milestones and achievements in the academy
+model AcademyMilestone {
+  id                String   @id @default(cuid())
+  userId            Int
+  user              User     @relation(fields: [userId], references: [id])
+  lessonId          String?
+  lesson            AcademyLesson? @relation(fields: [lessonId], references: [id])
+  moduleId          String?
+  type              String   // "lesson_completed", "module_completed", "capstone_completed", "virtue_mastered"
+  title             String
+  description       String
+  virtueGrants      Json     // Virtue points awarded
+  metadata          Json?    // Additional milestone data
+  achievedAt        DateTime @default(now())
+  createdAt         DateTime @default(now())
+}
