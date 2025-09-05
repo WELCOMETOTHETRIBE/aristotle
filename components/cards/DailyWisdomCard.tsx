@@ -25,25 +25,38 @@ interface WisdomSettings {
   enableNotifications: boolean;
 }
 
+// Available frameworks from onboarding
+const availableFrameworks = [
+  { id: 'stoic', name: 'Stoicism', emoji: '🧱', description: 'Rational thinking and emotional control' },
+  { id: 'spartan', name: 'Spartan Agōgē', emoji: '🛡️', description: 'Discipline and resilience' },
+  { id: 'bushido', name: 'Samurai Bushidō', emoji: '🗡️', description: 'Honor and rectitude' },
+  { id: 'monastic', name: 'Monastic Rule', emoji: '⛪', description: 'Contemplation and service' },
+  { id: 'berserker', name: 'Viking Berserker', emoji: '⚔️', description: 'Courage and strength' },
+  { id: 'druid', name: 'Celtic Druid', emoji: '🌿', description: 'Nature and wisdom' },
+  { id: 'monk', name: 'Tibetan Monk', emoji: '🧘', description: 'Mindfulness and compassion' },
+  { id: 'taoist', name: 'Taoist Sage', emoji: '☯️', description: 'Balance and flow' },
+  { id: 'epicurean', name: 'Epicurean', emoji: '🍇', description: 'Pleasure and moderation' },
+  { id: 'aristotelian', name: 'Aristotelian', emoji: '📚', description: 'Virtue and flourishing' }
+];
+
 export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const [wisdom, setWisdom] = useState<DailyWisdom>({
     quote: "The unexamined life is not worth living.",
     author: "Socrates",
-    framework: "Stoic",
+    framework: "Stoicism",
     reflection: "What aspect of your life needs deeper examination today?"
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-  const [availableFrameworks, setAvailableFrameworks] = useState<string[]>([]);
   const [settings, setSettings] = useState<WisdomSettings>({
     autoRefresh: true,
-    preferredFrameworks: ['Stoic', 'Spartan', 'Samurai'],
+    preferredFrameworks: ['stoic'], // Default to stoic
     showReflection: true,
     enableNotifications: true,
   });
 
-  // Load saved settings and available frameworks
+  // Load saved settings and user's selected frameworks
   useEffect(() => {
     const loadSettingsAndFrameworks = async () => {
       // Load saved settings
@@ -52,27 +65,29 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         setSettings(JSON.parse(savedSettings));
       }
 
-      // Load available frameworks from user preferences
+      // Load user's selected frameworks from preferences
       try {
-        const response = await fetch('/api/prefs');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.preferences?.framework) {
-            // If user has a specific framework, use that
-            setAvailableFrameworks([data.preferences.framework]);
+        const userPrefs = localStorage.getItem('userPreferences');
+        if (userPrefs) {
+          const parsed = JSON.parse(userPrefs);
+          if (parsed.selectedFrameworks && parsed.selectedFrameworks.length > 0) {
+            // Use user's selected frameworks
             setSettings(prev => ({
               ...prev,
-              preferredFrameworks: [data.preferences.framework]
+              preferredFrameworks: parsed.selectedFrameworks
             }));
-          } else {
-            // Use all available frameworks
-            setAvailableFrameworks(['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic', 'Buddhist', 'Confucian', 'Taoist', 'Indigenous', 'Martial', 'Sufi', 'Ubuntu', 'HighPerf']);
+            console.log('🎯 Using user\'s selected frameworks:', parsed.selectedFrameworks);
+          } else if (parsed.framework) {
+            // Fallback to single framework
+            setSettings(prev => ({
+              ...prev,
+              preferredFrameworks: [parsed.framework]
+            }));
+            console.log('🎯 Using user\'s primary framework:', parsed.framework);
           }
         }
       } catch (error) {
-        console.error('Error loading frameworks:', error);
-        // Fall back to default frameworks
-        setAvailableFrameworks(['Stoic', 'Spartan', 'Samurai', 'Monastic', 'Yogic', 'Buddhist', 'Confucian', 'Taoist', 'Indigenous', 'Martial', 'Sufi', 'Ubuntu', 'HighPerf']);
+        console.error('Error loading user frameworks:', error);
       }
     };
 
@@ -84,16 +99,20 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     setSettings(newSettings);
     localStorage.setItem('dailyWisdomSettings', JSON.stringify(newSettings));
     
-    // Also save framework preference to user profile if it's different
+    // Also save framework preference to user profile
     try {
+      const token = localStorage.getItem('auth-token');
       const response = await fetch('/api/prefs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(token && { 'Authorization': `Bearer ${token}` }),
         },
         body: JSON.stringify({ 
-          framework: newSettings.preferredFrameworks[0] || null,
-          preferences: newSettings 
+          preferences: {
+            selectedFrameworks: newSettings.preferredFrameworks,
+            framework: newSettings.preferredFrameworks[0] || null
+          }
         }),
       });
       
@@ -108,22 +127,12 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const loadDailyWisdom = async () => {
     setIsLoading(true);
     try {
-      // Get user's framework preference from localStorage
-      let userFramework = 'Stoic'; // Default fallback
-      try {
-        const userPrefs = localStorage.getItem('userPreferences');
-        if (userPrefs) {
-          const parsed = JSON.parse(userPrefs);
-          userFramework = parsed.framework || 'Stoic';
-          console.log(`🎯 Using user's framework preference: ${userFramework}`);
-        } else {
-          console.log('⚠️ No user preferences found, using default framework');
-        }
-      } catch (error) {
-        console.error('Error parsing user preferences:', error);
-      }
+      // Use user's preferred frameworks from settings
+      const frameworksToUse = settings.preferredFrameworks.length > 0 
+        ? settings.preferredFrameworks 
+        : ['stoic']; // Default fallback
       
-      console.log(`🎯 Loading daily wisdom for user's framework: ${userFramework}`);
+      console.log(`🎯 Loading daily wisdom for frameworks:`, frameworksToUse);
       
       const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
@@ -131,7 +140,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          framework: userFramework,
+          frameworks: frameworksToUse,
           date: new Date().toISOString().split('T')[0]
         }),
       });
@@ -149,6 +158,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             quote: newWisdom.quote,
             author: newWisdom.author,
             framework: newWisdom.framework,
+            frameworks: frameworksToUse,
             timestamp: new Date().toISOString(),
           },
           moduleId: 'daily_wisdom',
@@ -187,7 +197,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     const interval = setInterval(loadWisdomIfNeeded, 60 * 60 * 1000);
     
     return () => clearInterval(interval);
-  }, []);
+  }, [settings.preferredFrameworks]); // Re-run when frameworks change
 
   // Check if current quote is in favorites
   const isFavorite = () => {
@@ -249,51 +259,30 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     setWisdom({ ...wisdom });
   };
 
-  const getFrameworkColor = (framework: string) => {
+  const getFrameworkColor = (frameworkId: string) => {
     const colors: { [key: string]: string } = {
-      'Stoic': 'from-blue-500 to-indigo-500',
-      'Spartan': 'from-red-500 to-orange-500',
-      'Samurai': 'from-gray-700 to-gray-900',
-      'Monastic': 'from-purple-500 to-violet-500',
-      'Yogic': 'from-green-500 to-emerald-500',
-      'Buddhist': 'from-yellow-500 to-orange-500',
-      'Confucian': 'from-red-600 to-red-800',
-      'Taoist': 'from-green-600 to-green-800',
+      'stoic': 'from-blue-500 to-indigo-500',
+      'spartan': 'from-red-500 to-orange-500',
+      'bushido': 'from-gray-700 to-gray-900',
+      'monastic': 'from-purple-500 to-violet-500',
+      'berserker': 'from-orange-600 to-red-600',
+      'druid': 'from-green-500 to-emerald-500',
+      'monk': 'from-yellow-500 to-orange-500',
+      'taoist': 'from-green-600 to-green-800',
+      'epicurean': 'from-pink-500 to-purple-500',
+      'aristotelian': 'from-indigo-600 to-blue-600',
     };
-    return colors[framework] || 'from-purple-500 to-violet-500';
+    return colors[frameworkId] || 'from-purple-500 to-violet-500';
   };
 
-  const getFrameworkEmoji = (framework: string) => {
-    const emojis: { [key: string]: string } = {
-      'Stoic': '🏛️',
-      'Spartan': '🛡️',
-      'Samurai': '⚔️',
-      'Monastic': '⛪',
-      'Yogic': '🧘',
-      'Buddhist': '☸️',
-      'Confucian': '📚',
-      'Taoist': '☯️',
-    };
-    return emojis[framework] || '🧠';
+  const getFrameworkEmoji = (frameworkId: string) => {
+    const framework = availableFrameworks.find(f => f.id === frameworkId);
+    return framework?.emoji || '🧠';
   };
 
-  const getShortFrameworkName = (framework: string) => {
-    const shortNames: { [key: string]: string } = {
-      'Stoic': 'Stoicism',
-      'Spartan': 'Spartan Agōgē',
-      'Samurai': 'Samurai Bushidō',
-      'Monastic': 'Monastic Rule',
-      'Yogic': 'Yogic Path',
-      'Buddhist': 'Buddhist',
-      'Confucian': 'Confucian',
-      'Taoist': 'Taoist',
-      'Indigenous': 'Indigenous Wisdom',
-      'Martial': 'Martial Arts Code',
-      'Sufi': 'Sufi Practice',
-      'Ubuntu': 'Ubuntu',
-      'HighPerf': 'Modern High-Performance',
-    };
-    return shortNames[framework] || framework;
+  const getFrameworkName = (frameworkId: string) => {
+    const framework = availableFrameworks.find(f => f.id === frameworkId);
+    return framework?.name || frameworkId;
   };
 
   const getNextRefreshTime = () => {
@@ -368,7 +357,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             className="mb-4 p-4 bg-surface/50 rounded-lg border border-border/50"
           >
             <p className="text-sm text-muted">
-              Each day brings a new piece of wisdom from ancient philosophical traditions. 
+              Each day brings a new piece of wisdom from your selected philosophical traditions. 
               Take a moment to reflect on how this insight applies to your life today.
             </p>
           </motion.div>
@@ -386,26 +375,36 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           >
             <div>
               <label className="text-sm font-medium text-text mb-2 block">
-                Preferred Frameworks
+                Select Frameworks for Wisdom
               </label>
-              <div className="flex flex-wrap gap-2">
+              <p className="text-xs text-muted mb-3">
+                Choose which philosophical traditions you'd like to receive wisdom from
+              </p>
+              <div className="grid grid-cols-2 gap-2">
                 {availableFrameworks.map((framework) => (
                   <button
-                    key={framework}
+                    key={framework.id}
                     onClick={() => {
-                      const newFrameworks = settings.preferredFrameworks.includes(framework)
-                        ? settings.preferredFrameworks.filter(f => f !== framework)
-                        : [...settings.preferredFrameworks, framework];
+                      const newFrameworks = settings.preferredFrameworks.includes(framework.id)
+                        ? settings.preferredFrameworks.filter(f => f !== framework.id)
+                        : [...settings.preferredFrameworks, framework.id];
                       saveSettings({ ...settings, preferredFrameworks: newFrameworks });
                     }}
                     className={cn(
-                      "px-3 py-1 rounded-full text-xs font-medium transition-colors",
-                      settings.preferredFrameworks.includes(framework)
+                      "flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition-colors text-left",
+                      settings.preferredFrameworks.includes(framework.id)
                         ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
                         : "bg-surface/50 text-muted border border-border/50 hover:bg-surface"
                     )}
                   >
-                    {getFrameworkEmoji(framework)} {framework}
+                    <span className="text-sm">{framework.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{framework.name}</div>
+                      <div className="text-xs opacity-75 truncate">{framework.description}</div>
+                    </div>
+                    {settings.preferredFrameworks.includes(framework.id) && (
+                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    )}
                   </button>
                 ))}
               </div>
@@ -474,10 +473,10 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           <div className="flex items-center gap-2">
             <div className={cn(
               "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
-              `bg-gradient-to-r ${getFrameworkColor(wisdom.framework)} text-white`
+              `bg-gradient-to-r ${getFrameworkColor(wisdom.framework.toLowerCase())} text-white`
             )}>
-              <span>{getFrameworkEmoji(wisdom.framework)}</span>
-              <span>{getShortFrameworkName(wisdom.framework)}</span>
+              <span>{getFrameworkEmoji(wisdom.framework.toLowerCase())}</span>
+              <span>{getFrameworkName(wisdom.framework.toLowerCase())}</span>
             </div>
             <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
               Next: {getNextRefreshTime()}
@@ -553,4 +552,4 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       </div>
     </motion.div>
   );
-} 
+}
