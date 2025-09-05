@@ -27,7 +27,7 @@ ENV DATABASE_URL="file:./dummy.db"
 # Generate Prisma client
 RUN npx prisma generate
 
-# Build the application using a production-safe script (skips placeholder check)
+# Build the application using a production-safe script
 RUN npm run build:custom
 
 # Production image, copy all the files and run next
@@ -70,4 +70,4 @@ ENV HOSTNAME "0.0.0.0"
 ENV NODE_ENV production
 
 # Use Next.js with proper port binding
-CMD ["sh", "-c", "node scripts/init-database.js && PORT=8080 HOSTNAME=0.0.0.0 npm start"] 
+CMD ["sh", "-c", "node scripts/init-database.js && PORT=8080 HOSTNAME=0.0.0.0 npm start"]
