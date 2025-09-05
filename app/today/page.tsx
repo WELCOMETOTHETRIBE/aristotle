@@ -558,11 +558,11 @@ export default function TodayPage() {
               >
                 {/* Task Count Blip - Always show for new users, enhanced styling */}
                 <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse shadow-lg border-2 border-white">
-                  {Math.max(1, pendingTaskCount)}
+                  {pendingTaskCount}
                 </div>
                 
                 <div className="text-xl font-bold text-primary mb-1">
-                  {Math.max(1, pendingTaskCount)}
+                  {pendingTaskCount}
                 </div>
                 <div className="text-xs text-muted">Tasks</div>
               </button>

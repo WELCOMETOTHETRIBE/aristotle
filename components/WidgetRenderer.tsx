@@ -267,14 +267,27 @@ function TaskManagerWidget() {
       });
 
       if (response.ok) {
-        fetchTasks(); // Refresh data
+        // Update local state immediately for better UX
+        setTasks(prevTasks => 
+          prevTasks.map(task => 
+            task.id === taskId 
+              ? { ...task, completedAt: completed ? new Date().toISOString() : null }
+              : task
+          )
+        );
+        
+        // Refresh data to ensure consistency
+        setTimeout(() => {
+          fetchTasks();
+        }, 500);
       }
     } catch (error) {
       console.error('Error updating task:', error);
     }
   };
 
-  const dueTasks = tasks.filter(task => !task.completedAt && task.dueDate);
+  // Filter tasks properly - only show incomplete tasks
+  const incompleteTasks = tasks.filter(task => !task.completedAt);
   const completedTasks = tasks.filter(task => task.completedAt);
 
   if (loading) {
@@ -282,8 +295,8 @@ function TaskManagerWidget() {
   }
 
   // Separate onboarding tasks from regular tasks
-  const onboardingTasks = dueTasks.filter(task => task.tag === 'onboarding');
-  const regularTasks = dueTasks.filter(task => task.tag !== 'onboarding');
+  const onboardingTasks = incompleteTasks.filter(task => task.tag === 'onboarding');
+  const regularTasks = incompleteTasks.filter(task => task.tag !== 'onboarding');
 
   return (
     <Card className="bg-surface border border-border">
@@ -293,7 +306,7 @@ function TaskManagerWidget() {
           Tasks
         </CardTitle>
         <CardDescription className="text-muted">
-          {dueTasks.length} pending, {completedTasks.length} completed
+          {incompleteTasks.length} pending, {completedTasks.length} completed
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -361,7 +374,7 @@ function TaskManagerWidget() {
           </div>
         ))}
 
-        {dueTasks.length === 0 && (
+        {incompleteTasks.length === 0 && (
           <p className="text-muted-foreground text-center py-4">
             No tasks due today. Great job staying on top of things!
           </p>

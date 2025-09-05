@@ -311,17 +311,8 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   }, [timeLeft, isActive, isMuted, audioEnabled]);
 
-  // Play pattern change audio
-  useEffect(() => {
-    if (!isMuted && audioEnabled && audioRef.current) {
-      // Play a subtle pattern change sound
-      audioRef.current.src = '/audio/breathwork/session-start.mp3';
-      audioRef.current.volume = 0.3;
-      audioRef.current.play().catch(() => {
-        // Ignore errors for pattern change audio
-      });
-    }
-  }, [selectedPattern, isMuted, audioEnabled]);
+  // REMOVED: Pattern change audio that was playing on load
+  // This was causing the "begin your breathwork session" audio to play when the widget loaded
 
   // Preparation phase countdown
   useEffect(() => {
@@ -452,7 +443,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
         
         // Show XP gained notification
         if (result.xpGained) {
-          console.log(`🎯 +${result.xpGained} Temperance XP gained!`);
+          console.log(`�� +${result.xpGained} Temperance XP gained!`);
           // You could add a toast notification here
         }
         
@@ -970,4 +961,4 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       <audio ref={audioRef} preload="auto" />
     </div>
   );
-} 
+}

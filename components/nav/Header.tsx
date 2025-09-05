@@ -133,8 +133,11 @@ export function Header({ focusVirtue }: HeaderProps) {
           </div>
         )}
 
-        {/* Notifications */}
-        <button className="relative p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150">
+        {/* Notifications - Single notification icon with task count */}
+        <button 
+          onClick={() => window.location.href = '/today'}
+          className="relative p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+        >
           <Bell className="w-5 h-5" />
           {pendingTaskCount > 0 && (
             <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium animate-pulse shadow-lg">
@@ -142,23 +145,6 @@ export function Header({ focusVirtue }: HeaderProps) {
             </div>
           )}
         </button>
-
-        {/* Task Count Notification - Only show red blip, no giant notification */}
-        {pendingTaskCount > 0 && (
-          <div className="relative">
-            <button
-              onClick={() => window.location.href = '/today'}
-              className="group relative flex items-center space-x-2 px-3 py-2 bg-gradient-to-r from-red-500/10 to-pink-500/10 border border-red-500/20 rounded-full text-red-600 hover:from-red-500/20 hover:to-pink-500/20 hover:border-red-500/30 transition-all duration-300 hover:scale-105 shadow-sm hover:shadow-md"
-            >
-              <div className="relative">
-                <Target className="w-4 h-4 animate-pulse" />
-                <div className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-ping"></div>
-              </div>
-              <span className="text-sm font-medium">{pendingTaskCount} Task{pendingTaskCount !== 1 ? 's' : ''} Open</span>
-              <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse"></div>
-            </button>
-          </div>
-        )}
 
         {/* Profile Menu */}
         <div className="relative" ref={profileMenuRef}>
