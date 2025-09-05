@@ -186,34 +186,36 @@ export default function OnboardingPage() {
       const prefsData = await prefsResponse.json();
       console.log('✅ User preferences saved successfully:', prefsData);
 
-      // Step 2: Save user facts for AI personalization
+      // Step 2: Save user facts for AI personalization (skip if fails)
       console.log('🧠 Step 2: Saving user facts...');
-      const facts = [
-        { kind: 'bio', content: `Name: ${data.name}` },
-        { kind: 'preference', content: `Timezone: ${data.timezone}` },
-        { kind: 'preference', content: `Structured learning: ${data.question1}` },
-        { kind: 'preference', content: `Achievement focused: ${data.question2}` },
-        { kind: 'preference', content: `Direct confrontation: ${data.question3}` },
-        { kind: 'preference', content: `Individual practice: ${data.question4}` },
-        { kind: 'preference', content: `Physical discipline: ${data.question5}` }
-      ];
+      try {
+        const facts = [
+          { kind: 'bio', content: `Name: ${data.name}` },
+          { kind: 'preference', content: `Timezone: ${data.timezone}` },
+          { kind: 'preference', content: `Structured learning: ${data.question1}` },
+          { kind: 'preference', content: `Achievement focused: ${data.question2}` },
+          { kind: 'preference', content: `Direct confrontation: ${data.question3}` },
+          { kind: 'preference', content: `Individual practice: ${data.question4}` },
+          { kind: 'preference', content: `Physical discipline: ${data.question5}` }
+        ];
 
-      const factsResponse = await fetch('/api/user-facts', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ facts }),
-      });
+        const factsResponse = await fetch('/api/user-facts', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ facts }),
+        });
 
-      if (!factsResponse.ok) {
-        const errorData = await factsResponse.json();
-        console.error('❌ Failed to save user facts:', errorData);
-        throw new Error(`Failed to save user facts: ${errorData.error || 'Unknown error'}`);
+        if (factsResponse.ok) {
+          const factsData = await factsResponse.json();
+          console.log('✅ User facts saved successfully:', factsData);
+        } else {
+          console.log('⚠️ User facts save failed, continuing without them');
+        }
+      } catch (factsError) {
+        console.log('⚠️ User facts save failed, continuing without them:', factsError);
       }
-
-      const factsData = await factsResponse.json();
-      console.log('✅ User facts saved successfully:', factsData);
 
       // Step 3: Create initial tasks
       console.log('📋 Step 3: Creating initial tasks...');

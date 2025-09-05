@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { verifyToken } from '@/lib/auth';
-import { generateEmbedding } from '@/lib/embeddings';
 
 const UserFactsRequestSchema = z.object({
   facts: z.array(z.object({
@@ -24,20 +23,14 @@ async function getUserIdFromRequest(request: NextRequest): Promise<number | null
     }
   }
   
-  // If no Bearer token, try cookie-based auth
+  // If no Bearer token, try cookie-based auth directly
   if (!userId) {
     try {
-      const cookieHeader = request.headers.get('cookie');
-      if (cookieHeader) {
-        const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
-          headers: { cookie: cookieHeader }
-        });
-        
-        if (response.ok) {
-          const authData = await response.json();
-          if (authData.user && authData.user.id) {
-            userId = authData.user.id;
-          }
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
         }
       }
     } catch (error) {
@@ -61,17 +54,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Generate embeddings for each fact
-    const factsWithEmbeddings = await Promise.all(
-      facts.map(async (fact) => ({
+    // For now, just log the facts since we don't have a userFact model yet
+    console.log('User facts to save:', {
+      userId,
+      facts: facts.map(fact => ({
         kind: fact.kind,
         content: fact.content,
-        embedding: await generateEmbedding(fact.content),
+        // Note: embeddings would be generated here in the future
       }))
-    );
-
-    // Save to database (placeholder - implement when userFact model is available)
-    console.log('User facts to save:', factsWithEmbeddings);
+    });
 
     return NextResponse.json({
       success: true,
@@ -94,4 +85,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
