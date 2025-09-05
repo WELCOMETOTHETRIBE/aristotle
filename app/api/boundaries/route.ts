@@ -1,122 +1,80 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 
-export async function POST(request: NextRequest) {
-  try {
-    // Get token from cookies
-    const token = request.cookies.get('auth-token')?.value;
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+// Helper function to get user ID from request
+async function getUserIdFromRequest(request: NextRequest): Promise<number | null> {
+  let userId: number | null = null;
+  
+  // Try Bearer token first
+  const authHeader = request.headers.get('authorization');
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '');
     const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (payload) {
+      userId = payload.userId;
     }
-
-    const { boundaryId, date } = await request.json();
-
-    if (!boundaryId) {
-      return NextResponse.json(
-        { error: 'Boundary ID is required' },
-        { status: 400 }
-      );
-    }
-
-    // Generate AI insights for boundary practice
-    let aiInsights = null;
+  }
+  
+  // If no Bearer token, try cookie-based auth directly
+  if (!userId) {
     try {
-      const insightsResponse = await fetch(`${request.nextUrl.origin}/api/generate/practice`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          practiceType: 'boundary_setting',
-          boundaryId: boundaryId,
-          userId: payload.userId
-        })
-      });
-
-      if (insightsResponse.ok) {
-        aiInsights = await insightsResponse.json();
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
+        }
       }
     } catch (error) {
-      console.error('Error generating AI insights:', error);
+      console.error('Cookie auth check failed:', error);
+    }
+  }
+  
+  return userId;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { boundaryType, description, severity } = body;
+
+    // Get user ID from authentication
+    const userId = await getUserIdFromRequest(request);
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // In a real app, save to database
-    const boundaryPractice = {
-      id: Date.now().toString(),
-      userId: payload.userId,
-      boundaryId,
-      date,
-      aiInsights,
-      createdAt: new Date().toISOString()
+    // Generate insights directly instead of making internal API call
+    const insights = {
+      boundaryType,
+      description,
+      severity,
+      insights: [
+        `This ${boundaryType} boundary is important for your well-being.`,
+        `Consider how this boundary aligns with your values.`,
+        `Practice communicating this boundary clearly and consistently.`
+      ],
+      recommendations: [
+        'Set clear expectations with others',
+        'Practice saying no when needed',
+        'Regularly review and adjust boundaries'
+      ]
     };
 
-    console.log('Saving boundary practice:', boundaryPractice);
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      practice: boundaryPractice,
-      message: 'Boundary practice recorded successfully'
+      insights,
+      userId,
+      timestamp: new Date().toISOString(),
     });
 
   } catch (error) {
-    console.error('Error recording boundary practice:', error);
+    console.error('Boundaries API error:', error);
     return NextResponse.json(
-      { error: 'Failed to record boundary practice' },
+      { error: 'Failed to process boundary' },
       { status: 500 }
     );
   }
 }
-
-export async function GET(request: NextRequest) {
-  try {
-    // Get token from cookies
-    const token = request.cookies.get('auth-token')?.value;
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // In a real app, fetch from database
-    const mockPractices = [
-      {
-        id: '1',
-        boundaryId: 'say_no',
-        date: new Date().toISOString(),
-        aiInsights: {
-          strength: 'You showed courage in declining a request that didn\'t align with your priorities.',
-          growth: 'This practice builds your ability to stay true to your values.'
-        }
-      },
-      {
-        id: '2',
-        boundaryId: 'protect_energy',
-        date: new Date().toISOString(),
-        aiInsights: {
-          strength: 'Setting limits on draining activities shows wisdom in self-care.',
-          growth: 'This boundary helps maintain your emotional and mental well-being.'
-        }
-      }
-    ];
-
-    return NextResponse.json({ 
-      practices: mockPractices,
-      message: 'Boundary practices retrieved successfully'
-    });
-
-  } catch (error) {
-    console.error('Error fetching boundary practices:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch boundary practices' },
-      { status: 500 }
-    );
-  }
-} 

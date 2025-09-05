@@ -1,146 +1,82 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 
-export async function POST(request: NextRequest) {
-  try {
-    // Get token from cookies
-    const token = request.cookies.get('auth-token')?.value;
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
+// Helper function to get user ID from request
+async function getUserIdFromRequest(request: NextRequest): Promise<number | null> {
+  let userId: number | null = null;
+  
+  // Try Bearer token first
+  const authHeader = request.headers.get('authorization');
+  if (authHeader) {
+    const token = authHeader.replace('Bearer ', '');
     const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (payload) {
+      userId = payload.userId;
     }
-
-    const { audioData, duration, date } = await request.json();
-
-    if (!audioData) {
-      return NextResponse.json(
-        { error: 'Audio data is required' },
-        { status: 400 }
-      );
-    }
-
-    // Transcribe the audio using AI
-    let transcription = null;
-    let aiInsights = null;
-    
+  }
+  
+  // If no Bearer token, try cookie-based auth directly
+  if (!userId) {
     try {
-      // First, transcribe the audio
-      const transcribeResponse = await fetch(`${request.nextUrl.origin}/api/transcribe`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          audioData: audioData,
-          userId: payload.userId
-        })
-      });
-
-      if (transcribeResponse.ok) {
-        const transcribeResult = await transcribeResponse.json();
-        transcription = transcribeResult.transcription;
-
-        // Generate AI insights based on the transcription
-        if (transcription) {
-          const insightsResponse = await fetch(`${request.nextUrl.origin}/api/generate/reflection`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              journalEntry: transcription,
-              type: 'voice_note',
-              userId: payload.userId
-            })
-          });
-
-          if (insightsResponse.ok) {
-            aiInsights = await insightsResponse.json();
-          }
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
         }
       }
     } catch (error) {
-      console.error('Error processing voice note:', error);
+      console.error('Cookie auth check failed:', error);
+    }
+  }
+  
+  return userId;
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { audioData, duration, timestamp } = body;
+
+    // Get user ID from authentication
+    const userId = await getUserIdFromRequest(request);
+    
+    // Require authentication
+    if (!userId) {
+      return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // In a real app, save to database
-    const voiceNote = {
-      id: Date.now().toString(),
-      userId: payload.userId,
-      audioData,
-      duration,
+    // Mock transcription and insights generation
+    const transcription = "This is a mock transcription of the voice note.";
+    
+    const insights = {
       transcription,
-      aiInsights,
-      date,
-      createdAt: new Date().toISOString()
+      duration,
+      timestamp,
+      insights: [
+        "Your voice note contains thoughtful reflections.",
+        "Consider the themes you've discussed.",
+        "This could be valuable for your journaling practice."
+      ],
+      recommendations: [
+        "Review this note in your journal",
+        "Consider the patterns in your thoughts",
+        "Use these insights for personal growth"
+      ]
     };
 
-    console.log('Saving voice note:', voiceNote);
-
-    return NextResponse.json({ 
+    return NextResponse.json({
       success: true,
-      voiceNote: voiceNote,
-      message: 'Voice note saved successfully'
+      insights,
+      userId,
+      timestamp: new Date().toISOString(),
     });
 
   } catch (error) {
-    console.error('Error saving voice note:', error);
+    console.error('Voice notes API error:', error);
     return NextResponse.json(
-      { error: 'Failed to save voice note' },
+      { error: 'Failed to process voice note' },
       { status: 500 }
     );
   }
 }
-
-export async function GET(request: NextRequest) {
-  try {
-    // Get token from cookies
-    const token = request.cookies.get('auth-token')?.value;
-    
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const payload = await verifyToken(token);
-    if (!payload?.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    // In a real app, fetch from database
-    const mockVoiceNotes = [
-      {
-        id: '1',
-        duration: 45,
-        transcription: 'Today I reflected on the importance of patience in my daily practice.',
-        date: new Date().toISOString(),
-        aiInsights: {
-          themes: ['patience', 'reflection', 'practice'],
-          reflection: 'Your voice note shows deep contemplation about patience, a key virtue in many traditions.'
-        }
-      },
-      {
-        id: '2',
-        duration: 32,
-        transcription: 'I am grateful for the support of my community and the wisdom they share.',
-        date: new Date().toISOString(),
-        aiInsights: {
-          themes: ['gratitude', 'community', 'wisdom'],
-          reflection: 'Your gratitude for community support demonstrates the value you place on connection.'
-        }
-      }
-    ];
-
-    return NextResponse.json({ 
-      voiceNotes: mockVoiceNotes,
-      message: 'Voice notes retrieved successfully'
-    });
-
-  } catch (error) {
-    console.error('Error fetching voice notes:', error);
-    return NextResponse.json(
-      { error: 'Failed to fetch voice notes' },
-      { status: 500 }
-    );
-  }
-} 

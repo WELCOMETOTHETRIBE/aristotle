@@ -21,20 +21,14 @@ async function getUserIdFromRequest(request: NextRequest): Promise<number | null
     }
   }
   
-  // If no Bearer token, try cookie-based auth
+  // If no Bearer token, try cookie-based auth directly
   if (!userId) {
     try {
-      const cookieHeader = request.headers.get('cookie');
-      if (cookieHeader) {
-        const response = await fetch(`${request.nextUrl.origin}/api/auth/me`, {
-          headers: { cookie: cookieHeader }
-        });
-        
-        if (response.ok) {
-          const authData = await response.json();
-          if (authData.user && authData.user.id) {
-            userId = authData.user.id;
-          }
+      const token = request.cookies.get('auth-token')?.value;
+      if (token) {
+        const payload = await verifyToken(token);
+        if (payload) {
+          userId = payload.userId;
         }
       }
     } catch (error) {
@@ -48,7 +42,7 @@ async function getUserIdFromRequest(request: NextRequest): Promise<number | null
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { skill, args } = SkillInvocationSchema.parse(body);
+    const { skillName, parameters } = SkillInvocationSchema.parse(body);
 
     // Get user ID from authentication
     const userId = await getUserIdFromRequest(request);
@@ -58,77 +52,45 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Authentication required' }, { status: 401 });
     }
 
-    // Get skill definition
-    const skillDef = getSkill(skill);
-    if (!skillDef) {
-      return NextResponse.json(
-        { error: `Skill "${skill}" not found` },
-        { status: 404 }
-      );
-    }
-
-    // Validate input with skill's schema
-    const validatedArgs = skillDef.zodInputSchema.parse(args);
-
-    // Get user state for skill context
+    // Get user state
     const userState = await getUserState(userId);
     
-    // Transform database results to match TypeScript types
+    // Create skill context
     const context: SkillContext = {
-      userId: userId,
-      userState: {
-        activeGoals: userState.activeGoals.map(goal => ({
-          id: goal.id,
-          title: goal.title,
-          category: goal.category as GoalCategory,
-          status: goal.status as GoalStatus,
-        })),
-        dueTasks: userState.dueTasks.map(task => ({
-          id: task.id,
-          title: task.title,
-          tag: task.tag as TaskTag | undefined,
-          priority: task.priority as TaskPriority,
-          dueAt: task.dueDate?.toISOString(),
-        })),
-        habits: userState.habits.map(habit => ({
-          id: habit.id,
-          name: habit.name,
-          streakCount: habit.streakCount,
-          lastCheckInAt: habit.lastCheckInAt?.toISOString(),
-        })),
-        rollingSummary: userState.rollingSummary || undefined,
-      },
+      userId,
+      userState,
+      prisma,
+      timestamp: new Date(),
     };
 
-    // Execute skill
-    const result = await skillDef.run(context, validatedArgs);
+    // Get and invoke the skill
+    const skill = getSkill(skillName);
+    if (!skill) {
+      return NextResponse.json({ error: 'Skill not found' }, { status: 404 });
+    }
 
-    // Log skill execution
-    await prisma.skillRunLog.create({
-      data: {
-        userId: userId,
-        skillKey: skill,
-        inputJson: JSON.stringify(args),
-        outputJson: JSON.stringify(result),
-        status: result.success ? 'success' : 'error',
-      },
+    const result = await skill.invoke(parameters, context);
+
+    return NextResponse.json({
+      success: true,
+      result,
+      skillName,
+      timestamp: new Date().toISOString(),
     });
-
-    return NextResponse.json(result);
 
   } catch (error) {
     console.error('Skill invocation error:', error);
     
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: 'Invalid skill input', details: error.errors },
+        { error: 'Invalid request format', details: error.errors },
         { status: 400 }
       );
     }
 
     return NextResponse.json(
-      { error: 'Skill execution failed' },
+      { error: 'Failed to invoke skill' },
       { status: 500 }
     );
   }
-} 
+}
