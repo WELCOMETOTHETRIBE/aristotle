@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 import WidgetGallery from '@/components/WidgetGallery';
-import WidgetRenderer from '@/components/WidgetRenderer';
+import { WidgetRenderer } from '@/components/WidgetRenderer';
 import { AcademyCard, VirtueBadge } from '@/components/AcademyCard';
 
 interface WidgetInfo {
