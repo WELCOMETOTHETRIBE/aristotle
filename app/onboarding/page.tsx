@@ -274,7 +274,7 @@ export default function OnboardingPage() {
 
       console.log('✅ Onboarding marked as complete');
 
-      // Step 5: Redirect to dashboard
+      // Step 5: Redirect directly to dashboard (no completion page)
       console.log('🏠 Step 5: Redirecting to dashboard...');
       router.push('/dashboard');
       
@@ -493,13 +493,6 @@ export default function OnboardingPage() {
                 <p className="text-sm text-muted mb-4">
                   Your personalized journey begins now. We'll use these preferences to tailor your experience.
                 </p>
-                <Button
-                  onClick={handleComplete}
-                  disabled={isProcessing}
-                  className="px-8 py-3 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold"
-                >
-                  {isProcessing ? 'Setting up...' : 'Complete Setup'}
-                </Button>
               </div>
             </CardContent>
           </Card>
