@@ -4,12 +4,17 @@ export class BreathworkAudioManager {
   private volume: number = 0.7;
   private isMuted: boolean = false;
   private currentAudio: HTMLAudioElement | null = null;
+  private isLoading: boolean = false;
 
   constructor() {
-    this.preloadAudio();
+    // Don't preload automatically - wait for user interaction
   }
 
   private async preloadAudio(): Promise<void> {
+    if (this.isLoading || this.isLoaded) return;
+    
+    this.isLoading = true;
+    
     const audioFiles = [
       // Core breathing instructions
       { key: 'inhale', url: '/audio/breathwork/inhale.mp3' },
@@ -51,6 +56,14 @@ export class BreathworkAudioManager {
     } catch (error) {
       console.warn('⚠️ Some audio files failed to preload:', error);
       this.isLoaded = false;
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
+  public async ensureAudioLoaded(): Promise<void> {
+    if (!this.isLoaded && !this.isLoading) {
+      await this.preloadAudio();
     }
   }
 
@@ -70,7 +83,11 @@ export class BreathworkAudioManager {
   }
 
   public async playPhaseCue(phase: 'inhale' | 'hold' | 'exhale' | 'hold2'): Promise<void> {
-    if (this.isMuted || !this.isLoaded) return;
+    if (this.isMuted) return;
+    
+    await this.ensureAudioLoaded();
+    
+    if (!this.isLoaded) return;
 
     try {
       // Stop any currently playing audio
@@ -91,7 +108,11 @@ export class BreathworkAudioManager {
   }
 
   public async playCountdown(count: number): Promise<void> {
-    if (this.isMuted || !this.isLoaded || count < 1 || count > 15) return;
+    if (this.isMuted || count < 1 || count > 15) return;
+    
+    await this.ensureAudioLoaded();
+    
+    if (!this.isLoaded) return;
 
     try {
       // Stop any currently playing audio
@@ -112,7 +133,11 @@ export class BreathworkAudioManager {
   }
 
   public async playSessionStart(): Promise<void> {
-    if (this.isMuted || !this.isLoaded) return;
+    if (this.isMuted) return;
+    
+    await this.ensureAudioLoaded();
+    
+    if (!this.isLoaded) return;
 
     try {
       this.stopCurrentAudio();
@@ -130,7 +155,11 @@ export class BreathworkAudioManager {
   }
 
   public async playSessionComplete(): Promise<void> {
-    if (this.isMuted || !this.isLoaded) return;
+    if (this.isMuted) return;
+    
+    await this.ensureAudioLoaded();
+    
+    if (!this.isLoaded) return;
 
     try {
       this.stopCurrentAudio();
@@ -162,4 +191,4 @@ export class BreathworkAudioManager {
 }
 
 // Singleton instance
-export const breathworkAudioManager = new BreathworkAudioManager(); 
+export const breathworkAudioManager = new BreathworkAudioManager();

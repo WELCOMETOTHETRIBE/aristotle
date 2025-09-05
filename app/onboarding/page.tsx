@@ -2,180 +2,121 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  User, 
+  Globe, 
+  Heart, 
+  CheckCircle, 
+  ChevronRight, 
+  ChevronLeft,
+  Sparkles,
+  Shield,
+  Target,
+  Users,
+  Zap,
+  BookOpen
+} from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Brain, Shield, Scale, Heart, Target, Users, Zap, Moon, Sun, Flame, Leaf, Droplets, Wind, Sparkles, ArrowRight, Check } from 'lucide-react';
 
 interface OnboardingData {
-  name: string;
-  timezone: string;
+  name: string | null;
+  timezone: string | null;
   selectedFrameworks: string[];
-  question1: boolean | null; // Structured learning
-  question2: boolean | null; // Achievement focused
-  question3: boolean | null; // Direct confrontation
-  question4: boolean | null; // Individual practice
-  question5: boolean | null; // Physical discipline
+  question1: string | null;
+  question2: string | null;
+  question3: string | null;
+  question4: string | null;
+  question5: string | null;
 }
 
-const frameworks = [
+const steps = [
   {
-    id: 'stoic',
-    name: 'Stoicism',
-    description: 'Ancient wisdom for modern resilience',
-    icon: Shield,
-    color: 'from-fw-stoic to-blue-400',
-    benefits: ['Emotional control', 'Mental resilience', 'Practical wisdom']
+    id: 0,
+    title: 'Personal Information',
+    description: 'Tell us about yourself',
+    icon: User
   },
   {
-    id: 'spartan',
-    name: 'Spartan Agōgē',
-    description: 'Discipline and strength through adversity',
-    icon: Target,
-    color: 'from-fw-spartan to-orange-400',
-    benefits: ['Physical discipline', 'Mental toughness', 'Leadership skills']
+    id: 1,
+    title: 'Philosophical Preferences',
+    description: 'Choose your frameworks',
+    icon: Heart
   },
   {
-    id: 'samurai',
-    name: 'Samurai Bushidō',
-    description: 'Honor, loyalty, and martial excellence',
-    icon: Scale,
-    color: 'from-fw-bushido to-red-400',
-    benefits: ['Honor and integrity', 'Loyalty and duty', 'Martial discipline']
+    id: 2,
+    title: 'Learning Style',
+    description: 'How do you prefer to learn?',
+    icon: BookOpen
   },
   {
-    id: 'monastic',
-    name: 'Monastic Rule',
-    description: 'Contemplation and spiritual growth',
-    icon: Moon,
-    color: 'from-fw-monastic to-indigo-400',
-    benefits: ['Spiritual growth', 'Inner peace', 'Mindful living']
-  },
-  {
-    id: 'yogic',
-    name: 'Yogic Path',
-    description: 'Balance and harmony through practice',
-    icon: Leaf,
-    color: 'from-fw-yogic to-emerald-400',
-    benefits: ['Physical health', 'Mental balance', 'Spiritual connection']
-  },
-  {
-    id: 'indigenous',
-    name: 'Indigenous Wisdom',
-    description: 'Connection to nature and community',
-    icon: Wind,
-    color: 'from-fw-indigenous to-green-400',
-    benefits: ['Nature connection', 'Community values', 'Traditional wisdom']
-  },
-  {
-    id: 'martial',
-    name: 'Martial Arts Code',
-    description: 'Discipline through physical mastery',
-    icon: Flame,
-    color: 'from-fw-martial to-red-400',
-    benefits: ['Physical mastery', 'Mental discipline', 'Self-defense']
-  },
-  {
-    id: 'sufi',
-    name: 'Sufi Practice',
-    description: 'Mystical wisdom and inner transformation',
-    icon: Sparkles,
-    color: 'from-fw-sufi to-purple-400',
-    benefits: ['Inner transformation', 'Mystical wisdom', 'Spiritual insight']
-  },
-  {
-    id: 'ubuntu',
-    name: 'Ubuntu Philosophy',
-    description: 'Humanity and community connection',
-    icon: Users,
-    color: 'from-fw-ubuntu to-blue-400',
-    benefits: ['Community values', 'Human connection', 'Shared humanity']
-  },
-  {
-    id: 'modern',
-    name: 'Modern High-Performance',
-    description: 'Evidence-based optimization',
-    icon: Zap,
-    color: 'from-fw-highperf to-pink-400',
-    benefits: ['Performance optimization', 'Evidence-based methods', 'Modern tools']
-  },
-  {
-    id: 'celtic',
-    name: 'Celtic Druid',
-    description: 'Nature wisdom and seasonal cycles',
-    icon: Leaf,
-    color: 'from-fw-indigenous to-green-400',
-    benefits: ['Nature wisdom', 'Seasonal awareness', 'Ancient knowledge']
-  },
-  {
-    id: 'tibetan',
-    name: 'Tibetan Buddhist Monk',
-    description: 'Inner peace and spiritual awakening',
-    icon: Sun,
-    color: 'from-fw-monastic to-yellow-400',
-    benefits: ['Inner peace', 'Spiritual awakening', 'Compassion']
-  },
-  {
-    id: 'viking',
-    name: 'Viking Berserker',
-    description: 'Courage and strength in battle',
-    icon: Flame,
-    color: 'from-fw-spartan to-red-400',
-    benefits: ['Courage and bravery', 'Physical strength', 'Battle wisdom']
+    id: 3,
+    title: 'Complete Setup',
+    description: 'Review and finish',
+    icon: CheckCircle
   }
-];
-
-const timezones = [
-  { value: 'UTC', label: 'UTC (Coordinated Universal Time)' },
-  { value: 'America/New_York', label: 'Eastern Time (ET)' },
-  { value: 'America/Chicago', label: 'Central Time (CT)' },
-  { value: 'America/Denver', label: 'Mountain Time (MT)' },
-  { value: 'America/Los_Angeles', label: 'Pacific Time (PT)' },
-  { value: 'Europe/London', label: 'London (GMT/BST)' },
-  { value: 'Europe/Paris', label: 'Paris (CET/CEST)' },
-  { value: 'Europe/Berlin', label: 'Berlin (CET/CEST)' },
-  { value: 'Asia/Tokyo', label: 'Tokyo (JST)' },
-  { value: 'Asia/Shanghai', label: 'Shanghai (CST)' },
-  { value: 'Australia/Sydney', label: 'Sydney (AEST/AEDT)' },
-  { value: 'Pacific/Auckland', label: 'Auckland (NZST/NZDT)' }
 ];
 
 const questions = [
   {
     id: 'question1',
-    text: 'Do you prefer structured learning with clear steps and milestones?',
-    trueLabel: 'Yes, I like clear structure',
-    falseLabel: 'No, I prefer flexibility',
-    icon: Brain
+    text: 'How do you prefer to approach structured learning?',
+    options: [
+      { value: 'systematic', label: 'Systematic and methodical', icon: Target },
+      { value: 'exploratory', label: 'Exploratory and flexible', icon: Sparkles }
+    ],
+    icon: BookOpen
   },
   {
     id: 'question2',
-    text: 'Are you more focused on achieving specific goals or enjoying the journey?',
-    trueLabel: 'Goal-focused achiever',
-    falseLabel: 'Journey enjoyer',
-    icon: Target
+    text: 'What motivates you most in personal development?',
+    options: [
+      { value: 'achievement', label: 'Achievement and mastery', icon: Target },
+      { value: 'growth', label: 'Personal growth and insight', icon: Heart }
+    ],
+    icon: Zap
   },
   {
     id: 'question3',
-    text: 'Do you prefer to confront challenges directly or work around them?',
-    trueLabel: 'Direct confrontation',
-    falseLabel: 'Work around challenges',
+    text: 'How do you handle challenges and setbacks?',
+    options: [
+      { value: 'confront', label: 'Face them directly', icon: Shield },
+      { value: 'adapt', label: 'Adapt and find alternatives', icon: Sparkles }
+    ],
     icon: Shield
   },
   {
     id: 'question4',
-    text: 'Do you prefer to practice individually or with others?',
-    trueLabel: 'Individual practice',
-    falseLabel: 'Group practice',
+    text: 'What type of practice resonates with you?',
+    options: [
+      { value: 'individual', label: 'Individual reflection and practice', icon: User },
+      { value: 'community', label: 'Community and shared learning', icon: Users }
+    ],
     icon: Users
   },
   {
     id: 'question5',
-    text: 'Do you value physical discipline and fitness in your practice?',
-    trueLabel: 'Physical discipline',
-    falseLabel: 'Mental focus only',
+    text: 'How important is physical discipline to you?',
+    options: [
+      { value: 'essential', label: 'Essential for mental clarity', icon: Zap },
+      { value: 'complementary', label: 'Complementary to mental practice', icon: Heart }
+    ],
     icon: Heart
   }
+];
+
+const availableFrameworks = [
+  { id: 'stoic', name: 'Stoicism', emoji: '🧱', description: 'Rational thinking and emotional control' },
+  { id: 'spartan', name: 'Spartan Agōgē', emoji: '🛡️', description: 'Discipline and resilience' },
+  { id: 'bushido', name: 'Samurai Bushidō', emoji: '🗡️', description: 'Honor and rectitude' },
+  { id: 'monastic', name: 'Monastic Rule', emoji: '⛪', description: 'Contemplation and service' },
+  { id: 'berserker', name: 'Viking Berserker', emoji: '⚔️', description: 'Courage and strength' },
+  { id: 'druid', name: 'Celtic Druid', emoji: '🌿', description: 'Nature and wisdom' },
+  { id: 'monk', name: 'Tibetan Monk', emoji: '🧘', description: 'Mindfulness and compassion' },
+  { id: 'taoist', name: 'Taoist Sage', emoji: '☯️', description: 'Balance and flow' },
+  { id: 'epicurean', name: 'Epicurean', emoji: '🍇', description: 'Pleasure and moderation' },
+  { id: 'aristotelian', name: 'Aristotelian', emoji: '📚', description: 'Virtue and flourishing' }
 ];
 
 export default function OnboardingPage() {
@@ -183,8 +124,8 @@ export default function OnboardingPage() {
   const [currentStep, setCurrentStep] = useState(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [data, setData] = useState<OnboardingData>({
-    name: '',
-    timezone: 'UTC',
+    name: null,
+    timezone: null,
     selectedFrameworks: [],
     question1: null,
     question2: null,
@@ -193,40 +134,14 @@ export default function OnboardingPage() {
     question5: null
   });
 
-  const toggleFramework = (frameworkId: string) => {
-    setData(prev => ({
-      ...prev,
-      selectedFrameworks: prev.selectedFrameworks.includes(frameworkId)
-        ? prev.selectedFrameworks.filter(id => id !== frameworkId)
-        : [...prev.selectedFrameworks, frameworkId]
-    }));
-  };
-
-  const updateData = (field: keyof OnboardingData, value: any) => {
-    setData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const nextStep = () => {
-    if (currentStep < 3) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
-
   const canProceed = () => {
     switch (currentStep) {
       case 0:
-        return data.name.trim() !== '' && data.timezone !== '';
+        return data.name && data.timezone;
       case 1:
-        return data.question1 !== null && data.question2 !== null && 
-               data.question3 !== null && data.question4 !== null && data.question5 !== null;
-      case 2:
         return data.selectedFrameworks.length > 0;
+      case 2:
+        return data.question1 && data.question2 && data.question3 && data.question4 && data.question5;
       case 3:
         return true;
       default:
@@ -292,86 +207,92 @@ export default function OnboardingPage() {
       });
 
       if (!factsResponse.ok) {
-        console.error('⚠️ Failed to save user facts, but continuing with onboarding');
-      } else {
-        console.log('✅ User facts saved successfully');
+        const errorData = await factsResponse.json();
+        console.error('❌ Failed to save user facts:', errorData);
+        throw new Error(`Failed to save user facts: ${errorData.error || 'Unknown error'}`);
       }
 
-      // Step 3: Mark onboarding task as completed
-      console.log('✅ Step 3: Marking onboarding task as completed...');
-      const taskResponse = await fetch('/api/tasks', {
+      const factsData = await factsResponse.json();
+      console.log('✅ User facts saved successfully:', factsData);
+
+      // Step 3: Create initial tasks
+      console.log('📋 Step 3: Creating initial tasks...');
+      const tasks = [
+        {
+          title: 'Complete your first breathwork session',
+          description: 'Try the enhanced breathwork app with perfect audio-visual sync',
+          priority: 'H',
+          tag: 'breathwork'
+        },
+        {
+          title: 'Explore your selected frameworks',
+          description: 'Visit the frameworks page to learn more about your chosen paths',
+          priority: 'M',
+          tag: 'learning'
+        },
+        {
+          title: 'Set up your daily intention',
+          description: 'Create your first daily intention to start your journey',
+          priority: 'M',
+          tag: 'intention'
+        }
+      ];
+
+      for (const task of tasks) {
+        try {
+          await fetch('/api/tasks', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(task),
+          });
+        } catch (error) {
+          console.warn('Failed to create task:', task.title, error);
+        }
+      }
+
+      console.log('✅ Initial tasks created successfully');
+
+      // Step 4: Mark onboarding as complete
+      console.log('🎯 Step 4: Marking onboarding as complete...');
+      const onboardingResponse = await fetch('/api/onboarding-status', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          action: 'complete',
-          tag: 'onboarding'
-        }),
+        body: JSON.stringify({ completed: true }),
       });
 
-      if (!taskResponse.ok) {
-        console.error('⚠️ Failed to mark onboarding task as completed, but continuing');
-      } else {
-        console.log('✅ Onboarding task marked as completed');
+      if (!onboardingResponse.ok) {
+        const errorData = await onboardingResponse.json();
+        console.error('❌ Failed to mark onboarding complete:', errorData);
+        throw new Error(`Failed to mark onboarding complete: ${errorData.error || 'Unknown error'}`);
       }
 
-      // Step 4: Update onboarding status
-      console.log('📊 Step 4: Updating onboarding status...');
-      const onboardingStatusResponse = await fetch('/api/onboarding-status', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          isComplete: true,
-          completedAt: new Date().toISOString()
-        }),
-      });
+      console.log('✅ Onboarding marked as complete');
 
-      if (!onboardingStatusResponse.ok) {
-        console.error('⚠️ Failed to update onboarding status, but continuing');
-      } else {
-        console.log('✅ Onboarding status updated successfully');
-      }
-
-      // Store in localStorage for immediate use
-      const userPrefs = {
-        displayName: data.name,
-        name: data.name,
-        timezone: data.timezone,
-        framework: data.selectedFrameworks[0],
-        secondaryFrameworks: data.selectedFrameworks.slice(1),
-        onboardingCompleted: true,
-        completedAt: new Date().toISOString()
-      };
+      // Step 5: Redirect to dashboard
+      console.log('🏠 Step 5: Redirecting to dashboard...');
+      router.push('/dashboard');
       
-      localStorage.setItem('userPreferences', JSON.stringify(userPrefs));
-      console.log('💾 User preferences saved to localStorage:', userPrefs);
-
-      // Store personality profile for AI personalization
-      localStorage.setItem('personalityProfile', JSON.stringify({
-        structuredLearning: data.question1,
-        achievementFocused: data.question2,
-        directConfrontation: data.question3,
-        individualPractice: data.question4,
-        physicalDiscipline: data.question5
-      }));
-
-      // Success message
-      console.log('🎉 Onboarding completed successfully!');
-      alert('Onboarding completed successfully! Your preferences have been saved.');
-
-      // Dispatch custom event to notify header to update task count
-      window.dispatchEvent(new CustomEvent('taskCompleted'));
-
-      // Redirect to today page
-      router.push('/today');
-    } catch (error: any) {
-      console.error('❌ Error completing onboarding:', error);
-      alert(`There was an error completing your setup: ${error.message}. Please try again.`);
+    } catch (error) {
+      console.error('❌ Onboarding completion failed:', error);
+      alert(`Setup failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setIsProcessing(false);
+    }
+  };
+
+  const nextStep = () => {
+    if (canProceed() && currentStep < steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const prevStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
     }
   };
 
@@ -379,39 +300,50 @@ export default function OnboardingPage() {
     switch (currentStep) {
       case 0:
         return (
-          <Card className="bg-gray-800/50 border border-gray-600 shadow-xl backdrop-blur-sm">
-            <CardContent className="p-6 md:p-8">
-              <div className="space-y-6">
-                <div className="space-y-3">
-                  <label htmlFor="name" className="block text-lg font-semibold text-white">
-                    What should I call you?
-                  </label>
-                  <Input
-                    id="name"
-                    value={data.name}
-                    onChange={(e) => updateData('name', e.target.value)}
-                    placeholder="Enter your name"
-                    className="h-12 text-lg bg-gray-700 text-white placeholder:text-gray-400 border border-gray-600 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-fast"
-                  />
-                </div>
-                
-                <div className="space-y-3">
-                  <label htmlFor="timezone" className="block text-lg font-semibold text-white">
-                    What's your timezone?
-                  </label>
-                  <select
-                    id="timezone"
-                    value={data.timezone}
-                    onChange={(e) => updateData('timezone', e.target.value)}
-                    className="w-full h-12 px-4 border border-gray-600 rounded-lg bg-gray-700 text-white text-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all duration-fast"
-                  >
-                    {timezones.map(tz => (
-                      <option key={tz.value} value={tz.value} className="bg-gray-700 text-white py-2">
-                        {tz.label}
-                      </option>
-                    ))}
-                  </select>
-                </div>
+          <Card className="glass-effect border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95">
+            <CardHeader>
+              <CardTitle className="text-center">Personal Information</CardTitle>
+              <CardDescription className="text-center">
+                Let's start with the basics
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium text-text mb-2">
+                  What's your name?
+                </label>
+                <input
+                  type="text"
+                  value={data.name || ''}
+                  onChange={(e) => setData({ ...data, name: e.target.value })}
+                  placeholder="Enter your name"
+                  className="w-full px-4 py-3 bg-surface-2 border border-border rounded-lg text-text placeholder-muted focus:outline-none focus:ring-2 focus:ring-primary/50"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-text mb-2">
+                  What's your timezone?
+                </label>
+                <select
+                  value={data.timezone || ''}
+                  onChange={(e) => setData({ ...data, timezone: e.target.value })}
+                  className="w-full px-4 py-3 bg-surface-2 border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                >
+                  <option value="">Select your timezone</option>
+                  <option value="UTC">UTC</option>
+                  <option value="America/New_York">Eastern Time</option>
+                  <option value="America/Chicago">Central Time</option>
+                  <option value="America/Denver">Mountain Time</option>
+                  <option value="America/Los_Angeles">Pacific Time</option>
+                  <option value="Europe/London">London</option>
+                  <option value="Europe/Paris">Paris</option>
+                  <option value="Europe/Berlin">Berlin</option>
+                  <option value="Asia/Tokyo">Tokyo</option>
+                  <option value="Asia/Shanghai">Shanghai</option>
+                  <option value="Australia/Sydney">Sydney</option>
+                  <option value="Pacific/Auckland">Auckland</option>
+                </select>
               </div>
             </CardContent>
           </Card>
@@ -419,121 +351,156 @@ export default function OnboardingPage() {
 
       case 1:
         return (
-          <div className="space-y-4 md:space-y-6">
-            {questions.map((question, index) => (
-              <div key={question.id} className={`border border-gray-600 rounded-lg p-4 md:p-6 transition-all duration-fast hover:shadow-xl backdrop-blur-sm ${
-                data[question.id as keyof OnboardingData] === null
-                  ? 'border-yellow-500 bg-yellow-500/10'
-                  : 'border-gray-600 bg-gray-800/50 hover:border-blue-500/50'
-              }`}>
-                <div className="flex items-center space-x-3 mb-4 md:mb-6">
-                  <div className="w-8 h-8 md:w-10 md:h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <question.icon className="w-4 h-4 md:w-5 h-5 text-blue-400" />
-                  </div>
-                  <div className="flex-1">
-                    <h3 className="text-base md:text-lg font-semibold text-white leading-tight">{question.text}</h3>
-                    {data[question.id as keyof OnboardingData] === null && (
-                      <p className="text-sm text-yellow-400 mt-1">Please select an option</p>
-                    )}
-                  </div>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <Button
-                    onClick={() => updateData(question.id as keyof OnboardingData, true)}
-                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-fast ${
-                      data[question.id as keyof OnboardingData] === true
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-blue-500 shadow-xl'
-                        : 'bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 hover:border-blue-500/50'
+          <Card className="glass-effect border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95">
+            <CardHeader>
+              <CardTitle className="text-center">Choose Your Frameworks</CardTitle>
+              <CardDescription className="text-center">
+                Select the philosophical paths that resonate with you
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {availableFrameworks.map((framework) => (
+                  <motion.button
+                    key={framework.id}
+                    onClick={() => {
+                      const newFrameworks = data.selectedFrameworks.includes(framework.id)
+                        ? data.selectedFrameworks.filter(id => id !== framework.id)
+                        : [...data.selectedFrameworks, framework.id];
+                      setData({ ...data, selectedFrameworks: newFrameworks });
+                    }}
+                    className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
+                      data.selectedFrameworks.includes(framework.id)
+                        ? 'border-primary bg-primary/10 shadow-lg'
+                        : 'border-border bg-surface-2 hover:border-primary/50'
                     }`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    {question.trueLabel}
-                  </Button>
-                  <Button
-                    onClick={() => updateData(question.id as keyof OnboardingData, false)}
-                    className={`h-10 md:h-12 text-sm md:text-base font-medium transition-all duration-fast ${
-                      data[question.id as keyof OnboardingData] === false
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white border-blue-500 shadow-xl'
-                        : 'bg-gray-700 hover:bg-gray-600 text-white border border-gray-600 hover:border-blue-500/50'
-                    }`}
-                  >
-                    {question.falseLabel}
-                  </Button>
-                </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{framework.emoji}</span>
+                      <div>
+                        <h3 className="font-semibold text-text">{framework.name}</h3>
+                        <p className="text-sm text-muted">{framework.description}</p>
+                      </div>
+                      {data.selectedFrameworks.includes(framework.id) && (
+                        <CheckCircle className="w-5 h-5 text-primary ml-auto" />
+                      )}
+                    </div>
+                  </motion.button>
+                ))}
               </div>
-            ))}
-          </div>
+            </CardContent>
+          </Card>
         );
 
       case 2:
         return (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h3 className="text-xl font-semibold text-white mb-2">Choose Your Primary Framework</h3>
-              <p className="text-gray-300">Select the philosophical framework that resonates most with you</p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {frameworks.map((framework) => (
-                <div
-                  key={framework.id}
-                  onClick={() => toggleFramework(framework.id)}
-                  className={`cursor-pointer border border-gray-600 rounded-lg p-4 transition-all duration-fast hover:shadow-xl backdrop-blur-sm ${
-                    data.selectedFrameworks.includes(framework.id)
-                      ? 'border-blue-500 bg-blue-500/10 shadow-xl'
-                      : 'border-gray-600 bg-gray-800/50 hover:border-blue-500/50'
-                  }`}
-                >
-                  <div className="flex items-center space-x-3 mb-3">
-                    <div className={`w-10 h-10 rounded-lg bg-gradient-to-br ${framework.color} flex items-center justify-center`}>
-                      <framework.icon className="w-5 h-5 text-white" />
+          <Card className="glass-effect border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95">
+            <CardHeader>
+              <CardTitle className="text-center">Learning Preferences</CardTitle>
+              <CardDescription className="text-center">
+                Help us personalize your experience
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {questions.map((question) => (
+                <div key={question.id} className="space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center">
+                      <question.icon className="w-4 h-4 text-primary" />
                     </div>
-                    <div>
-                      <h4 className="font-semibold text-white">{framework.name}</h4>
-                      <p className="text-sm text-gray-300">{framework.description}</p>
-                    </div>
+                    <h3 className="font-semibold text-text">{question.text}</h3>
                   </div>
                   
-                  <div className="space-y-2">
-                    {framework.benefits.map((benefit, index) => (
-                      <div key={index} className="flex items-center space-x-2">
-                        <Check className="w-4 h-4 text-blue-400" />
-                        <span className="text-sm text-gray-300">{benefit}</span>
-                      </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {question.options.map((option) => (
+                      <motion.button
+                        key={option.value}
+                        onClick={() => setData({ ...data, [question.id]: option.value })}
+                        className={`p-4 rounded-lg border-2 transition-all duration-200 text-left ${
+                          data[question.id as keyof OnboardingData] === option.value
+                            ? 'border-primary bg-primary/10'
+                            : 'border-border bg-surface-2 hover:border-primary/50'
+                        }`}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        <div className="flex items-center gap-3">
+                          <option.icon className="w-5 h-5 text-primary" />
+                          <span className="text-text">{option.label}</span>
+                          {data[question.id as keyof OnboardingData] === option.value && (
+                            <CheckCircle className="w-4 h-4 text-primary ml-auto" />
+                          )}
+                        </div>
+                      </motion.button>
                     ))}
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         );
 
       case 3:
         return (
-          <div className="text-center space-y-6">
-            <div className="w-20 h-20 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto">
-              <Check className="w-10 h-10 text-blue-400" />
-            </div>
-            
-            <div>
-              <h3 className="text-2xl font-bold text-white mb-2">Ready to Begin Your Journey</h3>
-              <p className="text-gray-300 text-lg">
-                You've chosen the {data.selectedFrameworks[0]} framework. 
-                Let's get you started with your personalized experience.
-              </p>
-            </div>
-
-            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-600 backdrop-blur-sm">
-              <h4 className="font-semibold text-white mb-2">Your Setup Summary</h4>
-              <div className="text-sm text-gray-300 space-y-1">
-                <p><strong>Name:</strong> {data.name}</p>
-                <p><strong>Timezone:</strong> {data.timezone}</p>
-                <p><strong>Primary Framework:</strong> {frameworks.find(f => f.id === data.selectedFrameworks[0])?.name}</p>
-                {data.selectedFrameworks.length > 1 && (
-                  <p><strong>Secondary:</strong> {data.selectedFrameworks.slice(1).map(id => frameworks.find(f => f.id === id)?.name).join(', ')}</p>
-                )}
+          <Card className="glass-effect border-0 shadow-2xl bg-white/95 dark:bg-gray-900/95">
+            <CardHeader>
+              <CardTitle className="text-center">Ready to Begin</CardTitle>
+              <CardDescription className="text-center">
+                Let's review your preferences
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 p-3 bg-surface-2 rounded-lg">
+                  <User className="w-5 h-5 text-primary" />
+                  <div>
+                    <p className="font-medium text-text">Name</p>
+                    <p className="text-sm text-muted">{data.name}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-surface-2 rounded-lg">
+                  <Globe className="w-5 h-5 text-primary" />
+                  <div>
+                    <p className="font-medium text-text">Timezone</p>
+                    <p className="text-sm text-muted">{data.timezone}</p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center gap-3 p-3 bg-surface-2 rounded-lg">
+                  <Heart className="w-5 h-5 text-primary" />
+                  <div>
+                    <p className="font-medium text-text">Selected Frameworks</p>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {data.selectedFrameworks.map((frameworkId) => {
+                        const framework = availableFrameworks.find(f => f.id === frameworkId);
+                        return (
+                          <span key={frameworkId} className="px-2 py-1 bg-primary/10 text-primary rounded-full text-xs">
+                            {framework?.emoji} {framework?.name}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
+              
+              <div className="text-center">
+                <p className="text-sm text-muted mb-4">
+                  Your personalized journey begins now. We'll use these preferences to tailor your experience.
+                </p>
+                <Button
+                  onClick={handleComplete}
+                  disabled={isProcessing}
+                  className="px-8 py-3 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary/70 text-white font-semibold"
+                >
+                  {isProcessing ? 'Setting up...' : 'Complete Setup'}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         );
 
       default:
@@ -542,69 +509,106 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Welcome to Aristotle
-            </h1>
-            <p className="text-xl text-gray-300 max-w-2xl mx-auto">
-              Let's personalize your journey through ancient wisdom and modern practice
-            </p>
+    <div className="min-h-screen bg-bg flex items-center justify-center py-4 px-4">
+      <div className="w-full max-w-4xl mx-auto">
+        {/* Header with Close Button */}
+        <div className="relative text-center mb-8">
+          {/* Close Button */}
+          <button
+            onClick={() => window.location.href = '/'}
+            className="absolute top-0 right-0 p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+            title="Exit onboarding"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-primary to-primary/80 rounded-full mb-4 shadow-xl">
+            <Sparkles className="w-8 h-8 text-white" />
           </div>
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-3">
+            Welcome to Aristotle
+          </h1>
+          <p className="text-lg md:text-xl text-muted leading-relaxed max-w-2xl mx-auto px-4">
+            Let's personalize your journey toward wisdom and virtue
+          </p>
+        </div>
 
-          {/* Progress Bar */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-300">Step {currentStep + 1} of 4</span>
-              <span className="text-sm text-gray-300">{Math.round(((currentStep + 1) / 4) * 100)}%</span>
+        {/* Progress Steps */}
+        <div className="flex items-center justify-center mb-8 overflow-x-auto px-4">
+          {steps.map((step, index) => (
+            <div key={index} className="flex items-center flex-shrink-0">
+              <div className={`flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-full border-2 transition-all duration-200 ${
+                index <= currentStep 
+                  ? 'bg-primary border-primary text-white shadow-lg' 
+                  : 'border-border text-muted bg-surface'
+              }`}>
+                {index < currentStep ? (
+                  <CheckCircle className="w-4 h-4 md:w-6 md:h-6" />
+                ) : (
+                  <span className="text-xs md:text-sm font-semibold">{index + 1}</span>
+                )}
+              </div>
+              {index < steps.length - 1 && (
+                <div className={`w-12 md:w-20 h-0.5 mx-2 md:mx-3 transition-all duration-200 ${
+                  index < currentStep ? 'bg-primary' : 'bg-border'
+                }`} />
+              )}
             </div>
-            <div className="w-full bg-gray-700 rounded-full h-2">
-              <div 
-                className="bg-gradient-to-r from-blue-500 to-purple-600 h-2 rounded-full transition-all duration-slow"
-                style={{ width: `${((currentStep + 1) / 4) * 100}%` }}
-              />
-            </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Step Content */}
-          <div className="mb-8">
-            {renderStep()}
-          </div>
+        {/* Current Step Title */}
+        <div className="text-center mb-6 px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-text mb-2">
+            {steps[currentStep].title}
+          </h2>
+          <p className="text-base md:text-lg text-muted">
+            {steps[currentStep].description}
+          </p>
+        </div>
 
-          {/* Navigation */}
-          <div className="flex justify-between">
+        {/* Step Content */}
+        <div className="mx-4">
+          {renderStep()}
+        </div>
+
+        {/* Navigation */}
+        <div className="flex justify-between items-center px-4 mt-8">
+          <Button
+            onClick={prevStep}
+            disabled={currentStep === 0}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ChevronLeft className="w-4 h-4" />
+            Previous
+          </Button>
+          
+          <div className="text-sm text-muted">
+            Step {currentStep + 1} of {steps.length}
+          </div>
+          
+          {currentStep < steps.length - 1 ? (
             <Button
-              onClick={prevStep}
-              disabled={currentStep === 0}
-              variant="outline"
-              className="px-6 py-3 border-gray-600 text-gray-300 hover:bg-gray-800 hover:text-white"
+              onClick={nextStep}
+              disabled={!canProceed()}
+              className="flex items-center gap-2"
             >
-              Previous
+              Next
+              <ChevronRight className="w-4 h-4" />
             </Button>
-
-            {currentStep < 3 ? (
-              <Button
-                onClick={nextStep}
-                disabled={!canProceed()}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
-              >
-                Next
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            ) : (
-              <Button
-                onClick={handleComplete}
-                disabled={!canProceed() || isProcessing}
-                className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white"
-              >
-                {isProcessing ? 'Setting up...' : 'Complete Setup'}
-                <Check className="w-4 h-4 ml-2" />
-              </Button>
-            )}
-          </div>
+          ) : (
+            <Button
+              onClick={handleComplete}
+              disabled={!canProceed() || isProcessing}
+              className="flex items-center gap-2"
+            >
+              {isProcessing ? 'Setting up...' : 'Complete Setup'}
+              <CheckCircle className="w-4 h-4" />
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -54,7 +54,23 @@ export default function SettingsPage() {
           // Fallback to API if no localStorage data
           const loadFromAPI = async () => {
             try {
-              const response = await fetch('/api/prefs');
+              // Get auth token from cookie
+              const token = document.cookie
+                .split('; ')
+                .find(row => row.startsWith('auth-token='))
+                ?.split('=')[1];
+
+              if (!token) {
+                console.log('No auth token found, using default settings');
+                return;
+              }
+
+              const response = await fetch('/api/prefs', {
+                headers: {
+                  'Authorization': `Bearer ${token}`
+                }
+              });
+              
               if (response.ok) {
                 const data = await response.json();
                 const preferences = data.preferences || {};
@@ -110,10 +126,25 @@ export default function SettingsPage() {
     // Save to server
     try {
       setLoading(true);
+      
+      // Get auth token from cookie
+      const token = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('auth-token='))
+        ?.split('=')[1];
+
+      if (!token) {
+        console.log('No auth token found, saving to localStorage only');
+        setMessage('Settings saved locally!');
+        setTimeout(() => setMessage(''), 3000);
+        return;
+      }
+
       const response = await fetch('/api/prefs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({ 
           preferences: {
