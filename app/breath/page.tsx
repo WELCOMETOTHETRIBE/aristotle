@@ -153,7 +153,7 @@ export default function BreathPage() {
                       <div className="text-6xl mb-4">🧘</div>
                       <h3 className="text-xl font-semibold mb-2">Classic Timer</h3>
                       <p className="text-muted-foreground">
-                        Simple timer interface coming soon...
+                        Classic timer interface will be available soon.
                       </p>
                     </div>
                   )}
