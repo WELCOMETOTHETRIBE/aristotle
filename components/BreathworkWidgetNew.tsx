@@ -250,7 +250,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   }, [currentPhase, isActive]);
 
-  // Audio cue system
+  // Audio cue system - ONLY play phase cues, NO counting
   const playAudioCue = async (phase: string) => {
     if (isMuted || !audioEnabled) return;
     
@@ -283,36 +283,8 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   };
 
-  // Play counting audio for longer phases
-  const playCountingAudio = async (count: number) => {
-    if (isMuted || !audioEnabled || count < 1 || count > 15) return;
-    
-    try {
-      const audioUrl = `/audio/breathwork/count-${count}.mp3`;
-      if (audioRef.current) {
-        audioRef.current.src = audioUrl;
-        audioRef.current.volume = 0.5;
-        await audioRef.current.play();
-      }
-    } catch (error) {
-      console.log('Counting audio not available');
-    }
-  };
-
-  // Play counting audio for longer phases
-  useEffect(() => {
-    if (isActive && timeLeft > 3 && timeLeft <= 15) {
-      // Play counting audio for phases longer than 3 seconds
-      const timer = setTimeout(() => {
-        playCountingAudio(timeLeft);
-      }, 1000); // Wait 1 second before playing the count
-      
-      return () => clearTimeout(timer);
-    }
-  }, [timeLeft, isActive, isMuted, audioEnabled]);
-
-  // REMOVED: Pattern change audio that was playing on load
-  // This was causing the "begin your breathwork session" audio to play when the widget loaded
+  // REMOVED: All counting audio functionality
+  // No more playCountingAudio or counting audio effects
 
   // Preparation phase countdown
   useEffect(() => {
@@ -443,7 +415,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
         
         // Show XP gained notification
         if (result.xpGained) {
-          console.log(`�� +${result.xpGained} Temperance XP gained!`);
+          console.log(`🎯 +${result.xpGained} Temperance XP gained!`);
           // You could add a toast notification here
         }
         
@@ -528,7 +500,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Calculate the current phase progress for the countdown ring
+  // Calculate the current phase progress for the countdown ring - FIXED to complete the circle
   const getCurrentPhaseProgress = () => {
     const phaseDuration = pattern.pattern[currentPhase];
     const phaseTimeLeft = timeLeft;
@@ -740,7 +712,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
             />
           </svg>
 
-          {/* Phase countdown ring */}
+          {/* Phase countdown ring - FIXED to complete the circle */}
           <svg width="192" height="192" viewBox="0 0 192 192" className="absolute inset-0">
             <defs>
               <linearGradient id="phaseProgress" x1="0%" y1="0%" x2="100%" y2="0%">
