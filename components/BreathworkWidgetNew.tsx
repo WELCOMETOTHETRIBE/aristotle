@@ -250,7 +250,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     }
   }, [currentPhase, isActive]);
 
-  // Audio cue system - ONLY play phase cues, NO counting
+  // SIMPLE audio cue system - ONLY play phase cues, NO counting, NO API calls
   const playAudioCue = async (phase: string) => {
     if (isMuted || !audioEnabled) return;
     
@@ -282,9 +282,6 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
       console.log('Audio cue not available');
     }
   };
-
-  // REMOVED: All counting audio functionality
-  // No more playCountingAudio or counting audio effects
 
   // Preparation phase countdown
   useEffect(() => {
@@ -500,7 +497,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  // Calculate the current phase progress for the countdown ring - FIXED to complete the circle
+  // FIXED: Calculate the current phase progress for the countdown ring - proper clockwise completion
   const getCurrentPhaseProgress = () => {
     const phaseDuration = pattern.pattern[currentPhase];
     const phaseTimeLeft = timeLeft;
@@ -712,7 +709,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
             />
           </svg>
 
-          {/* Phase countdown ring - FIXED to complete the circle */}
+          {/* Phase countdown ring - FIXED to complete clockwise */}
           <svg width="192" height="192" viewBox="0 0 192 192" className="absolute inset-0">
             <defs>
               <linearGradient id="phaseProgress" x1="0%" y1="0%" x2="100%" y2="0%">
