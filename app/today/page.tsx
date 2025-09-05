@@ -37,13 +37,9 @@ export default function TodayPage() {
   const [submittedIntentions, setSubmittedIntentions] = useState<{[key: string]: boolean}>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [dismissedMoodModal, setDismissedMoodModal] = useState<{[key: string]: boolean}>({});
-  const [showTasksModal, setShowTasksModal] = useState(false);
-  const [pendingTaskCount, setPendingTaskCount] = useState(0);
   
   // Initialize empty arrays for authenticated users
   const [userWidgets, setUserWidgets] = useState<string[]>([]);
-
-  // No longer auto-loading demo data for unauthenticated users
 
   // Load user's added widgets and preferences
   useEffect(() => {
@@ -77,26 +73,6 @@ export default function TodayPage() {
             console.error('Error parsing user preferences:', error);
           }
         }
-
-        // Fetch pending task count
-        const fetchTaskCount = async () => {
-          try {
-            const response = await fetch('/api/tasks');
-            if (response.ok) {
-              const data = await response.json();
-              if (Array.isArray(data)) {
-                const pending = data.filter((task: any) => !task.completedAt).length;
-                setPendingTaskCount(pending);
-              } else {
-                setPendingTaskCount(data.pendingCount || 0);
-              }
-            }
-          } catch (error) {
-            console.error('Error fetching task count:', error);
-          }
-        };
-
-        fetchTaskCount();
       }
     } else {
       // Unauthenticated users start with empty widgets
@@ -520,7 +496,9 @@ export default function TodayPage() {
                     {isMorning ? 'Good morning' : isEvening ? 'Good evening' : 'Good afternoon'}
                     {userPreferences?.displayName && `, ${userPreferences.displayName.split(' ')[0]}`}
                   </h1>
-                  <p className="text-sm text-muted font-medium">Ready to flourish today?</p>
+                  <p className="text-sm text-muted font-medium">
+                    {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+                  </p>
                 </div>
               </div>
               
@@ -551,21 +529,7 @@ export default function TodayPage() {
             </div>
             
             {/* Stats Row */}
-            <div className="grid grid-cols-3 gap-3 mb-4">
-              <button 
-                onClick={() => setShowTasksModal(true)}
-                className="relative bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center hover:bg-surface/80 transition-colors cursor-pointer"
-              >
-                {/* Task Count Blip - Always show for new users, enhanced styling */}
-                <div className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold animate-pulse shadow-lg border-2 border-white">
-                  {pendingTaskCount}
-                </div>
-                
-                <div className="text-xl font-bold text-primary mb-1">
-                  {pendingTaskCount}
-                </div>
-                <div className="text-xs text-muted">Tasks</div>
-              </button>
+            <div className="grid grid-cols-2 gap-3 mb-4">
               <div className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-3 text-center">
                 <div className="text-xl font-bold text-courage mb-1">
                   0
@@ -615,10 +579,7 @@ export default function TodayPage() {
         {/* Dynamic Daily Intention */}
         {!submittedIntentions[currentTimePeriod] && !dismissedMoodModal[currentTimePeriod] ? (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-muted">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              </div>
+            <div className="flex items-center justify-end">
               <button
                 onClick={handleDismissMoodModal}
                 className="text-xs text-muted hover:text-text transition-colors duration-200 px-2 py-1 rounded hover:bg-surface-2"
@@ -716,12 +677,6 @@ export default function TodayPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-muted">
-                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
-              </div>
-            </div>
-            
             <div className="bg-gradient-to-br from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-4">
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center">
@@ -840,64 +795,8 @@ export default function TodayPage() {
         </div>
       </main>
 
-      {/* Tasks Modal */}
-      {showTasksModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-surface border border-border rounded-lg p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-text">Your Tasks</h3>
-              <button
-                onClick={() => setShowTasksModal(false)}
-                className="p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <div className="space-y-3">
-              {/* Onboarding Task - Always show first for new users */}
-              <div className="flex items-center gap-3 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-                <div className="w-5 h-5 bg-primary/20 rounded-full flex items-center justify-center">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
-                </div>
-                <div className="flex-1">
-                  <h4 className="font-medium text-sm text-primary">Complete Onboarding</h4>
-                  <p className="text-xs text-primary/70 mt-1">
-                    Set up your profile, choose your framework, and get started with Aristotle
-                  </p>
-                  <div className="flex gap-2 mt-2">
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                      onboarding
-                    </span>
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                      H
-                    </span>
-                  </div>
-                </div>
-                <button
-                  onClick={() => {
-                    setShowTasksModal(false);
-                    window.location.href = '/onboarding';
-                  }}
-                  className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary/90 transition-colors"
-                >
-                  Start
-                </button>
-              </div>
-              
-              {/* Other tasks would be loaded here */}
-              <p className="text-sm text-muted text-center py-4">
-                Complete your onboarding to unlock more features and tasks!
-              </p>
-            </div>
-          </div>
-        </div>
-      )}
-
       <GuideFAB />
       <TabBar />
     </div>
   );
-} 
+}

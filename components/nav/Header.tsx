@@ -26,59 +26,8 @@ const virtueLabels = {
 
 export function Header({ focusVirtue }: HeaderProps) {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-  const [pendingTaskCount, setPendingTaskCount] = useState(0);
   const profileMenuRef = useRef<HTMLDivElement>(null);
   const { user, signOut } = useAuth();
-
-  useEffect(() => {
-    // Fetch pending task count
-    const fetchTaskCount = async () => {
-      try {
-        const response = await fetch('/api/tasks');
-        if (response.ok) {
-          const data = await response.json();
-          // Handle both old format (array) and new format (object with pendingCount)
-          if (Array.isArray(data)) {
-            const pending = data.filter((task: any) => !task.completedAt).length;
-            setPendingTaskCount(pending);
-          } else {
-            setPendingTaskCount(data.pendingCount || 0);
-          }
-        }
-      } catch (error) {
-        console.error('Failed to fetch task count:', error);
-      }
-    };
-
-    // Initial fetch
-    fetchTaskCount();
-
-    // Set up real-time updates every 5 seconds
-    const interval = setInterval(fetchTaskCount, 5000);
-
-    // Listen for storage events (when localStorage changes in other tabs)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'userPreferences' || e.key === 'activeWidgets') {
-        // Refresh task count when user preferences change
-        fetchTaskCount();
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    // Listen for custom events (when tasks are completed in the same tab)
-    const handleTaskCompleted = () => {
-      fetchTaskCount();
-    };
-
-    window.addEventListener('taskCompleted', handleTaskCompleted);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('taskCompleted', handleTaskCompleted);
-    };
-  }, []);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -132,19 +81,6 @@ export function Header({ focusVirtue }: HeaderProps) {
             {virtueLabels[focusVirtue]}
           </div>
         )}
-
-        {/* Notifications - Single notification icon with task count */}
-        <button 
-          onClick={() => window.location.href = '/today'}
-          className="relative p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
-        >
-          <Bell className="w-5 h-5" />
-          {pendingTaskCount > 0 && (
-            <div className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-medium animate-pulse shadow-lg">
-              {pendingTaskCount > 9 ? '9+' : pendingTaskCount}
-            </div>
-          )}
-        </button>
 
         {/* Profile Menu */}
         <div className="relative" ref={profileMenuRef}>
