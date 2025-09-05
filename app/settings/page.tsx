@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { GuideFAB } from '@/components/ai/GuideFAB';
-import { User, Moon, Sun, Monitor, Bell, Shield, Download, Trash2 } from 'lucide-react';
+import { FrameworkSelector } from '@/components/FrameworkSelector';
+import { User, Moon, Sun, Monitor, Bell, Shield, Download, Trash2, Settings as SettingsIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface SettingSection {
@@ -17,7 +18,7 @@ interface SettingItem {
   id: string;
   label: string;
   description?: string;
-  type: 'toggle' | 'select' | 'button' | 'text';
+  type: 'toggle' | 'select' | 'button' | 'text' | 'framework-selector';
   value?: any;
   options?: string[];
   action?: () => void;
@@ -33,6 +34,7 @@ export default function SettingsPage() {
     dailyReminders: true,
     weeklyInsights: true,
     communityUpdates: false,
+    selectedFrameworks: [],
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
@@ -55,9 +57,30 @@ export default function SettingsPage() {
               const response = await fetch('/api/prefs');
               if (response.ok) {
                 const data = await response.json();
-                setSettingsState(data.preferences);
+                const preferences = data.preferences || {};
+                
+                // Handle frameworks - convert from string to array if needed
+                let selectedFrameworks = [];
+                if (preferences.frameworks) {
+                  try {
+                    selectedFrameworks = JSON.parse(preferences.frameworks);
+                  } catch {
+                    selectedFrameworks = [preferences.frameworks];
+                  }
+                } else if (preferences.framework) {
+                  selectedFrameworks = [preferences.framework];
+                }
+                
+                setSettingsState({
+                  ...preferences,
+                  selectedFrameworks
+                });
+                
                 // Save to localStorage for future use
-                localStorage.setItem('userPreferences', JSON.stringify(data.preferences));
+                localStorage.setItem('userPreferences', JSON.stringify({
+                  ...preferences,
+                  selectedFrameworks
+                }));
               }
             } catch (error) {
               console.error('Error loading preferences:', error);
@@ -92,7 +115,13 @@ export default function SettingsPage() {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ preferences: newSettings }),
+        body: JSON.stringify({ 
+          preferences: {
+            ...newSettings,
+            frameworks: JSON.stringify(newSettings.selectedFrameworks),
+            framework: newSettings.selectedFrameworks[0] || null // Primary framework
+          }
+        }),
       });
       
       if (response.ok) {
@@ -189,6 +218,19 @@ export default function SettingsPage() {
       ],
     },
     {
+      title: 'Frameworks',
+      icon: SettingsIcon,
+      items: [
+        {
+          id: 'selectedFrameworks',
+          label: 'Preferred Frameworks',
+          description: 'Select the philosophical frameworks that resonate with you',
+          type: 'framework-selector',
+          value: settingsState.selectedFrameworks || [],
+        },
+      ],
+    },
+    {
       title: 'Appearance',
       icon: Monitor,
       items: [
@@ -232,7 +274,7 @@ export default function SettingsPage() {
           label: 'View Selected Frameworks',
           description: 'See which frameworks are currently active',
           type: 'button',
-          action: () => console.log('View frameworks'),
+          action: () => window.location.href = '/frameworks',
         },
       ],
     },
@@ -345,6 +387,15 @@ export default function SettingsPage() {
           />
         );
 
+      case 'framework-selector':
+        return (
+          <FrameworkSelector
+            selectedFrameworks={settingsState[item.id] || []}
+            onFrameworksChange={(frameworks) => handleSettingChange(item.id, frameworks)}
+            className="w-full"
+          />
+        );
+
       default:
         return null;
     }
@@ -385,7 +436,7 @@ export default function SettingsPage() {
                 
                 <div className="p-4 space-y-4">
                   {section.items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between">
+                    <div key={item.id} className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="text-sm font-medium text-text">{item.label}</div>
                         {item.description && (
@@ -445,4 +496,4 @@ export default function SettingsPage() {
       <TabBar />
     </div>
   );
-} 
+}

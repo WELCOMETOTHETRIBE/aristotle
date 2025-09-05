@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Play, Pause, RotateCcw, Settings, Heart, Timer, Target, Sparkles, ChevronDown, ChevronUp, Volume2, VolumeX } from 'lucide-react';
+import { EnhancedBreathworkWidget } from '@/components/EnhancedBreathworkWidget';
 
 interface BreathPattern {
   name: string;
@@ -73,486 +74,8 @@ const breathPatterns: BreathPattern[] = [
 
 export default function BreathPage() {
   const [selectedPattern, setSelectedPattern] = useState<BreathPattern>(breathPatterns[0]);
-  const [isActive, setIsActive] = useState(false);
-  const [currentPhase, setCurrentPhase] = useState<'inhale' | 'hold' | 'exhale' | 'hold2'>('inhale');
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [currentCycle, setCurrentCycle] = useState(1);
-  const [totalCycles, setTotalCycles] = useState(selectedPattern.pattern.cycles);
-  const [sessionStartTime, setSessionStartTime] = useState<Date | null>(null);
-  const [sessionDuration, setSessionDuration] = useState(0);
-  const [breathScale, setBreathScale] = useState(1);
-  const [audioEnabled, setAudioEnabled] = useState(false); // Start with audio disabled
-  const [audioInitialized, setAudioInitialized] = useState(false);
   const [expandedPattern, setExpandedPattern] = useState<string | null>(null);
-  const [audioMapping, setAudioMapping] = useState<any>(null);
-  const [isLoadingAudio, setIsLoadingAudio] = useState(false);
-  const [databaseAvailable, setDatabaseAvailable] = useState(true);
-  
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const sessionIntervalRef = useRef<NodeJS.Timeout | null>(null);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  // Load audio mapping on component mount
-  useEffect(() => {
-    const loadAudioMapping = async () => {
-      try {
-        console.log('Loading audio mapping...');
-        const response = await fetch('/audio/breathwork/audio-mapping.json');
-        console.log('Audio mapping response status:', response.status);
-        
-        if (response.ok) {
-          const mapping = await response.json();
-          setAudioMapping(mapping);
-          console.log('Audio mapping loaded successfully:', mapping);
-        } else {
-          console.warn('⚠️ Audio mapping not found, attempting to generate audio files...');
-          // Try to generate audio files if mapping is missing
-          try {
-            const generateResponse = await fetch('/api/generate-breathwork-audio', {
-              method: 'POST'
-            });
-            if (generateResponse.ok) {
-              const newMapping = await generateResponse.json();
-              setAudioMapping(newMapping);
-              console.log('✅ Audio files generated successfully');
-            } else {
-              console.warn('⚠️ Could not generate audio files, audio will be disabled');
-              setAudioMapping(null);
-            }
-          } catch (generateError) {
-            console.warn('⚠️ Audio generation failed, audio will be disabled');
-            setAudioMapping(null);
-          }
-        }
-      } catch (error) {
-        console.error('Error loading audio mapping:', error);
-        setAudioMapping(null);
-      }
-    };
-    
-    loadAudioMapping();
-  }, []);
-
-  // Initialize audio context on user interaction
-  const initializeAudio = () => {
-    if (!audioInitialized && audioRef.current) {
-      // Create a silent audio context to enable audio playback
-      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
-      audioContext.resume().then(() => {
-        console.log('Audio context initialized');
-        setAudioInitialized(true);
-        setAudioEnabled(true);
-      });
-    }
-  };
-
-  // Play pre-generated audio guidance for current phase
-  const playAudioGuidance = (phase: string) => {
-    if (!audioEnabled || !audioMapping || isLoadingAudio) return;
-    
-    setIsLoadingAudio(true);
-    
-    let audioUrl = '';
-    switch (phase) {
-      case 'inhale':
-        audioUrl = audioMapping.instructions.inhale;
-        break;
-      case 'hold':
-        audioUrl = audioMapping.instructions.hold;
-        break;
-      case 'exhale':
-        audioUrl = audioMapping.instructions.exhale;
-        break;
-      case 'hold2':
-        audioUrl = audioMapping.instructions.holdEmpty;
-        break;
-    }
-
-    if (audioUrl && audioRef.current) {
-      console.log('Playing audio guidance:', phase, audioUrl);
-      audioRef.current.src = audioUrl;
-      audioRef.current.volume = 0.7; // Set volume to 70%
-      
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            console.log('Audio guidance played successfully');
-            setIsLoadingAudio(false);
-          })
-          .catch((error) => {
-            console.error('Error playing audio guidance:', error);
-            // Try to enable audio context if it's suspended
-            if (audioRef.current) {
-              audioRef.current.muted = false;
-              audioRef.current.play().catch(console.error);
-            }
-            setIsLoadingAudio(false);
-          });
-      }
-    } else {
-      console.log('No audio URL found for phase:', phase);
-      setIsLoadingAudio(false);
-    }
-  };
-
-  // Play pre-generated counting audio
-  const playCountingAudio = (count: number) => {
-    if (!audioEnabled || !audioMapping || isLoadingAudio) return;
-    
-    const audioUrl = audioMapping.counting[count.toString()];
-    if (audioUrl && audioRef.current) {
-      console.log('Playing counting audio:', count, audioUrl);
-      audioRef.current.src = audioUrl;
-      audioRef.current.volume = 0.5; // Lower volume for counting
-      
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error('Error playing counting audio:', error);
-          // Try to enable audio context if it's suspended
-          if (audioRef.current) {
-            audioRef.current.muted = false;
-            audioRef.current.play().catch(console.error);
-          }
-        });
-      }
-    }
-  };
-
-  // Play session start audio
-  const playSessionStartAudio = () => {
-    if (!audioEnabled || !audioMapping) return;
-    
-    const audioUrl = audioMapping.session.start;
-    if (audioUrl && audioRef.current) {
-      console.log('Playing session start audio:', audioUrl);
-      audioRef.current.src = audioUrl;
-      audioRef.current.volume = 0.7;
-      
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error('Error playing session start audio:', error);
-          if (audioRef.current) {
-            audioRef.current.muted = false;
-            audioRef.current.play().catch(console.error);
-          }
-        });
-      }
-    }
-  };
-
-  // Play session complete audio
-  const playSessionCompleteAudio = () => {
-    if (!audioEnabled || !audioMapping) return;
-    
-    const audioUrl = audioMapping.session.complete;
-    if (audioUrl && audioRef.current) {
-      console.log('Playing session complete audio:', audioUrl);
-      audioRef.current.src = audioUrl;
-      audioRef.current.volume = 0.7;
-      
-      const playPromise = audioRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => {
-          console.error('Error playing session complete audio:', error);
-          if (audioRef.current) {
-            audioRef.current.muted = false;
-            audioRef.current.play().catch(console.error);
-          }
-        });
-      }
-    }
-  };
-
-  useEffect(() => {
-    if (isActive) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          if (prev <= 1) {
-            // Move to next phase
-            const nextPhase = getNextPhase(currentPhase);
-            setCurrentPhase(nextPhase);
-            
-            if (nextPhase === 'inhale' && currentPhase === 'hold2') {
-              // Completed a cycle
-              if (currentCycle >= totalCycles) {
-                // Session complete
-                handleSessionComplete();
-                return 0;
-              } else {
-                setCurrentCycle(prev => prev + 1);
-              }
-            }
-            
-            const newDuration = getPhaseDuration(nextPhase);
-            
-            // Play audio guidance for new phase with slight delay for smooth transition
-            if (audioEnabled) {
-              setTimeout(() => {
-                playAudioGuidance(nextPhase);
-              }, 100); // Small delay to ensure smooth phase transition
-            }
-            
-            return newDuration;
-          }
-          
-          // Play counting audio for the last 3 seconds of each phase
-          if (audioEnabled && prev <= 3 && prev > 1) {
-            // Add small delay to prevent audio overlap
-            setTimeout(() => {
-              playCountingAudio(prev);
-            }, 50);
-          }
-          
-          return prev - 1;
-        });
-      }, 1000);
-
-      // Track session duration
-      sessionIntervalRef.current = setInterval(() => {
-        setSessionDuration(prev => prev + 1);
-      }, 1000);
-    } else {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-        intervalRef.current = null;
-      }
-      if (sessionIntervalRef.current) {
-        clearInterval(sessionIntervalRef.current);
-        sessionIntervalRef.current = null;
-      }
-    }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      if (sessionIntervalRef.current) clearInterval(sessionIntervalRef.current);
-    };
-  }, [isActive, currentPhase, currentCycle, totalCycles, audioEnabled]);
-
-  // Animate breath circle with smooth transitions
-  useEffect(() => {
-    if (isActive) {
-      let scale = 1;
-      let opacity = 1;
-      
-      switch (currentPhase) {
-        case 'inhale':
-          scale = 1.3;
-          opacity = 1;
-          break;
-        case 'hold':
-          scale = 1.1;
-          opacity = 0.9;
-          break;
-        case 'exhale':
-          scale = 0.7;
-          opacity = 0.8;
-          break;
-        case 'hold2':
-          scale = 0.9;
-          opacity = 0.7;
-          break;
-        default:
-          scale = 1;
-          opacity = 1;
-      }
-      
-      setBreathScale(scale);
-    } else {
-      setBreathScale(1);
-    }
-  }, [currentPhase, isActive]);
-
-  const getNextPhase = (phase: string): 'inhale' | 'hold' | 'exhale' | 'hold2' => {
-    switch (phase) {
-      case 'inhale': return 'hold';
-      case 'hold': return 'exhale';
-      case 'exhale': return selectedPattern.pattern.hold2 > 0 ? 'hold2' : 'inhale';
-      case 'hold2': return 'inhale';
-      default: return 'inhale';
-    }
-  };
-
-  const getPhaseDuration = (phase: string): number => {
-    switch (phase) {
-      case 'inhale': return selectedPattern.pattern.inhale;
-      case 'hold': return selectedPattern.pattern.hold;
-      case 'exhale': return selectedPattern.pattern.exhale;
-      case 'hold2': return selectedPattern.pattern.hold2;
-      default: return 0;
-    }
-  };
-
-  const getPhaseLabel = (phase: string): string => {
-    switch (phase) {
-      case 'inhale': return 'Inhale';
-      case 'hold': return 'Hold';
-      case 'exhale': return 'Exhale';
-      case 'hold2': return 'Hold';
-      default: return '';
-    }
-  };
-
-  const getPhaseBorderColor = (phase: string): string => {
-    switch (phase) {
-      case 'inhale': return '#3b82f6'; // blue-500
-      case 'hold': return '#8b5cf6'; // purple-500
-      case 'exhale': return '#10b981'; // emerald-500
-      case 'hold2': return '#f59e0b'; // amber-500
-      default: return '#e5e7eb'; // gray-200
-    }
-  };
-
-  const getPhaseGlowColor = (phase: string): string => {
-    switch (phase) {
-      case 'inhale': return 'rgba(59, 130, 246, 0.5)'; // blue-500 with opacity
-      case 'hold': return 'rgba(139, 92, 246, 0.5)'; // purple-500 with opacity
-      case 'exhale': return 'rgba(16, 185, 129, 0.5)'; // emerald-500 with opacity
-      case 'hold2': return 'rgba(245, 158, 11, 0.5)'; // amber-500 with opacity
-      default: return 'rgba(59, 130, 246, 0.3)'; // default blue with opacity
-    }
-  };
-
-  const getPhaseProgressColor = (phase: string): string => {
-    switch (phase) {
-      case 'inhale': return '#3b82f6'; // blue-500
-      case 'hold': return '#8b5cf6'; // purple-500
-      case 'exhale': return '#10b981'; // emerald-500
-      case 'hold2': return '#f59e0b'; // amber-500
-      default: return '#3b82f6'; // blue-500
-    }
-  };
-
-  const getPhaseColor = (phase: string): string => {
-    switch (phase) {
-      case 'inhale': return 'text-blue-600 bg-blue-100 border-blue-200';
-      case 'hold': return 'text-purple-600 bg-purple-100 border-purple-200';
-      case 'exhale': return 'text-green-600 bg-green-100 border-green-200';
-      case 'hold2': return 'text-orange-600 bg-orange-100 border-orange-200';
-      default: return 'text-gray-600 bg-gray-100 border-gray-200';
-    }
-  };
-
-  const handleStart = async () => {
-    // Initialize audio on first start
-    if (!audioInitialized) {
-      initializeAudio();
-    }
-    
-    setIsActive(true);
-    setCurrentPhase('inhale');
-    setTimeLeft(selectedPattern.pattern.inhale);
-    setCurrentCycle(1);
-    setSessionStartTime(new Date());
-    setSessionDuration(0);
-
-    // Play session start audio
-    if (audioEnabled) {
-      playSessionStartAudio();
-    }
-
-    // Log breathwork session start (optional - don't block session if it fails)
-    if (databaseAvailable) {
-      try {
-        await fetch('/api/skills/invoke', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            skill: 'breathwork.start',
-            args: {
-              name: selectedPattern.name,
-              pattern: selectedPattern.pattern,
-              durationSec: selectedPattern.pattern.cycles * (
-                selectedPattern.pattern.inhale + 
-                selectedPattern.pattern.hold + 
-                selectedPattern.pattern.exhale + 
-                (selectedPattern.pattern.hold2 || 0)
-              ),
-            },
-          }),
-        });
-      } catch (error) {
-        // Don't block the breathwork session if logging fails
-        console.warn('Breathwork session logging failed (non-critical):', error);
-        setDatabaseAvailable(false);
-      }
-    }
-  };
-
-  const handlePause = () => {
-    setIsActive(false);
-  };
-
-  const handleReset = () => {
-    setIsActive(false);
-    setCurrentPhase('inhale');
-    setTimeLeft(selectedPattern.pattern.inhale);
-    setCurrentCycle(1);
-    setSessionStartTime(null);
-    setSessionDuration(0);
-  };
-
-  const handleSessionComplete = async () => {
-    setIsActive(false);
-    setCurrentPhase('inhale');
-    setTimeLeft(0);
-    
-    // Play session completion audio
-    if (audioEnabled) {
-      playSessionCompleteAudio();
-    }
-    
-    // Log session completion to API
-    try {
-      const response = await fetch('/api/breathwork/sessions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pattern: selectedPattern.name,
-          durationSec: sessionDuration,
-          startedAt: sessionStartTime,
-          completedAt: new Date()
-        })
-      });
-      
-      if (response.ok) {
-        const result = await response.json();
-        
-        // Show XP gained notification
-        if (result.xpGained) {
-          console.log(`🎯 +${result.xpGained} Temperance XP gained!`);
-          // You could add a toast notification here
-        }
-        
-        // Show journal entry created notification
-        if (result.journalEntry) {
-          console.log('📝 Session logged to journal');
-        }
-        
-        console.log('Breathwork session completed and logged:', {
-          pattern: selectedPattern.name,
-          duration: sessionDuration,
-          cycles: totalCycles,
-        });
-      }
-    } catch (error) {
-      console.warn('Session completion logging failed (non-critical):', error);
-    }
-  };
-
-  const formatTime = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const formatSessionDuration = (seconds: number): string => {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
-  };
+  const [showEnhancedWidget, setShowEnhancedWidget] = useState(true);
 
   const togglePatternExpansion = (patternName: string) => {
     setExpandedPattern(expandedPattern === patternName ? null : patternName);
@@ -560,9 +83,6 @@ export default function BreathPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-blue-900 dark:to-indigo-900">
-      {/* Hidden audio element for TTS playback */}
-      <audio ref={audioRef} preload="auto" />
-      
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -573,15 +93,22 @@ export default function BreathPage() {
               </div>
             </div>
             <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Breathwork
+              Enhanced Breathwork
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Harness the power of conscious breathing for clarity, calm, and connection
+              Perfectly synchronized visual and audio cues for an optimal breathwork experience
             </p>
+            
+            {/* Enhanced Features Notice */}
+            <div className="mt-4 p-3 bg-green-500/10 border border-green-500/20 rounded-lg inline-block">
+              <p className="text-sm text-green-600 font-medium">
+                ✨ Enhanced with perfect audio-visual synchronization, haptic feedback, and preloaded audio
+              </p>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-            {/* Main Timer Widget */}
+            {/* Enhanced Breathwork Widget */}
             <div className="xl:col-span-2">
               <Card className="glass-effect border-0 shadow-2xl bg-white/80 backdrop-blur-xl h-full">
                 <CardHeader className="text-center pb-6">
@@ -593,218 +120,41 @@ export default function BreathPage() {
                 </CardHeader>
                 
                 <CardContent className="text-center pb-8">
-                  {/* Audio Controls */}
-                  <div className="flex justify-center gap-2 mb-4">
+                  {/* Enhanced Widget Toggle */}
+                  <div className="flex justify-center gap-2 mb-6">
                     <Button
-                      variant="outline"
+                      variant={showEnhancedWidget ? "default" : "outline"}
                       size="sm"
-                      onClick={() => {
-                        if (!audioInitialized) {
-                          initializeAudio();
-                        } else {
-                          setAudioEnabled(!audioEnabled);
-                        }
-                      }}
-                      disabled={isLoadingAudio}
-                      className={`flex items-center gap-2 ${
-                        audioEnabled ? 'text-blue-600 border-blue-200' : 'text-gray-500 border-gray-200'
-                      }`}
+                      onClick={() => setShowEnhancedWidget(true)}
+                      className="flex items-center gap-2"
                     >
-                      {isLoadingAudio ? (
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600" />
-                      ) : audioEnabled ? (
-                        <Volume2 className="h-4 w-4" />
-                      ) : (
-                        <VolumeX className="h-4 w-4" />
-                      )}
-                      {isLoadingAudio 
-                        ? 'Loading...' 
-                        : !audioInitialized 
-                        ? 'Enable Audio' 
-                        : audioEnabled 
-                        ? 'Audio On' 
-                        : 'Audio Off'
-                      }
+                      <Sparkles className="h-4 w-4" />
+                      Enhanced Widget
                     </Button>
-                    
-                    {audioEnabled && audioMapping && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => playAudioGuidance('inhale')}
-                        className="text-green-600 border-green-200"
-                      >
-                        Test Audio
-                      </Button>
-                    )}
-                  </div>
-
-                  {/* Enhanced Breath Circle - Mobile Optimized */}
-                  <div className="flex justify-center mb-6 sm:mb-8">
-                    <div className="relative">
-                      {/* Main breath circle with enhanced visual effects */}
-                      <div 
-                        className={`w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56 rounded-full border-4 flex items-center justify-center transition-all duration-500 ease-out relative overflow-hidden`}
-                        style={{ 
-                          transform: `scale(${breathScale})`,
-                          borderColor: isActive ? getPhaseBorderColor(currentPhase) : '#e5e7eb',
-                          background: isActive ? `radial-gradient(circle, ${getPhaseGlowColor(currentPhase)}20, transparent 70%)` : 'transparent'
-                        }}
-                      >
-                        {/* Animated background rings - hidden on mobile for less clutter */}
-                        {isActive && (
-                          <>
-                            <div 
-                              className="absolute inset-0 rounded-full border-2 border-current opacity-20 animate-ping hidden sm:block"
-                              style={{ borderColor: getPhaseBorderColor(currentPhase) }}
-                            />
-                            <div 
-                              className="absolute inset-2 rounded-full border border-current opacity-30 animate-pulse hidden sm:block"
-                              style={{ borderColor: getPhaseBorderColor(currentPhase) }}
-                            />
-                          </>
-                        )}
-                        
-                        {/* Inner circle with enhanced styling */}
-                        <div 
-                          className={`w-24 h-24 sm:w-32 sm:h-32 md:w-40 md:h-40 lg:w-44 lg:h-44 rounded-full bg-gradient-to-r ${selectedPattern.color} flex items-center justify-center shadow-2xl transition-all duration-500 ease-out relative`}
-                          style={{
-                            boxShadow: isActive 
-                              ? `0 0 20px ${getPhaseGlowColor(currentPhase)}, 0 4px 16px rgba(0,0,0,0.1)` 
-                              : '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                          }}
-                        >
-                          {/* Time display */}
-                          <div className="text-center z-10">
-                            <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-white mb-1 transition-all duration-300">
-                              {formatTime(timeLeft)}
-                            </div>
-                            <div className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 ${getPhaseColor(currentPhase)} backdrop-blur-sm`}>
-                              <div className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${isActive ? 'animate-pulse' : ''}`} style={{ backgroundColor: getPhaseBorderColor(currentPhase) }} />
-                              <span className="hidden sm:inline">{getPhaseLabel(currentPhase)}</span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      {/* Enhanced progress ring */}
-                      <div className="absolute inset-0 w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 lg:w-56 lg:h-56">
-                        <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                          {/* Background circle */}
-                          <circle
-                            cx="50"
-                            cy="50"
-                            r="45"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            className="text-gray-100"
-                          />
-                          {/* Progress circle */}
-                          <circle
-                            cx="50"
-                            cy="50"
-                            r="45"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            className="transition-all duration-500 ease-out drop-shadow-sm"
-                            style={{
-                              stroke: getPhaseProgressColor(currentPhase),
-                              strokeDasharray: `${2 * Math.PI * 45}`,
-                              strokeDashoffset: `${2 * Math.PI * 45 * (1 - (getPhaseDuration(currentPhase) - timeLeft) / getPhaseDuration(currentPhase))}`
-                            }}
-                          />
-                        </svg>
-                      </div>
-                      
-                      {/* Enhanced phase indicators - Mobile optimized */}
-                      {isActive && (
-                        <div className="absolute -bottom-8 sm:-bottom-12 left-1/2 transform -translate-x-1/2 flex gap-2 sm:gap-3">
-                          {['inhale', 'hold', 'exhale', 'hold2'].map((phase, index) => (
-                            <div key={phase} className="flex flex-col items-center gap-0.5 sm:gap-1">
-                              <div
-                                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
-                                  currentPhase === phase 
-                                    ? 'bg-blue-500 scale-125 shadow-lg' 
-                                    : selectedPattern.pattern[phase as keyof typeof selectedPattern.pattern] > 0 
-                                      ? 'bg-gray-300' 
-                                      : 'bg-transparent'
-                                }`}
-                              />
-                              <span className={`text-xs font-medium transition-all duration-300 hidden sm:block ${
-                                currentPhase === phase ? 'text-blue-600' : 'text-gray-400'
-                              }`}>
-                                {phase === 'hold2' ? 'Hold' : phase.charAt(0).toUpperCase() + phase.slice(1)}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Cycle Progress */}
-                  <div className="mb-6">
-                    <div className="flex items-center justify-center gap-3 mb-3">
-                      <Target className="h-4 w-4 text-muted-foreground" />
-                      <span className="text-base font-medium">
-                        Cycle {currentCycle} of {totalCycles}
-                      </span>
-                    </div>
-                    <div className="w-full max-w-sm mx-auto bg-gray-200 rounded-full h-2">
-                      <div 
-                        className={`h-2 rounded-full bg-gradient-to-r ${selectedPattern.color} transition-all duration-500`}
-                        style={{ width: `${(currentCycle / totalCycles) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-
-                  {/* Controls */}
-                  <div className="flex justify-center gap-3 mb-6">
-                    {!isActive ? (
-                      <Button 
-                        onClick={handleStart} 
-                        size="lg" 
-                        className="px-8 py-4 text-base bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 shadow-lg"
-                        data-test="clickable"
-                        data-clickable-name="start-breathwork-session"
-                      >
-                        <Play className="h-5 w-5 mr-2" />
-                        Start Session
-                      </Button>
-                    ) : (
-                      <Button 
-                        onClick={handlePause} 
-                        variant="outline" 
-                        size="lg" 
-                        className="px-8 py-4 text-base border-2"
-                        data-test="clickable"
-                        data-clickable-name="pause-breathwork-session"
-                      >
-                        <Pause className="h-5 w-5 mr-2" />
-                        Pause
-                      </Button>
-                    )}
-                    
-                    <Button 
-                      onClick={handleReset} 
-                      variant="outline" 
-                      size="lg" 
-                      className="px-4 py-4"
-                      data-test="clickable"
-                      data-clickable-name="reset-breathwork-session"
+                    <Button
+                      variant={!showEnhancedWidget ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setShowEnhancedWidget(false)}
+                      className="flex items-center gap-2"
                     >
-                      <RotateCcw className="h-5 w-5" />
-                    </Button>
-                  </div>
-
-                  {/* Session Info */}
-                  {sessionStartTime && (
-                    <div className="flex items-center justify-center gap-2 text-muted-foreground text-sm">
                       <Timer className="h-4 w-4" />
-                      <span>Session duration: {formatSessionDuration(sessionDuration)}</span>
+                      Classic Timer
+                    </Button>
+                  </div>
+
+                  {/* Enhanced Breathwork Widget */}
+                  {showEnhancedWidget && (
+                    <EnhancedBreathworkWidget frameworkTone="stoic" />
+                  )}
+
+                  {/* Classic Timer (placeholder for now) */}
+                  {!showEnhancedWidget && (
+                    <div className="text-center py-12">
+                      <div className="text-6xl mb-4">🧘</div>
+                      <h3 className="text-xl font-semibold mb-2">Classic Timer</h3>
+                      <p className="text-muted-foreground">
+                        Simple timer interface coming soon...
+                      </p>
                     </div>
                   )}
                 </CardContent>
@@ -817,45 +167,45 @@ export default function BreathPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Sparkles className="h-5 w-5 text-primary" />
-                    Getting Started
+                    Enhanced Features
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4 text-sm">
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        1
+                      <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        ✨
                       </div>
                       <div>
-                        <h4 className="font-medium">Find a comfortable position</h4>
-                        <p className="text-muted-foreground">Sit or lie down in a relaxed posture</p>
+                        <h4 className="font-medium">Perfect Audio Sync</h4>
+                        <p className="text-muted-foreground">Audio cues play exactly when phases change</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        2
+                      <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        📳
                       </div>
                       <div>
-                        <h4 className="font-medium">Close your eyes</h4>
-                        <p className="text-muted-foreground">Focus inward and minimize distractions</p>
+                        <h4 className="font-medium">Haptic Feedback</h4>
+                        <p className="text-muted-foreground">Vibrations for phase transitions</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        3
+                      <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        🎵
                       </div>
                       <div>
-                        <h4 className="font-medium">Follow the guidance</h4>
-                        <p className="text-muted-foreground">Listen to audio cues and follow visual indicators</p>
+                        <h4 className="font-medium">Preloaded Audio</h4>
+                        <p className="text-muted-foreground">No delays, instant audio playback</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                        4
+                      <div className="w-6 h-6 bg-gradient-to-r from-green-500 to-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        ⏱️
                       </div>
                       <div>
-                        <h4 className="font-medium">Stay present</h4>
-                        <p className="text-muted-foreground">Gently return focus to your breath if your mind wanders</p>
+                        <h4 className="font-medium">Smart Countdown</h4>
+                        <p className="text-muted-foreground">Audio countdown at perfect intervals</p>
                       </div>
                     </div>
                   </div>
@@ -904,10 +254,6 @@ export default function BreathPage() {
                           className="p-3 cursor-pointer"
                           onClick={() => {
                             setSelectedPattern(pattern);
-                            setTotalCycles(pattern.pattern.cycles);
-                            if (!isActive) {
-                              setTimeLeft(pattern.pattern.inhale);
-                            }
                           }}
                         >
                           <div className="flex items-start gap-3">

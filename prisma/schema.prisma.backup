@@ -359,7 +359,6 @@ model UserPreference {
   userId    Int     @id
   user      User    @relation(fields: [userId], references: [id])
   framework String?
-  frameworks String?
   style     String?
   locale    String? @default("en")
   name      String?

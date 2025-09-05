@@ -22,12 +22,26 @@ export async function GET(request: NextRequest) {
       where: { userId: payload.userId },
     });
 
+    // Parse frameworks from JSON string if it exists
+    let selectedFrameworks = [];
+    if (userPrefs?.frameworks) {
+      try {
+        selectedFrameworks = JSON.parse(userPrefs.frameworks);
+      } catch {
+        selectedFrameworks = userPrefs.frameworks ? [userPrefs.frameworks] : [];
+      }
+    } else if (userPrefs?.framework) {
+      selectedFrameworks = [userPrefs.framework];
+    }
+
     // Return preferences with defaults
     const preferences = {
       displayName: (userPrefs as any)?.name || payload.displayName || 'User',
       email: payload.email || '',
       timezone: (userPrefs as any)?.timezone || 'UTC',
       framework: userPrefs?.framework || null,
+      frameworks: userPrefs?.frameworks || null,
+      selectedFrameworks: selectedFrameworks,
       theme: 'dark',
       focusVirtue: 'wisdom',
       dailyReminders: true,
@@ -107,7 +121,30 @@ export async function POST(request: NextRequest) {
 
     // Handle regular preferences
     if (preferences) {
-      // In a real app, you'd save other preferences to database
+      // Extract frameworks data
+      const frameworksData = preferences.frameworks;
+      const primaryFramework = preferences.framework;
+      
+      // Update user preferences in database
+      await (prisma.userPreference as any).upsert({
+        where: { userId: userId },
+        update: {
+          framework: primaryFramework || undefined,
+          frameworks: frameworksData || undefined,
+          name: preferences.displayName || undefined,
+          timezone: preferences.timezone || undefined,
+          updatedAt: new Date(),
+        },
+        create: {
+          userId: userId,
+          framework: primaryFramework || null,
+          frameworks: frameworksData || null,
+          name: preferences.displayName || null,
+          timezone: preferences.timezone || null,
+          updatedAt: new Date(),
+        },
+      });
+
       console.log('Saving preferences for user:', userId, preferences);
     }
 
@@ -120,4 +157,4 @@ export async function POST(request: NextRequest) {
     console.error('Error saving preferences:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
-} 
+}
