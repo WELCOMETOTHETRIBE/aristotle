@@ -160,15 +160,12 @@ export default function AuthPage() {
               <Image
                 src="/eudaimonia.png"
                 alt="EudAimonia Academy Logo"
-                width={80}
-                height={80}
-                className="w-20 h-20 object-contain"
+                width={400}
+                height={400}
+                className="w-96 h-96 object-contain"
                 priority
               />
             </div>
-            <h1 className="text-3xl font-bold text-text mb-2">
-              Welcome to EudAimonia Academy
-            </h1>
             <p className="text-muted">
               Your journey to ancient wisdom begins here
             </p>
