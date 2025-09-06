@@ -4,6 +4,73 @@ import { verifyToken } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
+// GET /api/academy/milestone - Get user's Academy milestones
+export async function GET(request: NextRequest) {
+  try {
+    const token = request.cookies.get('auth-token')?.value;
+    if (!token) {
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 }
+      );
+    }
+
+    const payload = await verifyToken(token);
+    if (!payload) {
+      return NextResponse.json(
+        { error: 'Invalid token' },
+        { status: 401 }
+      );
+    }
+
+    const userId = payload.userId;
+    const url = new URL(request.url);
+    const limit = parseInt(url.searchParams.get('limit') || '10');
+    const type = url.searchParams.get('type');
+
+    // Build where clause
+    const whereClause: any = { userId };
+    if (type) {
+      whereClause.type = type;
+    }
+
+    const milestones = await prisma.academyMilestone.findMany({
+      where: whereClause,
+      include: {
+        lesson: {
+          select: {
+            id: true,
+            title: true,
+            module: {
+              select: {
+                id: true,
+                name: true,
+                virtue: true
+              }
+            }
+          }
+        }
+      },
+      orderBy: { achievedAt: 'desc' },
+      take: limit
+    });
+
+    return NextResponse.json({ 
+      success: true,
+      milestones,
+      count: milestones.length
+    });
+
+  } catch (error) {
+    console.error('Error fetching Academy milestones:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch milestones' },
+      { status: 500 }
+    );
+  }
+}
+
+// POST /api/academy/milestone - Create or update Academy milestones
 export async function POST(request: NextRequest) {
   try {
     const token = request.cookies.get('auth-token')?.value;
@@ -23,80 +90,154 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { lessonId, lessonTitle, moduleName, milestones, userInputs, aiResponses } = body;
-
-    if (!lessonId || !lessonTitle || !moduleName) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-    }
+    const { 
+      lessonId, 
+      moduleId, 
+      type, 
+      title, 
+      description, 
+      virtueGrants,
+      metadata,
+      // Legacy support for existing milestone route
+      lessonTitle, 
+      moduleName, 
+      milestones, 
+      userInputs, 
+      aiResponses 
+    } = body;
 
     const userId = payload.userId;
 
-    // Create a comprehensive journal entry for the completed lesson
-    const journalContent = `# Academy Milestone: ${lessonTitle}
+    // Handle legacy milestone creation (for backward compatibility)
+    if (lessonTitle && moduleName) {
+      // Create a comprehensive journal entry for the completed lesson
+      const journalEntry = await prisma.journalEntry.create({
+        data: {
+          userId,
+          content: `Completed Academy lesson: ${lessonTitle}
 
-## Module: ${moduleName}
-**Lesson Completed:** ${new Date().toLocaleDateString('en-US', { 
-  weekday: 'long', 
-  year: 'numeric', 
-  month: 'long', 
-  day: 'numeric' 
-})}
+Module: ${moduleName}
 
-## What I Learned
-${userInputs.teaching || 'Reflection on teaching section'}
+Key Milestones:
+${milestones ? milestones.map((m: any) => `• ${m.title}: ${m.description}`).join('\n') : 'Lesson completed successfully'}
 
-## My Reflection
-${userInputs.question || 'Personal response to reflection question'}
+User Responses:
+${userInputs ? JSON.stringify(userInputs, null, 2) : 'No responses recorded'}
 
-## Practice Experience
-${userInputs.practice || 'Experience with practice exercise'}
+AI Interactions:
+${aiResponses ? JSON.stringify(aiResponses, null, 2) : 'No AI interactions recorded'}
 
-## Reading Insights
-${userInputs.reading || 'Analysis of recommended reading'}
+This lesson has contributed to my virtue development and understanding of Aristotelian principles.`,
+          mood: 'accomplished',
+          tags: ['academy', 'learning', 'virtue', moduleName.toLowerCase()],
+          metadata: {
+            lessonId,
+            lessonTitle,
+            moduleName,
+            milestones: milestones || [],
+            userInputs: userInputs || {},
+            aiResponses: aiResponses || {},
+            completedAt: new Date().toISOString()
+          }
+        }
+      });
 
-## Wisdom Application
-${userInputs.quote || 'Personal interpretation of wisdom quote'}
+      // Create Academy milestone
+      const academyMilestone = await prisma.academyMilestone.create({
+        data: {
+          userId,
+          lessonId,
+          moduleId,
+          type: 'lesson_completed',
+          title: `Completed: ${lessonTitle}`,
+          description: `Successfully completed the Academy lesson "${lessonTitle}" in the ${moduleName} module`,
+          virtueGrants: virtueGrants || { wisdom: 1 },
+          metadata: {
+            journalEntryId: journalEntry.id,
+            milestones: milestones || [],
+            userInputs: userInputs || {},
+            aiResponses: aiResponses || {}
+          }
+        }
+      });
 
-## AI Guidance Received
-${Object.entries(aiResponses).map(([section, response]) => 
-  response ? `**${section.charAt(0).toUpperCase() + section.slice(1)}:** ${response}` : ''
-).filter(Boolean).join('\n\n')}
+      return NextResponse.json({
+        success: true,
+        journalEntry,
+        milestone: academyMilestone,
+        message: 'Milestone logged successfully'
+      });
+    }
 
-## Next Steps
-Based on this lesson, I will continue to develop my understanding of ${moduleName.toLowerCase()} and apply these insights in my daily life.
+    // Handle new milestone creation
+    if (!type || !title || !description) {
+      return NextResponse.json({ 
+        error: 'Missing required fields: type, title, description' 
+      }, { status: 400 });
+    }
 
----
-*This milestone was automatically logged from Aristotle's Academy*`;
+    const validTypes = [
+      'lesson_completed', 
+      'module_completed', 
+      'capstone_completed', 
+      'virtue_mastered',
+      'assessment_passed',
+      'practice_completed',
+      'reflection_submitted',
+      'reading_analyzed',
+      'wisdom_interpreted'
+    ];
 
-    // Save to journal
-    const journalEntry = await prisma.journalEntry.create({
+    if (!validTypes.includes(type)) {
+      return NextResponse.json({ 
+        error: `Invalid milestone type. Must be one of: ${validTypes.join(', ')}` 
+      }, { status: 400 });
+    }
+
+    const milestone = await prisma.academyMilestone.create({
       data: {
         userId,
-        type: 'reflection',
-        content: journalContent,
-        prompt: `Academy milestone: ${lessonTitle}`,
-        category: 'academy_milestone',
-        date: new Date(),
-        aiInsights: `Congratulations on completing "${lessonTitle}"! This lesson has contributed to your growth in ${moduleName.toLowerCase()}. Consider how you can apply these insights in your daily life.`
+        lessonId: lessonId || null,
+        moduleId: moduleId || null,
+        type,
+        title,
+        description,
+        virtueGrants: virtueGrants || {},
+        metadata: metadata || {}
       }
     });
 
-    // Update user's virtue scores based on lesson completion
-    // This would integrate with your existing virtue tracking system
-    console.log(`Milestone logged for user ${userId}: ${lessonTitle}`);
+    // Update user's virtue totals if virtue grants are provided
+    if (virtueGrants && Object.keys(virtueGrants).length > 0) {
+      await prisma.virtueTotals.upsert({
+        where: { userId },
+        update: {
+          wisdom: { increment: virtueGrants.wisdom || 0 },
+          justice: { increment: virtueGrants.justice || 0 },
+          courage: { increment: virtueGrants.courage || 0 },
+          temperance: { increment: virtueGrants.temperance || 0 }
+        },
+        create: {
+          userId,
+          wisdom: virtueGrants.wisdom || 0,
+          justice: virtueGrants.justice || 0,
+          courage: virtueGrants.courage || 0,
+          temperance: virtueGrants.temperance || 0
+        }
+      });
+    }
 
     return NextResponse.json({
       success: true,
-      journalEntry,
-      message: 'Milestone logged successfully',
-      milestones
+      milestone,
+      message: 'Milestone created successfully'
     });
 
   } catch (error) {
-    console.error('Error logging milestone:', error);
+    console.error('Error creating Academy milestone:', error);
     return NextResponse.json(
-      { error: 'Failed to log milestone' },
+      { error: 'Failed to create milestone' },
       { status: 500 }
     );
   }
-} 
+}

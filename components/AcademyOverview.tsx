@@ -29,8 +29,8 @@ export default function AcademyOverview({ onStartJourney }: AcademyOverviewProps
       description: 'The virtue of knowledge, understanding, and sound judgment',
       icon: Brain,
       color: 'bg-primary/20 text-primary border-primary/30',
-      lessons: 12,
-      time: 180,
+      lessons: 4,
+      time: 120,
       focus: 'Intellectual development and practical wisdom'
     },
     {
@@ -40,8 +40,8 @@ export default function AcademyOverview({ onStartJourney }: AcademyOverviewProps
       description: 'The virtue of fairness, right relationships, and social harmony',
       icon: Scale,
       color: 'bg-justice/20 text-justice border-justice/30',
-      lessons: 12,
-      time: 180,
+      lessons: 4,
+      time: 120,
       focus: 'Social responsibility and ethical relationships'
     },
     {
@@ -51,8 +51,8 @@ export default function AcademyOverview({ onStartJourney }: AcademyOverviewProps
       description: 'The virtue of facing challenges with strength and determination',
       icon: Shield,
       color: 'bg-courage/20 text-courage border-courage/30',
-      lessons: 12,
-      time: 180,
+      lessons: 4,
+      time: 120,
       focus: 'Moral and physical courage in daily life'
     },
     {
@@ -62,8 +62,8 @@ export default function AcademyOverview({ onStartJourney }: AcademyOverviewProps
       description: 'The virtue of self-control, moderation, and inner harmony',
       icon: Leaf,
       color: 'bg-temperance/20 text-temperance border-temperance/30',
-      lessons: 12,
-      time: 180,
+      lessons: 4,
+      time: 120,
       focus: 'Balance and self-mastery in all things'
     }
   ];

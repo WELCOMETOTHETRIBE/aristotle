@@ -22,9 +22,22 @@ async function verifyTokenInMiddleware(token: string) {
 }
 
 export async function middleware(request: NextRequest) {
-  console.log('🚨 MIDDLEWARE CALLED for path:', request.nextUrl.pathname);
-  
   const { pathname } = request.nextUrl;
+  
+  // Skip middleware for static assets and API routes
+  if (
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/api/') ||
+    pathname.startsWith('/favicon.ico') ||
+    pathname.startsWith('/images/') ||
+    pathname.startsWith('/audio/') ||
+    pathname.includes('.')
+  ) {
+    return NextResponse.next();
+  }
+
+  console.log('🚨 MIDDLEWARE CALLED for path:', pathname);
+  
   const token = request.cookies.get('auth-token')?.value;
   
   console.log('🔍 Middleware debug:', {
@@ -35,11 +48,7 @@ export async function middleware(request: NextRequest) {
   });
 
   // Define protected and auth routes
-  const isProtectedRoute = pathname !== '/auth' && 
-                          !pathname.startsWith('/api/') && 
-                          !pathname.startsWith('/_next/') && 
-                          !pathname.startsWith('/favicon.ico');
-  
+  const isProtectedRoute = pathname !== '/auth';
   const isAuthRoute = pathname === '/auth';
 
   console.log('🔍 Route types:', { isProtectedRoute, isAuthRoute });
@@ -75,5 +84,17 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
-}; 
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - api (API routes)
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - images (image files)
+     * - audio (audio files)
+     * - files with extensions (static assets)
+     */
+    '/((?!api|_next/static|_next/image|favicon.ico|images|audio|.*\\.).*)',
+  ],
+};
