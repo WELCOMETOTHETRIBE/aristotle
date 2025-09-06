@@ -126,6 +126,7 @@ export async function POST(request: NextRequest) {
     // Community sharing functionality restored
     let thread = null;
     if (shareToCommunity) {
+      console.log('🌿 Creating community post for nature photo:', photo.id);
       const createdPost = await db.communityPost.create({
         data: {
           title: `Nature Log: ${photo.caption}`,
@@ -167,6 +168,9 @@ export async function POST(request: NextRequest) {
       }
 
       thread = createdPost;
+      console.log('✅ Community post created successfully:', createdPost.id);
+    } else {
+      console.log('ℹ️ Photo not shared to community (shareToCommunity = false)');
     }
 
     return NextResponse.json({

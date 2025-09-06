@@ -78,8 +78,11 @@ export default function CommunityPage() {
       const data = await response.json();
       console.log('🔍 Fetched threads:', data);
       
+      // The API returns { threads: [...], pagination: {...} }
+      const threadsData = data.threads || data;
+      
       // Transform the data to match our Thread interface
-      const transformedThreads = data.map((thread: any) => ({
+      const transformedThreads = threadsData.map((thread: any) => ({
         id: thread.id,
         title: thread.title,
         content: thread.content,
@@ -89,7 +92,7 @@ export default function CommunityPage() {
           isAI: thread.isAIQuestion || false,
           persona: thread.author?.isAI ? thread.author?.displayName : undefined,
         },
-        type: thread.isAIQuestion ? 'ai' : 'user',
+        type: thread.isAIQuestion ? 'ai' : (thread.type === 'nature_photo' ? 'nature_photo' : 'user'),
         category: thread.category || 'General',
         tags: thread.tags || [],
         replies: thread.replies?.length || 0,
@@ -252,7 +255,7 @@ export default function CommunityPage() {
   const filteredThreads = threads.filter(thread => {
     const matchesFilter = activeFilter === 'all' || 
       (activeFilter === 'ai' && thread.type === 'ai') ||
-      (activeFilter === 'user' && thread.type === 'user');
+      (activeFilter === 'user' && (thread.type === 'user' || thread.type === 'nature_photo'));
     
     const matchesCategory = selectedCategory === 'all' || thread.category === selectedCategory;
     
@@ -425,11 +428,27 @@ export default function CommunityPage() {
                           AI Philosopher
                         </span>
                       )}
+                      {thread.type === 'nature_photo' && (
+                        <span className="px-2 py-1 bg-green-500/10 text-green-400 text-xs rounded-full">
+                          🌿 Nature Photo
+                        </span>
+                      )}
                     </div>
                     
                     <p className="text-muted text-sm line-clamp-2 mb-3">
                       {thread.content}
                     </p>
+
+                    {/* Nature Photo Display */}
+                    {thread.type === 'nature_photo' && thread.imagePath && (
+                      <div className="mb-3">
+                        <img
+                          src={thread.imagePath}
+                          alt={thread.title}
+                          className="w-full h-32 object-cover rounded-lg"
+                        />
+                      </div>
+                    )}
 
                     {/* Thread Meta */}
                     <div className="flex items-center justify-between text-xs text-muted">
