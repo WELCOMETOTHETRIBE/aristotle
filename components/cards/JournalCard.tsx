@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { BookOpen, Plus, Sparkles, Info, Settings, Brain, Calendar, Heart, MessageSquare, Save, Trash2 } from 'lucide-react';
+import { BookOpen, Plus, Sparkles, Info, Settings, Brain, Calendar, Heart, MessageSquare, Save, Trash2, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface JournalCardProps {
@@ -10,15 +10,14 @@ interface JournalCardProps {
 
 interface JournalEntry {
   id: string;
-  title: string;
+  type: string;
   content: string;
-  mood: number;
-  tags: string[];
-  timestamp: Date;
-  aiInsights?: string[];
-  wordCount: number;
+  prompt?: string;
+  category?: string;
+  date: Date;
+  aiInsights?: string;
+  metadata?: any;
 }
-
 interface JournalSettings {
   enableAIInsights: boolean;
   autoSave: boolean;
@@ -69,6 +68,7 @@ export function JournalCard({ className }: JournalCardProps) {
       const response = await fetch('/api/journal');
       if (response.ok) {
         const data = await response.json();
+        console.log('📝 Fetched journal entries from database:', data.entries);
         setEntries(data.entries || []);
       } else {
         console.error('Failed to fetch journal entries');
@@ -76,8 +76,7 @@ export function JournalCard({ className }: JournalCardProps) {
     } catch (error) {
       console.error('Error fetching journal entries:', error);
     }
-  };
-  // Save data
+  };  // Save data
   const saveEntries = (newEntries: JournalEntry[]) => {
     setEntries(newEntries);
     localStorage.setItem('journalEntries', JSON.stringify(newEntries));
@@ -247,6 +246,12 @@ export function JournalCard({ className }: JournalCardProps) {
         
         <div className="flex items-center gap-1">
           <button
+            onClick={fetchJournalEntries}
+            className="p-1.5 hover:bg-surface-2 rounded-lg transition-colors"
+            title="Refresh from database"
+          >
+            <RefreshCw className="w-4 h-4 text-muted hover:text-text" />
+          </button>          <button
             onClick={() => setShowInfo(!showInfo)}
             className="p-1.5 hover:bg-surface-2 rounded-lg transition-colors"
           >
@@ -374,28 +379,22 @@ export function JournalCard({ className }: JournalCardProps) {
                 className="bg-surface-2 border border-border rounded-lg p-3 cursor-pointer hover:bg-surface transition-colors"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <h5 className="text-sm font-medium text-text truncate">{entry.title}</h5>
-                  <div className="flex items-center gap-2">
-                    {settings.showMoodTracking && (
-                      <span className="text-sm">{moodEmojis[entry.mood - 1]}</span>
+                  <h5 className="text-sm font-medium text-text truncate">{entry.type.replace(/_/g, ' ').replace(/bw/g, l => l.toUpperCase())}</h5>                  <div className="flex items-center gap-2">
+                    {entry.metadata?.mood && (                      <span className="text-sm">{moodEmojis[entry.mood - 1]}</span>
                     )}
                     <span className="text-xs text-muted">
-                      {entry.timestamp.toLocaleDateString()}
-                    </span>
+                      {new Date(entry.date).toLocaleDateString()}                    </span>
                   </div>
                 </div>
-                <p className="text-xs text-muted line-clamp-2">{entry.content}</p>
-                
+                <p className="text-xs text-muted line-clamp-2">{entry.content}</p>                
                 {selectedEntry?.id === entry.id && (
                   <div className="mt-3 pt-3 border-t border-border">
                     <div className="text-xs text-muted mb-2">
-                      {entry.wordCount} words • {entry.tags.join(', ')}
-                    </div>
+                      {entry.content.length} characters • {entry.category || 'General'}                    </div>
                     {entry.aiInsights && entry.aiInsights.length > 0 && (
                       <div className="mb-2">
                         <div className="text-xs text-primary mb-1">AI Insights:</div>
-                        {entry.aiInsights.map((insight, index) => (
-                          <div key={index} className="text-xs text-primary/80 mb-1 flex items-start gap-2">
+                        {entry.aiInsights && entry.aiInsights.split('n').map((insight, index) => (                          <div key={index} className="text-xs text-primary/80 mb-1 flex items-start gap-2">
                             <div className="w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0" />
                             <span>{insight}</span>
                           </div>
@@ -466,8 +465,7 @@ export function JournalCard({ className }: JournalCardProps) {
           </div>
 
           {/* Mood */}
-          {settings.showMoodTracking && (
-            <div>
+                    {entry.metadata?.mood && (            <div>
               <label className="text-xs text-muted mb-2 block">How are you feeling?</label>
               <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5].map((level) => (
