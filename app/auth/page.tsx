@@ -9,6 +9,7 @@ import PageLayout from '@/components/PageLayout';
 import AuroraBackground from '@/components/AuroraBackground';
 import GraduationCapIcon from '@/components/GraduationCapIcon';
 import AcademyLogoData from '@/components/AcademyLogoData';
+import Image from 'next/image';
 
 export default function AuthPage() {
   const [isSignUp, setIsSignUp] = useState(false);
