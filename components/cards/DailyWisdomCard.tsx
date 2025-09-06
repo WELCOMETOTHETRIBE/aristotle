@@ -116,7 +116,19 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         }),
       });
       
-      if (response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('📱 Mobile Debug - API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          requestBody: {
+            frameworks: frameworksToUse,
+            date: new Date().toISOString().split('T')[0]
+          }
+        });
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+      }      if (response.ok) {
         console.log('Framework preferences saved to profile');
       }
     } catch (error) {
@@ -134,7 +146,12 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       
       console.log(`🎯 Loading daily wisdom for frameworks:`, frameworksToUse);
       
-      const response = await fetch('/api/generate/daily-wisdom', {
+      console.log('📱 Mobile Debug - Request body:', {
+        frameworks: frameworksToUse,
+        date: new Date().toISOString().split('T')[0],
+        userAgent: navigator.userAgent,
+        isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
+      });      const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -145,7 +162,19 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         }),
       });
 
-      if (response.ok) {
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('📱 Mobile Debug - API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          requestBody: {
+            frameworks: frameworksToUse,
+            date: new Date().toISOString().split('T')[0]
+          }
+        });
+        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+      }      if (response.ok) {
         const newWisdom = await response.json();
         setWisdom(newWisdom);
         

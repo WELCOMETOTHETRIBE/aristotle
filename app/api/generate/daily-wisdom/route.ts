@@ -98,9 +98,13 @@ const frameworkDefinitions = {
 };
 
 export async function POST(request: NextRequest) {
-  try {
+  console.log('📱 Server Debug - Daily Wisdom API called');
+  console.log('📱 Server Debug - User Agent:', request.headers.get('user-agent'));
+  console.log('📱 Server Debug - Content-Type:', request.headers.get('content-type'));  try {
     const body = await request.json();
-    const { frameworks, date } = body;
+  console.log('📱 Server Debug - Request body:', body);
+  console.log('📱 Server Debug - Frameworks received:', body.frameworks);
+  console.log('📱 Server Debug - Date received:', body.date);    const { frameworks, date } = body;
 
     // Get user ID from authentication (optional for daily wisdom)
     const userId = await getUserIdFromRequest(request);
@@ -113,7 +117,8 @@ export async function POST(request: NextRequest) {
     const framework = frameworkDefinitions[randomFramework as keyof typeof frameworkDefinitions];
     
     if (!framework) {
-      return NextResponse.json(
+    console.log('📱 Server Debug - Invalid framework:', randomFramework);
+    console.log('📱 Server Debug - Available frameworks:', Object.keys(frameworkDefinitions));      return NextResponse.json(
         { error: 'Invalid framework selected' },
         { status: 400 }
       );
