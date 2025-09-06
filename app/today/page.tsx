@@ -139,7 +139,7 @@ export default function TodayPage() {
           return <DailyWisdomCard key={widgetId} />;
         case 'terminology':
           return <TerminologyWidget key={widgetId} />;
-        case 'nature_photo':
+        case 'nature_photo_log':
           return <NaturePhotoLogWidget key={widgetId} />;
         case 'gratitude_journal':
           return <GratitudeJournalCard key={widgetId} />;

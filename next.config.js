@@ -28,7 +28,7 @@ const nextConfig = {
           // Content Security Policy - adjust based on your needs
           { 
             key: "Content-Security-Policy", 
-            value: "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https:; font-src 'self' data:;" 
+            value: "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; connect-src 'self' https: http://localhost:* ws://localhost:*; font-src 'self' data:;" 
           },
         ],
       },
