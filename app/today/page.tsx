@@ -698,32 +698,11 @@ export default function TodayPage() {
               </button>
             </div>
             <div className="grid grid-cols-1 gap-4">
-              {userWidgets.map(widgetId => {
-                console.log('Rendering widget:', widgetId);
-                return renderWidget(widgetId);
-              })}
+              {userWidgets.map(widgetId => renderWidget(widgetId))}
             </div>
           </div>
         )}
 
-        {/* Debug Section - Temporary */}
-        <div className="space-y-4">
-          <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-xl p-4">
-            <h3 className="text-sm font-semibold text-yellow-400 mb-2">Debug Info</h3>
-            <p className="text-xs text-yellow-300 mb-2">Current userWidgets: {JSON.stringify(userWidgets)}</p>
-            <p className="text-xs text-yellow-300 mb-2">User ID: {user?.id || 'Not logged in'}</p>
-            <button
-              onClick={() => {
-                const testWidgets = [...userWidgets, 'nature_photo_log'];
-                saveUserWidgets(testWidgets);
-                console.log('Added nature_photo_log widget for testing');
-              }}
-              className="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs hover:bg-yellow-500/30"
-            >
-              Add Nature Photo Log (Test)
-            </button>
-          </div>
-        </div>
 
         {/* Evening Block */}
         {isEvening && (

@@ -5,7 +5,7 @@ import { useAuth } from '@/lib/auth-context';
 import { 
   Play, Pause, RotateCcw, Timer, Target, BookOpen, Heart, Brain, Zap, 
   Users, Sun, Moon, Coffee, Droplets, Dumbbell, CheckCircle,
-  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera, Minus, Plus, X, MapPin, Cloud, Heart as HeartIcon, Tag, Check, Trash2, Eye, Share2, MessageCircle, ArrowRight
+  Clock, TrendingUp, Activity, Sparkles, Flame, Wind, Camera, Minus, Plus, X, MapPin, Cloud, Heart as HeartIcon, Check, Trash2, Eye, Share2, MessageCircle, ArrowRight
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { logToJournal } from '@/lib/journal-logger';
@@ -1084,7 +1084,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const { user } = useAuth();
   const [photos, setPhotos] = useState<NaturePhoto[]>([]);
   const [isAdding, setIsAdding] = useState(false);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [caption, setCaption] = useState('');
   const [location, setLocation] = useState('');
   const [weather, setWeather] = useState('');
@@ -1099,16 +1098,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [shareToCommunity, setShareToCommunity] = useState(false);
   const [philosopher, setPhilosopher] = useState("aristotle");
 
-  const availableTags = [
-    'dawn','sunrise','morning','midday','afternoon','dusk','sunset','night','stars','moon',
-    'tree','forest','leaf','flower','grass','moss','mushroom',
-    'water','river','stream','lake','ocean','wave','waterfall','rain','snow','ice',
-    'sky','clouds','fog','mist','storm','lightning','rainbow',
-    'mountain','hill','valley','meadow','desert','beach','coast','cliff',
-    'animal','bird','insect','fish','mammal','tracks',
-    'earth','rock','sand','soil',
-    'wind','breeze','calm','serene','vibrant','moody','golden-hour'
-  ];
 
   // Load saved photos from database on component mount
   useEffect(() => {
@@ -1138,6 +1127,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     const file = event.target.files?.[0];
     if (file) {
       setUploadedImage(file);
+      setIsAdding(true); // Automatically show the form when file is selected
       const reader = new FileReader();
       reader.onload = (e) => {
         setImagePreview(e.target?.result as string);
@@ -1154,7 +1144,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       const formData = new FormData();
       formData.append('image', uploadedImage);
       formData.append('caption', caption);
-      formData.append('tags', JSON.stringify(selectedTags));
       formData.append('location', location);
       formData.append('weather', weather);
       formData.append('mood', mood);
@@ -1170,12 +1159,10 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           userId: user?.id || 1, // Use actual user ID if available
           imageData: imagePreview,
           caption,
-          tags: selectedTags,
           location,
           weather,
           mood,
           shareToCommunity,
-
         }),
       });
 
@@ -1192,7 +1179,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
           category: 'nature',
           metadata: {
             caption: caption || 'Nature moment',
-            tags: selectedTags,
             location: location,
             weather: weather,
             mood: mood,
@@ -1206,7 +1192,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         
         // Reset form
         setIsAdding(false);
-        setSelectedTags([]);
         setCaption('');
         setLocation('');
         setWeather('');
@@ -1253,13 +1238,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
     setPhotos(prev => prev.filter(photo => photo.id !== photoId));
   };
 
-  const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
-        ? prev.filter(t => t !== tag)
-        : [...prev, tag]
-    );
-  };
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
@@ -1314,7 +1292,12 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
       {/* Add Photo Section */}
       {!isAdding ? (
         <motion.button
-          onClick={() => setIsAdding(true)}
+          onClick={() => {
+            const fileInput = document.getElementById('photo-upload') as HTMLInputElement;
+            if (fileInput) {
+              fileInput.click();
+            }
+          }}
           className="w-full p-6 border-2 border-dashed border-green-500/30 rounded-xl text-green-400 hover:border-green-500/50 hover:bg-green-500/10 transition-all mb-6"
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
@@ -1377,31 +1360,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             />
           </div>
 
-          {/* Tags */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-text">Tags</label>
-            <div className="overflow-x-auto no-scrollbar">
-              <div className="grid grid-rows-2 grid-flow-col auto-cols-max gap-2 pr-2">
-                {availableTags.map((tag) => (
-                  <button
-                    key={tag}
-                    onClick={() => setSelectedTags(prev => 
-                      prev.includes(tag) 
-                        ? prev.filter(t => t !== tag)
-                        : [...prev, tag]
-                    )}
-                    className={`px-3 py-1 rounded-full text-xs transition-all ${
-                      selectedTags.includes(tag)
-                        ? 'bg-green-500 text-white'
-                        : 'bg-surface-2 text-muted hover:text-text hover:bg-green-500/10'
-                    }`}
-                  >
-                    {tag}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
 
           {/* Optional Fields */}
           <div className="grid grid-cols-2 gap-3">
@@ -1466,7 +1424,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             <button
               onClick={() => {
                 setIsAdding(false);
-                setSelectedTags([]);
                 setCaption('');
                 setLocation('');
                 setWeather('');
@@ -1474,7 +1431,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
                 setUploadedImage(null);
                 setImagePreview('');
                 setShareToCommunity(false);
-    
               }}
               className="flex-1 px-3 py-2 bg-surface-2 border border-border text-text rounded-lg hover:bg-surface transition-colors duration-150"
             >
@@ -1584,13 +1540,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
               
               <div>
                 <h3 className="font-semibold text-text text-lg mb-2">{selectedPhoto.caption}</h3>
-                <div className="flex flex-wrap gap-2 mb-3">
-                  {selectedPhoto.tags.map((tag) => (
-                    <span key={tag} className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
                 
                 {selectedPhoto.location && (
                   <p className="text-sm text-muted mb-2">📍 {selectedPhoto.location}</p>
