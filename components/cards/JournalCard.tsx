@@ -59,24 +59,24 @@ export function JournalCard({ className }: JournalCardProps) {
     reminderTime: '20:00',
   });
 
-  // Load saved data
+  // Load journal entries from database API
   useEffect(() => {
-    const savedEntries = localStorage.getItem('journalEntries');
-    const savedSettings = localStorage.getItem('journalSettings');
-    
-    if (savedEntries) {
-      const parsed = JSON.parse(savedEntries);
-      setEntries(parsed.map((entry: any) => ({
-        ...entry,
-        timestamp: new Date(entry.timestamp)
-      })));
-    }
-    
-    if (savedSettings) {
-      setSettings(JSON.parse(savedSettings));
-    }
+    fetchJournalEntries();
   }, []);
 
+  const fetchJournalEntries = async () => {
+    try {
+      const response = await fetch('/api/journal');
+      if (response.ok) {
+        const data = await response.json();
+        setEntries(data.entries || []);
+      } else {
+        console.error('Failed to fetch journal entries');
+      }
+    } catch (error) {
+      console.error('Error fetching journal entries:', error);
+    }
+  };
   // Save data
   const saveEntries = (newEntries: JournalEntry[]) => {
     setEntries(newEntries);
