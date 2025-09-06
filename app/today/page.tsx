@@ -502,30 +502,6 @@ export default function TodayPage() {
                 </div>
               </div>
               
-              {/* Tools Link */}
-              <div className="flex items-center space-x-2">
-                <button
-                  onClick={async () => {
-                    // Log tools navigation to journal
-                    const toolsLogData = {
-                      type: 'navigation',
-                      content: 'Navigated to tools section',
-                      category: 'navigation',
-                      metadata: {
-                        destination: 'tools',
-                        timestamp: new Date().toISOString(),
-                      },
-                      moduleId: 'navigation',
-                      widgetId: 'tools_button',
-                    };
-                    await logToJournal(toolsLogData);
-                    window.location.href = '/tools';
-                  }}
-                  className="text-sm font-medium text-primary hover:text-primary/80 transition-colors underline decoration-primary/30 hover:decoration-primary/60"
-                >
-                  tools
-                </button>
-              </div>
             </div>
             
             {/* Stats Row */}

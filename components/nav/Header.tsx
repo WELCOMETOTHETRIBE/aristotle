@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bell, User, ChevronDown, Settings, Target } from 'lucide-react';
+import { Bell, User, ChevronDown, Settings, Target, Wrench } from 'lucide-react';
 import AcademyLogo from '@/components/AcademyLogo';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
@@ -82,41 +82,53 @@ export function Header({ focusVirtue }: HeaderProps) {
           </div>
         )}
 
-        {/* Profile Menu */}
-        <div className="relative" ref={profileMenuRef}>
+        {/* Tools and Profile Menu */}
+        <div className="flex items-center space-x-2">
+          {/* Tools Button */}
           <button
-            onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="flex items-center space-x-2 p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+            onClick={() => window.location.href = '/tools'}
+            className="p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+            title="Tools"
           >
-            <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
-              <User className="w-4 h-4 text-primary" />
-            </div>
-            <ChevronDown className="w-4 h-4" />
+            <Wrench className="w-5 h-5" />
           </button>
 
-          {showProfileMenu && (
-            <div className="absolute right-0 top-full mt-2 w-48 bg-surface border border-border rounded-lg shadow-lg py-1">
-              <div className="px-4 py-2 border-b border-border">
-                <p className="text-sm font-medium text-text">
-                  {user?.displayName || user?.username || 'User'}
-                </p>
-                <p className="text-xs text-muted">{user?.email}</p>
+          {/* Profile Menu */}
+          <div className="relative" ref={profileMenuRef}>
+            <button
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+              className="flex items-center space-x-2 p-2 text-muted hover:text-text hover:bg-surface-2 rounded-lg transition-colors duration-150"
+            >
+              <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
+                <User className="w-4 h-4 text-primary" />
               </div>
-              <button
-                onClick={handleSettingsClick}
-                className="w-full text-left px-4 py-2 text-sm text-muted hover:text-text hover:bg-surface-2 transition-colors duration-150 flex items-center gap-2"
-              >
-                <Settings className="w-4 h-4" />
-                Settings
-              </button>
-              <button
-                onClick={handleSignOut}
-                className="w-full text-left px-4 py-2 text-sm text-muted hover:text-text hover:bg-surface-2 transition-colors duration-150"
-              >
-                Sign Out
-              </button>
-            </div>
-          )}
+              <ChevronDown className="w-4 h-4" />
+            </button>
+
+            {showProfileMenu && (
+              <div className="absolute right-0 top-full mt-2 w-48 bg-surface border border-border rounded-lg shadow-lg py-1">
+                <div className="px-4 py-2 border-b border-border">
+                  <p className="text-sm font-medium text-text">
+                    {user?.displayName || user?.username || 'User'}
+                  </p>
+                  <p className="text-xs text-muted">{user?.email}</p>
+                </div>
+                <button
+                  onClick={handleSettingsClick}
+                  className="w-full text-left px-4 py-2 text-sm text-muted hover:text-text hover:bg-surface-2 transition-colors duration-150 flex items-center gap-2"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </button>
+                <button
+                  onClick={handleSignOut}
+                  className="w-full text-left px-4 py-2 text-sm text-muted hover:text-text hover:bg-surface-2 transition-colors duration-150"
+                >
+                  Sign Out
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
