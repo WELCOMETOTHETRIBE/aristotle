@@ -746,7 +746,7 @@ export default function TodayPage() {
                   // Log widget addition navigation to journal
                   const widgetAddLogData = {
                     type: 'navigation',
-                    content: 'Added new widget to dashboard',
+                    content: 'Navigated to add new widget',
                     category: 'navigation',
                     metadata: {
                       destination: 'tools',

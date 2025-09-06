@@ -1289,6 +1289,15 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
         </motion.div>
       )}
 
+      {/* Hidden file input - always available */}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleImageUpload}
+        className="hidden"
+        id="photo-upload"
+      />
+
       {/* Add Photo Section */}
       {!isAdding ? (
         <motion.button
@@ -1333,16 +1342,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
               ) : (
                 <div className="space-y-2">
                   <Camera className="w-8 h-8 text-green-400 mx-auto" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                    id="photo-upload"
-                  />
-                  <label htmlFor="photo-upload" className="cursor-pointer text-green-400 hover:text-green-300">
-                    Click to upload or drag and drop
-                  </label>
+                  <p className="text-green-400 text-sm">Image selected - ready to add details</p>
                 </div>
               )}
             </div>
