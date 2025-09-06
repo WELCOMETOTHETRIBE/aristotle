@@ -542,7 +542,7 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
             {isMuted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
           </button>
           
-          <div className="relative">
+          <div className="relative z-50">
             <button
               onClick={() => setShowPatterns(!showPatterns)}
               className="flex items-center gap-1 px-2 py-1.5 bg-surface-2 rounded-lg text-text hover:bg-surface transition-colors text-sm"
@@ -558,12 +558,16 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
             
             <AnimatePresence>
               {showPatterns && (
-                <motion.div 
-                  className="absolute top-full right-0 mt-1 w-56 bg-surface border border-border rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto"
-                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                >
+                <>
+                  {/* Backdrop to ensure dropdown is on top */}
+                  <div className="fixed inset-0 z-40" onClick={() => setShowPatterns(false)} />
+                  
+                  <motion.div 
+                    className="absolute top-full right-0 mt-1 w-56 bg-surface border border-border rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto"
+                    initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  >
                   {breathPatterns.map((p, index) => (
                     <button
                       key={index}
@@ -594,7 +598,8 @@ export function BreathworkWidgetNew({ frameworkTone = "stoic" }: BreathworkWidge
                       </div>
                     </button>
                   ))}
-                </motion.div>
+                  </motion.div>
+                </>
               )}
             </AnimatePresence>
           </div>
