@@ -1096,7 +1096,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [shareToCommunity, setShareToCommunity] = useState(false);
-  const [philosopher, setPhilosopher] = useState("aristotle");
 
 
   // Load saved photos from database on component mount
@@ -1399,25 +1398,6 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
             </label>
           </div>
 
-          {/* Philosopher Selection (only show when sharing to community) */}
-          {shareToCommunity && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-text">Choose a Philosopher for AI Comment</label>
-              <select
-                value={philosopher}
-                onChange={(e) => setPhilosopher(e.target.value)}
-                className="w-full px-3 py-2 bg-surface-2 border border-border rounded-lg text-text focus:outline-none focus:ring-2 focus:ring-green-500/50 focus:border-green-500"
-              >
-                <option value="aristotle">Aristotle - The Philosopher</option>
-                <option value="socrates">Socrates - The Gadfly of Athens</option>
-                <option value="marcus_aurelius">Marcus Aurelius - The Stoic Emperor</option>
-                <option value="epictetus">Epictetus - The Former Slave</option>
-              </select>
-              <p className="text-xs text-gray-400">
-                An AI philosopher will analyze your photo and leave an inspirational comment
-              </p>
-            </div>
-          )}
 
           {/* Action Buttons */}
           <div className="flex gap-2">
