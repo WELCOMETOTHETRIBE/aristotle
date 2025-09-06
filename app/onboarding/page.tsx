@@ -523,7 +523,7 @@ export default function OnboardingPage() {
             <Sparkles className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-text mb-3">
-            Welcome to Aristotle
+            Welcome to EudAimonia Academy
           </h1>
           <p className="text-lg md:text-xl text-muted leading-relaxed max-w-2xl mx-auto px-4">
             Let's personalize your journey toward wisdom and virtue

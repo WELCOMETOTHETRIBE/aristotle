@@ -157,10 +157,17 @@ export default function AuthPage() {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-4">
-              <AcademyLogoData className="w-16 h-16" />
+              <Image
+                src="/eudaimonia.png"
+                alt="EudAimonia Academy Logo"
+                width={80}
+                height={80}
+                className="w-20 h-20 object-contain"
+                priority
+              />
             </div>
             <h1 className="text-3xl font-bold text-text mb-2">
-              Welcome to Aristotle
+              Welcome to EudAimonia Academy
             </h1>
             <p className="text-muted">
               Your journey to ancient wisdom begins here

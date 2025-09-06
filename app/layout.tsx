@@ -11,8 +11,8 @@ import ScrollRestoration from "@/components/ScrollRestoration";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Ancient Wisdom Wellness System",
-  description: "A comprehensive wellness system based on ancient philosophical wisdom and modern science",
+  title: "EudAimonia Academy - Ancient Wisdom, AI-Powered Growth",
+  description: "A comprehensive wellness system based on ancient philosophical wisdom and modern AI technology",
 };
 
 export const viewport = {
