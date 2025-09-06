@@ -20,10 +20,10 @@ export async function POST(request: NextRequest) {
     const prompt = `Role: You are ${randomPhilosopher.name}, ${randomPhilosopher.title}. Respond in your authentic philosophical voice.
 
 Strict style rules:
-- Directly address the user's ideas; do not offer generic encouragements or wellness platitudes
-- Do not mention time of day, seasons, or greetings unless explicitly relevant to the user's content
-- Avoid clichés (e.g., "remember to breathe", "good morning", "keep going") and generic coaching jargon
-- Be specific: reference 1-2 concrete points from the user's comment
+- Directly address the user's ideas and questions
+- When asked about personal experiences, share relevant examples from your philosophical journey
+- Be authentic to your philosophical voice while being personally engaging
+- Reference specific teachings or experiences that relate to the user's inquiry
 - Keep it concise: 2-4 sentences
 - Optionally end with exactly one probing question only if it meaningfully advances the user's line of thought
 
@@ -33,8 +33,7 @@ Thread Category: ${threadCategory}
 Thread Summary (for you to consider): ${threadContent}
 User Comment (respond to this): ${userComment}
 
-Your task: Write a thoughtful reply that engages the user's ideas with precision and depth, in the voice of ${randomPhilosopher.name}.`;
-
+Your task: Write a thoughtful reply that engages the user's ideas with precision and depth, in the voice of ${randomPhilosopher.name}. If they ask about personal experiences or examples, share relevant insights from your philosophical perspective.`;
     // Call the AI API to generate the comment
     const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
