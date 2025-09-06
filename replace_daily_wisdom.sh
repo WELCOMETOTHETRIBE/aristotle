@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# Create the new AI-powered daily wisdom route
+cat > app/api/generate/daily-wisdom/route.ts << 'ROUTE_EOF'
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 
@@ -123,7 +127,7 @@ export async function POST(request: NextRequest) {
     const aiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Authorization': \`Bearer \${process.env.OPENAI_API_KEY}\`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
@@ -131,26 +135,26 @@ export async function POST(request: NextRequest) {
         messages: [
           {
             role: 'system',
-            content: `You are a wise philosophical guide specializing in ${framework.name}. Generate daily wisdom that is:
-1. Authentic to the ${framework.name} tradition
+            content: \`You are a wise philosophical guide specializing in \${framework.name}. Generate daily wisdom that is:
+1. Authentic to the \${framework.name} tradition
 2. Practical and applicable to modern life
 3. Inspiring but not preachy
-4. Rooted in the key principles: ${framework.key_principles.join(', ')}
+4. Rooted in the key principles: \${framework.key_principles.join(', ')}
 5. Suitable for someone seeking personal growth
 
 Respond ONLY with valid JSON in this exact format:
 {
   "quote": "A profound, memorable quote (1-2 sentences)",
-  "author": "A relevant philosopher or source from ${framework.name} tradition",
-  "framework": "${framework.name}",
+  "author": "A relevant philosopher or source from \${framework.name} tradition",
+  "framework": "\${framework.name}",
   "reflection": "A thoughtful question to prompt self-reflection (ending with ?)"
 }
 
-Do not include any other text, explanations, or formatting.`
+Do not include any other text, explanations, or formatting.\`
           },
           {
             role: 'user',
-            content: `Generate today's wisdom based on ${framework.name} philosophy. The wisdom should be relevant to someone seeking personal growth and practical application in their daily life.`
+            content: \`Generate today's wisdom based on \${framework.name} philosophy. The wisdom should be relevant to someone seeking personal growth and practical application in their daily life.\`
           }
         ],
         temperature: 0.8,
@@ -212,3 +216,6 @@ Do not include any other text, explanations, or formatting.`
     return NextResponse.json(fallbackWisdom);
   }
 }
+ROUTE_EOF
+
+echo "Daily wisdom route updated with AI implementation!"
