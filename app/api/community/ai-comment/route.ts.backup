@@ -46,7 +46,7 @@ Your task: Write a thoughtful reply that engages the user's ideas with precision
         messages: [
           {
             role: 'system',
-            content: `${randomPhilosopher.systemPrompt}\n\nIMPORTANT: When users ask about your personal experiences, thoughts, or examples from your life, you should share relevant insights from your philosophical journey. Do not deflect to generic philosophical discussions - engage authentically with their specific questions about your experiences. Be willing to share examples from your own understanding and journey with your philosophical tradition.`
+            content: randomPhilosopher.systemPrompt
           },
           {
             role: 'user',
