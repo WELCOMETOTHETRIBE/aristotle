@@ -2,14 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpen, Plus, Heart, Brain, Calendar, Smile, MessageSquare, Shield, Users } from 'lucide-react';
+import { BookOpen, Plus, Heart, Brain, Calendar, Smile, MessageSquare, Shield, Users, Wind } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 interface JournalEntry {
   id: string;
   content: string;
-  type: 'gratitude' | 'reflection' | 'voice_note' | 'boundaries' | 'community_connections' | 'mood' | 'daily_intention' | 'nature_photo_upload' | 'quote_favorited' | 'quote_unfavorited';
+  type: 'gratitude' | 'reflection' | 'voice_note' | 'boundaries' | 'community_connections' | 'mood' | 'daily_intention' | 'nature_photo_upload' | 'quote_favorited' | 'quote_unfavorited' | 'breathwork_session';
   category?: string;
   date: string;
   aiInsights?: string;
@@ -62,6 +62,7 @@ export default function JournalPage() {
       case 'mood': return <Smile className="w-5 h-5 text-yellow-400" />;
       case 'daily_intention': return <Calendar className="w-5 h-5 text-indigo-400" />;
       case 'nature_photo_upload': return <Plus className="w-5 h-5 text-green-400" />;
+      case 'breathwork_session': return <Wind className="w-5 h-5 text-cyan-400" />;
       case 'quote_favorited': return <Heart className="w-5 h-5 text-red-400" />;
       case 'quote_unfavorited': return <Heart className="w-5 h-5 text-gray-400" />;
       default: return <BookOpen className="w-5 h-5" />;
@@ -78,6 +79,7 @@ export default function JournalPage() {
       case 'mood': return 'border-yellow-500/20 bg-yellow-500/5';
       case 'daily_intention': return 'border-indigo-500/20 bg-indigo-500/5';
       case 'nature_photo_upload': return 'border-green-500/20 bg-green-500/5';
+      case 'breathwork_session': return 'border-cyan-500/20 bg-cyan-500/5';
       case 'quote_favorited': return 'border-red-500/20 bg-red-500/5';
       case 'quote_unfavorited': return 'border-gray-500/20 bg-gray-500/5';
       default: return 'border-gray-500/20 bg-gray-500/5';
@@ -94,6 +96,7 @@ export default function JournalPage() {
       case 'mood': return 'Mood';
       case 'daily_intention': return 'Daily Intention';
       case 'nature_photo_upload': return 'Nature Photo';
+      case 'breathwork_session': return 'Breathwork Session';
       case 'quote_favorited': return 'Quote Favorited';
       case 'quote_unfavorited': return 'Quote Unfavorited';
       default: return type;
@@ -190,6 +193,14 @@ export default function JournalPage() {
             <Card className="bg-white/10 backdrop-blur-sm border-white/20">
               <CardContent className="p-4 text-center">
                 <div className="text-2xl font-bold text-white mb-1">
+                  {entries.filter(e => e.type === 'breathwork_session').length}
+                </div>
+                <div className="text-xs text-gray-300">Breathwork</div>
+              </CardContent>
+            </Card>
+            <Card className="bg-white/10 backdrop-blur-sm border-white/20">
+              <CardContent className="p-4 text-center">
+                <div className="text-2xl font-bold text-white mb-1">
                   {favoriteQuotes.length}
                 </div>
                 <div className="text-xs text-gray-300">Favorite Quotes</div>
@@ -240,6 +251,13 @@ export default function JournalPage() {
                 className="bg-green-600 hover:bg-green-700 text-white"
               >
                 Nature Photos
+              </Button>
+              <Button
+                onClick={() => setFilterType('breathwork_session')}
+                variant={filterType === 'breathwork_session' ? 'default' : 'outline'}
+                className="bg-cyan-600 hover:bg-cyan-700 text-white"
+              >
+                Breathwork
               </Button>
               <Button
                 onClick={() => setFilterType('reflection')}

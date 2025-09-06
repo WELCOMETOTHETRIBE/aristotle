@@ -41,6 +41,7 @@ export function JournalCard({ className }: JournalCardProps) {
   const [showNewEntry, setShowNewEntry] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showAllEntries, setShowAllEntries] = useState(false);
   const [currentEntry, setCurrentEntry] = useState<Partial<JournalEntry>>({
     title: '',
     content: '',
@@ -370,31 +371,50 @@ export function JournalCard({ className }: JournalCardProps) {
       {/* Recent Entries */}
       {entries.length > 0 && (
         <div className="mb-4">
-          <h4 className="text-xs text-muted mb-2">Recent Entries</h4>
+          <div className="flex items-center justify-between mb-2">
+            <h4 className="text-xs text-muted">
+              {showAllEntries ? 'All Entries' : 'Recent Entries'}
+            </h4>
+            {entries.length > 3 && (
+              <button
+                onClick={() => setShowAllEntries(!showAllEntries)}
+                className="text-xs text-primary hover:text-primary/80 transition-colors"
+              >
+                {showAllEntries ? 'Show Less' : `Show All (${entries.length})`}
+              </button>
+            )}
+          </div>
           <div className="space-y-2">
-            {entries.slice(0, 3).map(entry => (
+            {(showAllEntries ? entries : entries.slice(0, 3)).map(entry => (
               <div
                 key={entry.id}
                 onClick={() => setSelectedEntry(selectedEntry?.id === entry.id ? null : entry)}
                 className="bg-surface-2 border border-border rounded-lg p-3 cursor-pointer hover:bg-surface transition-colors"
               >
                 <div className="flex items-center justify-between mb-1">
-                  <h5 className="text-sm font-medium text-text truncate">{entry.type.replace(/_/g, ' ').replace(/bw/g, l => l.toUpperCase())}</h5>                  <div className="flex items-center gap-2">
-                    {entry.metadata?.mood && (                      <span className="text-sm">{moodEmojis[entry.mood - 1]}</span>
+                  <h5 className="text-sm font-medium text-text truncate">
+                    {entry.type.replace(/_/g, ' ').replace(/bw/g, l => l.toUpperCase())}
+                  </h5>
+                  <div className="flex items-center gap-2">
+                    {entry.metadata?.mood && (
+                      <span className="text-sm">{moodEmojis[entry.mood - 1]}</span>
                     )}
                     <span className="text-xs text-muted">
-                      {new Date(entry.date).toLocaleDateString()}                    </span>
+                      {new Date(entry.date).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
                 <p className="text-xs text-muted line-clamp-2">{entry.content}</p>                
                 {selectedEntry?.id === entry.id && (
                   <div className="mt-3 pt-3 border-t border-border">
                     <div className="text-xs text-muted mb-2">
-                      {entry.content.length} characters • {entry.category || 'General'}                    </div>
+                      {entry.content.length} characters • {entry.category || 'General'}
+                    </div>
                     {entry.aiInsights && entry.aiInsights.length > 0 && (
                       <div className="mb-2">
                         <div className="text-xs text-primary mb-1">AI Insights:</div>
-                        {entry.aiInsights && entry.aiInsights.split('n').map((insight, index) => (                          <div key={index} className="text-xs text-primary/80 mb-1 flex items-start gap-2">
+                        {entry.aiInsights && entry.aiInsights.split('\n').map((insight, index) => (
+                          <div key={index} className="text-xs text-primary/80 mb-1 flex items-start gap-2">
                             <div className="w-1 h-1 bg-primary rounded-full mt-2 flex-shrink-0" />
                             <span>{insight}</span>
                           </div>
