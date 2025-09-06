@@ -1097,6 +1097,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
   const [showSuccess, setShowSuccess] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [shareToCommunity, setShareToCommunity] = useState(false);
+  const [philosopher, setPhilosopher] = useState("aristotle");
 
   const availableTags = [
     'dawn','sunrise','morning','midday','afternoon','dusk','sunset','night','stars','moon',

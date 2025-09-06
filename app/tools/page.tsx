@@ -214,6 +214,16 @@ const availableWidgets: Widget[] = [
     color: 'from-teal-500 to-cyan-500',
     isActive: true,
     isAdded: false,
+  },
+  {
+    id: 'nature_photo_log',
+    name: 'Nature Photo Log',
+    description: 'Capture and reflect on moments in nature',
+    icon: Camera,
+    category: 'mindfulness',
+    color: 'from-green-500 to-emerald-500',
+    isActive: true,
+    isAdded: false,
   }
 ];
 
