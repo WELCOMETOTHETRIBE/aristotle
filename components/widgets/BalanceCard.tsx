@@ -28,11 +28,14 @@ export default function BalanceCard({
   const [isBalanced, setIsBalanced] = useState(true);
   const [motionCount, setMotionCount] = useState(0);
   const [sessionComplete, setSessionComplete] = useState(false);
+  const [motionPermission, setMotionPermission] = useState<'unknown' | 'granted' | 'denied' | 'unsupported'>('unknown');
+  const [motionSupported, setMotionSupported] = useState(false);
   
   const animationFrameRef = useRef<number>();
   const startTimeRef = useRef<number>();
   const motionThresholdRef = useRef<number>();
   const lastMotionTimeRef = useRef<number>();
+  const motionHandlerRef = useRef<((event: DeviceMotionEvent) => void) | null>(null);
 
   // Get motion threshold based on sensitivity
   const getMotionThreshold = () => {
@@ -44,9 +47,54 @@ export default function BalanceCard({
     }
   };
 
+  // Check motion support and request permissions
+  const checkMotionSupport = async () => {
+    if (typeof window === 'undefined') {
+      setMotionSupported(false);
+      setMotionPermission('unsupported');
+      return;
+    }
+
+    if (!('DeviceMotionEvent' in window)) {
+      setMotionSupported(false);
+      setMotionPermission('unsupported');
+      console.log('❌ DeviceMotionEvent not supported');
+      return;
+    }
+
+    setMotionSupported(true);
+    console.log('✅ DeviceMotionEvent supported');
+
+    // Check if permission is required (iOS 13+)
+    if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
+      try {
+        const permission = await (DeviceMotionEvent as any).requestPermission();
+        if (permission === 'granted') {
+          setMotionPermission('granted');
+          console.log('✅ Motion permission granted');
+        } else {
+          setMotionPermission('denied');
+          console.log('❌ Motion permission denied');
+        }
+      } catch (error) {
+        console.error('Error requesting motion permission:', error);
+        setMotionPermission('denied');
+      }
+    } else {
+      // Permission not required (Android, older iOS, desktop)
+      setMotionPermission('granted');
+      console.log('✅ Motion permission not required');
+    }
+  };
+
+  // Check motion support on component mount
+  useEffect(() => {
+    checkMotionSupport();
+  }, []);
+
   // Motion detection - only active during balance sessions
   useEffect(() => {
-    if (!isActive || typeof window === 'undefined' || !('DeviceMotionEvent' in window)) {
+    if (!isActive || motionPermission !== 'granted' || !motionSupported) {
       return;
     }
 
@@ -87,24 +135,21 @@ export default function BalanceCard({
       });
     };
 
-    // Request permission for motion events (required on iOS 13+)
-    if (typeof (DeviceMotionEvent as any).requestPermission === 'function') {
-      (DeviceMotionEvent as any).requestPermission().then((response: string) => {
-        if (response === 'granted') {
-          window.addEventListener('devicemotion', handleMotion);
-        } else {
-          console.log('❌ Motion permission denied');
-        }
-      });
-    } else {
-      window.addEventListener('devicemotion', handleMotion);
-    }
+    // Store handler reference for cleanup
+    motionHandlerRef.current = handleMotion;
+    
+    // Add event listener
+    window.addEventListener('devicemotion', handleMotion);
+    console.log('✅ Motion event listener added');
 
     return () => {
-      window.removeEventListener('devicemotion', handleMotion);
-      console.log('✅ Motion detection stopped');
+      if (motionHandlerRef.current) {
+        window.removeEventListener('devicemotion', motionHandlerRef.current);
+        motionHandlerRef.current = null;
+        console.log('✅ Motion detection stopped');
+      }
     };
-  }, [isActive, config.sensitivity]);
+  }, [isActive, motionPermission, motionSupported, config.sensitivity]);
 
   // Animation loop for balance time tracking
   useEffect(() => {
@@ -157,7 +202,21 @@ export default function BalanceCard({
     };
   }, [isActive, config.targetSec, motionCount, onComplete, config.sensitivity]);
 
-  const startBalance = () => {
+  const startBalance = async () => {
+    // Check motion permission before starting
+    if (motionPermission === 'unknown') {
+      await checkMotionSupport();
+    }
+    
+    if (motionPermission === 'denied') {
+      alert('Motion permission is required for the balance challenge. Please enable it in your browser settings.');
+      return;
+    }
+    
+    if (!motionSupported) {
+      alert('Motion detection is not supported on this device. You can still use the timer manually.');
+    }
+    
     setIsActive(true);
     setBalanceTime(0);
     setMotionCount(0);
@@ -252,7 +311,26 @@ export default function BalanceCard({
         <div className="text-center mb-2">
           <span className="text-sm font-medium text-white">Motion Status</span>
         </div>
-        {isActive ? (
+        
+        {/* Permission Status */}
+        <div className="text-xs mb-2">
+          <div className="flex justify-between">
+            <span>Permission:</span>
+            <span className={
+              motionPermission === 'granted' ? 'text-green-400' :
+              motionPermission === 'denied' ? 'text-red-400' :
+              motionPermission === 'unsupported' ? 'text-yellow-400' :
+              'text-gray-400'
+            }>
+              {motionPermission === 'granted' ? '✅ Granted' :
+               motionPermission === 'denied' ? '❌ Denied' :
+               motionPermission === 'unsupported' ? '⚠️ Unsupported' :
+               '⏳ Checking...'}
+            </span>
+          </div>
+        </div>
+
+        {motionPermission === 'granted' && isActive ? (
           <div className="text-xs text-gray-400 space-y-1">
             <div className="flex justify-between">
               <span>Motion Events:</span>
@@ -275,6 +353,16 @@ export default function BalanceCard({
                 <div>Z: {lastMotion.z.toFixed(2)}</div>
               </div>
             )}
+          </div>
+        ) : motionPermission === 'denied' ? (
+          <div className="text-xs text-red-400 space-y-1">
+            <div>Motion permission denied</div>
+            <div className="text-yellow-400 mt-2">Enable motion access in browser settings</div>
+          </div>
+        ) : motionPermission === 'unsupported' ? (
+          <div className="text-xs text-yellow-400 space-y-1">
+            <div>Motion detection not supported</div>
+            <div className="text-gray-400 mt-2">Timer will work without motion detection</div>
           </div>
         ) : (
           <div className="text-xs text-gray-500 space-y-1">
@@ -320,11 +408,22 @@ export default function BalanceCard({
           <div>
             <p>Hold your device steady to maintain balance</p>
             <p className="mt-1">Keep the ⚖️ icon to stay balanced</p>
+            {motionPermission === 'granted' && (
+              <p className="mt-1 text-xs text-blue-400">Motion detection active</p>
+            )}
           </div>
         ) : (
           <div>
             <p>Hold your device steady for {config.targetSec} seconds</p>
-            <p className="mt-1">Motion detection will start when you begin</p>
+            {motionPermission === 'granted' ? (
+              <p className="mt-1">Motion detection will start when you begin</p>
+            ) : motionPermission === 'denied' ? (
+              <p className="mt-1 text-yellow-400">Motion detection unavailable - timer only</p>
+            ) : motionPermission === 'unsupported' ? (
+              <p className="mt-1 text-yellow-400">Motion detection not supported - timer only</p>
+            ) : (
+              <p className="mt-1">Checking motion detection support...</p>
+            )}
           </div>
         )}
       </div>
