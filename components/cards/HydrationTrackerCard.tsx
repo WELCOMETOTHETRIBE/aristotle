@@ -60,6 +60,7 @@ export function HydrationTrackerCard({ className }: HydrationTrackerCardProps) {
 
   // Load saved data
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const savedEntries = localStorage.getItem('hydrationTrackerEntries');
     const savedSettings = localStorage.getItem('hydrationTrackerSettings');
     

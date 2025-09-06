@@ -45,6 +45,7 @@ export function FocusTimerWidget({ frameworkTone = "stoic" }: FocusTimerWidgetPr
   ];
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     let interval: NodeJS.Timeout;
     
     if (isRunning && timeLeft > 0) {
@@ -394,6 +395,7 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
 
   // Load saved entries from localStorage on component mount
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const savedEntries = localStorage.getItem('gratitudeJournalEntries');
     if (savedEntries) {
       setEntries(JSON.parse(savedEntries));
@@ -402,6 +404,7 @@ export function GratitudeJournalWidget({ frameworkTone = "stoic" }: GratitudeJou
 
   // Save entries to localStorage whenever they change
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     localStorage.setItem('gratitudeJournalEntries', JSON.stringify(entries));
   }, [entries]);
 
@@ -856,6 +859,7 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
 
   // Load saved hydration from localStorage on component mount
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const savedHydration = localStorage.getItem('dailyHydration');
     if (savedHydration) {
       setCurrentHydration(parseInt(savedHydration));
@@ -864,6 +868,7 @@ export function HydrationWidget({ frameworkTone = "stoic" }: HydrationWidgetProp
 
   // Save hydration to localStorage whenever it changes
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     localStorage.setItem('dailyHydration', JSON.stringify(currentHydration));
   }, [currentHydration]);
 
@@ -1106,6 +1111,7 @@ export function NaturePhotoLogWidget({ frameworkTone = "stewardship" }: NaturePh
 
   // Load saved photos from database on component mount
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     const loadPhotos = async () => {
       try {
         // Use actual user ID from auth context

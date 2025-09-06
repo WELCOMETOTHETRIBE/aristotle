@@ -84,6 +84,7 @@ export function HabitTrackerCard({ className }: HabitTrackerCardProps) {
 
   // Load saved data
   useEffect(() => {
+    if (typeof window === 'undefined') return;
     try {
       const savedHabits = localStorage.getItem('habitTrackerHabits');
       const savedCompletions = localStorage.getItem('habitTrackerCompletions');
