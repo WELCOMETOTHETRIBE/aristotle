@@ -232,7 +232,9 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         moduleId: 'daily_wisdom',
         widgetId: 'daily_wisdom_card',
       };
-      await logToJournal(removeLogData);
+      console.log("📝 Attempting to log quote unfavorited to journal:", removeLogData);
+      const logResult = await logToJournal(removeLogData);
+      console.log("📝 Journal log result:", logResult);
     } else {
       // Add to favorites
       favorites.push(currentQuote);
@@ -252,7 +254,9 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         moduleId: 'daily_wisdom',
         widgetId: 'daily_wisdom_card',
       };
-      await logToJournal(addLogData);
+      console.log("📝 Attempting to log quote favorited to journal:", addLogData);
+      const logResult = await logToJournal(addLogData);
+      console.log("📝 Journal log result:", logResult);
     }
     
     // Force re-render
