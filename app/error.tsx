@@ -14,7 +14,13 @@ export default function Error({
   useEffect(() => {
     // Log the error to an error reporting service
     console.error('Global error:', error);
-  }, [error]);
+    console.error('🚨 Global error details:', {
+      message: error.message,
+      stack: error.stack,
+      digest: error.digest,
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString()
+    });  }, [error]);
 
   return (
     <div className="min-h-screen bg-bg flex items-center justify-center p-4">

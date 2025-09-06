@@ -33,14 +33,13 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryProvider>
             <AuthProvider>
-              <div className="min-h-screen bg-bg">
-                <ScrollRestoration />
-                <ClickToFeedback>
-                  {children}
-                </ClickToFeedback>
-                <DeveloperToolbar />
-              </div>
-            </AuthProvider>
+        <div className="min-h-screen bg-bg">
+          <ScrollRestoration />
+          <ClickToFeedback>
+            {children}
+          </ClickToFeedback>
+          <DeveloperToolbar />
+        </div>            </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>
       </body>
