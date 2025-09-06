@@ -101,11 +101,36 @@ export async function POST(request: NextRequest) {
   console.log('📱 Server Debug - Daily Wisdom API called');
   console.log('📱 Server Debug - User Agent:', request.headers.get('user-agent'));
   console.log('📱 Server Debug - Content-Type:', request.headers.get('content-type'));  try {
-    const body = await request.json();
-  console.log('📱 Server Debug - Request body:', body);
+  let body;
+  try {
+    body = await request.json();
+  } catch (error) {
+    console.log('�� Server Debug - JSON parsing error:', error);
+    console.log('📱 Server Debug - Request body (raw):', await request.text());
+    return NextResponse.json(
+      { error: 'Invalid JSON in request body' },
+      { status: 400 }
+    );
+  }  console.log('📱 Server Debug - Request body:', body);
   console.log('📱 Server Debug - Frameworks received:', body.frameworks);
   console.log('📱 Server Debug - Date received:', body.date);    const { frameworks, date } = body;
-
+  // Validate request body structure
+  if (!body || typeof body !== 'object') {
+    console.log('📱 Server Debug - Invalid body type:', typeof body);
+    return NextResponse.json(
+      { error: 'Request body must be an object' },
+      { status: 400 }
+    );
+  }
+  
+  // Validate frameworks field
+  if (body.frameworks && !Array.isArray(body.frameworks)) {
+    console.log('📱 Server Debug - Frameworks not an array:', body.frameworks);
+    return NextResponse.json(
+      { error: 'Frameworks must be an array' },
+      { status: 400 }
+    );
+  }
     // Get user ID from authentication (optional for daily wisdom)
     const userId = await getUserIdFromRequest(request);
 

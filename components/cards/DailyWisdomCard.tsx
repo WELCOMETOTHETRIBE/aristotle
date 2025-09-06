@@ -145,7 +145,9 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         : ['stoic']; // Default fallback
       
       console.log(`🎯 Loading daily wisdom for frameworks:`, frameworksToUse);
-      
+      console.log('📱 Mobile Debug - Settings object:', settings);
+      console.log('📱 Mobile Debug - Preferred frameworks:', settings.preferredFrameworks);
+      console.log('📱 Mobile Debug - Frameworks to use:', frameworksToUse);      
       console.log('📱 Mobile Debug - Request body:', {
         frameworks: frameworksToUse,
         date: new Date().toISOString().split('T')[0],
