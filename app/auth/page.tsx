@@ -32,17 +32,8 @@ export default function AuthPage() {
     setIsClient(true);
   }, []);
 
-  // Safe auth context usage with error boundary
-  let authContext: any;
-  try {
-    authContext = useAuth();
-  } catch (error) {
-    console.error('Auth context error:', error);
-    setAuthError('Authentication system error. Please refresh the page.');
-  }
-
-  const { signIn, signUp, user, loading } = authContext || {};
-
+  // Always call useAuth hook - React hooks must be called unconditionally
+  const { signIn, signUp, user, loading } = useAuth();
   // Redirect if already authenticated
   useEffect(() => {
     if (!isClient) return;
