@@ -30,8 +30,8 @@ export interface JournalLogResult {
 export async function logToJournal(data: JournalLogData): Promise<JournalLogResult> {
   try {
     // Use absolute URL for server-side calls
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-    const url = `${baseUrl}/api/journal`;
+    // Use relative URL for client-side calls
+    const url = '/api/journal';
     console.log('🔍 Journal logger calling:', url);
     const response = await fetch(url, {
       method: 'POST',
