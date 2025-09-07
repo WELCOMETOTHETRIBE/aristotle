@@ -90,11 +90,11 @@ export class BalanceEngine {
   }
   
   get progress(): number {
-    return Math.min(1, this.stableSeconds / this.config.goalSeconds);
+    return Math.min(1, this.sessionTime / this.config.goalSeconds);
   }
   
   get remainingTime(): number {
-    return Math.max(0, this.config.goalSeconds - this.stableSeconds);
+    return Math.max(0, this.config.goalSeconds - this.sessionTime);
   }
   
   get currentScore(): number {
@@ -270,8 +270,8 @@ export class BalanceEngine {
     // Notify listeners
     this.onMotionUpdate?.(this.motionData);
     
-    // Check for completion (60 seconds of stable time achieved)
-    if (this.stableSeconds >= this.config.goalSeconds) {
+    // Check for completion (60 seconds of total session time elapsed)
+    if (this.sessionTime >= this.config.goalSeconds) {
       console.log('🎯 Balance challenge completed!', {
         stableSeconds: this.stableSeconds,
         goalSeconds: this.config.goalSeconds,
