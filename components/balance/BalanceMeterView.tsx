@@ -312,22 +312,6 @@ export function BalanceMeterView({
           }}
         />
         
-        {/* Out of Zone Pulse Effect */}
-        <AnimatePresence>
-          {balanceState === 'out' && (
-            <motion.div 
-              className="absolute inset-0 rounded-full"
-              style={{
-                border: `2px solid ${colors.out}`,
-                opacity: 0.3
-              }}
-              initial={{ scale: 1, opacity: 0 }}
-              animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
-              exit={{ scale: 1, opacity: 0 }}
-              transition={{ duration: 0.5, repeat: Infinity }}
-            />
-          )}
-        </AnimatePresence>
       </div>
       
       {/* Status Text */}
