@@ -29,9 +29,9 @@ export default function BalanceTestSimplePage() {
         
         <BalanceCardNew
           title="Balance Challenge"
-          goalSeconds={30}
+          goalSeconds={60}
           onComplete={handleComplete}
-          virtueGrantPerCompletion={{ temperance: 1, wisdom: 1 }}
+          virtueGrantPerCompletion={{ temperance: 2, wisdom: 2 }}
         />
         
         <div className="mt-8 bg-white/10 p-6 rounded-xl text-white">
@@ -41,7 +41,7 @@ export default function BalanceTestSimplePage() {
             <li>2. Hold your device steady for 0.5s calibration</li>
             <li>3. Keep the green dot in the center circle</li>
             <li>4. The ring fills as you maintain balance</li>
-            <li>5. Complete 30 seconds of steady balance</li>
+            <li>5. Score up to 100 points in 60 seconds</li>
           </ol>
           
           <div className="mt-4 p-3 bg-green-900/30 border border-green-500/30 rounded text-sm">
@@ -49,6 +49,8 @@ export default function BalanceTestSimplePage() {
               <strong>✅ Success!</strong> The balance widget is now fully functional with:
             </p>
             <ul className="mt-2 space-y-1 text-green-100">
+              <li>• 60-second countdown timer</li>
+              <li>• 100-point scoring system</li>
               <li>• Real-time motion detection</li>
               <li>• Visual feedback system</li>
               <li>• Haptic feedback</li>

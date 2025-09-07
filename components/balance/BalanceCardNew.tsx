@@ -16,7 +16,7 @@ interface BalanceCardNewProps {
 
 export function BalanceCardNew({ 
   title = "Balance Challenge",
-  goalSeconds = 30,
+  goalSeconds = 60,
   onComplete,
   virtueGrantPerCompletion,
   className = ""
@@ -67,12 +67,12 @@ export function BalanceCardNew({
       className={`p-6 ${className}`}
     >
       {/* Motivational Message */}
-      <p className="text-sm text-gray-300 mb-4 text-center">
+      <p className="text-xs text-gray-300 mb-3 text-center">
         {getMotivationalMessage()}
       </p>
       
       {/* Main Balance Interface */}
-      <div className="mb-4">
+      <div className="mb-3">
         <BalanceMeterView
           goalSeconds={goalSeconds}
           onComplete={handleComplete}
@@ -80,10 +80,10 @@ export function BalanceCardNew({
       </div>
       
       {/* Stats Toggle */}
-      <div className="flex justify-center mb-3">
+      <div className="flex justify-center mb-2">
         <button
           onClick={() => setShowStats(!showStats)}
-          className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 transition-colors"
+          className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
         >
           {showStats ? 'Hide Stats' : 'Show Stats'}
         </button>
@@ -91,15 +91,15 @@ export function BalanceCardNew({
       
       {/* Stats Panel */}
       {showStats && (
-        <div className="bg-gray-800/30 rounded-lg p-4 mb-4">
-          <h3 className="text-white font-medium mb-3 flex items-center gap-2">
+        <div className="bg-gray-800/30 rounded-lg p-3 mb-3">
+          <h3 className="text-white font-medium mb-2 flex items-center gap-2 text-sm">
             <TrendingUp className="w-4 h-4" />
             Your Progress
           </h3>
           
-          <div className="grid grid-cols-2 gap-4 text-sm">
+          <div className="grid grid-cols-2 gap-3 text-xs">
             <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-yellow-400" />
+              <Trophy className="w-3 h-3 text-yellow-400" />
               <div>
                 <div className="text-gray-400">Best Time</div>
                 <div className="text-white font-medium">
@@ -109,7 +109,7 @@ export function BalanceCardNew({
             </div>
             
             <div className="flex items-center gap-2">
-              <Clock className="w-4 h-4 text-blue-400" />
+              <Clock className="w-3 h-3 text-blue-400" />
               <div>
                 <div className="text-gray-400">Sessions</div>
                 <div className="text-white font-medium">
@@ -119,7 +119,7 @@ export function BalanceCardNew({
             </div>
             
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-green-400" />
+              <TrendingUp className="w-3 h-3 text-green-400" />
               <div>
                 <div className="text-gray-400">Average</div>
                 <div className="text-white font-medium">
@@ -129,7 +129,7 @@ export function BalanceCardNew({
             </div>
             
             <div className="flex items-center gap-2">
-              <Target className="w-4 h-4 text-purple-400" />
+              <Target className="w-3 h-3 text-purple-400" />
               <div>
                 <div className="text-gray-400">Streak</div>
                 <div className="text-white font-medium">
@@ -141,8 +141,8 @@ export function BalanceCardNew({
           
           {/* Recent Sessions */}
           {recentSessions.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-700">
-              <h4 className="text-white font-medium mb-2">Recent Sessions</h4>
+            <div className="mt-3 pt-3 border-t border-gray-700">
+              <h4 className="text-white font-medium mb-2 text-xs">Recent Sessions</h4>
               <div className="space-y-1">
                 {recentSessions.slice(0, 3).map((session) => (
                   <div key={session.id} className="flex justify-between text-xs">
@@ -161,14 +161,9 @@ export function BalanceCardNew({
       )}
       
       {/* Instructions */}
-      <div className="text-center text-xs sm:text-sm text-gray-400">
-        <p>Hold your device steady to keep the dot in the center</p>
-        <p className="mt-1">The ring fills as you maintain balance</p>
-        {goalSeconds === 30 && (
-          <p className="mt-1 text-xs text-blue-400">
-            Try the 60-second challenge for advanced practice
-          </p>
-        )}
+      <div className="text-center text-xs text-gray-400">
+        <p>Hold steady for 60 seconds to score up to 100 points</p>
+        <p className="mt-1">The ring fills as you maintain perfect balance</p>
       </div>
     </GlassCard>
   );

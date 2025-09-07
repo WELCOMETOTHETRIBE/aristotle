@@ -15,14 +15,14 @@ export default function BalanceTestPage() {
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <BalanceCardNew
-            title="30-Second Challenge"
-            goalSeconds={30}
+            title="Balance Challenge"
+            goalSeconds={60}
             onComplete={handleComplete}
-            virtueGrantPerCompletion={{ temperance: 1, wisdom: 1 }}
+            virtueGrantPerCompletion={{ temperance: 2, wisdom: 2 }}
           />
           
           <BalanceCardNew
-            title="60-Second Challenge"
+            title="Balance Challenge (Test)"
             goalSeconds={60}
             onComplete={handleComplete}
             virtueGrantPerCompletion={{ temperance: 2, wisdom: 2 }}
@@ -35,6 +35,8 @@ export default function BalanceTestPage() {
             <div>
               <h3 className="text-lg font-semibold mb-2 text-green-400">✅ What's New</h3>
               <ul className="space-y-1 text-sm">
+                <li>• 60-second countdown timer</li>
+                <li>• 100-point scoring system</li>
                 <li>• Real-time motion detection with smoothing</li>
                 <li>• Visual dot that moves based on device orientation</li>
                 <li>• Safe zone with clear visual feedback</li>
@@ -51,6 +53,8 @@ export default function BalanceTestPage() {
                 <li>• Hold device steady to keep dot in center</li>
                 <li>• Green dot = stable, Red = out of balance</li>
                 <li>• Ring fills only when you're balanced</li>
+                <li>• Score climbs to 100 points for perfect balance</li>
+                <li>• 60-second countdown timer</li>
                 <li>• 0.5s calibration before each session</li>
                 <li>• Progress decays when you move too much</li>
                 <li>• Haptic feedback guides you back to center</li>

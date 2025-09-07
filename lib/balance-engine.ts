@@ -10,7 +10,8 @@ export interface MotionData {
 export interface BalanceConfig {
   alpha: number;      // EMA smoothing factor (0.10-0.25)
   deadZone: number;   // stability threshold in radians (~3.4°)
-  goalSeconds: number; // target time (30 or 60)
+  goalSeconds: number; // target time (60 seconds)
+  maxScore: number;   // maximum score achievable (100 points)
 }
 
 export class BalanceEngine {
@@ -41,7 +42,8 @@ export class BalanceEngine {
   private config: BalanceConfig = {
     alpha: 0.15,
     deadZone: 0.06, // ~3.4 degrees
-    goalSeconds: 30
+    goalSeconds: 60,
+    maxScore: 100
   };
   
   // Callbacks
@@ -77,6 +79,17 @@ export class BalanceEngine {
   
   get remainingTime(): number {
     return Math.max(0, this.config.goalSeconds - this.stableSeconds);
+  }
+  
+  get currentScore(): number {
+    // Score based on stable time, with bonus for perfect balance
+    const baseScore = (this.stableSeconds / this.config.goalSeconds) * this.config.maxScore;
+    const perfectBonus = this.isStable() ? 1.0 : 0.8; // 20% bonus for being stable
+    return Math.min(this.config.maxScore, baseScore * perfectBonus);
+  }
+  
+  get sessionTime(): number {
+    return this.isRunning ? (Date.now() - this.sessionStartTime) / 1000 : 0;
   }
   
   // Event handlers
@@ -228,8 +241,8 @@ export class BalanceEngine {
     // Notify listeners
     this.onMotionUpdate?.(this.motionData);
     
-    // Check for completion
-    if (this.stableSeconds >= this.config.goalSeconds) {
+    // Check for completion (60 seconds elapsed)
+    if (this.sessionTime >= this.config.goalSeconds) {
       this.onStateChange?.('completed');
     }
   }

@@ -15,7 +15,7 @@ interface BalanceMeterViewProps {
 }
 
 export function BalanceMeterView({ 
-  goalSeconds = 30, 
+  goalSeconds = 60, 
   onComplete,
   className = ''
 }: BalanceMeterViewProps) {
@@ -137,6 +137,7 @@ export function BalanceMeterView({
   
   const handleSessionComplete = useCallback(async () => {
     const totalDuration = Date.now() - sessionStartTime;
+    const finalScore = Math.round(engine.currentScore);
     const session: SessionSummary = {
       id: '',
       date: new Date(),
@@ -158,12 +159,13 @@ export function BalanceMeterView({
     try {
       await logToJournal({
         type: 'activity',
-        content: `Completed ${goalSeconds}-second balance challenge! Held steady for ${Math.floor(motionData.stableSeconds)} seconds.`,
+        content: `Completed 60-second balance challenge! Scored ${finalScore}/100 points with ${Math.floor(motionData.stableSeconds)}s of stable balance.`,
         category: 'balance_training',
         metadata: {
           goalSeconds,
           stableSeconds: Math.floor(motionData.stableSeconds),
           totalDuration,
+          finalScore,
           balanceState,
           maxPitch: Math.abs(motionData.pitch),
           maxRoll: Math.abs(motionData.roll),
@@ -179,7 +181,7 @@ export function BalanceMeterView({
     }
     
     onComplete?.(savedSession);
-  }, [sessionStartTime, goalSeconds, motionData, balanceState, haptic, onComplete]);
+  }, [sessionStartTime, goalSeconds, motionData, balanceState, haptic, onComplete, engine]);
   
   // Get screen coordinates for the dot
   const getDotPosition = useCallback(() => {
@@ -222,6 +224,8 @@ export function BalanceMeterView({
   const dotPosition = getDotPosition();
   const progress = engine.progress;
   const remainingTime = engine.remainingTime;
+  const currentScore = engine.currentScore;
+  const sessionTime = engine.sessionTime;
   
   // Get status text
   const getStatusText = () => {
@@ -250,7 +254,7 @@ export function BalanceMeterView({
       {/* Main Balance Display */}
       <div 
         ref={containerRef}
-        className="relative w-full max-w-[280px] aspect-square mb-4"
+        className="relative w-full max-w-[240px] aspect-square mb-3"
       >
         {/* Safe Zone Circle */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -268,18 +272,21 @@ export function BalanceMeterView({
         {/* Progress Ring */}
         <div className="absolute inset-0 flex items-center justify-center">
           <AnimatedProgressRing
-            size={Math.min(280, containerRef.current?.offsetWidth || 280)}
+            size={Math.min(240, containerRef.current?.offsetWidth || 240)}
             targetProgress={progress}
             color={state === 'completed' ? 'completed' : balanceState}
             isAnimating={state === 'running'}
           >
-            {/* Countdown Timer */}
+            {/* Timer and Score Display */}
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
-                {state === 'running' ? Math.ceil(remainingTime) : Math.floor(motionData.stableSeconds)}
+              <div className="text-xl sm:text-2xl font-bold text-white mb-1">
+                {state === 'running' ? Math.ceil(remainingTime) : Math.floor(sessionTime)}
               </div>
-              <div className="text-xs sm:text-sm text-gray-400">
-                {state === 'running' ? 'remaining' : 'stable'}
+              <div className="text-xs text-gray-400 mb-1">
+                {state === 'running' ? 'seconds left' : 'total time'}
+              </div>
+              <div className="text-lg font-bold text-green-400">
+                {Math.round(currentScore)} pts
               </div>
             </div>
           </AnimatedProgressRing>
@@ -310,59 +317,59 @@ export function BalanceMeterView({
       </div>
       
       {/* Status Text */}
-      <div className="text-center mb-4">
-        <div className="text-base sm:text-lg font-medium text-white mb-2">
+      <div className="text-center mb-3">
+        <div className="text-sm font-medium text-white mb-1">
           {getStatusText()}
         </div>
-        <div className="text-xs sm:text-sm text-gray-400">
-          Goal: {goalSeconds}s • Target: {Math.floor(motionData.stableSeconds)}s stable
+        <div className="text-xs text-gray-400">
+          {state === 'running' ? `${Math.floor(sessionTime)}s elapsed` : `Stable: ${Math.floor(motionData.stableSeconds)}s`}
         </div>
       </div>
       
       {/* Controls */}
-      <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 justify-center">
+      <div className="flex flex-wrap gap-2 mb-3 justify-center">
         {state === 'idle' ? (
           <button
             onClick={handleStart}
-            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
+            className="flex items-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white font-medium text-sm"
           >
-            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Play className="w-4 h-4" />
             Start
           </button>
         ) : (
           <button
             onClick={handleStop}
-            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
+            className="flex items-center gap-1 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors text-white font-medium text-sm"
           >
-            <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
+            <Pause className="w-4 h-4" />
             Stop
           </button>
         )}
         
         <button
           onClick={handleReset}
-          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
+          className="flex items-center gap-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm"
         >
-          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
+          <RotateCcw className="w-4 h-4" />
           Reset
         </button>
         
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
+          className="flex items-center gap-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm"
         >
-          <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
+          <Settings className="w-4 h-4" />
           Settings
         </button>
       </div>
       
       {/* Settings Panel */}
       {showSettings && (
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 w-full max-w-sm">
-          <h3 className="text-white font-medium mb-3">Settings</h3>
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-3 w-full max-w-sm">
+          <h3 className="text-white font-medium mb-2 text-sm">Settings</h3>
           
-          <div className="space-y-3">
-            <label className="flex items-center justify-between text-white">
+          <div className="space-y-2">
+            <label className="flex items-center justify-between text-white text-sm">
               <span>Haptic Feedback</span>
               <input
                 type="checkbox"
@@ -372,11 +379,11 @@ export function BalanceMeterView({
                   setSettings(newSettings);
                   haptic.updateConfig({ enabled: e.target.checked });
                 }}
-                className="w-4 h-4"
+                className="w-3 h-3"
               />
             </label>
             
-            <label className="flex items-center justify-between text-white">
+            <label className="flex items-center justify-between text-white text-sm">
               <span>Audio Cues</span>
               <input
                 type="checkbox"
@@ -386,17 +393,17 @@ export function BalanceMeterView({
                   setSettings(newSettings);
                   haptic.updateConfig({ volume: e.target.checked ? 0.5 : 0 });
                 }}
-                className="w-4 h-4"
+                className="w-3 h-3"
               />
             </label>
             
-            <label className="flex items-center justify-between text-white">
+            <label className="flex items-center justify-between text-white text-sm">
               <span>High Contrast</span>
               <input
                 type="checkbox"
                 checked={settings.highContrast}
                 onChange={(e) => setSettings({ ...settings, highContrast: e.target.checked })}
-                className="w-4 h-4"
+                className="w-3 h-3"
               />
             </label>
           </div>
