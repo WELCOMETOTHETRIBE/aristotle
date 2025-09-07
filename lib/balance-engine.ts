@@ -40,8 +40,8 @@ export class BalanceEngine {
   
   // Configuration
   private config: BalanceConfig = {
-    alpha: 0.15,
-    deadZone: 0.06, // ~3.4 degrees
+    alpha: 0.08, // More aggressive smoothing to reduce jitter
+    deadZone: 0.08, // Slightly larger dead zone for stability
     goalSeconds: 60,
     maxScore: 100
   };
@@ -78,14 +78,17 @@ export class BalanceEngine {
   }
   
   get remainingTime(): number {
-    return Math.max(0, this.config.goalSeconds - this.stableSeconds);
+    return Math.max(0, this.config.goalSeconds - this.sessionTime);
   }
   
   get currentScore(): number {
-    // Score based on stable time, with bonus for perfect balance
+    // Score based on stable time as percentage of goal
     const baseScore = (this.stableSeconds / this.config.goalSeconds) * this.config.maxScore;
-    const perfectBonus = this.isStable() ? 1.0 : 0.8; // 20% bonus for being stable
-    return Math.min(this.config.maxScore, baseScore * perfectBonus);
+    
+    // Apply bonus for current stability (small bonus for being stable right now)
+    const stabilityBonus = this.isStable() ? 1.0 : 0.95;
+    
+    return Math.min(this.config.maxScore, baseScore * stabilityBonus);
   }
   
   get sessionTime(): number {
@@ -286,9 +289,10 @@ export class BalanceEngine {
     const rollAbs = Math.abs(this.smoothedRoll);
     const maxDeviation = Math.max(pitchAbs, rollAbs);
     
-    if (maxDeviation < this.config.deadZone) {
+    // Use more generous thresholds to prevent flickering
+    if (maxDeviation < this.config.deadZone * 0.8) {
       return 'stable';
-    } else if (maxDeviation < this.config.deadZone * 1.5) {
+    } else if (maxDeviation < this.config.deadZone * 2.0) {
       return 'borderline';
     } else {
       return 'out';

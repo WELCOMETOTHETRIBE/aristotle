@@ -86,13 +86,15 @@ export function BalanceCardNew({
             <div>
               <h3 className="font-bold text-white text-lg">{title}</h3>
               <p className="text-sm text-gray-400">
-                {stats.totalSessions > 0 ? `${stats.totalSessions} sessions completed` : 'Test your balance and mindfulness'}
+                Test your balance and mindfulness
               </p>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold text-blue-400">{stats.bestStableSeconds}</div>
-            <div className="text-xs text-gray-400">Best (s)</div>
+            <div className="text-2xl font-bold text-blue-400">
+              {stats.totalSessions > 0 ? Math.round((stats.bestStableSeconds / 60) * 100) : 0}
+            </div>
+            <div className="text-xs text-gray-400">Best Score</div>
           </div>
         </div>
         {/* Motivational Message */}
@@ -158,9 +160,9 @@ export function BalanceCardNew({
                 >
                   <Trophy className="w-4 h-4 text-yellow-400" />
                   <div>
-                    <div className="text-gray-400">Best Time</div>
+                    <div className="text-gray-400">Best Score</div>
                     <div className="text-white font-medium">
-                      {formatTime(stats.bestStableSeconds)}
+                      {stats.totalSessions > 0 ? Math.round((stats.bestStableSeconds / 60) * 100) : 0}/100
                     </div>
                   </div>
                 </motion.div>
@@ -184,9 +186,9 @@ export function BalanceCardNew({
                 >
                   <TrendingUp className="w-4 h-4 text-green-400" />
                   <div>
-                    <div className="text-gray-400">Average</div>
+                    <div className="text-gray-400">Avg Score</div>
                     <div className="text-white font-medium">
-                      {formatTime(stats.averageStableSeconds)}
+                      {stats.totalSessions > 0 ? Math.round((stats.averageStableSeconds / 60) * 100) : 0}/100
                     </div>
                   </div>
                 </motion.div>
@@ -225,7 +227,7 @@ export function BalanceCardNew({
                           {session.date.toLocaleDateString()}
                         </span>
                         <span className="text-white font-medium">
-                          {formatTime(session.secondsStable)} / {formatTime(session.goal)}
+                          {Math.round((session.secondsStable / session.goal) * 100)}/100
                         </span>
                       </motion.div>
                     ))}
