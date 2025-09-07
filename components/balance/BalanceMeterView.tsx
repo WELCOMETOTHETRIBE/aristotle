@@ -124,6 +124,13 @@ export function BalanceMeterView({
   }, [engine, haptic]);
   
   const handleSessionComplete = useCallback(async () => {
+    console.log('🎯 handleSessionComplete called!', {
+      stableSeconds: motionData.stableSeconds,
+      goalSeconds,
+      sessionStartTime,
+      balanceState
+    });
+    
     const totalDuration = Date.now() - sessionStartTime;
     const finalScore = Math.round(engine.currentScore);
     const session: SessionSummary = {
@@ -140,11 +147,14 @@ export function BalanceMeterView({
       }
     };
     
+    console.log('💾 Saving session:', session);
     const savedSession = SessionStore.saveSession(session);
+    console.log('💾 Session saved with ID:', savedSession.id);
     
     // Log successful balance session to journal
     try {
-      await logToJournal({
+      console.log('📝 Logging balance session to journal...');
+      const journalData = {
         type: 'activity',
         content: `Completed 60-second balance challenge! Scored ${finalScore}/100 points with ${Math.floor(motionData.stableSeconds)}s of stable balance.`,
         category: 'balance_training',
@@ -162,9 +172,12 @@ export function BalanceMeterView({
         },
         moduleId: 'balance_gyro',
         widgetId: 'balance_challenge'
-      });
+      };
+      console.log('📝 Journal data:', journalData);
+      const result = await logToJournal(journalData);
+      console.log('📝 Journal log result:', result);
     } catch (error) {
-      console.error('Error logging balance session to journal:', error);
+      console.error('❌ Error logging balance session to journal:', error);
     }
     
     onComplete?.(savedSession);

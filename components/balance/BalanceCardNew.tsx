@@ -50,7 +50,7 @@ export function BalanceCardNew({
       return "Start your balance journey today!";
     }
     
-    if (stats.currentStreak > 0) {
+    if (stats.currentStreak >= 3) {
       return `Great streak! ${stats.currentStreak} days in a row!`;
     }
     
@@ -198,12 +198,14 @@ export function BalanceCardNew({
                   whileHover={{ scale: 1.05 }}
                 >
                   <Target className="w-4 h-4 text-purple-400" />
-                  <div>
-                    <div className="text-gray-400">Streak</div>
-                    <div className="text-white font-medium">
-                      {stats.currentStreak} days
+                  {stats.currentStreak >= 3 && (
+                    <div>
+                      <div className="text-gray-400">Streak</div>
+                      <div className="text-white font-medium">
+                        {stats.currentStreak} days
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </motion.div>
               </div>
           

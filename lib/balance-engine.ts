@@ -94,7 +94,7 @@ export class BalanceEngine {
   }
   
   get remainingTime(): number {
-    return Math.max(0, this.config.goalSeconds - this.sessionTime);
+    return Math.max(0, this.config.goalSeconds - this.stableSeconds);
   }
   
   get currentScore(): number {
@@ -270,8 +270,13 @@ export class BalanceEngine {
     // Notify listeners
     this.onMotionUpdate?.(this.motionData);
     
-    // Check for completion (60 seconds elapsed)
-    if (this.sessionTime >= this.config.goalSeconds) {
+    // Check for completion (60 seconds of stable time achieved)
+    if (this.stableSeconds >= this.config.goalSeconds) {
+      console.log('🎯 Balance challenge completed!', {
+        stableSeconds: this.stableSeconds,
+        goalSeconds: this.config.goalSeconds,
+        sessionTime: this.sessionTime
+      });
       this.haptic.trigger('completion');
       this.onStateChange?.('completed');
     }
