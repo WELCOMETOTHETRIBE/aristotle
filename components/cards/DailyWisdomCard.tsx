@@ -166,10 +166,18 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         const newWisdom = await response.json();
         setWisdom(newWisdom);
         
+        // Save wisdom for today
+        const today = new Date().toDateString();
+        const dailyWisdomKey = `dailyWisdom_${today}`;
+        localStorage.setItem(dailyWisdomKey, JSON.stringify(newWisdom));
+        localStorage.setItem('lastDailyWisdomCheck', today);
+        
+        console.log('📚 Saved new daily wisdom for today:', newWisdom.framework);
+        
         // Log new wisdom to journal
         const wisdomLogData = {
           type: 'daily_wisdom_refresh',
-          content: `Refreshed daily wisdom: "${newWisdom.quote}" - ${newWisdom.author} (${newWisdom.framework})`,
+          content: `Daily wisdom loaded: "${newWisdom.quote}" - ${newWisdom.author} (${newWisdom.framework})`,
           category: 'wisdom',
           metadata: {
             quote: newWisdom.quote,
@@ -177,6 +185,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             framework: newWisdom.framework,
             frameworks: frameworksToUse,
             timestamp: new Date().toISOString(),
+            isDailyWisdom: true
           },
           moduleId: 'daily_wisdom',
           widgetId: 'daily_wisdom_card',
@@ -215,28 +224,53 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     }
   };
 
-  // Load wisdom on mount and every 6 hours
+  // Load wisdom on mount and check for daily reset
   useEffect(() => {
     const loadWisdomIfNeeded = () => {
       if (typeof window === 'undefined') return;
       
       const now = new Date();
-      const currentHour = now.getHours();
-      const currentTimeSlot = Math.floor(currentHour / 6); // 0-3 for 6-hour slots
-      const lastLoadTime = localStorage.getItem('lastWisdomLoadTime');
-      const lastTimeSlot = lastLoadTime ? Math.floor(new Date(lastLoadTime).getHours() / 6) : -1;
+      const today = now.toDateString(); // e.g., "Mon Jan 01 2024"
       
-      // Load wisdom if it's a new 6-hour time slot or if never loaded
-      if (lastTimeSlot !== currentTimeSlot) {
+      // Check if we have wisdom for today
+      const dailyWisdomKey = `dailyWisdom_${today}`;
+      const savedWisdom = localStorage.getItem(dailyWisdomKey);
+      
+      if (savedWisdom) {
+        // Load existing wisdom for today
+        try {
+          const parsedWisdom = JSON.parse(savedWisdom);
+          setWisdom(parsedWisdom);
+          setIsLoading(false);
+          console.log('📚 Loaded existing daily wisdom for today');
+        } catch (error) {
+          console.error('Error parsing saved wisdom:', error);
+          // Fallback to loading new wisdom
+          loadDailyWisdom();
+        }
+      } else {
+        // No wisdom for today, load new one
+        console.log('📚 No wisdom for today, loading new daily wisdom');
         loadDailyWisdom();
-        localStorage.setItem('lastWisdomLoadTime', now.toISOString());
       }
     };
 
     loadWisdomIfNeeded();
     
-    // Set up interval to check every hour
-    const interval = setInterval(loadWisdomIfNeeded, 60 * 60 * 1000);
+    // Set up interval to check for midnight reset every minute
+    const interval = setInterval(() => {
+      const now = new Date();
+      const today = now.toDateString();
+      const lastCheck = localStorage.getItem('lastDailyWisdomCheck');
+      
+      if (lastCheck !== today) {
+        // New day detected, clear old wisdom and load new
+        console.log('📚 New day detected, loading fresh daily wisdom');
+        localStorage.removeItem(`dailyWisdom_${lastCheck}`);
+        loadDailyWisdom();
+        localStorage.setItem('lastDailyWisdomCheck', today);
+      }
+    }, 60 * 1000); // Check every minute
     
     return () => clearInterval(interval);
   }, [settings.preferredFrameworks]); // Re-run when frameworks change
@@ -334,26 +368,21 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const getNextRefreshTime = () => {
     if (typeof window === 'undefined') return 'Loading...';
     
-    const lastLoadTime = localStorage.getItem('lastWisdomLoadTime');
-    if (!lastLoadTime) {
-      return 'Never loaded';
-    }
-    const lastLoadDate = new Date(lastLoadTime);
     const now = new Date();
+    
+    // Calculate next midnight (00:00)
+    const nextMidnight = new Date(now);
+    nextMidnight.setHours(24, 0, 0, 0); // Set to next midnight
+    
+    const timeDiff = nextMidnight.getTime() - now.getTime();
+    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
 
-    // Calculate the next 6-hour slot
-    const nextSlot = Math.ceil(now.getHours() / 6);
-    const nextHour = nextSlot * 6;
-    const nextDate = new Date(lastLoadDate);
-    nextDate.setHours(nextHour, 0, 0, 0);
-
-    if (nextDate <= now) {
-      // If the next slot is in the past (e.g., if it was 5:30 AM and now is 6:00 AM)
-      // The next refresh will be in the next 6-hour period.
-      nextDate.setHours(nextHour + 6, 0, 0, 0);
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
     }
-
-    return nextDate.toLocaleTimeString([], { hour: 'numeric', minute: 'numeric' });
   };
 
   return (
@@ -549,9 +578,9 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
               <span>{getFrameworkEmoji(wisdom.framework.toLowerCase())}</span>
               <span>{getFrameworkName(wisdom.framework.toLowerCase())}</span>
             </div>
-            <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
-              Next: {getNextRefreshTime()}
-            </div>
+                <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
+                  Resets: {getNextRefreshTime()}
+                </div>
           </div>
         </div>
 
@@ -574,19 +603,24 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
 
         {/* Action Buttons - Compact Design */}
         <div className="flex items-center gap-2 pt-3">
-          <button
-            onClick={loadDailyWisdom}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md hover:bg-purple-500/30 transition-colors disabled:opacity-50 text-sm"
-            title="Get new wisdom"
-          >
-            {isLoading ? (
-              <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <RefreshCw className="w-3.5 h-3.5" />
-            )}
-            New
-          </button>
+              <button
+                onClick={() => {
+                  // Force load new wisdom (bypass daily persistence)
+                  const today = new Date().toDateString();
+                  localStorage.removeItem(`dailyWisdom_${today}`);
+                  loadDailyWisdom();
+                }}
+                disabled={isLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md hover:bg-purple-500/30 transition-colors disabled:opacity-50 text-sm"
+                title="Get new wisdom (bypasses daily persistence)"
+              >
+                {isLoading ? (
+                  <RotateCcw className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="w-3.5 h-3.5" />
+                )}
+                New
+              </button>
           
           <button
             onClick={() => {
