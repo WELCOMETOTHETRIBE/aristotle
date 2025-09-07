@@ -24,7 +24,7 @@ import AcademyLogo from '@/components/AcademyLogo';
 import { Target, Heart, Brain, BookOpen, Grid3X3, MessageCircle, Plus, Activity, Zap, Shield, Camera, Leaf, Timer } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { NaturePhotoLogWidget } from '@/components/ModuleWidgets';
-import BalanceCard from '@/components/widgets/BalanceCard';
+import { BalanceCardNew } from '@/components/balance/BalanceCardNew';
 import Link from 'next/link';
 
 export default function TodayPage() {
@@ -149,11 +149,11 @@ export default function TodayPage() {
           return <JournalCard key={widgetId} />;
         case 'balance_gyro':
           return (
-            <BalanceCard 
+            <BalanceCardNew 
               key={widgetId}
               title="Balance Challenge"
-              config={{ targetSec: 60, sensitivity: 'medium', teaching: "Find your center through stillness" }}
-              onComplete={() => console.log('Balance challenge completed')}
+              goalSeconds={60}
+              onComplete={(session) => console.log('Balance challenge completed:', session)}
               virtueGrantPerCompletion={{ temperance: 2, wisdom: 1 }}
             />
           );

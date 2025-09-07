@@ -10,7 +10,7 @@ import {
 import { cn } from '@/lib/utils';
 import { logToJournal } from '@/lib/journal-logger';
 import { BreathworkWidgetNew } from './BreathworkWidgetNew';
-import BalanceCard from './widgets/BalanceCard';
+import { BalanceCardNew } from './balance/BalanceCardNew';
 
 // ===== ENHANCED BREATHWORK WIDGET =====
 interface BreathworkWidgetProps {
@@ -1794,10 +1794,10 @@ export default function ModuleWidget({ moduleId, moduleName, frameworkTone }: {
     case 'nature_photo_log':
       return <NaturePhotoLogWidget frameworkTone={frameworkTone} />;
     case 'balance_gyro':
-      return <BalanceCard 
+      return <BalanceCardNew 
         title="Balance Challenge"
-        config={{ targetSec: 60, sensitivity: 'medium', teaching: "Find your center through stillness" }}
-        onComplete={() => console.log('Balance challenge completed')}
+        goalSeconds={60}
+        onComplete={(session) => console.log('Balance challenge completed:', session)}
         virtueGrantPerCompletion={{ temperance: 2, wisdom: 1 }}
       />;
     default:
