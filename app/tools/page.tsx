@@ -224,6 +224,7 @@ export default function ToolsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedWidget, setSelectedWidget] = useState<Widget | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showFeedback, setShowFeedback] = useState<{message: string, type: 'success' | 'info'} | null>(null);
 
   // Load user's added widgets from localStorage
   useEffect(() => {
@@ -282,7 +283,13 @@ export default function ToolsPage() {
       const widget = updatedWidgets.find(w => w.id === widgetId);
       if (widget) {
         const action = widget.isAdded ? 'added to' : 'removed from';
-        console.log(`${widget.name} ${action} your homepage`);
+        const message = `${widget.name} ${action} your Today page`;
+        setShowFeedback({ message, type: 'success' });
+        
+        // Auto-hide feedback after 2 seconds
+        setTimeout(() => setShowFeedback(null), 2000);
+        
+        console.log(message);
       }
       
       return updatedWidgets;
@@ -408,14 +415,12 @@ export default function ToolsPage() {
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredWidgets.map((widget) => (
-                <motion.button
+                <motion.div
                   key={widget.id}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  onClick={() => openWidgetModal(widget)}
-                  className="group bg-surface border border-border rounded-2xl p-4 hover:shadow-lg hover:border-primary/30 transition-all duration-200 text-left"
+                  className="group bg-surface border border-border rounded-2xl p-4 hover:shadow-lg hover:border-primary/30 transition-all duration-200"
                   whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                 >
                   {/* Widget Icon */}
                   <div className={`w-16 h-16 bg-gradient-to-r ${widget.color} rounded-2xl flex items-center justify-center shadow-sm mb-3 mx-auto group-hover:shadow-lg transition-shadow`}>
@@ -423,26 +428,52 @@ export default function ToolsPage() {
                   </div>
 
                   {/* Widget Info */}
-                  <div className="text-center">
+                  <div className="text-center mb-3">
                     <h3 className="font-semibold text-text text-sm mb-1 line-clamp-2">{widget.name}</h3>
-                    <p className="text-xs text-muted line-clamp-2 mb-2">{widget.description}</p>
-                    
-                    {/* Status Badge */}
-                    <div className="flex items-center justify-center">
-                      {widget.isAdded ? (
-                        <div className="px-2 py-1 bg-success/10 text-success text-xs rounded-full flex items-center gap-1">
-                          <Check className="w-3 h-3" />
-                          Added
-                        </div>
-                      ) : (
-                        <div className="px-2 py-1 bg-primary/10 text-primary text-xs rounded-full flex items-center gap-1">
-                          <Plus className="w-3 h-3" />
-                          Add
-                        </div>
-                      )}
-                    </div>
+                    <p className="text-xs text-muted line-clamp-2">{widget.description}</p>
                   </div>
-                </motion.button>
+                  
+                  {/* Action Buttons */}
+                  <div className="flex gap-2">
+                    {widget.isAdded ? (
+                      <>
+                        <motion.button
+                          onClick={() => openWidgetModal(widget)}
+                          className="flex-1 px-3 py-2 bg-surface-2 hover:bg-surface-3 text-text text-xs rounded-lg transition-colors border border-border"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          View
+                        </motion.button>
+                        <motion.button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            toggleWidget(widget.id);
+                          }}
+                          className="flex-1 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 text-xs rounded-lg transition-colors border border-red-500/30 flex items-center justify-center gap-1"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <X className="w-3 h-3" />
+                          Remove
+                        </motion.button>
+                      </>
+                    ) : (
+                      <motion.button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleWidget(widget.id);
+                        }}
+                        className="w-full px-3 py-2 bg-primary hover:bg-primary/90 text-white text-xs rounded-lg transition-colors flex items-center justify-center gap-1"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Plus className="w-3 h-3" />
+                        Add to Today
+                      </motion.button>
+                    )}
+                  </div>
+                </motion.div>
               ))}
             </div>
           )}
@@ -458,14 +489,41 @@ export default function ToolsPage() {
               <div>
                 <h3 className="font-semibold text-text mb-1">How to use widgets</h3>
                 <p className="text-sm text-muted">
-                  Click on any widget to view details and add it to your Today page. 
-                  Each widget provides specific functionality to help you track, practice, and grow.
+                  Click "Add to Today" to instantly add widgets to your Today page, or "Remove" to take them off. 
+                  Use "View" to see more details about added widgets. Each widget provides specific functionality to help you track, practice, and grow.
                 </p>
               </div>
             </div>
           </div>
         )}
       </main>
+
+      {/* Feedback Notification */}
+      <AnimatePresence>
+        {showFeedback && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 50, scale: 0.9 }}
+            className="fixed bottom-20 left-1/2 transform -translate-x-1/2 z-50"
+          >
+            <div className={`px-4 py-3 rounded-xl shadow-lg backdrop-blur-sm border ${
+              showFeedback.type === 'success' 
+                ? 'bg-green-500/20 border-green-500/30 text-green-400' 
+                : 'bg-blue-500/20 border-blue-500/30 text-blue-400'
+            }`}>
+              <div className="flex items-center gap-2">
+                {showFeedback.type === 'success' ? (
+                  <Check className="w-4 h-4" />
+                ) : (
+                  <Sparkles className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">{showFeedback.message}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Full-Screen Widget Modal */}
       <AnimatePresence>
@@ -513,30 +571,44 @@ export default function ToolsPage() {
                   </span>
                 </div>
 
-                {/* Action Button */}
-                <button
-                  onClick={() => {
-                    toggleWidget(selectedWidget.id);
-                    closeWidgetModal();
-                  }}
-                  className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-200 ${
-                    selectedWidget.isAdded
-                      ? 'bg-success/20 text-success hover:bg-success/30 border border-success/30'
-                      : 'bg-primary text-white hover:bg-primary/90 shadow-lg hover:shadow-xl'
-                  }`}
-                >
+                {/* Action Buttons */}
+                <div className="flex gap-3">
                   {selectedWidget.isAdded ? (
-                    <span className="flex items-center justify-center gap-2">
-                      <Check className="w-5 h-5" />
-                      Remove from Homepage
-                    </span>
+                    <motion.button
+                      onClick={() => {
+                        toggleWidget(selectedWidget.id);
+                        closeWidgetModal();
+                      }}
+                      className="flex-1 py-3 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-xl font-semibold transition-all duration-200 border border-red-500/30 flex items-center justify-center gap-2"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <X className="w-4 h-4" />
+                      Remove from Today
+                    </motion.button>
                   ) : (
-                    <span className="flex items-center justify-center gap-2">
-                      <Plus className="w-5 h-5" />
-                      Add to Homepage
-                    </span>
+                    <motion.button
+                      onClick={() => {
+                        toggleWidget(selectedWidget.id);
+                        closeWidgetModal();
+                      }}
+                      className="flex-1 py-3 bg-primary text-white hover:bg-primary/90 rounded-xl font-semibold transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2"
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Plus className="w-4 h-4" />
+                      Add to Today
+                    </motion.button>
                   )}
-                </button>
+                  <motion.button
+                    onClick={closeWidgetModal}
+                    className="px-6 py-3 bg-surface-2 hover:bg-surface-3 text-text rounded-xl font-semibold transition-all duration-200 border border-border"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    Close
+                  </motion.button>
+                </div>
               </div>
             </motion.div>
           </motion.div>
