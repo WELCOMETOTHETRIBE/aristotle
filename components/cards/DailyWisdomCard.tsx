@@ -40,13 +40,8 @@ const availableFrameworks = [
 ];
 
 export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
-  const [wisdom, setWisdom] = useState<DailyWisdom>({
-    quote: "The unexamined life is not worth living.",
-    author: "Socrates",
-    framework: "Stoicism",
-    reflection: "What aspect of your life needs deeper examination today?"
-  });
-  const [isLoading, setIsLoading] = useState(false);
+  const [wisdom, setWisdom] = useState<DailyWisdom | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [showSettings, setShowSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
   const [settings, setSettings] = useState<WisdomSettings>({
@@ -56,7 +51,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     enableNotifications: true,
   });
 
-  // Load saved settings and user's selected frameworks
+  // Load saved settings and user's selected frameworks, then load wisdom
   useEffect(() => {
     const loadSettingsAndFrameworks = async () => {
       // Load saved settings
@@ -89,6 +84,9 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       } catch (error) {
         console.error('Error loading user frameworks:', error);
       }
+      
+      // Load wisdom immediately after settings are loaded
+      await loadDailyWisdom();
     };
 
     loadSettingsAndFrameworks();
@@ -164,19 +162,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         }),
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('📱 Mobile Debug - API Error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData,
-          requestBody: {
-            frameworks: frameworksToUse,
-            date: new Date().toISOString().split('T')[0]
-          }
-        });
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-      }      if (response.ok) {
+      if (response.ok) {
         const newWisdom = await response.json();
         setWisdom(newWisdom);
         
@@ -196,9 +182,34 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           widgetId: 'daily_wisdom_card',
         };
         await logToJournal(wisdomLogData);
+      } else {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('📱 Mobile Debug - API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          requestBody: {
+            frameworks: frameworksToUse,
+            date: new Date().toISOString().split('T')[0]
+          }
+        });
+        // Fallback to default wisdom if API fails
+        setWisdom({
+          quote: "The unexamined life is not worth living.",
+          author: "Socrates",
+          framework: "Stoicism",
+          reflection: "What aspect of your life needs deeper examination today?"
+        });
       }
     } catch (error) {
       console.error('Error loading daily wisdom:', error);
+      // Fallback to default wisdom if API fails
+      setWisdom({
+        quote: "The unexamined life is not worth living.",
+        author: "Socrates",
+        framework: "Stoicism",
+        reflection: "What aspect of your life needs deeper examination today?"
+      });
     } finally {
       setIsLoading(false);
     }
@@ -232,14 +243,14 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
 
   // Check if current quote is in favorites
   const isFavorite = () => {
-    if (typeof window === 'undefined') return false;
+    if (typeof window === 'undefined' || !wisdom) return false;
     const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
     return favorites.some((fav: any) => fav.quote === wisdom.quote && fav.author === wisdom.author);
   };
 
   // Toggle favorite status
   const toggleFavorite = async () => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !wisdom) return;
     
     const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
     const currentQuote = { quote: wisdom.quote, author: wisdom.author, framework: wisdom.framework, timestamp: new Date().toISOString() };
@@ -468,41 +479,66 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
 
       {/* Wisdom Content */}
       <div className="space-y-4">
-        {/* Quote */}
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={wisdom.quote}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.3 }}
-            className="relative"
-          >
-            <Quote className="absolute -top-2 -left-2 w-6 h-6 text-purple-400/50" />
-            <div className="flex items-start justify-between pl-6">
-              <blockquote className="text-lg font-serif italic text-text leading-relaxed flex-1">
-                "{wisdom.quote}"
-              </blockquote>
-              <button
-                onClick={toggleFavorite}
-                className={`ml-3 p-1.5 rounded-full transition-all duration-200 flex-shrink-0 ${
-                  isFavorite()
-                    ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                    : 'text-muted hover:text-yellow-400 hover:bg-yellow-500/10'
-                }`}
-                title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-purple-300">Loading wisdom...</span>
+            </div>
+          </div>
+        ) : wisdom ? (
+          <>
+            {/* Quote */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={wisdom.quote}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="relative"
               >
-                {isFavorite() ? (
-                  <span className="text-lg">★</span>
-                ) : (
-                  <span className="text-lg">☆</span>
-                )}
+                <Quote className="absolute -top-2 -left-2 w-6 h-6 text-purple-400/50" />
+                <div className="flex items-start justify-between pl-6">
+                  <blockquote className="text-lg font-serif italic text-text leading-relaxed flex-1">
+                    "{wisdom.quote}"
+                  </blockquote>
+                  <button
+                    onClick={toggleFavorite}
+                    className={`ml-3 p-1.5 rounded-full transition-all duration-200 flex-shrink-0 ${
+                      isFavorite()
+                        ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                        : 'text-muted hover:text-yellow-400 hover:bg-yellow-500/10'
+                    }`}
+                    title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    {isFavorite() ? (
+                      <span className="text-lg">★</span>
+                    ) : (
+                      <span className="text-lg">☆</span>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
+          </>
+        ) : (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="text-purple-300 mb-2">Failed to load wisdom</div>
+              <button
+                onClick={loadDailyWisdom}
+                className="text-sm text-purple-400 hover:text-purple-300 underline"
+              >
+                Try again
               </button>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
+        )}
 
-        {/* Author and Framework */}
+        {wisdom && (
+          <>
+            {/* Author and Framework */}
         <div className="flex items-center justify-between">
           <cite className="text-purple-300 font-medium">— {wisdom.author}</cite>
           <div className="flex items-center gap-2">
@@ -554,10 +590,46 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           
           <button
             onClick={() => {
-              // Show favorites modal or navigate to favorites page
               const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
               if (favorites.length > 0) {
-                alert(`You have ${favorites.length} favorite quotes. This feature will be expanded soon!`);
+                // Show a simple modal with favorites
+                const favoritesList = favorites.map((fav: any, index: number) => 
+                  `${index + 1}. "${fav.quote}" - ${fav.author}`
+                ).join('\n\n');
+                
+                // Create a more user-friendly display
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+                modal.innerHTML = `
+                  <div class="bg-surface border border-border rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="text-lg font-semibold text-text">Your Favorite Quotes</h3>
+                      <button onclick="this.closest('.fixed').remove()" class="text-muted hover:text-text">✕</button>
+                    </div>
+                    <div class="space-y-3">
+                      ${favorites.map((fav: any, index: number) => `
+                        <div class="p-3 bg-surface/50 rounded-lg border border-border/50">
+                          <blockquote class="text-sm italic text-text mb-2">"${fav.quote}"</blockquote>
+                          <div class="flex items-center justify-between">
+                            <cite class="text-xs text-purple-300">— ${fav.author}</cite>
+                            <span class="text-xs text-muted">${fav.framework}</span>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                    <div class="mt-4 text-center">
+                      <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Close on backdrop click
+                modal.addEventListener('click', (e) => {
+                  if (e.target === modal) modal.remove();
+                });
               } else {
                 alert('No favorite quotes yet. Add some by clicking the star icon!');
               }
@@ -566,7 +638,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             title="View your favorite quotes"
           >
             <BookOpen className="w-3.5 h-3.5" />
-            Favorites
+            Favorites ({JSON.parse(localStorage.getItem('favoriteQuotes') || '[]').length})
           </button>
           
           <Link 
@@ -584,6 +656,8 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
             Ask AI
           </Link>
         </div>
+          </>
+        )}
       </div>
     </motion.div>
   );
