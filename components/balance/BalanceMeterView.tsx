@@ -6,6 +6,7 @@ import { BalanceEngine, MotionData } from '@/lib/balance-engine';
 import { SessionStore, SessionSummary } from '@/lib/session-store';
 import { HapticFeedback, HapticEvent } from '@/lib/haptic-feedback';
 import { ProgressRing, AnimatedProgressRing } from './ProgressRing';
+import { logToJournal } from '@/lib/journal-logger';
 
 interface BalanceMeterViewProps {
   goalSeconds?: number;
@@ -134,7 +135,7 @@ export function BalanceMeterView({
     haptic.reset();
   }, [engine, haptic]);
   
-  const handleSessionComplete = useCallback(() => {
+  const handleSessionComplete = useCallback(async () => {
     const totalDuration = Date.now() - sessionStartTime;
     const session: SessionSummary = {
       id: '',
@@ -152,6 +153,31 @@ export function BalanceMeterView({
     
     const savedSession = SessionStore.saveSession(session);
     haptic.trigger('completion');
+    
+    // Log successful balance session to journal
+    try {
+      await logToJournal({
+        type: 'activity',
+        content: `Completed ${goalSeconds}-second balance challenge! Held steady for ${Math.floor(motionData.stableSeconds)} seconds.`,
+        category: 'balance_training',
+        metadata: {
+          goalSeconds,
+          stableSeconds: Math.floor(motionData.stableSeconds),
+          totalDuration,
+          balanceState,
+          maxPitch: Math.abs(motionData.pitch),
+          maxRoll: Math.abs(motionData.roll),
+          avgDeviation: (Math.abs(motionData.pitch) + Math.abs(motionData.roll)) / 2,
+          sessionId: savedSession.id,
+          timestamp: new Date().toISOString()
+        },
+        moduleId: 'balance_gyro',
+        widgetId: 'balance_challenge'
+      });
+    } catch (error) {
+      console.error('Error logging balance session to journal:', error);
+    }
+    
     onComplete?.(savedSession);
   }, [sessionStartTime, goalSeconds, motionData, balanceState, haptic, onComplete]);
   
@@ -220,11 +246,11 @@ export function BalanceMeterView({
   };
   
   return (
-    <div className={`flex flex-col items-center justify-center min-h-[400px] ${className}`}>
+    <div className={`flex flex-col items-center justify-center w-full max-w-sm mx-auto ${className}`}>
       {/* Main Balance Display */}
       <div 
         ref={containerRef}
-        className="relative w-80 h-80 mb-6"
+        className="relative w-full max-w-[280px] aspect-square mb-4"
       >
         {/* Safe Zone Circle */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -242,17 +268,17 @@ export function BalanceMeterView({
         {/* Progress Ring */}
         <div className="absolute inset-0 flex items-center justify-center">
           <AnimatedProgressRing
-            size={320}
+            size={Math.min(280, containerRef.current?.offsetWidth || 280)}
             targetProgress={progress}
             color={state === 'completed' ? 'completed' : balanceState}
             isAnimating={state === 'running'}
           >
             {/* Countdown Timer */}
             <div className="text-center">
-              <div className="text-3xl font-bold text-white mb-1">
+              <div className="text-2xl sm:text-3xl font-bold text-white mb-1">
                 {state === 'running' ? Math.ceil(remainingTime) : Math.floor(motionData.stableSeconds)}
               </div>
-              <div className="text-sm text-gray-400">
+              <div className="text-xs sm:text-sm text-gray-400">
                 {state === 'running' ? 'remaining' : 'stable'}
               </div>
             </div>
@@ -284,55 +310,55 @@ export function BalanceMeterView({
       </div>
       
       {/* Status Text */}
-      <div className="text-center mb-6">
-        <div className="text-lg font-medium text-white mb-2">
+      <div className="text-center mb-4">
+        <div className="text-base sm:text-lg font-medium text-white mb-2">
           {getStatusText()}
         </div>
-        <div className="text-sm text-gray-400">
+        <div className="text-xs sm:text-sm text-gray-400">
           Goal: {goalSeconds}s • Target: {Math.floor(motionData.stableSeconds)}s stable
         </div>
       </div>
       
       {/* Controls */}
-      <div className="flex gap-4 mb-4">
+      <div className="flex flex-wrap gap-2 sm:gap-4 mb-4 justify-center">
         {state === 'idle' ? (
           <button
             onClick={handleStart}
-            className="flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white font-medium"
+            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
           >
-            <Play className="w-5 h-5" />
+            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
             Start
           </button>
         ) : (
           <button
             onClick={handleStop}
-            className="flex items-center gap-2 px-6 py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors text-white font-medium"
+            className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
           >
-            <Pause className="w-5 h-5" />
+            <Pause className="w-4 h-4 sm:w-5 sm:h-5" />
             Stop
           </button>
         )}
         
         <button
           onClick={handleReset}
-          className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium"
+          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
         >
-          <RotateCcw className="w-5 h-5" />
+          <RotateCcw className="w-4 h-4 sm:w-5 sm:h-5" />
           Reset
         </button>
         
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium"
+          className="flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm sm:text-base"
         >
-          <Settings className="w-5 h-5" />
+          <Settings className="w-4 h-4 sm:w-5 sm:h-5" />
           Settings
         </button>
       </div>
       
       {/* Settings Panel */}
       {showSettings && (
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 w-80">
+        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-4 w-full max-w-sm">
           <h3 className="text-white font-medium mb-3">Settings</h3>
           
           <div className="space-y-3">

@@ -67,12 +67,12 @@ export function BalanceCardNew({
       className={`p-6 ${className}`}
     >
       {/* Motivational Message */}
-      <p className="text-sm text-gray-300 mb-6 text-center">
+      <p className="text-sm text-gray-300 mb-4 text-center">
         {getMotivationalMessage()}
       </p>
       
       {/* Main Balance Interface */}
-      <div className="mb-6">
+      <div className="mb-4">
         <BalanceMeterView
           goalSeconds={goalSeconds}
           onComplete={handleComplete}
@@ -80,10 +80,10 @@ export function BalanceCardNew({
       </div>
       
       {/* Stats Toggle */}
-      <div className="flex justify-center mb-4">
+      <div className="flex justify-center mb-3">
         <button
           onClick={() => setShowStats(!showStats)}
-          className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+          className="text-xs sm:text-sm text-blue-400 hover:text-blue-300 transition-colors"
         >
           {showStats ? 'Hide Stats' : 'Show Stats'}
         </button>
@@ -161,7 +161,7 @@ export function BalanceCardNew({
       )}
       
       {/* Instructions */}
-      <div className="text-center text-sm text-gray-400">
+      <div className="text-center text-xs sm:text-sm text-gray-400">
         <p>Hold your device steady to keep the dot in the center</p>
         <p className="mt-1">The ring fills as you maintain balance</p>
         {goalSeconds === 30 && (
