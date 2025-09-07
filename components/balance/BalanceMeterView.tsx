@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Play, Pause, RotateCcw, Settings, Target } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Play, Pause, RotateCcw, Settings, Target, Zap, Trophy } from 'lucide-react';
 import { BalanceEngine, MotionData } from '@/lib/balance-engine';
 import { SessionStore, SessionSummary } from '@/lib/session-store';
 import { HapticFeedback, HapticEvent } from '@/lib/haptic-feedback';
@@ -293,122 +294,176 @@ export function BalanceMeterView({
         </div>
         
         {/* Balance Dot */}
-        <div
-          className="absolute w-6 h-6 rounded-full transition-all duration-200 ease-out"
+        <motion.div
+          className="absolute w-6 h-6 rounded-full"
           style={{
             left: dotPosition.x - 12,
             top: dotPosition.y - 12,
             backgroundColor: colors[balanceState],
-            boxShadow: balanceState === 'out' ? `0 0 20px ${colors.out}80` : 'none',
-            transform: 'translate3d(0, 0, 0)' // Hardware acceleration
+          }}
+          animate={{
+            scale: balanceState === 'stable' ? [1, 1.2, 1] : 1,
+            boxShadow: balanceState === 'out' ? `0 0 20px ${colors.out}80` : 
+                      balanceState === 'stable' ? `0 0 15px ${colors.stable}60` : 'none'
+          }}
+          transition={{
+            scale: { duration: 0.5, repeat: balanceState === 'stable' ? Infinity : 0 },
+            boxShadow: { duration: 0.3 }
           }}
         />
         
         {/* Out of Zone Pulse Effect */}
-        {balanceState === 'out' && (
-          <div 
-            className="absolute inset-0 rounded-full animate-pulse"
-            style={{
-              border: `2px solid ${colors.out}`,
-              opacity: 0.3
-            }}
-          />
-        )}
+        <AnimatePresence>
+          {balanceState === 'out' && (
+            <motion.div 
+              className="absolute inset-0 rounded-full"
+              style={{
+                border: `2px solid ${colors.out}`,
+                opacity: 0.3
+              }}
+              initial={{ scale: 1, opacity: 0 }}
+              animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
+              exit={{ scale: 1, opacity: 0 }}
+              transition={{ duration: 0.5, repeat: Infinity }}
+            />
+          )}
+        </AnimatePresence>
       </div>
       
       {/* Status Text */}
-      <div className="text-center mb-3">
-        <div className="text-sm font-medium text-white mb-1">
+      <motion.div 
+        className="text-center mb-3"
+        key={state}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <div className="text-sm font-medium text-white mb-1 flex items-center justify-center gap-2">
+          {state === 'completed' && <Trophy className="w-4 h-4 text-yellow-400" />}
+          {state === 'running' && balanceState === 'stable' && <Zap className="w-4 h-4 text-green-400" />}
           {getStatusText()}
         </div>
         <div className="text-xs text-gray-400">
           {state === 'running' ? `${Math.floor(sessionTime)}s elapsed` : `Stable: ${Math.floor(motionData.stableSeconds)}s`}
         </div>
-      </div>
+      </motion.div>
       
       {/* Controls */}
-      <div className="flex flex-wrap gap-2 mb-3 justify-center">
+      <motion.div 
+        className="flex flex-wrap gap-2 mb-3 justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
         {state === 'idle' ? (
-          <button
+          <motion.button
             onClick={handleStart}
-            className="flex items-center gap-1 px-3 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors text-white font-medium text-sm"
+            className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-lg text-white font-medium text-sm shadow-lg"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Play className="w-4 h-4" />
-            Start
-          </button>
+            Start Challenge
+          </motion.button>
         ) : (
-          <button
+          <motion.button
             onClick={handleStop}
-            className="flex items-center gap-1 px-3 py-2 bg-yellow-600 hover:bg-yellow-700 rounded-lg transition-colors text-white font-medium text-sm"
+            className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 rounded-lg text-white font-medium text-sm shadow-lg"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             <Pause className="w-4 h-4" />
             Stop
-          </button>
+          </motion.button>
         )}
         
-        <button
+        <motion.button
           onClick={handleReset}
-          className="flex items-center gap-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm"
+          className="flex items-center gap-1 px-3 py-2 bg-gray-600/80 hover:bg-gray-700/80 rounded-lg text-white font-medium text-sm border border-gray-500/30"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           <RotateCcw className="w-4 h-4" />
           Reset
-        </button>
+        </motion.button>
         
-        <button
+        <motion.button
           onClick={() => setShowSettings(!showSettings)}
-          className="flex items-center gap-1 px-3 py-2 bg-gray-600 hover:bg-gray-700 rounded-lg transition-colors text-white font-medium text-sm"
+          className="flex items-center gap-1 px-3 py-2 bg-gray-600/80 hover:bg-gray-700/80 rounded-lg text-white font-medium text-sm border border-gray-500/30"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           <Settings className="w-4 h-4" />
           Settings
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
       
       {/* Settings Panel */}
-      {showSettings && (
-        <div className="bg-gray-800/50 backdrop-blur-sm rounded-lg p-3 w-full max-w-sm">
-          <h3 className="text-white font-medium mb-2 text-sm">Settings</h3>
+      <AnimatePresence>
+        {showSettings && (
+          <motion.div 
+            className="bg-gradient-to-r from-gray-800/50 to-gray-700/50 backdrop-blur-sm rounded-lg p-4 w-full max-w-sm border border-gray-600/30"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h3 className="text-white font-medium mb-3 text-sm flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              Settings
+            </h3>
           
-          <div className="space-y-2">
-            <label className="flex items-center justify-between text-white text-sm">
-              <span>Haptic Feedback</span>
-              <input
-                type="checkbox"
-                checked={settings.hapticsEnabled}
-                onChange={(e) => {
-                  const newSettings = { ...settings, hapticsEnabled: e.target.checked };
-                  setSettings(newSettings);
-                  haptic.updateConfig({ enabled: e.target.checked });
-                }}
-                className="w-3 h-3"
-              />
-            </label>
-            
-            <label className="flex items-center justify-between text-white text-sm">
-              <span>Audio Cues</span>
-              <input
-                type="checkbox"
-                checked={settings.audioEnabled}
-                onChange={(e) => {
-                  const newSettings = { ...settings, audioEnabled: e.target.checked };
-                  setSettings(newSettings);
-                  haptic.updateConfig({ volume: e.target.checked ? 0.5 : 0 });
-                }}
-                className="w-3 h-3"
-              />
-            </label>
-            
-            <label className="flex items-center justify-between text-white text-sm">
-              <span>High Contrast</span>
-              <input
-                type="checkbox"
-                checked={settings.highContrast}
-                onChange={(e) => setSettings({ ...settings, highContrast: e.target.checked })}
-                className="w-3 h-3"
-              />
-            </label>
-          </div>
-        </div>
-      )}
+            <div className="space-y-3">
+              <motion.label 
+                className="flex items-center justify-between text-white text-sm p-2 bg-white/5 rounded-lg"
+                whileHover={{ scale: 1.02 }}
+              >
+                <span>Haptic Feedback</span>
+                <input
+                  type="checkbox"
+                  checked={settings.hapticsEnabled}
+                  onChange={(e) => {
+                    const newSettings = { ...settings, hapticsEnabled: e.target.checked };
+                    setSettings(newSettings);
+                    haptic.updateConfig({ enabled: e.target.checked });
+                  }}
+                  className="w-4 h-4 rounded"
+                />
+              </motion.label>
+              
+              <motion.label 
+                className="flex items-center justify-between text-white text-sm p-2 bg-white/5 rounded-lg"
+                whileHover={{ scale: 1.02 }}
+              >
+                <span>Audio Cues</span>
+                <input
+                  type="checkbox"
+                  checked={settings.audioEnabled}
+                  onChange={(e) => {
+                    const newSettings = { ...settings, audioEnabled: e.target.checked };
+                    setSettings(newSettings);
+                    haptic.updateConfig({ volume: e.target.checked ? 0.5 : 0 });
+                  }}
+                  className="w-4 h-4 rounded"
+                />
+              </motion.label>
+              
+              <motion.label 
+                className="flex items-center justify-between text-white text-sm p-2 bg-white/5 rounded-lg"
+                whileHover={{ scale: 1.02 }}
+              >
+                <span>High Contrast</span>
+                <input
+                  type="checkbox"
+                  checked={settings.highContrast}
+                  onChange={(e) => setSettings({ ...settings, highContrast: e.target.checked })}
+                  className="w-4 h-4 rounded"
+                />
+              </motion.label>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       
       {/* Debug Info (only in development) */}
       {process.env.NODE_ENV === 'development' && (
