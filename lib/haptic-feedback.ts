@@ -158,18 +158,19 @@ export class HapticFeedback {
     try {
       switch (type) {
         case 'light':
-          navigator.vibrate(10);
+          navigator.vibrate(15); // Slightly longer for better feel
           break;
         case 'medium':
-          navigator.vibrate(20);
+          navigator.vibrate(30); // More noticeable
           break;
         case 'heavy':
-          navigator.vibrate(50);
+          navigator.vibrate(60); // Strong feedback
           break;
         case 'selection':
-          navigator.vibrate([10, 5, 10]);
+          navigator.vibrate([15, 10, 15]); // More distinct pattern
           break;
       }
+      console.log(`📳 Haptic feedback triggered: ${type}`);
     } catch (error) {
       console.warn('Error triggering haptic feedback:', error);
     }

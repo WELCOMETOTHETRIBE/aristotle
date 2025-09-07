@@ -83,20 +83,8 @@ export function BalanceMeterView({
     const currentState = balanceState;
     const lastState = lastBalanceStateRef.current;
     
-    if (currentState !== lastState) {
-      if (currentState === 'stable' && lastState !== 'stable') {
-        haptic.trigger('enter_stable');
-      } else if (currentState === 'out' && lastState !== 'out') {
-        haptic.trigger('exit_zone');
-      }
-      
-      lastBalanceStateRef.current = currentState;
-    }
-    
-    // Stable tick haptic
-    if (currentState === 'stable') {
-      haptic.trigger('stable_tick');
-    }
+    // Haptic feedback is now handled by the balance engine
+    lastBalanceStateRef.current = currentState;
   }, [balanceState, state, haptic]);
   
   // Breathing reminder audio
@@ -119,7 +107,6 @@ export function BalanceMeterView({
     const success = await engine.start();
     if (success) {
       setSessionStartTime(Date.now());
-      haptic.trigger('calibration_complete');
     }
   }, [engine, haptic]);
   
@@ -154,7 +141,6 @@ export function BalanceMeterView({
     };
     
     const savedSession = SessionStore.saveSession(session);
-    haptic.trigger('completion');
     
     // Log successful balance session to journal
     try {
@@ -409,7 +395,7 @@ export function BalanceMeterView({
                   onChange={(e) => {
                     const newSettings = { ...settings, hapticsEnabled: e.target.checked };
                     setSettings(newSettings);
-                    haptic.updateConfig({ enabled: e.target.checked });
+                    engine.updateHapticSettings(e.target.checked);
                   }}
                   className="w-4 h-4 rounded"
                 />

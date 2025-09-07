@@ -1,5 +1,7 @@
 'use client';
 
+import { HapticFeedback, HapticEvent } from './haptic-feedback';
+
 export interface MotionData {
   pitch: number; // radians
   roll: number;  // radians
@@ -12,6 +14,7 @@ export interface BalanceConfig {
   deadZone: number;   // stability threshold in radians (~3.4°)
   goalSeconds: number; // target time (60 seconds)
   maxScore: number;   // maximum score achievable (100 points)
+  hapticsEnabled: boolean; // enable haptic feedback
 }
 
 export class BalanceEngine {
@@ -43,8 +46,13 @@ export class BalanceEngine {
     alpha: 0.08, // More aggressive smoothing to reduce jitter
     deadZone: 0.08, // Slightly larger dead zone for stability
     goalSeconds: 60,
-    maxScore: 100
+    maxScore: 100,
+    hapticsEnabled: true
   };
+  
+  // Haptic feedback
+  private haptic: HapticFeedback;
+  private lastBalanceState: 'stable' | 'borderline' | 'out' = 'out';
   
   // Callbacks
   private onMotionUpdate?: (data: MotionData) => void;
@@ -54,6 +62,14 @@ export class BalanceEngine {
     if (config) {
       this.config = { ...this.config, ...config };
     }
+    
+    // Initialize haptic feedback
+    this.haptic = new HapticFeedback({
+      enabled: this.config.hapticsEnabled,
+      stableTickInterval: 2000,
+      exitZoneCooldown: 1000,
+      volume: 0.5
+    });
   }
   
   // Public API
@@ -102,6 +118,12 @@ export class BalanceEngine {
   
   onStateChangeCallback(callback: (state: 'idle' | 'calibrating' | 'running' | 'completed') => void) {
     this.onStateChange = callback;
+  }
+  
+  // Update haptic settings
+  updateHapticSettings(enabled: boolean) {
+    this.config.hapticsEnabled = enabled;
+    this.haptic.updateConfig({ enabled });
   }
   
   // Core methods
@@ -225,6 +247,7 @@ export class BalanceEngine {
         this.smoothedRoll = 0;
         this.isCalibrated = true;
         this.onStateChange?.('running');
+        this.haptic.trigger('calibration_complete');
         console.log('✅ Calibration complete');
       }
       return;
@@ -241,11 +264,15 @@ export class BalanceEngine {
     // Update stable time
     this.updateStableTime(deltaTime);
     
+    // Handle haptic feedback based on balance state changes
+    this.handleHapticFeedback();
+    
     // Notify listeners
     this.onMotionUpdate?.(this.motionData);
     
     // Check for completion (60 seconds elapsed)
     if (this.sessionTime >= this.config.goalSeconds) {
+      this.haptic.trigger('completion');
       this.onStateChange?.('completed');
     }
   }
@@ -266,6 +293,34 @@ export class BalanceEngine {
     } else {
       // Decay time when unstable (0.5x speed)
       this.stableSeconds = Math.max(0, this.stableSeconds - deltaTime * 0.5);
+    }
+  }
+  
+  private handleHapticFeedback() {
+    if (!this.config.hapticsEnabled) return;
+    
+    const currentBalanceState = this.getBalanceState();
+    
+    // Trigger haptic feedback on state changes
+    if (currentBalanceState !== this.lastBalanceState) {
+      switch (currentBalanceState) {
+        case 'stable':
+          if (this.lastBalanceState !== 'stable') {
+            this.haptic.trigger('enter_stable');
+          }
+          break;
+        case 'out':
+          if (this.lastBalanceState === 'stable' || this.lastBalanceState === 'borderline') {
+            this.haptic.trigger('exit_zone');
+          }
+          break;
+      }
+      this.lastBalanceState = currentBalanceState;
+    }
+    
+    // Trigger stable tick when in stable zone
+    if (currentBalanceState === 'stable') {
+      this.haptic.trigger('stable_tick');
     }
   }
   
