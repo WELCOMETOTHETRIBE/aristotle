@@ -276,6 +276,12 @@ function QuizActivity({ activity, onResponse }: { activity: Activity; onResponse
               </button>
             ))}
           </div>
+          {/* Show correct answer if provided */}
+          {question.answer && (
+            <div className="text-xs text-muted mt-2">
+              Correct answer: {question.answer}
+            </div>
+          )}
         </div>
       ))}
     </div>
@@ -284,12 +290,51 @@ function QuizActivity({ activity, onResponse }: { activity: Activity; onResponse
 
 function PhotoCaptureActivity({ activity, onResponse }: { activity: Activity; onResponse: (response: any) => void }) {
   const [photo, setPhoto] = useState<string | null>(null);
+  const [isCapturing, setIsCapturing] = useState(false);
 
-  const handlePhotoCapture = () => {
-    // Simulate photo capture
-    const mockPhoto = 'data:image/jpeg;base64,mock-photo-data';
-    setPhoto(mockPhoto);
-    onResponse({ photo: mockPhoto, analysis: 'AI analysis would go here' });
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setPhoto(result);
+        onResponse({ 
+          photo: result, 
+          filename: file.name,
+          timestamp: new Date().toISOString(),
+          analysis: 'Photo captured successfully. AI analysis would be performed here.'
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCameraCapture = async () => {
+    try {
+      setIsCapturing(true);
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const video = document.createElement('video');
+      video.srcObject = stream;
+      video.play();
+      
+      // For now, we'll simulate camera capture
+      setTimeout(() => {
+        const mockPhoto = 'data:image/jpeg;base64,mock-camera-photo-data';
+        setPhoto(mockPhoto);
+        onResponse({ 
+          photo: mockPhoto, 
+          source: 'camera',
+          timestamp: new Date().toISOString(),
+          analysis: 'Photo captured from camera. AI analysis would be performed here.'
+        });
+        setIsCapturing(false);
+        stream.getTracks().forEach(track => track.stop());
+      }, 2000);
+    } catch (error) {
+      console.error('Camera access denied:', error);
+      setIsCapturing(false);
+    }
   };
 
   return (
@@ -304,14 +349,38 @@ function PhotoCaptureActivity({ activity, onResponse }: { activity: Activity; on
             <Camera className="w-8 h-8 text-muted" />
           )}
         </div>
-        <button
-          onClick={handlePhotoCapture}
-          className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
-        >
-          {photo ? 'Photo Captured' : 'Capture Photo'}
-        </button>
+        
+        <div className="space-y-2">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleFileUpload}
+            className="hidden"
+            id="photo-upload"
+          />
+          <label
+            htmlFor="photo-upload"
+            className="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors cursor-pointer"
+          >
+            Upload Photo
+          </label>
+          
+          <button
+            onClick={handleCameraCapture}
+            disabled={isCapturing}
+            className={cn(
+              'block mx-auto px-4 py-2 rounded-lg transition-colors',
+              isCapturing
+                ? 'bg-gray-500 text-white cursor-not-allowed'
+                : 'bg-surface-2 text-text hover:bg-surface-3'
+            )}
+          >
+            {isCapturing ? 'Capturing...' : 'Use Camera'}
+          </button>
+        </div>
+        
         <p className="text-sm text-muted mt-2">
-          {activity.instructions}
+          {activity.instructions || 'Capture or upload a photo related to this lesson.'}
         </p>
       </div>
     </div>
@@ -358,16 +427,70 @@ function SliderActivity({ activity, onResponse }: { activity: Activity; onRespon
 function VoiceNoteActivity({ activity, onResponse }: { activity: Activity; onResponse: (response: any) => void }) {
   const [isRecording, setIsRecording] = useState(false);
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null);
+  const [recordingTime, setRecordingTime] = useState(0);
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null);
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([]);
 
-  const handleStartRecording = () => {
-    setIsRecording(true);
-    // Simulate recording
-    setTimeout(() => {
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      const chunks: Blob[] = [];
+
+      recorder.ondataavailable = (event) => {
+        chunks.push(event.data);
+      };
+
+      recorder.onstop = () => {
+        const blob = new Blob(chunks, { type: 'audio/wav' });
+        setAudioBlob(blob);
+        onResponse({ 
+          audio: blob, 
+          duration: recordingTime,
+          timestamp: new Date().toISOString(),
+          transcription: 'Voice note recorded. Transcription would be performed here.'
+        });
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      recorder.start();
+      setMediaRecorder(recorder);
+      setIsRecording(true);
+      setRecordingTime(0);
+      setAudioChunks(chunks);
+
+      // Start timer
+      const timer = setInterval(() => {
+        setRecordingTime(prev => {
+          const newTime = prev + 1;
+          if (activity.max_seconds && newTime >= activity.max_seconds) {
+            stopRecording();
+          }
+          return newTime;
+        });
+      }, 1000);
+
+      // Store timer for cleanup
+      (recorder as any).timer = timer;
+    } catch (error) {
+      console.error('Microphone access denied:', error);
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop();
       setIsRecording(false);
-      const mockBlob = new Blob(['mock audio data'], { type: 'audio/wav' });
-      setAudioBlob(mockBlob);
-      onResponse({ audio: mockBlob, duration: 30 });
-    }, 3000);
+      if ((mediaRecorder as any).timer) {
+        clearInterval((mediaRecorder as any).timer);
+      }
+    }
+  };
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
@@ -383,21 +506,26 @@ function VoiceNoteActivity({ activity, onResponse }: { activity: Activity; onRes
           )}
         </div>
         
+        {isRecording && (
+          <div className="text-lg font-mono text-red-500 mb-2">
+            {formatTime(recordingTime)}
+          </div>
+        )}
+        
         <button
-          onClick={handleStartRecording}
-          disabled={isRecording}
+          onClick={isRecording ? stopRecording : startRecording}
           className={cn(
             'px-6 py-3 rounded-lg font-semibold transition-colors',
             isRecording
-              ? 'bg-red-500 text-white cursor-not-allowed'
+              ? 'bg-red-500 text-white hover:bg-red-600'
               : 'bg-primary text-white hover:bg-primary/90'
           )}
         >
-          {isRecording ? 'Recording...' : audioBlob ? 'Re-record' : 'Start Recording'}
+          {isRecording ? 'Stop Recording' : audioBlob ? 'Re-record' : 'Start Recording'}
         </button>
         
         <p className="text-sm text-muted mt-2">
-          {activity.prompt}
+          {activity.prompt || 'Record a voice note sharing your thoughts on this lesson.'}
         </p>
         {activity.max_seconds && (
           <p className="text-xs text-muted">

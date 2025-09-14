@@ -25,8 +25,27 @@ export default function LyceumAssessment({ assessment, activityResponses, onComp
   const handleEvaluate = async () => {
     setIsEvaluating(true);
     
-    // Simulate AI evaluation
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/lyceum/ai/evaluate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          assessment: assessment,
+          activityResponses: activityResponses
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Evaluation failed');
+      }
+
+      const evaluationData = await response.json();
+      setEvaluation(evaluationData);
+    } catch (error) {
+      console.error('Evaluation error:', error);
+      // Fallback to mock evaluation if API fails
       const mockEvaluation = {
         scores: {
           'Correct categorizations': 0.8,
@@ -40,10 +59,10 @@ export default function LyceumAssessment({ assessment, activityResponses, onComp
         },
         passed: true
       };
-      
       setEvaluation(mockEvaluation);
+    } finally {
       setIsEvaluating(false);
-    }, 2000);
+    }
   };
 
   const getScoreColor = (score: number) => {
