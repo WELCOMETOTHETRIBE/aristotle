@@ -181,7 +181,7 @@ export async function PUT(request: NextRequest) {
     const checkin = await prisma.lyceumDailyCheckin.update({
       where: {
         id: id,
-        userId: session.user.id
+        userId: user.id
       },
       data: {
         telos: telos || 'general flourishing',

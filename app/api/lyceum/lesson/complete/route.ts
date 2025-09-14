@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
 
     // Get or create user progress
     let userProgress = await prisma.lyceumUserProgress.findUnique({
-      where: { userId: session.user.id }
+      where: { userId: user.id }
     });
 
     if (!userProgress) {
@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     // Update user progress
     const updatedProgress = await prisma.lyceumUserProgress.update({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       data: {
         completedLessons: updatedCompletedLessons,
         completedPaths: updatedCompletedPaths,

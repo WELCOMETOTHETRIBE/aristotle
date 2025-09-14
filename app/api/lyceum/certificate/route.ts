@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     // Get user progress
     const userProgress = await prisma.lyceumUserProgress.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       include: {
         lyceumPathProgress: true,
         lyceumActivityResponses: true,
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     // Get user progress
     const userProgress = await prisma.lyceumUserProgress.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       include: {
         lyceumPathProgress: true,
         lyceumActivityResponses: true,
@@ -78,12 +78,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user name
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
+    const userData = await prisma.user.findUnique({
+      where: { id: user.id },
       select: { name: true }
     });
 
-    if (!user) {
+    if (!userData) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       userProgress,
       userProgress.lyceumPathProgress,
       [...userProgress.lyceumActivityResponses, ...userProgress.lyceumEvaluations],
-      user.name || 'Anonymous',
+      userData.name || 'Anonymous',
       lyceumData
     );
 
