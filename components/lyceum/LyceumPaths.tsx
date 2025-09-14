@@ -86,10 +86,12 @@ export default function LyceumPaths({ onSelectPath, onSelectLesson }: LyceumPath
   };
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-text mb-2">Choose Your Path</h2>
-        <p className="text-muted">Select a path to begin your journey through Aristotle's wisdom</p>
+    <div className="max-w-6xl mx-auto space-y-8">
+      <div className="text-center space-y-3">
+        <h2 className="text-2xl font-bold text-text">Choose Your Learning Path</h2>
+        <p className="text-muted max-w-2xl mx-auto">
+          Each path represents a different aspect of Aristotle's wisdom. Start with any available path and progress at your own pace.
+        </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -130,20 +132,20 @@ export default function LyceumPaths({ onSelectPath, onSelectLesson }: LyceumPath
               {/* Path Header */}
               <div className="flex items-start space-x-4 mb-4">
                 <div className={cn(
-                  'w-12 h-12 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0',
+                  'w-14 h-14 rounded-xl flex items-center justify-center shadow-lg flex-shrink-0',
                   getPathColor(path.id)
                 )}>
-                  <IconComponent className="w-6 h-6" />
+                  <IconComponent className="w-7 h-7" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-bold text-text mb-1">{path.title}</h3>
-                  <p className="text-sm text-muted mb-2">{path.description}</p>
+                  <h3 className="text-lg font-bold text-text mb-2">{path.title}</h3>
+                  <p className="text-sm text-muted line-clamp-2 mb-3">{path.description}</p>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
+                    <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded-full">
                       {getMasteryDomain(path.id)}
                     </span>
                     <span className="text-xs text-muted">
-                      {path.estimated_minutes_total} min
+                      {path.lessons.length} lessons • {path.estimated_minutes_total} min
                     </span>
                   </div>
                 </div>
@@ -176,60 +178,13 @@ export default function LyceumPaths({ onSelectPath, onSelectLesson }: LyceumPath
                 </div>
               </div>
 
-              {/* Path Stats */}
-              <div className="grid grid-cols-3 gap-2 text-xs text-muted mb-4">
-                <div className="text-center">
-                  <div className="font-medium text-text">{completedLessons}</div>
-                  <div>Completed</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-medium text-text">{path.lessons.length}</div>
-                  <div>Total</div>
-                </div>
-                <div className="text-center">
-                  <div className="font-medium text-text">{path.estimated_minutes_total}</div>
-                  <div>Minutes</div>
-                </div>
-              </div>
-
-              {/* Lesson Preview */}
-              <div className="space-y-2 mb-4">
-                {path.lessons.slice(0, 3).map((lesson, lessonIndex) => {
-                  const isLessonCompleted = progress.completedLessons.has(lesson.id);
-                  return (
-                    <div key={lesson.id} className="flex items-center space-x-2">
-                      <div className={cn(
-                        'w-6 h-6 rounded-full flex items-center justify-center text-xs flex-shrink-0',
-                        isLessonCompleted 
-                          ? 'bg-green-500/20 text-green-500' 
-                          : 'bg-surface-2 text-muted'
-                      )}>
-                        {isLessonCompleted ? '✓' : lessonIndex + 1}
-                      </div>
-                      <span className={cn(
-                        'text-sm flex-1 truncate',
-                        isLessonCompleted ? 'text-green-500' : 'text-muted'
-                      )}>
-                        {lesson.title}
-                      </span>
-                      <span className="text-xs text-muted">{lesson.time_minutes}m</span>
-                    </div>
-                  );
-                })}
-                {path.lessons.length > 3 && (
-                  <div className="text-xs text-muted text-center">
-                    +{path.lessons.length - 3} more lessons
-                  </div>
-                )}
-              </div>
-
               {/* Action Button */}
               <div className="flex items-center justify-between">
-                <span className="text-xs text-muted">
-                  {completedLessons} of {path.lessons.length} lessons
+                <span className="text-sm text-muted">
+                  {completedLessons} of {path.lessons.length} lessons completed
                 </span>
                 {isAccessible && (
-                  <div className="flex items-center space-x-1 text-primary group-hover:text-primary/80 transition-colors">
+                  <div className="flex items-center space-x-2 text-primary group-hover:text-primary/80 transition-colors">
                     <span className="text-sm font-medium">
                       {isCompleted ? 'Review' : nextLesson ? 'Continue' : 'Start'}
                     </span>
@@ -252,30 +207,19 @@ export default function LyceumPaths({ onSelectPath, onSelectLesson }: LyceumPath
         })}
       </div>
 
-      {/* Path Legend */}
-      <div className="bg-surface border border-border rounded-xl p-4">
-        <h3 className="text-sm font-semibold text-text mb-3">Path Legend</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full" />
-              <span className="text-muted">Completed Path</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-primary rounded-full" />
-              <span className="text-muted">Available Path</span>
-            </div>
-          </div>
-          <div className="space-y-2">
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-surface-2 rounded-full opacity-60" />
-              <span className="text-muted">Locked Path</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-primary/20 rounded-full" />
-              <span className="text-muted">In Progress</span>
-            </div>
-          </div>
+      {/* Quick Legend */}
+      <div className="flex items-center justify-center space-x-6 text-sm text-muted">
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-green-500 rounded-full" />
+          <span>Completed</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-primary rounded-full" />
+          <span>Available</span>
+        </div>
+        <div className="flex items-center space-x-2">
+          <div className="w-3 h-3 bg-surface-2 rounded-full opacity-60" />
+          <span>Locked</span>
         </div>
       </div>
     </div>

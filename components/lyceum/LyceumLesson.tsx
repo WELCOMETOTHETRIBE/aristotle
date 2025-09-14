@@ -121,8 +121,8 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
   }
 
   return (
-    <div className="space-y-6">
-      {/* Lesson Header */}
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Lesson Header - Simplified */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -155,42 +155,12 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
             <p className="text-muted">{path.title}</p>
           </div>
 
-          {/* Objectives */}
-          <div>
-            <h3 className="font-semibold text-text mb-2">Learning Objectives</h3>
-            <ul className="space-y-1">
-              {lesson.objectives.map((objective, index) => (
-                <li key={index} className="flex items-start space-x-2 text-sm text-muted">
-                  <Target className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
-                  <span>{objective}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Terms */}
-          {lesson.terms_introduced.length > 0 && (
-            <div>
-              <h3 className="font-semibold text-text mb-2">Terms Introduced</h3>
-              <div className="flex flex-wrap gap-2">
-                {lesson.terms_introduced.map((term, index) => (
-                  <span
-                    key={index}
-                    className="px-3 py-1 bg-primary/20 text-primary text-sm rounded-full"
-                  >
-                    {term}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Modern Payoff */}
+          {/* Modern Payoff - Key Focus */}
           <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
             <div className="flex items-start space-x-3">
               <Lightbulb className="w-5 h-5 text-primary mt-0.5 flex-shrink-0" />
               <div>
-                <h4 className="font-semibold text-text mb-1">Modern Payoff</h4>
+                <h4 className="font-semibold text-text mb-1">Why This Matters Today</h4>
                 <p className="text-sm text-muted">{lesson.modern_payoff}</p>
               </div>
             </div>
@@ -198,7 +168,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
         </div>
       </motion.div>
 
-      {/* Narrative Introduction */}
+      {/* Aristotle's Introduction - Simplified */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -216,7 +186,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
         </div>
       </motion.div>
 
-      {/* Progress Indicator */}
+      {/* Progress Indicator - Simplified */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -224,7 +194,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
         className="bg-surface border border-border rounded-xl p-4"
       >
         <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-text">Lesson Progress</span>
+          <span className="text-sm font-medium text-text">Progress</span>
           <span className="text-sm text-muted">
             {currentActivityIndex + 1} of {lesson.activities.length} activities
           </span>
@@ -270,7 +240,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
         </motion.div>
       )}
 
-      {/* Completion */}
+      {/* Completion - Simplified */}
       {isCompleted && (
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -298,22 +268,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
             </div>
           </div>
 
-          {/* Artifacts Earned */}
-          {lesson.artifacts.length > 0 && (
-            <div className="bg-surface border border-border rounded-xl p-4">
-              <h4 className="font-semibold text-text mb-3">Artifacts Earned</h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {lesson.artifacts.map((artifact, index) => (
-                  <div key={index} className="flex items-center space-x-2 p-2 bg-primary/10 rounded-lg">
-                    <Award className="w-4 h-4 text-primary" />
-                    <span className="text-sm text-text">{artifact}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Action Buttons */}
+          {/* Action Buttons - Simplified */}
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={handleLessonComplete}
@@ -327,7 +282,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
                 onClick={() => setShowScholarMode(true)}
                 className="px-6 py-3 bg-surface border border-border text-text rounded-xl font-semibold hover:bg-surface-2 transition-colors"
               >
-                Scholar Mode
+                Deep Dive
               </button>
             )}
             
@@ -336,7 +291,7 @@ export default function LyceumLesson({ lessonId, onBack, onComplete }: LyceumLes
                 onClick={() => setShowAgora(true)}
                 className="px-6 py-3 bg-surface border border-border text-text rounded-xl font-semibold hover:bg-surface-2 transition-colors"
               >
-                Share in Agora
+                Share
               </button>
             )}
           </div>

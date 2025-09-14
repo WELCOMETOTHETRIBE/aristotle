@@ -66,173 +66,146 @@ export default function LyceumOverview({ onStartJourney }: LyceumOverviewProps) 
   };
 
   return (
-    <div className="space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8">
       {/* Welcome Section */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-center space-y-4"
+        className="text-center space-y-6"
       >
-        <div className="w-20 h-20 bg-gradient-to-br from-primary/30 to-primary/10 rounded-2xl flex items-center justify-center mx-auto">
-          <GraduationCap className="w-10 h-10 text-primary" />
+        <div className="w-24 h-24 bg-gradient-to-br from-primary/30 to-primary/10 rounded-3xl flex items-center justify-center mx-auto">
+          <GraduationCap className="w-12 h-12 text-primary" />
         </div>
-        <h2 className="text-2xl font-bold text-text">Welcome to Aristotle's Lyceum</h2>
-        <p className="text-muted max-w-2xl mx-auto">
-          Embark on a transformative journey through 12 paths of wisdom, 
-          each designed to cultivate virtue and practical wisdom in your daily life.
-        </p>
+        <div className="space-y-3">
+          <h2 className="text-3xl font-bold text-text">Welcome to Aristotle's Lyceum</h2>
+          <p className="text-muted text-lg max-w-2xl mx-auto leading-relaxed">
+            {data.meta.philosophical_scope}
+          </p>
+        </div>
       </motion.div>
 
-      {/* Key Features */}
+      {/* Quick Stats */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
-        className="grid grid-cols-1 md:grid-cols-3 gap-4"
+        className="bg-surface border border-border rounded-2xl p-6"
       >
-        <div className="bg-surface border border-border rounded-xl p-4 text-center">
-          <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <BookOpen className="w-6 h-6 text-blue-300" />
-          </div>
-          <h3 className="font-semibold text-text mb-2">36 Interactive Lessons</h3>
-          <p className="text-sm text-muted">Hands-on activities, reflections, and assessments</p>
-        </div>
-        
-        <div className="bg-surface border border-border rounded-xl p-4 text-center">
-          <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <Brain className="w-6 h-6 text-green-300" />
-          </div>
-          <h3 className="font-semibold text-text mb-2">AI-Powered Guidance</h3>
-          <p className="text-sm text-muted">Personalized tutoring, evaluation, and coaching</p>
-        </div>
-        
-        <div className="bg-surface border border-border rounded-xl p-4 text-center">
-          <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center mx-auto mb-3">
-            <Award className="w-6 h-6 text-purple-300" />
-          </div>
-          <h3 className="font-semibold text-text mb-2">Certificate of Mastery</h3>
-          <p className="text-sm text-muted">Earn your Lyceum Scroll upon completion</p>
-        </div>
-      </motion.div>
-
-      {/* Paths Preview */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2 }}
-        className="space-y-4"
-      >
-        <h3 className="text-xl font-semibold text-text text-center">The 12 Paths of Wisdom</h3>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {data.paths.map((path, index) => {
-            const IconComponent = getPathIcon(path.id);
-            const isCompleted = progress.completedPaths.has(path.id);
-            const completedLessons = path.lessons.filter(lesson => 
-              progress.completedLessons.has(lesson.id)
-            ).length;
-            const progressPercent = Math.round((completedLessons / path.lessons.length) * 100);
-            
-            return (
-              <motion.div
-                key={path.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 * index }}
-                className={cn(
-                  'p-4 bg-surface border rounded-xl transition-all duration-200',
-                  isCompleted 
-                    ? 'border-green-500/30 bg-green-500/5' 
-                    : 'border-border hover:border-primary/30'
-                )}
-              >
-                <div className="flex items-start space-x-3 mb-3">
-                  <div className={cn(
-                    'w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0',
-                    getPathColor(path.id)
-                  )}>
-                    <IconComponent className="w-5 h-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold text-text text-sm mb-1">{path.title}</h4>
-                    <p className="text-xs text-muted line-clamp-2">{path.description}</p>
-                  </div>
-                  {isCompleted && (
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                  )}
-                </div>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs text-muted">
-                    <span>{completedLessons}/{path.lessons.length} lessons</span>
-                    <span>{progressPercent}%</span>
-                  </div>
-                  <div className="w-full bg-surface-2 rounded-full h-1.5">
-                    <div 
-                      className={cn(
-                        'h-1.5 rounded-full transition-all duration-500',
-                        isCompleted ? 'bg-green-500' : 'bg-primary'
-                      )}
-                      style={{ width: `${progressPercent}%` }}
-                    />
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </motion.div>
-
-      {/* Stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-        className="bg-surface border border-border rounded-xl p-6"
-      >
-        <h3 className="text-lg font-semibold text-text mb-4 text-center">Your Journey Stats</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
-            <div className="text-2xl font-bold text-text">{progress.completedPaths.size}</div>
+            <div className="text-3xl font-bold text-text mb-1">{progress.completedPaths.size}</div>
             <div className="text-sm text-muted">Paths Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-text">{progress.completedLessons.size}</div>
+            <div className="text-3xl font-bold text-text mb-1">{progress.completedLessons.size}</div>
             <div className="text-sm text-muted">Lessons Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-text">{progress.artifacts.size}</div>
+            <div className="text-3xl font-bold text-text mb-1">{progress.artifacts.size}</div>
             <div className="text-sm text-muted">Artifacts Collected</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-text">{overallProgress}%</div>
+            <div className="text-3xl font-bold text-text mb-1">{overallProgress}%</div>
             <div className="text-sm text-muted">Overall Progress</div>
           </div>
         </div>
       </motion.div>
 
-      {/* Start Journey Button */}
+      {/* Next Steps */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="text-center"
+        transition={{ delay: 0.2 }}
+        className="space-y-6"
       >
-        <motion.button
-          onClick={onStartJourney}
-          className="px-8 py-4 bg-gradient-to-r from-primary to-primary/80 text-white rounded-xl font-semibold hover:from-primary/90 hover:to-primary/70 transition-all duration-200 hover:scale-105 shadow-lg"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <div className="flex items-center space-x-2">
-            <span>Begin Your Journey</span>
-            <ArrowRight className="w-5 h-5" />
-          </div>
-        </motion.button>
-        <p className="text-sm text-muted mt-3">
-          {data.meta.session_length_minutes} per lesson • {data.paths.length} paths • {data.paths.reduce((sum, path) => sum + path.lessons.length, 0)} lessons total
-        </p>
+        <h3 className="text-xl font-semibold text-text text-center">What would you like to do?</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <motion.button
+            onClick={onStartJourney}
+            className="p-6 bg-gradient-to-br from-primary/10 to-primary/5 border border-primary/20 rounded-2xl text-left hover:from-primary/20 hover:to-primary/10 transition-all duration-200 group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-primary/20 rounded-xl flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                <BookOpen className="w-6 h-6 text-primary" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-text mb-1">Explore Learning Paths</h4>
+                <p className="text-sm text-muted">Choose from 12 paths of wisdom</p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-primary ml-auto" />
+            </div>
+          </motion.button>
+
+          <motion.button
+            onClick={() => {/* Navigate to progress */}}
+            className="p-6 bg-gradient-to-br from-green-500/10 to-green-500/5 border border-green-500/20 rounded-2xl text-left hover:from-green-500/20 hover:to-green-500/10 transition-all duration-200 group"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <div className="flex items-center space-x-4">
+              <div className="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
+                <Target className="w-6 h-6 text-green-500" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-text mb-1">View Progress</h4>
+                <p className="text-sm text-muted">Track your learning journey</p>
+              </div>
+              <ArrowRight className="w-5 h-5 text-green-500 ml-auto" />
+            </div>
+          </motion.button>
+        </div>
       </motion.div>
+
+      {/* Recent Activity */}
+      {progress.completedLessons.size > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="bg-surface border border-border rounded-2xl p-6"
+        >
+          <h3 className="text-lg font-semibold text-text mb-4">Recent Activity</h3>
+          <div className="space-y-3">
+            {data.paths.slice(0, 3).map((path) => {
+              const completedLessons = path.lessons.filter(lesson => 
+                progress.completedLessons.has(lesson.id)
+              );
+              
+              if (completedLessons.length === 0) return null;
+              
+              const IconComponent = getPathIcon(path.id);
+              const progressPercent = Math.round((completedLessons.length / path.lessons.length) * 100);
+              
+              return (
+                <div key={path.id} className="flex items-center space-x-3 p-3 bg-surface-2 rounded-lg">
+                  <div className={cn(
+                    'w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0',
+                    getPathColor(path.id)
+                  )}>
+                    <IconComponent className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-text text-sm">{path.title}</h4>
+                    <p className="text-xs text-muted">{completedLessons.length}/{path.lessons.length} lessons completed</p>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-sm font-medium text-text">{progressPercent}%</div>
+                    <div className="w-16 bg-surface rounded-full h-1.5 mt-1">
+                      <div 
+                        className="h-1.5 bg-primary rounded-full transition-all duration-500"
+                        style={{ width: `${progressPercent}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 }

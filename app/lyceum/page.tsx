@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { useLyceum } from '@/lib/lyceum-context';
@@ -21,7 +21,10 @@ import {
   Scroll,
   Lightbulb,
   Heart,
-  Star
+  Star,
+  ArrowLeft,
+  Menu,
+  Home
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import LyceumOverview from '@/components/lyceum/LyceumOverview';
@@ -34,7 +37,6 @@ import LyceumGlossary from '@/components/lyceum/LyceumGlossary';
 import LyceumArtifacts from '@/components/lyceum/LyceumArtifacts';
 import LyceumPortfolio from '@/components/lyceum/LyceumPortfolio';
 import LyceumAgora from '@/components/lyceum/LyceumAgora';
-import LyceumFloatingActions from '@/components/lyceum/LyceumFloatingActions';
 
 type ViewMode = 'overview' | 'paths' | 'progress' | 'lesson' | 'certificate' | 'daily-checkin' | 'glossary' | 'artifacts' | 'portfolio' | 'agora';
 
@@ -43,6 +45,7 @@ export default function LyceumPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('overview');
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
 
   const overallProgress = getOverallProgress();
   const canEarn = canEarnCertificate();
@@ -76,6 +79,23 @@ export default function LyceumPage() {
     setSelectedPath(null);
     setSelectedLesson(null);
     setViewMode('overview');
+  };
+
+  const getCurrentPathTitle = () => {
+    if (selectedPath) {
+      const path = data.paths.find(p => p.id === selectedPath);
+      return path?.title || 'Unknown Path';
+    }
+    return null;
+  };
+
+  const getCurrentLessonTitle = () => {
+    if (selectedLesson && selectedPath) {
+      const path = data.paths.find(p => p.id === selectedPath);
+      const lesson = path?.lessons.find(l => l.id === selectedLesson);
+      return lesson?.title || 'Unknown Lesson';
+    }
+    return null;
   };
 
   const getPathIcon = (pathId: string) => {
@@ -115,235 +135,325 @@ export default function LyceumPage() {
   };
 
   return (
-    <div className="min-h-screen bg-bg pb-20">
+    <div className="min-h-screen bg-bg">
       <Header focusVirtue="wisdom" />
       
-      <main className="px-4 py-6 space-y-6">
-        {/* Header */}
-        <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-6"
-          >
-            <h1 className="text-4xl font-bold text-text mb-3">
-              {data.meta.title}
-            </h1>
-            <p className="text-muted text-lg max-w-2xl mx-auto">
-              {data.meta.philosophical_scope}
-            </p>
-          </motion.div>
-
-          {/* Progress Overview */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-surface border border-border rounded-2xl p-6 mb-6"
-          >
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+      {/* Clean Header with Progress */}
+      <div className="bg-surface border-b border-border">
+        <div className="px-4 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              {/* Back Button */}
+              {viewMode !== 'overview' && (
+                <button
+                  onClick={viewMode === 'lesson' ? backToPaths : backToOverview}
+                  className="p-2 hover:bg-surface-2 rounded-lg transition-colors"
+                >
+                  <ArrowLeft className="w-5 h-5 text-muted" />
+                </button>
+              )}
+              
+              {/* Title */}
               <div>
-                <div className="text-2xl font-bold text-text">{progress.completedPaths.size}</div>
-                <div className="text-sm text-muted">Paths Completed</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-text">{progress.completedLessons.size}</div>
-                <div className="text-sm text-muted">Lessons Completed</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-text">{progress.artifacts.size}</div>
-                <div className="text-sm text-muted">Artifacts Collected</div>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-text">{overallProgress}%</div>
-                <div className="text-sm text-muted">Overall Progress</div>
+                <h1 className="text-xl font-bold text-text">
+                  {viewMode === 'lesson' && getCurrentLessonTitle() 
+                    ? getCurrentLessonTitle()
+                    : viewMode === 'paths' && getCurrentPathTitle()
+                    ? getCurrentPathTitle()
+                    : data.meta.title}
+                </h1>
+                {viewMode === 'lesson' && getCurrentPathTitle() && (
+                  <p className="text-sm text-muted">{getCurrentPathTitle()}</p>
+                )}
               </div>
             </div>
-            
-            {/* Overall Progress Bar */}
-            <div className="mt-4">
-              <div className="flex items-center justify-between text-sm text-muted mb-2">
-                <span>Journey Progress</span>
-                <span>{overallProgress}%</span>
-              </div>
-              <div className="w-full bg-surface-2 rounded-full h-3">
-                <motion.div 
-                  className="h-3 bg-gradient-to-r from-primary to-primary/80 rounded-full"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${overallProgress}%` }}
-                  transition={{ duration: 1, ease: "easeOut" }}
-                />
-              </div>
-            </div>
-          </motion.div>
 
-          {/* Certificate Status */}
-          {canEarn && (
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-gradient-to-r from-yellow-500/10 to-amber-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6"
-            >
-              <div className="flex items-center justify-center space-x-2 text-yellow-300">
-                <Award className="w-5 h-5" />
-                <span className="font-medium">Certificate Available!</span>
+            {/* Progress & Menu */}
+            <div className="flex items-center space-x-3">
+              {/* Compact Progress */}
+              <div className="hidden sm:flex items-center space-x-2 text-sm">
+                <span className="text-muted">{overallProgress}%</span>
+                <div className="w-16 bg-surface-2 rounded-full h-2">
+                  <div 
+                    className="h-2 bg-gradient-to-r from-primary to-primary/80 rounded-full transition-all duration-300"
+                    style={{ width: `${overallProgress}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Certificate Badge */}
+              {canEarn && (
                 <button
                   onClick={() => setViewMode('certificate')}
-                  className="text-sm bg-yellow-500/20 hover:bg-yellow-500/30 px-3 py-1 rounded-lg transition-colors"
+                  className="flex items-center space-x-1 bg-yellow-500/20 hover:bg-yellow-500/30 px-3 py-1 rounded-lg transition-colors"
                 >
-                  View Certificate
+                  <Award className="w-4 h-4 text-yellow-300" />
+                  <span className="text-sm text-yellow-300 font-medium">Certificate</span>
+                </button>
+              )}
+
+              {/* Menu Button */}
+              <button
+                onClick={() => setShowMenu(!showMenu)}
+                className="p-2 hover:bg-surface-2 rounded-lg transition-colors"
+              >
+                <Menu className="w-5 h-5 text-muted" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Dropdown Menu */}
+      <AnimatePresence>
+        {showMenu && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="bg-surface border-b border-border shadow-lg"
+          >
+            <div className="px-4 py-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button
+                  onClick={() => { setViewMode('overview'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'overview' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <Home className="w-4 h-4" />
+                  <span className="text-sm font-medium">Overview</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('paths'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'paths' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <BookOpen className="w-4 h-4" />
+                  <span className="text-sm font-medium">Paths</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('progress'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'progress' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <Target className="w-4 h-4" />
+                  <span className="text-sm font-medium">Progress</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('daily-checkin'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'daily-checkin' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <Heart className="w-4 h-4" />
+                  <span className="text-sm font-medium">Check-in</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('glossary'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'glossary' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <Scroll className="w-4 h-4" />
+                  <span className="text-sm font-medium">Glossary</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('artifacts'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'artifacts' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <Sparkles className="w-4 h-4" />
+                  <span className="text-sm font-medium">Artifacts</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('portfolio'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'portfolio' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span className="text-sm font-medium">Portfolio</span>
+                </button>
+                <button
+                  onClick={() => { setViewMode('agora'); setShowMenu(false); }}
+                  className={cn(
+                    'flex items-center space-x-2 p-3 rounded-lg text-left transition-colors',
+                    viewMode === 'agora' 
+                      ? 'bg-primary/20 text-primary' 
+                      : 'hover:bg-surface-2 text-muted hover:text-text'
+                  )}
+                >
+                  <Users className="w-4 h-4" />
+                  <span className="text-sm font-medium">Agora</span>
                 </button>
               </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Main Content - Clean and Focused */}
+      <main className="px-4 py-6 pb-20">
+        <AnimatePresence mode="wait">
+          {viewMode === 'overview' && (
+            <motion.div
+              key="overview"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumOverview onStartJourney={startJourney} />
             </motion.div>
           )}
-        </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center justify-center space-x-1 bg-surface border border-border rounded-xl p-1 overflow-x-auto">
-          <button
-            onClick={() => setViewMode('overview')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'overview' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setViewMode('paths')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'paths' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Paths
-          </button>
-          <button
-            onClick={() => setViewMode('progress')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'progress' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Progress
-          </button>
-          <button
-            onClick={() => setViewMode('daily-checkin')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'daily-checkin' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Check-in
-          </button>
-          <button
-            onClick={() => setViewMode('glossary')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'glossary' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Glossary
-          </button>
-          <button
-            onClick={() => setViewMode('artifacts')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'artifacts' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Artifacts
-          </button>
-          <button
-            onClick={() => setViewMode('portfolio')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'portfolio' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Portfolio
-          </button>
-          <button
-            onClick={() => setViewMode('agora')}
-            className={cn(
-              'px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
-              viewMode === 'agora' 
-                ? 'bg-primary text-white' 
-                : 'text-muted hover:text-text'
-            )}
-          >
-            Agora
-          </button>
-        </div>
+          {viewMode === 'paths' && (
+            <motion.div
+              key="paths"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumPaths 
+                onSelectPath={selectPath}
+                onSelectLesson={selectLesson}
+              />
+            </motion.div>
+          )}
 
-        {/* Content */}
-        {viewMode === 'overview' && (
-          <LyceumOverview onStartJourney={startJourney} />
-        )}
+          {viewMode === 'progress' && (
+            <motion.div
+              key="progress"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumProgress 
+                onSelectPath={selectPath}
+                onSelectLesson={selectLesson}
+              />
+            </motion.div>
+          )}
 
-        {viewMode === 'paths' && (
-          <LyceumPaths 
-            onSelectPath={selectPath}
-            onSelectLesson={selectLesson}
-          />
-        )}
+          {viewMode === 'lesson' && selectedLesson && (
+            <motion.div
+              key="lesson"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumLesson 
+                lessonId={selectedLesson}
+                onBack={backToPaths}
+                onComplete={() => {
+                  // Auto-advance logic can be added here
+                }}
+              />
+            </motion.div>
+          )}
 
-        {viewMode === 'progress' && (
-          <LyceumProgress 
-            onSelectPath={selectPath}
-            onSelectLesson={selectLesson}
-          />
-        )}
+          {viewMode === 'certificate' && (
+            <motion.div
+              key="certificate"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumCertificate onBack={backToOverview} />
+            </motion.div>
+          )}
 
-        {viewMode === 'lesson' && selectedLesson && (
-          <LyceumLesson 
-            lessonId={selectedLesson}
-            onBack={backToPaths}
-            onComplete={() => {
-              // Auto-advance logic can be added here
-            }}
-          />
-        )}
+          {viewMode === 'daily-checkin' && (
+            <motion.div
+              key="daily-checkin"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumDailyCheckin />
+            </motion.div>
+          )}
 
-        {viewMode === 'certificate' && (
-          <LyceumCertificate onBack={backToOverview} />
-        )}
+          {viewMode === 'glossary' && (
+            <motion.div
+              key="glossary"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumGlossary />
+            </motion.div>
+          )}
 
-        {viewMode === 'daily-checkin' && (
-          <LyceumDailyCheckin />
-        )}
+          {viewMode === 'artifacts' && (
+            <motion.div
+              key="artifacts"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumArtifacts pathId={selectedPath || undefined} lessonId={selectedLesson || undefined} />
+            </motion.div>
+          )}
 
-        {viewMode === 'glossary' && (
-          <LyceumGlossary />
-        )}
+          {viewMode === 'portfolio' && (
+            <motion.div
+              key="portfolio"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumPortfolio />
+            </motion.div>
+          )}
 
-        {viewMode === 'artifacts' && (
-          <LyceumArtifacts pathId={selectedPath || undefined} lessonId={selectedLesson || undefined} />
-        )}
-
-        {viewMode === 'portfolio' && (
-          <LyceumPortfolio />
-        )}
-
-        {viewMode === 'agora' && (
-          <LyceumAgora pathId={selectedPath || undefined} lessonId={selectedLesson || undefined} />
-        )}
+          {viewMode === 'agora' && (
+            <motion.div
+              key="agora"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <LyceumAgora pathId={selectedPath || undefined} lessonId={selectedLesson || undefined} />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
 
-      <LyceumFloatingActions />
       <TabBar />
     </div>
   );
