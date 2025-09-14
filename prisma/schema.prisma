@@ -814,7 +814,7 @@ model LyceumUserProgress {
   lessonProgress        LyceumLessonProgress[]
   activityResponses     LyceumActivityResponse[]
   evaluations           LyceumEvaluation[]
-  dailyCheckins         LyceumDailyCheckin[]
+  lyceumDailyCheckins   LyceumDailyCheckin[]
 }
 
 // Lyceum Path Progress - progress for individual paths
