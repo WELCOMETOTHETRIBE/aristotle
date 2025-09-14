@@ -223,12 +223,16 @@ model User {
   academyModuleProgress AcademyModuleProgress[]
   
   // Lyceum relations
-  lyceumUserProgress LyceumUserProgress[]
+  lyceumUserProgress LyceumUserProgress?
   lyceumPathProgress LyceumPathProgress[]
   lyceumLessonProgress LyceumLessonProgress[]
   lyceumActivityResponses LyceumActivityResponse[]
   lyceumEvaluations LyceumEvaluation[]
   lyceumDailyCheckins LyceumDailyCheckin[]
+  lyceumAgoraPosts LyceumAgoraPost[]
+  lyceumAgoraComments LyceumAgoraComment[]
+  lyceumAgoraLikes LyceumAgoraLike[]
+  lyceumCertificates LyceumCertificate[]
 }
 
 model Session {
@@ -730,6 +734,7 @@ model LyceumPath {
   
   lessons               LyceumLesson[]
   userProgress          LyceumPathProgress[]
+  agoraPosts            LyceumAgoraPost[]
 }
 
 // Lyceum Lesson - individual lessons within a path
@@ -758,6 +763,7 @@ model LyceumLesson {
   activities            LyceumActivity[]
   assessments           LyceumAssessment[]
   userProgress          LyceumLessonProgress[]
+  agoraPosts            LyceumAgoraPost[]
 }
 
 // Lyceum Activity - interactive elements within lessons
@@ -794,7 +800,7 @@ model LyceumAssessment {
 // Lyceum User Progress - overall progress tracking
 model LyceumUserProgress {
   id                    String                @id @default(cuid())
-  userId                String
+  userId                Int                   @unique
   completedLessons      String[]              // Array of completed lesson IDs
   completedPaths        String[]              // Array of completed path IDs
   artifacts             String[]              // Array of collected artifacts
@@ -820,7 +826,7 @@ model LyceumUserProgress {
 // Lyceum Path Progress - progress for individual paths
 model LyceumPathProgress {
   id                    String                @id @default(cuid())
-  userId                String
+  userId                Int
   pathId                String
   completed             Boolean               @default(false)
   completedLessons      Int                   @default(0)
@@ -831,7 +837,7 @@ model LyceumPathProgress {
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "LyceumPathProgress_user_fkey")
   path                  LyceumPath            @relation(fields: [pathId], references: [id], onDelete: Cascade)
   userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
 }
@@ -839,7 +845,7 @@ model LyceumPathProgress {
 // Lyceum Lesson Progress - progress for individual lessons
 model LyceumLessonProgress {
   id                    String                @id @default(cuid())
-  userId                String
+  userId                Int
   lessonId              String
   completed             Boolean               @default(false)
   timeSpent             Int                   @default(0) // Time in minutes
@@ -848,7 +854,7 @@ model LyceumLessonProgress {
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
   
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "LyceumLessonProgress_user_fkey")
   lesson                LyceumLesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
   userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
 }
@@ -856,13 +862,13 @@ model LyceumLessonProgress {
 // Lyceum Activity Response - user responses to activities
 model LyceumActivityResponse {
   id                    String                @id @default(cuid())
-  userId                String
+  userId                Int
   activityId            String
   response              Json                  // User's response data
   submittedAt           DateTime              @default(now())
   createdAt             DateTime              @default(now())
   
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "LyceumActivityResponse_user_fkey")
   activity              LyceumActivity        @relation(fields: [activityId], references: [id], onDelete: Cascade)
   userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
 }
@@ -870,7 +876,7 @@ model LyceumActivityResponse {
 // Lyceum Evaluation - AI evaluations of user work
 model LyceumEvaluation {
   id                    String                @id @default(cuid())
-  userId                String
+  userId                Int
   assessmentId          String
   scores                Json                  // Evaluation scores
   notes                 String                // AI feedback
@@ -880,7 +886,7 @@ model LyceumEvaluation {
   evaluatedAt           DateTime              @default(now())
   createdAt             DateTime              @default(now())
   
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "LyceumEvaluation_user_fkey")
   assessment            LyceumAssessment      @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
   userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
 }
@@ -888,7 +894,7 @@ model LyceumEvaluation {
 // Lyceum Daily Check-in - daily reflection and coaching
 model LyceumDailyCheckin {
   id                    String                @id @default(cuid())
-  userId                String
+  userId                Int
   userTelos             String?               // User's stated purpose
   reflection            String?               // User's reflection
   coachingSuggestion    String?               // AI coaching suggestion
@@ -897,6 +903,69 @@ model LyceumDailyCheckin {
   completedAt           DateTime              @default(now())
   createdAt             DateTime              @default(now())
   
-  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade, map: "LyceumDailyCheckin_user_fkey")
   userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
+}
+
+// Lyceum Agora (Community) Models
+model LyceumAgoraPost {
+  id          String   @id @default(cuid())
+  userId      Int
+  pathId      String?
+  lessonId    String?
+  title       String
+  content     String
+  type        String   @default("reflection")
+  tags        String[]
+  isAnonymous Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  path        LyceumPath?           @relation(fields: [pathId], references: [id], onDelete: SetNull)
+  lesson      LyceumLesson?         @relation(fields: [lessonId], references: [id], onDelete: SetNull)
+  comments    LyceumAgoraComment[]
+  likes       LyceumAgoraLike[]
+}
+
+model LyceumAgoraComment {
+  id          String   @id @default(cuid())
+  userId      Int
+  postId      String
+  content     String
+  isAnonymous Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post        LyceumAgoraPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+}
+
+model LyceumAgoraLike {
+  id     String @id @default(cuid())
+  userId Int
+  postId String
+  createdAt DateTime @default(now())
+  
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  post   LyceumAgoraPost @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, postId], name: "LyceumAgoraLike_userId_postId_key")
+}
+
+// Lyceum Certificate Model
+model LyceumCertificate {
+  id                String   @id @default(cuid())
+  userId            Int
+  certificateId     String   @unique
+  verificationCode  String   @unique
+  completionDate    DateTime
+  overallMastery    Float
+  masteryBreakdown  Json
+  pathCompletions   String[]
+  totalArtifacts    Int
+  certificateData   String   // JSON string of certificate data
+  createdAt         DateTime @default(now())
+  
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
