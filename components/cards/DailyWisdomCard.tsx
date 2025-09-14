@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Sparkles, RefreshCw, BookOpen, Quote, Brain, RotateCcw, Settings, Info, MessageCircle } from 'lucide-react';
+import { Sparkles, RefreshCw, BookOpen, Quote, Brain, RotateCcw, Settings, Info, MessageCircle, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -81,6 +81,62 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     }
   };
 
+  // Check if current quote is in favorites
+  const isFavorite = () => {
+    if (!wisdom) return false;
+    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+    return favorites.some((fav: any) => fav.quote === wisdom.quote && fav.author === wisdom.author);
+  };
+
+  // Toggle favorite status
+  const toggleFavorite = async () => {
+    if (!wisdom) return;
+    
+    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+    
+    if (isFavorite()) {
+      // Remove from favorites
+      const newFavorites = favorites.filter((fav: any) => !(fav.quote === wisdom.quote && fav.author === wisdom.author));
+      localStorage.setItem('favoriteQuotes', JSON.stringify(newFavorites));
+      
+      // Log to journal
+      await logToJournal({
+        type: 'favorite_removed',
+        content: `Removed from favorites: "${wisdom.quote}" - ${wisdom.author}`,
+        category: 'wisdom',
+        metadata: {
+          quote: wisdom.quote,
+          author: wisdom.author,
+          framework: wisdom.framework,
+          timestamp: new Date().toISOString()
+        }
+      });
+    } else {
+      // Add to favorites
+      const currentQuote = {
+        quote: wisdom.quote,
+        author: wisdom.author,
+        framework: wisdom.framework,
+        addedAt: new Date().toISOString()
+      };
+      favorites.push(currentQuote);
+      localStorage.setItem('favoriteQuotes', JSON.stringify(favorites));
+      
+      // Log to journal
+      await logToJournal({
+        type: 'favorite_added',
+        content: `Added to favorites: "${wisdom.quote}" - ${wisdom.author}`,
+        category: 'wisdom',
+        metadata: {
+          quote: wisdom.quote,
+          author: wisdom.author,
+          framework: wisdom.framework,
+          timestamp: new Date().toISOString()
+        }
+      });
+    }
+  };
+
   const loadDailyWisdom = async (forceRefresh = false) => {
     // Check if we already have wisdom for today and don't force refresh
     if (!forceRefresh && typeof window !== 'undefined') {
@@ -112,7 +168,7 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       console.log('📱 Mobile Debug - Settings object:', settings);
       console.log('📱 Mobile Debug - Preferred frameworks:', settings.preferredFrameworks);
       console.log('📱 Mobile Debug - Frameworks to use:', frameworksToUse);      
-      console.log('�� Mobile Debug - Request body:', {
+      console.log('📱 Mobile Debug - Request body:', {
         frameworks: frameworksToUse,
         date: new Date().toISOString().split('T')[0],
         userAgent: navigator.userAgent,
@@ -406,9 +462,23 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
               <p className="text-sm text-gray-600 dark:text-gray-400">{wisdom.framework}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <BookOpen className="w-4 h-4" />
-            <span>Daily</span>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={toggleFavorite}
+              className={cn(
+                "p-2 rounded-lg transition-all duration-200",
+                isFavorite()
+                  ? "text-yellow-500 hover:text-yellow-400"
+                  : "text-gray-400 hover:text-yellow-500"
+              )}
+              title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
+            >
+              <Star className={cn("w-5 h-5", isFavorite() && "fill-current")} />
+            </button>
+            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+              <BookOpen className="w-4 h-4" />
+              <span>Daily</span>
+            </div>
           </div>
         </div>
 
@@ -423,23 +493,70 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-3">
-          <Link
-            href="/journal"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
-          >
-            <MessageCircle className="w-4 h-4" />
-            <span>Journal</span>
-          </Link>
+        {/* Action Buttons - Compact Design */}
+        <div className="flex items-center gap-2 pt-3">
           <button
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-white/10 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+            onClick={() => {
+              const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+              if (favorites.length > 0) {
+                // Show a simple modal with favorites
+                const modal = document.createElement('div');
+                modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+                modal.innerHTML = `
+                  <div class="bg-surface border border-border rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+                    <div class="flex items-center justify-between mb-4">
+                      <h3 class="text-lg font-semibold text-text">Your Favorite Quotes</h3>
+                      <button onclick="this.closest('.fixed').remove()" class="text-muted hover:text-text">✕</button>
+                    </div>
+                    <div class="space-y-3">
+                      ${favorites.map((fav: any, index: number) => `
+                        <div class="p-3 bg-surface/50 rounded-lg border border-border/50">
+                          <blockquote class="text-sm italic text-text mb-2">"${fav.quote}"</blockquote>
+                          <div class="flex items-center justify-between">
+                            <cite class="text-xs text-purple-300">— ${fav.author}</cite>
+                            <span class="text-xs text-muted">${fav.framework}</span>
+                          </div>
+                        </div>
+                      `).join('')}
+                    </div>
+                    <div class="mt-4 text-center">
+                      <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                `;
+                document.body.appendChild(modal);
+                
+                // Close on backdrop click
+                modal.addEventListener('click', (e) => {
+                  if (e.target === modal) modal.remove();
+                });
+              } else {
+                alert('No favorite quotes yet. Add some by clicking the star icon!');
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-surface/60 border border-border/50 text-muted hover:text-text hover:bg-surface transition-colors text-sm"
+            title="View your favorite quotes"
           >
-            <RotateCcw className="w-4 h-4" />
-            <span>New Wisdom</span>
+            <BookOpen className="w-3.5 h-3.5" />
+            Favorites ({JSON.parse(localStorage.getItem('favoriteQuotes') || '[]').length})
           </button>
+          
+          <Link 
+            href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
+            onClick={() => {
+              // Scroll to top when navigating to coach page
+              if (typeof window !== 'undefined') {
+                window.scrollTo(0, 0);
+              }
+            }}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
+            title="Ask AI to discuss this quote"
+          >
+            <MessageCircle className="w-3.5 h-5" />
+            Ask AI
+          </Link>
         </div>
       </motion.div>
 
