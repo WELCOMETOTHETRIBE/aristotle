@@ -1,114 +1,105 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
-import { Sparkles, Brain, Shield, Scale, Leaf, ArrowRight, BookOpen, Target, Heart, Zap, Star, Clock, Lightbulb, MessageCircle, GraduationCap, Users, Eye, Compass, CheckCircle, Circle, Quote, Calendar, BookMarked } from 'lucide-react';
+import { 
+  BookOpen, 
+  GraduationCap, 
+  Clock, 
+  Star, 
+  CheckCircle, 
+  Circle, 
+  ArrowRight, 
+  Play, 
+  Brain, 
+  Target, 
+  Users, 
+  MessageCircle,
+  Eye,
+  Compass,
+  Sparkles,
+  Quote,
+  Calendar,
+  Award,
+  Lightbulb,
+  Mic,
+  FileText,
+  Zap
+} from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth-context';
 import PhilosophersDialogueModal from '@/components/PhilosophersDialogueModal';
-import { ACADEMY_CURRICULUM, type VirtueModule, type AcademyLesson } from '@/lib/academy-curriculum';
-import AcademyOverview from '@/components/AcademyOverview';
-import AcademyProgress from '@/components/AcademyProgress';
-import InteractiveLessonInterface from '@/components/InteractiveLessonInterface';
+import AcademyWisdomJourney from '@/components/AcademyWisdomJourney';
+import AcademyArtifacts from '@/components/AcademyArtifacts';
+
+// Import the wisdom journey data
+import academyData from '@/data/academy_wisdom_journey_v1_1.json';
+
+type ViewMode = 'overview' | 'paths' | 'progress' | 'lesson' | 'certificate' | 'daily-checkin' | 'glossary' | 'artifacts' | 'portfolio' | 'agora';
 
 export default function AcademyPage() {
   const { user, loading } = useAuth();
-  const [selectedModule, setSelectedModule] = useState<VirtueModule | null>(null);
-  const [currentLesson, setCurrentLesson] = useState<AcademyLesson | null>(null);
-  const [userResponse, setUserResponse] = useState('');
-  const [modules, setModules] = useState<VirtueModule[]>(ACADEMY_CURRICULUM);
+  const [viewMode, setViewMode] = useState<ViewMode>('overview');
+  const [selectedPath, setSelectedPath] = useState<any>(null);
+  const [currentLesson, setCurrentLesson] = useState<any>(null);
   const [showPhilosophersDialogue, setShowPhilosophersDialogue] = useState(false);
-  const [showOverview, setShowOverview] = useState(true);
-  const [viewMode, setViewMode] = useState<'overview' | 'modules' | 'progress'>('overview');
+  const [userProgress, setUserProgress] = useState<any>({});
 
-  // Load saved progress
+  // Load user progress
   useEffect(() => {
-    if (loading) return; // Wait for auth to load
+    if (loading) return;
 
     if (user) {
-      // Authenticated user - load their personal progress
-      const savedModules = localStorage.getItem(`academyModules_${user.id}`);
-      if (savedModules) {
-        setModules(JSON.parse(savedModules));
-      } else {
-        // New authenticated user - start with fresh progress
-        setModules(ACADEMY_CURRICULUM);
+      const savedProgress = localStorage.getItem(`academyProgress_${user.id}`);
+      if (savedProgress) {
+        setUserProgress(JSON.parse(savedProgress));
       }
-    } else {
-      // Unauthenticated users start with fresh progress
-      setModules(ACADEMY_CURRICULUM);
     }
   }, [user, loading]);
 
   // Save progress
-  const saveProgress = (updatedModules: VirtueModule[]) => {
-    setModules(updatedModules);
+  const saveProgress = (progress: any) => {
+    setUserProgress(progress);
     if (user) {
-      localStorage.setItem(`academyModules_${user.id}`, JSON.stringify(updatedModules));
+      localStorage.setItem(`academyProgress_${user.id}`, JSON.stringify(progress));
     }
   };
 
-  const startModuleJourney = (module: VirtueModule) => {
-    setSelectedModule(module);
-    const firstLesson = module.lessons.find(lesson => !lesson.completed) || module.lessons[0];
-    setCurrentLesson(firstLesson);
-  };
-
-  const submitResponse = () => {
-    if (!userResponse.trim() || !currentLesson || !selectedModule) return;
-
-    // Update lesson with response
-    const updatedModule = {
-      ...selectedModule,
-      lessons: selectedModule.lessons.map(lesson =>
-        lesson.id === currentLesson.id
-          ? { ...lesson, response: userResponse.trim(), completed: true }
-          : lesson
-      )
-    };
-
-    // Calculate progress
-    const completedLessons = updatedModule.lessons.filter(lesson => lesson.completed).length;
-    const progress = Math.round((completedLessons / updatedModule.lessons.length) * 100);
-    updatedModule.progress = progress;
-    updatedModule.completed = progress === 100;
-    updatedModule.completedLessons = completedLessons;
-
-    // Update modules
-    const updatedModules = modules.map(module =>
-      module.id === selectedModule.id ? updatedModule : module
-    );
-    saveProgress(updatedModules);
-
-    // Store response for journal integration
-    const journalEntry = {
-      id: Date.now().toString(),
-      title: `${selectedModule.name} Academy: ${currentLesson.title}`,
-      content: `Teaching: ${currentLesson.teaching}\n\nQuestion: ${currentLesson.question}\n\nMy Response: ${userResponse.trim()}\n\nPractice: ${currentLesson.practice}`,
-      timestamp: new Date(),
-      tags: ['academy', selectedModule.id.toLowerCase(), 'virtue-learning', currentLesson.difficulty],
-      virtue: selectedModule.id
-    };
-
-    if (user) {
-      // Authenticated user - save to user-specific storage
-      const existingEntries = localStorage.getItem(`journalEntries_${user.id}`) || '[]';
-      const entries = JSON.parse(existingEntries);
-      entries.unshift(journalEntry);
-      localStorage.setItem(`journalEntries_${user.id}`, JSON.stringify(entries));
-    }
-
-    setUserResponse('');
+  const getPathProgress = (pathId: string) => {
+    const path = academyData.paths.find(p => p.id === pathId);
+    if (!path) return 0;
     
-    // Move to next lesson or complete module
-    const nextLesson = updatedModule.lessons.find(lesson => !lesson.completed);
-    if (nextLesson) {
-      setCurrentLesson(nextLesson);
+    const completedLessons = path.lessons.filter(lesson => 
+      userProgress[lesson.id]?.completed
+    ).length;
+    
+    return Math.round((completedLessons / path.lessons.length) * 100);
+  };
+
+  const getOverallProgress = () => {
+    const totalLessons = academyData.paths.reduce((sum, path) => sum + path.lessons.length, 0);
+    const completedLessons = academyData.paths.reduce((sum, path) => 
+      sum + path.lessons.filter(lesson => userProgress[lesson.id]?.completed).length, 0
+    );
+    
+    return Math.round((completedLessons / totalLessons) * 100);
+  };
+
+  const getCompletedPaths = () => {
+    return academyData.paths.filter(path => getPathProgress(path.id) === 100).length;
+  };
+
+  const startPath = (path: any) => {
+    setSelectedPath(path);
+    const firstIncompleteLesson = path.lessons.find((lesson: any) => !userProgress[lesson.id]?.completed);
+    if (firstIncompleteLesson) {
+      setCurrentLesson(firstIncompleteLesson);
+      setViewMode('lesson');
     } else {
-      setCurrentLesson(null);
-      setSelectedModule(null);
+      setCurrentLesson(path.lessons[0]);
+      setViewMode('lesson');
     }
   };
 
@@ -130,527 +121,595 @@ export default function AcademyPage() {
     }
   };
 
-  const startJourney = () => {
-    setShowOverview(false);
-    setViewMode('modules');
-  };
-
-  const viewModule = (module: VirtueModule) => {
-    setSelectedModule(module);
-    setCurrentLesson(null);
-  };
-
   return (
     <div className="min-h-screen bg-bg pb-20">
       <Header focusVirtue="wisdom" />
       
       <main className="px-4 py-6 space-y-6">
-        {showOverview ? (
-          <AcademyOverview onStartJourney={startJourney} />
-        ) : (
-          <>
-            {/* Header */}
-            <div className="text-center">
-              <h1 className="text-3xl font-bold text-text mb-3">Aristotle's Academy</h1>
-              <p className="text-muted text-lg">Master the four cardinal virtues through authentic philosophical study</p>
-              <div className="mt-4 flex items-center justify-center space-x-4 text-sm text-muted">
-                <div className="flex items-center space-x-1">
-                  <GraduationCap className="w-4 h-4" />
-                  <span>48 Lessons</span>
+        {/* Header */}
+        <div className="text-center">
+          <div className="flex items-center justify-center mb-4">
+            <div className="w-16 h-16 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-2xl flex items-center justify-center shadow-lg">
+              <GraduationCap className="w-8 h-8 text-indigo-400" />
+            </div>
+          </div>
+          <h1 className="text-3xl font-bold text-text mb-3">{academyData.meta.title}</h1>
+          <p className="text-muted text-lg mb-4">{academyData.meta.philosophical_scope}</p>
+          <div className="flex items-center justify-center space-x-6 text-sm text-muted">
+            <div className="flex items-center space-x-1">
+              <BookOpen className="w-4 h-4" />
+              <span>{academyData.paths.length} Paths</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Clock className="w-4 h-4" />
+              <span>{academyData.meta.session_length_minutes}</span>
+            </div>
+            <div className="flex items-center space-x-1">
+              <Award className="w-4 h-4" />
+              <span>Certificate Available</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="flex items-center justify-center space-x-1 bg-surface border border-border rounded-xl p-1 overflow-x-auto">
+          <button
+            onClick={() => setViewMode('overview')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              viewMode === 'overview' 
+                ? 'bg-primary text-white' 
+                : 'text-muted hover:text-text'
+            )}
+          >
+            Overview
+          </button>
+          <button
+            onClick={() => setViewMode('paths')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              viewMode === 'paths' 
+                ? 'bg-primary text-white' 
+                : 'text-muted hover:text-text'
+            )}
+          >
+            Paths
+          </button>
+          <button
+            onClick={() => setViewMode('progress')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              viewMode === 'progress' 
+                ? 'bg-primary text-white' 
+                : 'text-muted hover:text-text'
+            )}
+          >
+            Progress
+          </button>
+          <button
+            onClick={() => setViewMode('certificate')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              viewMode === 'certificate' 
+                ? 'bg-primary text-white' 
+                : 'text-muted hover:text-text'
+            )}
+          >
+            Certificate
+          </button>
+          <button
+            onClick={() => setViewMode('daily-checkin')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              viewMode === 'daily-checkin' 
+                ? 'bg-primary text-white' 
+                : 'text-muted hover:text-text'
+            )}
+          >
+            Daily Check-in
+          </button>
+          <button
+            onClick={() => setViewMode('artifacts')}
+            className={cn(
+              'px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap',
+              viewMode === 'artifacts' 
+                ? 'bg-primary text-white' 
+                : 'text-muted hover:text-text'
+            )}
+          >
+            Portfolio
+          </button>
+        </div>
+
+        {/* Overview Mode */}
+        {viewMode === 'overview' && (
+          <div className="space-y-6">
+            {/* Progress Summary */}
+            <div className="bg-gradient-to-br from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-bold text-text">Your Journey Progress</h2>
+                <div className="text-2xl font-bold text-indigo-400">{getOverallProgress()}%</div>
+              </div>
+              <div className="w-full bg-surface-2 rounded-full h-3 mb-4">
+                <div 
+                  className="h-3 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+                  style={{ width: `${getOverallProgress()}%` }}
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-4 text-center">
+                <div>
+                  <div className="text-2xl font-bold text-text">{getCompletedPaths()}</div>
+                  <div className="text-sm text-muted">Paths Completed</div>
                 </div>
-                <div className="flex items-center justify-center space-x-1">
-                  <Clock className="w-4 h-4" />
-                  <span>12 Hours</span>
+                <div>
+                  <div className="text-2xl font-bold text-text">{academyData.paths.length}</div>
+                  <div className="text-sm text-muted">Total Paths</div>
                 </div>
-                <div className="flex items-center justify-center space-x-1">
-                  <BookMarked className="w-4 h-4" />
-                  <span>4 Capstone Projects</span>
+                <div>
+                  <div className="text-2xl font-bold text-text">{academyData.certificate.requirements.min_lessons_completed}</div>
+                  <div className="text-sm text-muted">Lessons for Certificate</div>
                 </div>
               </div>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="flex items-center justify-center space-x-1 bg-surface border border-border rounded-xl p-1">
-              <button
-                onClick={() => setViewMode('modules')}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  viewMode === 'modules' 
-                    ? 'bg-primary text-white' 
-                    : 'text-muted hover:text-text'
-                )}
-              >
-                Modules
-              </button>
-              <button
-                onClick={() => setViewMode('progress')}
-                className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
-                  viewMode === 'progress' 
-                    ? 'bg-primary text-white' 
-                    : 'text-muted hover:text-text'
-                )}
-              >
-                Progress
-              </button>
-            </div>
-
-            {viewMode === 'modules' && !selectedModule && (
-              /* Module Selection */
-              <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-text">Choose Your Path</h2>
-                  <button
-                    onClick={() => setShowOverview(true)}
-                    className="text-sm text-muted hover:text-text transition-colors"
-                  >
-                    View Overview
-                  </button>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {modules.map((module) => {
-                    const IconComponent = module.icon;
-                    return (
-                      <motion.button
-                        key={module.id}
-                        onClick={() => startModuleJourney(module)}
-                        className="p-6 bg-surface border border-border rounded-2xl hover:bg-surface-2 transition-all duration-200 hover:scale-105 text-left group"
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <div className="flex items-start space-x-4 mb-4">
-                          <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center shadow-lg', module.color)}>
-                            <IconComponent className="w-6 h-6" />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-xl font-bold text-text mb-1">{module.name}</h3>
-                            <p className="text-sm text-muted mb-2">{module.greekName}</p>
-                            <p className="text-sm text-muted">{module.description}</p>
-                          </div>
-                          {module.completed && (
-                            <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
-                              <CheckCircle className="w-4 h-4 text-success" />
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Progress */}
-                        <div className="space-y-3 mb-4">
-                          <div className="flex items-center justify-between text-sm">
-                            <span className="text-muted">Progress</span>
-                            <span className="font-medium text-text">{module.progress}%</span>
-                          </div>
-                          <div className="w-full bg-surface-2 rounded-full h-2">
-                            <div 
-                              className={cn(
-                                'h-2 rounded-full transition-all duration-500',
-                                module.id === 'wisdom' ? 'bg-primary' :
-                                module.id === 'justice' ? 'bg-justice' :
-                                module.id === 'courage' ? 'bg-courage' :
-                                'bg-temperance'
-                              )}
-                              style={{ width: `${module.progress}%` }}
-                            />
-                          </div>
-                        </div>
-
-                        {/* Module Stats */}
-                        <div className="grid grid-cols-3 gap-2 text-xs text-muted mb-4">
-                          <div className="text-center">
-                            <div className="font-medium text-text">{module.completedLessons}</div>
-                            <div>Completed</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="font-medium text-text">{module.totalLessons}</div>
-                            <div>Total</div>
-                          </div>
-                          <div className="text-center">
-                            <div className="font-medium text-text">{module.estimatedTotalTime}</div>
-                            <div>Minutes</div>
-                          </div>
-                        </div>
-
-                        {/* Lesson Preview */}
-                        <div className="space-y-2">
-                          {module.lessons.slice(0, 3).map((lesson, index) => {
-                            const DifficultyIcon = getDifficultyIcon(lesson.difficulty);
-                            return (
-                              <div key={lesson.id} className="flex items-center space-x-2">
-                                <div className={cn(
-                                  'w-6 h-6 rounded-full flex items-center justify-center text-xs',
-                                  lesson.completed 
-                                    ? 'bg-success/20 text-success' 
-                                    : 'bg-surface-2 text-muted'
-                                )}>
-                                  {lesson.completed ? '✓' : index + 1}
-                                </div>
-                                <span className={cn(
-                                  'text-sm flex-1',
-                                  lesson.completed ? 'text-success' : 'text-muted'
-                                )}>
-                                  {lesson.title}
-                                </span>
-                                <div className={cn('px-2 py-1 rounded text-xs', getDifficultyColor(lesson.difficulty))}>
-                                  <DifficultyIcon className="w-3 h-3" />
-                                </div>
-                              </div>
-                            );
-                          })}
-                          {module.lessons.length > 3 && (
-                            <div className="text-xs text-muted text-center">
-                              +{module.lessons.length - 3} more lessons
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="mt-4 flex items-center justify-between">
-                          <span className="text-xs text-muted">
-                            {module.completedLessons} of {module.totalLessons} lessons
-                          </span>
-                          <ArrowRight className="w-4 h-4 text-muted group-hover:text-text transition-colors" />
-                        </div>
-                      </motion.button>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {viewMode === 'progress' && (
-              <AcademyProgress modules={modules} onViewModule={viewModule} />
-            )}
-
-            {selectedModule && (
-              <div className="space-y-6">
-                {/* Module Header */}
-                <div className="flex items-center justify-between p-6 bg-surface border border-border rounded-2xl">
-                  <div className="flex items-center space-x-4">
-                    <div className={cn('w-12 h-12 rounded-xl flex items-center justify-center shadow-lg', selectedModule.color)}>
-                      {(() => {
-                        const IconComponent = selectedModule.icon;
-                        return <IconComponent className="w-6 h-6" />;
-                      })()}
-                    </div>
-                    <div>
-                      <h2 className="text-xl font-bold text-text">{selectedModule.name}</h2>
-                      <p className="text-sm text-muted">{selectedModule.greekName}</p>
-                      <p className="text-sm text-muted">{selectedModule.description}</p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSelectedModule(null);
-                      setCurrentLesson(null);
-                    }}
-                    className="text-sm text-muted hover:text-text transition-colors"
-                  >
-                    Back to Modules
-                  </button>
-                </div>
-
-                {/* Lesson Selection */}
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-text">Your Learning Journey</h3>
-                  <div className="bg-surface border border-border rounded-xl p-4">
-                    <div className="flex items-center space-x-2 mb-4">
-                      <Compass className="w-5 h-5 text-primary" />
-                      <span className="text-sm font-medium text-text">Progress: {selectedModule.lessons.filter(l => l.completed).length} of {selectedModule.lessons.length} lessons</span>
-                    </div>
-                    
-                    {/* Compact Journey Map */}
-                    <div className="space-y-3">
-                      {selectedModule.lessons.map((lesson, index) => {
-                        const isCompleted = lesson.completed;
-                        const isCurrent = currentLesson?.id === lesson.id;
-                        const isAccessible = index === 0 || selectedModule.lessons[index - 1]?.completed;
-                        const isLocked = !isAccessible;
-                        
-                        return (
-                          <motion.div
-                            key={lesson.id}
-                            className={cn(
-                              'relative flex items-center space-x-3 p-3 rounded-lg border transition-all duration-200',
-                              isCurrent
-                                ? 'border-primary bg-primary/5'
-                                : isCompleted
-                                ? 'border-green-500/30 bg-green-500/5'
-                                : isLocked
-                                ? 'border-border/50 bg-surface-2 opacity-50'
-                                : 'border-border bg-surface hover:bg-surface-2 cursor-pointer'
-                            )}
-                            onClick={() => {
-                              if (!isLocked) {
-                                setCurrentLesson(lesson);
-                              }
-                            }}
-                            whileHover={!isLocked ? { scale: 1.02 } : {}}
-                            whileTap={!isLocked ? { scale: 0.98 } : {}}
-                          >
-                            {/* Lesson Number & Status */}
-                            <div className={cn(
-                              'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium flex-shrink-0',
-                              isCompleted
-                                ? 'bg-green-500 text-white'
-                                : isCurrent
-                                ? 'bg-primary text-white'
-                                : isLocked
-                                ? 'bg-surface-2 text-muted'
-                                : 'bg-surface-2 text-text'
-                            )}>
-                              {isCompleted ? (
-                                <CheckCircle className="w-4 h-4" />
-                              ) : (
-                                index + 1
-                              )}
-                            </div>
-
-                            {/* Lesson Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between mb-1">
-                                <h4 className={cn(
-                                  'font-medium text-sm truncate',
-                                  isCompleted ? 'text-green-600' : 'text-text'
-                                )}>
-                                  {lesson.title}
-                                </h4>
-                                <div className={cn('px-2 py-1 rounded text-xs', getDifficultyColor(lesson.difficulty))}>
-                                  {(() => {
-                                    const DifficultyIcon = getDifficultyIcon(lesson.difficulty);
-                                    return <DifficultyIcon className="w-3 h-3" />;
-                                  })()}
-                                </div>
-                              </div>
-                              <p className="text-xs text-muted truncate">{lesson.subtitle}</p>
-                              <div className="flex items-center space-x-4 mt-1 text-xs text-muted">
-                                <span>{lesson.estimatedTotalTime || lesson.estimatedTime} min</span>
-                                {isCompleted && <span className="text-green-500">✓ Completed</span>}
-                                {isCurrent && <span className="text-primary">→ Current</span>}
-                                {isLocked && <span className="text-muted">🔒 Locked</span>}
-                              </div>
-                            </div>
-
-                            {/* Connection Line */}
-                            {index < selectedModule.lessons.length - 1 && (
-                              <div className="absolute left-4 top-11 w-0.5 h-6 bg-border transform -translate-x-1/2" />
-                            )}
-                          </motion.div>
-                        );
-                      })}
-                    </div>
-
-                    {/* Journey Legend */}
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <div className="flex items-center space-x-4 text-xs text-muted">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 bg-green-500 rounded-full" />
-                          <span>Completed</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 bg-primary rounded-full" />
-                          <span>Current</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 bg-surface-2 rounded-full" />
-                          <span>Available</span>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-3 h-3 bg-surface-2 rounded-full opacity-50" />
-                          <span>Locked</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Interactive Lesson Interface */}
-                {currentLesson && (
-                  <div className="space-y-4">
-                    {/* Module Completion Celebration */}
-                    {selectedModule.completed && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-500/20 rounded-xl p-6 text-center"
-                      >
-                        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                          <GraduationCap className="w-8 h-8 text-green-600" />
-                        </div>
-                        <h3 className="text-xl font-bold text-text mb-2">Module Completed!</h3>
-                        <p className="text-green-600 mb-4">
-                          Congratulations! You've mastered {selectedModule.name} ({selectedModule.greekName}). 
-                          Your journey toward wisdom continues.
-                        </p>
-                        <div className="flex items-center justify-center space-x-4 text-sm text-muted">
-                          <div className="flex items-center space-x-1">
-                            <Star className="w-4 h-4" />
-                            <span>All {selectedModule.totalLessons} lessons completed</span>
-                          </div>
-                          <div className="flex items-center space-x-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{selectedModule.estimatedTotalTime} minutes of learning</span>
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-
-                    {/* Lesson Navigation */}
-                    <div className="flex items-center justify-between p-4 bg-surface border border-border rounded-xl">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
-                          <BookOpen className="w-5 h-5 text-primary" />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-text">{currentLesson.title}</h3>
-                          <p className="text-sm text-muted">Lesson {selectedModule.lessons.findIndex(l => l.id === currentLesson.id) + 1} of {selectedModule.lessons.length}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-center space-x-2">
-                        <button
-                          onClick={() => {
-                            const currentIndex = selectedModule.lessons.findIndex(l => l.id === currentLesson.id);
-                            const prevLesson = selectedModule.lessons[currentIndex - 1];
-                            if (prevLesson && (prevLesson.completed || currentIndex === 0)) {
-                              setCurrentLesson(prevLesson);
-                            }
-                          }}
-                          disabled={selectedModule.lessons.findIndex(l => l.id === currentLesson.id) === 0}
-                          className={cn(
-                            'p-2 rounded-lg transition-colors',
-                            selectedModule.lessons.findIndex(l => l.id === currentLesson.id) === 0
-                              ? 'bg-surface-2 text-muted cursor-not-allowed'
-                              : 'bg-surface-2 text-text hover:bg-surface-3'
-                          )}
-                        >
-                          <ArrowRight className="w-4 h-4 rotate-180" />
-                        </button>
-                        
-                        <button
-                          onClick={() => {
-                            const currentIndex = selectedModule.lessons.findIndex(l => l.id === currentLesson.id);
-                            const nextLesson = selectedModule.lessons[currentIndex + 1];
-                            if (nextLesson && nextLesson.completed) {
-                              setCurrentLesson(nextLesson);
-                            }
-                          }}
-                          disabled={!selectedModule.lessons.find(l => l.id === currentLesson.id)?.completed}
-                          className={cn(
-                            'p-2 rounded-lg transition-colors',
-                            !selectedModule.lessons.find(l => l.id === currentLesson.id)?.completed
-                              ? 'bg-surface-2 text-surface-2 cursor-not-allowed'
-                              : 'bg-surface-2 text-text hover:bg-surface-3'
-                          )}
-                        >
-                          <ArrowRight className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <InteractiveLessonInterface
-                      lesson={currentLesson}
-                      onComplete={(lessonId, milestones) => {
-                        console.log('Lesson completed:', lessonId, milestones);
-                        // Update lesson completion status
-                        const updatedModules = modules.map(module => {
-                          if (module.id === selectedModule.id) {
-                            const updatedLessons = module.lessons.map(lesson => {
-                              if (lesson.id === lessonId) {
-                                return { ...lesson, completed: true };
-                              }
-                              return lesson;
-                            });
-                            
-                            // Calculate new progress
-                            const completedLessons = updatedLessons.filter(l => l.completed).length;
-                            const progress = Math.round((completedLessons / updatedLessons.length) * 100);
-                            
-                            return { 
-                              ...module, 
-                              lessons: updatedLessons,
-                              progress,
-                              completedLessons,
-                              completed: progress === 100
-                            };
-                          }
-                          return module;
-                        });
-                        setModules(updatedModules);
-                        
-                        // Auto-advance to next lesson
-                        const currentLessonIndex = selectedModule.lessons.findIndex(l => l.id === lessonId);
-                        const nextLesson = selectedModule.lessons[currentLessonIndex + 1];
-                        if (nextLesson) {
-                          setCurrentLesson(nextLesson);
-                        }
-                      }}
-                      onSaveProgress={(lessonId, data) => {
-                        console.log('Progress saved for lesson:', lessonId, data);
-                        // Save progress to localStorage
-                        localStorage.setItem(`academyLesson_${lessonId}`, JSON.stringify(data));
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {/* Philosopher's Dialogue Button - Only show when no module is selected */}
-            {!selectedModule && viewMode === 'modules' && (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <h2 className="text-lg font-semibold text-text mb-2">Ready for deeper dialogue?</h2>
-                  <p className="text-sm text-muted">Chat directly with ancient philosophers</p>
-                </div>
-                
+            {/* Quick Start */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-text">Quick Start</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <motion.button
-                  onClick={() => setShowPhilosophersDialogue(true)}
-                  className="w-full p-6 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-purple-500/5 border border-purple-500/20 rounded-2xl hover:from-purple-500/15 hover:via-violet-500/15 hover:to-purple-500/10 hover:border-purple-500/30 transition-all duration-300 hover:scale-[1.02] group"
+                  onClick={() => setViewMode('paths')}
+                  className="p-6 bg-surface border border-border rounded-2xl hover:bg-surface-2 transition-all duration-200 text-left group"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center shadow-lg">
-                        <MessageCircle className="w-6 h-6 text-purple-300" />
-                      </div>
-                      <div className="text-left">
-                        <h3 className="text-lg font-semibold text-text group-hover:text-purple-300 transition-colors">
-                          Philosopher's Dialogue
-                        </h3>
-                        <p className="text-sm text-muted group-hover:text-purple-200 transition-colors">
-                          Engage in deep conversations with ancient wisdom
-                        </p>
-                      </div>
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center">
+                      <Compass className="w-6 h-6 text-indigo-400" />
                     </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <div className="flex -space-x-2">
-                        <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
-                          <span className="text-xs text-blue-300">A</span>
-                        </div>
-                        <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
-                          <span className="text-xs text-green-300">S</span>
-                        </div>
-                        <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
-                          <span className="text-xs text-yellow-300">P</span>
-                        </div>
-                      </div>
-                      <ArrowRight className="w-5 h-5 text-purple-300 group-hover:translate-x-1 transition-transform" />
+                    <div>
+                      <h3 className="text-lg font-bold text-text">Start Learning</h3>
+                      <p className="text-sm text-muted">Begin your wisdom journey</p>
                     </div>
                   </div>
-                  
-                  <div className="mt-4 flex items-center justify-between text-xs text-muted">
-                    <span>Choose from 8+ philosophers</span>
-                    <span className="flex items-center gap-1">
-                      <Sparkles className="w-3 h-3" />
-                      AI-powered conversations
-                    </span>
+                  <ArrowRight className="w-5 h-5 text-muted group-hover:text-text transition-colors" />
+                </motion.button>
+
+                <motion.button
+                  onClick={() => setViewMode('daily-checkin')}
+                  className="p-6 bg-surface border border-border rounded-2xl hover:bg-surface-2 transition-all duration-200 text-left group"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <div className="flex items-center space-x-4 mb-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-xl flex items-center justify-center">
+                      <Calendar className="w-6 h-6 text-green-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-text">Daily Check-in</h3>
+                      <p className="text-sm text-muted">Sustain your ascent</p>
+                    </div>
                   </div>
+                  <ArrowRight className="w-5 h-5 text-muted group-hover:text-text transition-colors" />
                 </motion.button>
               </div>
-            )}
-          </>
+            </div>
+
+            {/* Featured Paths */}
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold text-text">Featured Paths</h2>
+              <div className="space-y-3">
+                {academyData.paths.slice(0, 3).map((path) => {
+                  const progress = getPathProgress(path.id);
+                  return (
+                    <motion.button
+                      key={path.id}
+                      onClick={() => startPath(path)}
+                      className="w-full p-4 bg-surface border border-border rounded-xl hover:bg-surface-2 transition-all duration-200 text-left group"
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
+                    >
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-lg flex items-center justify-center">
+                            <BookOpen className="w-5 h-5 text-indigo-400" />
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-text">{path.title}</h3>
+                            <p className="text-sm text-muted">{path.description}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-3">
+                          <div className="text-right">
+                            <div className="text-sm font-medium text-text">{progress}%</div>
+                            <div className="text-xs text-muted">{path.estimated_minutes_total} min</div>
+                          </div>
+                          <ArrowRight className="w-4 h-4 text-muted group-hover:text-text transition-colors" />
+                        </div>
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Paths Mode */}
+        {viewMode === 'paths' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-semibold text-text">Learning Paths</h2>
+              <div className="text-sm text-muted">
+                {getCompletedPaths()} of {academyData.paths.length} completed
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {academyData.paths.map((path) => {
+                const progress = getPathProgress(path.id);
+                const isCompleted = progress === 100;
+                const completedLessons = path.lessons.filter(lesson => userProgress[lesson.id]?.completed).length;
+                
+                return (
+                  <motion.button
+                    key={path.id}
+                    onClick={() => startPath(path)}
+                    className="p-6 bg-surface border border-border rounded-2xl hover:bg-surface-2 transition-all duration-200 text-left group"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    <div className="flex items-start space-x-4 mb-4">
+                      <div className="w-12 h-12 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl flex items-center justify-center shadow-lg">
+                        <BookOpen className="w-6 h-6 text-indigo-400" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="text-xl font-bold text-text mb-1">{path.title}</h3>
+                        <p className="text-sm text-muted mb-2">{path.description}</p>
+                        <div className="flex items-center space-x-2 text-xs text-muted">
+                          <Clock className="w-3 h-3" />
+                          <span>{path.estimated_minutes_total} minutes</span>
+                          <span>•</span>
+                          <span>{path.lessons.length} lessons</span>
+                        </div>
+                      </div>
+                      {isCompleted && (
+                        <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Progress */}
+                    <div className="space-y-3 mb-4">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted">Progress</span>
+                        <span className="font-medium text-text">{progress}%</span>
+                      </div>
+                      <div className="w-full bg-surface-2 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Lesson Preview */}
+                    <div className="space-y-2">
+                      {path.lessons.slice(0, 3).map((lesson, index) => {
+                        const isCompleted = userProgress[lesson.id]?.completed;
+                        return (
+                          <div key={lesson.id} className="flex items-center space-x-2">
+                            <div className={cn(
+                              'w-6 h-6 rounded-full flex items-center justify-center text-xs',
+                              isCompleted 
+                                ? 'bg-green-500/20 text-green-500' 
+                                : 'bg-surface-2 text-muted'
+                            )}>
+                              {isCompleted ? '✓' : index + 1}
+                            </div>
+                            <span className={cn(
+                              'text-sm flex-1',
+                              isCompleted ? 'text-green-500' : 'text-muted'
+                            )}>
+                              {lesson.title}
+                            </span>
+                            <div className="text-xs text-muted">
+                              {lesson.time_minutes}min
+                            </div>
+                          </div>
+                        );
+                      })}
+                      {path.lessons.length > 3 && (
+                        <div className="text-xs text-muted text-center">
+                          +{path.lessons.length - 3} more lessons
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="mt-4 flex items-center justify-between">
+                      <span className="text-xs text-muted">
+                        {completedLessons} of {path.lessons.length} lessons
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-muted group-hover:text-text transition-colors" />
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Progress Mode */}
+        {viewMode === 'progress' && (
+          <div className="space-y-6">
+            <h2 className="text-xl font-semibold text-text">Your Progress</h2>
+            
+            {/* Overall Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="p-4 bg-surface border border-border rounded-xl text-center">
+                <div className="text-2xl font-bold text-text">{getOverallProgress()}%</div>
+                <div className="text-sm text-muted">Overall Progress</div>
+              </div>
+              <div className="p-4 bg-surface border border-border rounded-xl text-center">
+                <div className="text-2xl font-bold text-text">{getCompletedPaths()}</div>
+                <div className="text-sm text-muted">Paths Completed</div>
+              </div>
+              <div className="p-4 bg-surface border border-border rounded-xl text-center">
+                <div className="text-2xl font-bold text-text">
+                  {academyData.paths.reduce((sum, path) => 
+                    sum + path.lessons.filter(lesson => userProgress[lesson.id]?.completed).length, 0
+                  )}
+                </div>
+                <div className="text-sm text-muted">Lessons Completed</div>
+              </div>
+              <div className="p-4 bg-surface border border-border rounded-xl text-center">
+                <div className="text-2xl font-bold text-text">
+                  {academyData.paths.reduce((sum, path) => 
+                    sum + path.lessons.filter(lesson => userProgress[lesson.id]?.completed)
+                      .reduce((lessonSum, lesson) => lessonSum + lesson.time_minutes, 0), 0
+                  )}
+                </div>
+                <div className="text-sm text-muted">Minutes Learned</div>
+              </div>
+            </div>
+
+            {/* Path Progress */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold text-text">Path Progress</h3>
+              <div className="space-y-3">
+                {academyData.paths.map((path) => {
+                  const progress = getPathProgress(path.id);
+                  const completedLessons = path.lessons.filter(lesson => userProgress[lesson.id]?.completed).length;
+                  
+                  return (
+                    <div key={path.id} className="p-4 bg-surface border border-border rounded-xl">
+                      <div className="flex items-center justify-between mb-3">
+                        <div>
+                          <h4 className="font-semibold text-text">{path.title}</h4>
+                          <p className="text-sm text-muted">{completedLessons} of {path.lessons.length} lessons</p>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-lg font-bold text-text">{progress}%</div>
+                          <div className="text-xs text-muted">{path.estimated_minutes_total} min</div>
+                        </div>
+                      </div>
+                      <div className="w-full bg-surface-2 rounded-full h-2">
+                        <div 
+                          className="h-2 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-500"
+                          style={{ width: `${progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Certificate Mode */}
+        {viewMode === 'certificate' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="w-20 h-20 bg-gradient-to-br from-yellow-500/20 to-orange-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Award className="w-10 h-10 text-yellow-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-text mb-2">Academy Certificate</h2>
+              <p className="text-muted">Complete your journey to earn your Academy Dialogue certificate</p>
+            </div>
+
+            <div className="bg-surface border border-border rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-text mb-4">Requirements</h3>
+              <div className="space-y-4">
+                <div className="flex items-center justify-between p-3 bg-surface-2 rounded-lg">
+                  <span className="text-text">Complete {academyData.certificate.requirements.completed_paths} paths</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-muted">{getCompletedPaths()}/{academyData.certificate.requirements.completed_paths}</span>
+                    {getCompletedPaths() >= academyData.certificate.requirements.completed_paths ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-muted" />
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-surface-2 rounded-lg">
+                  <span className="text-text">Complete {academyData.certificate.requirements.min_lessons_completed} lessons</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-muted">
+                      {academyData.paths.reduce((sum, path) => 
+                        sum + path.lessons.filter(lesson => userProgress[lesson.id]?.completed).length, 0
+                      )}/{academyData.certificate.requirements.min_lessons_completed}
+                    </span>
+                    {academyData.paths.reduce((sum, path) => 
+                      sum + path.lessons.filter(lesson => userProgress[lesson.id]?.completed).length, 0
+                    ) >= academyData.certificate.requirements.min_lessons_completed ? (
+                      <CheckCircle className="w-5 h-5 text-green-500" />
+                    ) : (
+                      <Circle className="w-5 h-5 text-muted" />
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center justify-between p-3 bg-surface-2 rounded-lg">
+                  <span className="text-text">Maintain {academyData.certificate.scoring.rubric_average_threshold * 100}% average score</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm text-muted">In Progress</span>
+                    <Circle className="w-5 h-5 text-muted" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gradient-to-br from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-text mb-2">Certificate Features</h3>
+              <ul className="space-y-2 text-sm text-muted">
+                <li>• PDF/HTML dialogue scroll with artifacts</li>
+                <li>• Unlocked glossary of philosophical terms</li>
+                <li>• Portfolio of your learning journey</li>
+                <li>• Shareable Academy Dialogue certificate</li>
+              </ul>
+            </div>
+          </div>
+        )}
+
+        {/* Artifacts Mode */}
+        {viewMode === 'artifacts' && (
+          <AcademyArtifacts userProgress={userProgress} academyData={academyData} />
+        )}
+
+        {/* Daily Check-in Mode */}
+        {viewMode === 'daily-checkin' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-green-500" />
+              </div>
+              <h2 className="text-2xl font-bold text-text mb-2">{academyData.daily_checkin.title}</h2>
+              <p className="text-muted">{academyData.daily_checkin.purpose}</p>
+            </div>
+
+            <div className="bg-surface border border-border rounded-2xl p-6">
+              <h3 className="text-lg font-semibold text-text mb-4">Today's Reflection</h3>
+              <div className="space-y-4">
+                <div className="p-4 bg-surface-2 rounded-lg">
+                  <h4 className="font-medium text-text mb-2">Example Questions:</h4>
+                  <ul className="space-y-2 text-sm text-muted">
+                    {academyData.daily_checkin.examples.map((example, index) => (
+                      <li key={index} className="flex items-start space-x-2">
+                        <Quote className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
+                        <span>"{example}"</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                
+                <div className="space-y-3">
+                  <label className="block text-sm font-medium text-text">
+                    Your reflection for today:
+                  </label>
+                  <textarea
+                    className="w-full p-3 bg-surface-2 border border-border rounded-lg text-text placeholder-muted resize-none"
+                    rows={4}
+                    placeholder="Share a brief reflection on today's question..."
+                  />
+                  <button className="w-full py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors">
+                    Submit Reflection
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Lesson Mode */}
+        {viewMode === 'lesson' && currentLesson && (
+          <AcademyWisdomJourney
+            lesson={currentLesson}
+            path={selectedPath}
+            userProgress={userProgress}
+            onComplete={(lessonId, data) => {
+              const newProgress = {
+                ...userProgress,
+                [lessonId]: {
+                  completed: true,
+                  completedAt: new Date().toISOString(),
+                  data
+                }
+              };
+              saveProgress(newProgress);
+              
+              // Move to next lesson or back to paths
+              const currentIndex = selectedPath.lessons.findIndex((l: any) => l.id === lessonId);
+              const nextLesson = selectedPath.lessons[currentIndex + 1];
+              if (nextLesson) {
+                setCurrentLesson(nextLesson);
+              } else {
+                setViewMode('paths');
+                setCurrentLesson(null);
+                setSelectedPath(null);
+              }
+            }}
+            onBack={() => {
+              setViewMode('paths');
+              setCurrentLesson(null);
+              setSelectedPath(null);
+            }}
+          />
+        )}
+
+        {/* Philosopher's Dialogue Button */}
+        {viewMode !== 'lesson' && (
+          <div className="space-y-4">
+            <div className="text-center">
+              <h2 className="text-lg font-semibold text-text mb-2">Ready for deeper dialogue?</h2>
+              <p className="text-sm text-muted">Chat directly with Plato and other ancient philosophers</p>
+            </div>
+            
+            <motion.button
+              onClick={() => setShowPhilosophersDialogue(true)}
+              className="w-full p-6 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-purple-500/5 border border-purple-500/20 rounded-2xl hover:from-purple-500/15 hover:via-violet-500/15 hover:to-purple-500/10 hover:border-purple-500/30 transition-all duration-300 hover:scale-[1.02] group"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center shadow-lg">
+                    <MessageCircle className="w-6 h-6 text-purple-300" />
+                  </div>
+                  <div className="text-left">
+                    <h3 className="text-lg font-semibold text-text group-hover:text-purple-300 transition-colors">
+                      Philosopher's Dialogue
+                    </h3>
+                    <p className="text-sm text-muted group-hover:text-purple-200 transition-colors">
+                      Engage in deep conversations with ancient wisdom
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <div className="flex -space-x-2">
+                    <div className="w-8 h-8 bg-blue-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
+                      <span className="text-xs text-blue-300">P</span>
+                    </div>
+                    <div className="w-8 h-8 bg-green-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
+                      <span className="text-xs text-green-300">S</span>
+                    </div>
+                    <div className="w-8 h-8 bg-yellow-500/20 rounded-full flex items-center justify-center border-2 border-purple-500/30">
+                      <span className="text-xs text-yellow-300">A</span>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-purple-300 group-hover:translate-x-1 transition-transform" />
+                </div>
+              </div>
+              
+              <div className="mt-4 flex items-center justify-between text-xs text-muted">
+                <span>Choose from 8+ philosophers</span>
+                <span className="flex items-center gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  AI-powered conversations
+                </span>
+              </div>
+            </motion.button>
+          </div>
         )}
       </main>
 
@@ -663,4 +722,4 @@ export default function AcademyPage() {
       <TabBar />
     </div>
   );
-} 
+}

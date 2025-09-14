@@ -1,0 +1,1556 @@
+{
+  "meta": {
+    "title": "Plato’s Academy — 12-Path Wisdom Journey",
+    "version": "1.1.0",
+    "authoring_date": "2025-09-14",
+    "philosophical_scope": "Faithful to Plato’s core teachings; adapted for modern micro-learning.",
+    "session_length_minutes": "10–12 avg per lesson",
+    "device_capabilities": [
+      "microphone",
+      "touch",
+      "text"
+    ],
+    "artifacts_portfolio": "Auto-compiled into a shareable ‘Academy Dialogue’ certificate.",
+    "ux_enhancements": [
+      "Narrative intros/outros by Plato",
+      "Modern payoff per lesson",
+      "Daily Academy check-in loop",
+      "Scholar Mode per lesson",
+      "Agora prompts",
+      "Per-lesson AI hook guidance for OpenAI"
+    ]
+  },
+  "ai_prompts": {
+    "tutor_system": "You are Plato, guiding by Socratic questioning. Invite brief answers, surface contradictions, and use vivid images. Keep each turn under 80 words. Encourage aporia as progress toward seeing the Forms.",
+    "evaluator_system": "You are a Platonic assessor. Score artifacts with the rubric; return JSON {scores:{}, notes:'', mastery_deltas:{}}. Point out one inconsistency and one improvement in plain language.",
+    "coach_system": "You are a Platonic life-coach. Connect the learner’s stated Good to one tiny practice tomorrow. Keep under 25 words; be kind and concrete."
+  },
+  "daily_checkin": {
+    "title": "Academy Daily: Turn the Soul",
+    "duration_minutes": 2,
+    "purpose": "Sustain ascent: a tiny question, a tiny answer.",
+    "examples": [
+      "Name one assumption you will question today.",
+      "What shadow will you turn away from?",
+      "What small step moves a belief toward knowledge?"
+    ],
+    "ai_prompt": "Praise one effort and pose one new question in Plato’s voice (<25 words)."
+  },
+  "certificate": {
+    "requirements": {
+      "completed_paths": 12,
+      "min_lessons_completed": 17,
+      "portfolio_items_required": [
+        "dialogue_fragment",
+        "refined_definition",
+        "academy_vow",
+        "cave_note",
+        "turning_action",
+        "math_gate_card",
+        "form_invariant_note",
+        "line_card",
+        "belief_raise_note",
+        "soul_balance_card",
+        "justice_step",
+        "leadership_note",
+        "ladder_step",
+        "long_view_note",
+        "good_star",
+        "academy_speech",
+        "fearless_note"
+      ]
+    },
+    "scoring": {
+      "rubric_average_threshold": 0.8,
+      "mastery_domains": {
+        "dialectic": 0.6,
+        "forms": 0.6,
+        "math": 0.6,
+        "soul_ethics": 0.6,
+        "politics": 0.6,
+        "rhetoric": 0.6
+      }
+    },
+    "output": "PDF/HTML dialogue scroll with artifacts and unlocked glossary."
+  },
+  "paths": [
+    {
+      "id": "path1",
+      "title": "The Socratic Way",
+      "description": "Learn to question like Socrates.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "pl1.l1",
+          "title": "What Is It? (Aporia Welcome)",
+          "time_minutes": 12,
+          "objectives": [
+            "Experience a Socratic exchange.",
+            "Feel aporia as useful."
+          ],
+          "terms_introduced": [
+            "socratic_method",
+            "dialectic",
+            "aporia"
+          ],
+          "activities": [
+            {
+              "type": "voice_note",
+              "id": "pl1l1_a1",
+              "prompt": "Answer Plato: 'What is courage?' Give one sentence.",
+              "max_seconds": 40
+            },
+            {
+              "type": "reflection",
+              "id": "pl1l1_a2",
+              "prompt": "Where did your definition break? One sentence.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Engagement",
+                "weight": "0.6",
+                "description": "Answered question"
+              },
+              {
+                "criterion": "Aporia noted",
+                "weight": "0.4",
+                "description": "Names one gap/contradiction"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "dialogue_fragment"
+          ],
+          "mastery_updates": {
+            "dialectic_skill": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Socratic Way', we turn this page: 'What Is It? (Aporia Welcome)'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Improve self-awareness and critical listening by asking better questions.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'What Is It? (Aporia Welcome)' that others might ponder today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "pl1.l2",
+          "title": "Socratic Contradictions",
+          "time_minutes": 10,
+          "objectives": [
+            "Spot tension in a belief and refine it."
+          ],
+          "terms_introduced": [
+            "dialectic"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "pl1l2_a1",
+              "instructions": "Find the contradiction",
+              "questions": [
+                {
+                  "stem": "Courage is fearlessness; but reckless fool is fearless yet not courageous.",
+                  "choices": [
+                    "contradiction present",
+                    "no contradiction"
+                  ],
+                  "answer": "contradiction present"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "pl1l2_a2",
+              "prompt": "Rewrite your definition in one clearer sentence.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Contradiction ID",
+                "weight": "0.6",
+                "description": "Correct"
+              },
+              {
+                "criterion": "Refinement",
+                "weight": "0.4",
+                "description": "Clearer definition offered"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "refined_definition"
+          ],
+          "mastery_updates": {
+            "dialectic_refine": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Socratic Way', we turn this page: 'Socratic Contradictions'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Improve self-awareness and critical listening by asking better questions.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Socratic Contradictions' that others might ponder today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "pl1.l3",
+          "title": "Academy Vow",
+          "time_minutes": 8,
+          "objectives": [
+            "Adopt a learner’s stance."
+          ],
+          "terms_introduced": [
+            "academy"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl1l3_a1",
+              "prompt": "State your intention for study in one line (The Academy Vow).",
+              "input": {
+                "type": "text",
+                "max_len": 100
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Vow present",
+                "weight": "1.0",
+                "description": "Short vow stated"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "academy_vow"
+          ],
+          "mastery_updates": {
+            "dialectic_commitment": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Socratic Way', we turn this page: 'Academy Vow'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Improve self-awareness and critical listening by asking better questions.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Academy Vow' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path2",
+      "title": "The Cave",
+      "description": "From shadows to sunlight.",
+      "estimated_minutes_total": 22,
+      "lessons": [
+        {
+          "id": "pl2.l1",
+          "title": "Shadows on the Wall",
+          "time_minutes": 12,
+          "objectives": [
+            "See the difference between appearance and reality."
+          ],
+          "terms_introduced": [
+            "cave",
+            "doxa"
+          ],
+          "activities": [
+            {
+              "type": "interactive_story",
+              "id": "pl2l1_a1",
+              "title": "The Cave",
+              "steps": [
+                "Shadows",
+                "Chains",
+                "Escape",
+                "Sun"
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "pl2l1_a2",
+              "prompt": "Name one 'shadow' in your life (a misleading appearance).",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Story completed",
+                "weight": "0.5",
+                "description": "Stepped through the cave story"
+              },
+              {
+                "criterion": "Personal shadow",
+                "weight": "0.5",
+                "description": "Concrete example named"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "cave_note"
+          ],
+          "mastery_updates": {
+            "platonic_discernment": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Cave', we turn this page: 'Shadows on the Wall'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Spot illusions (media, bias) and move toward reality.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Shadows on the Wall' that others might ponder today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "pl2.l2",
+          "title": "Turning Toward the Light",
+          "time_minutes": 10,
+          "objectives": [
+            "Translate a shadow into a clearer view."
+          ],
+          "terms_introduced": [
+            "forms",
+            "episteme"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl2l2_a1",
+              "prompt": "What would count as a clearer view of that shadow? Name one check or test.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Clarity step",
+                "weight": "1.0",
+                "description": "Actionable check named"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "turning_action"
+          ],
+          "mastery_updates": {
+            "knowledge_ascend": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Cave', we turn this page: 'Turning Toward the Light'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Spot illusions (media, bias) and move toward reality.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Turning Toward the Light' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path3",
+      "title": "Mathematics as Gateway",
+      "description": "Train the mind for clarity and ascent.",
+      "estimated_minutes_total": 20,
+      "lessons": [
+        {
+          "id": "pl3.l1",
+          "title": "A Necessary Truth",
+          "time_minutes": 10,
+          "objectives": [
+            "Feel the difference between necessity and opinion."
+          ],
+          "terms_introduced": [
+            "geometry",
+            "episteme"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "pl3l1_a1",
+              "instructions": "Pick the necessary truth",
+              "questions": [
+                {
+                  "stem": "Sum of angles in a triangle (Euclidean).",
+                  "choices": [
+                    "necessary",
+                    "opinion"
+                  ],
+                  "answer": "necessary"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "pl3l1_a2",
+              "prompt": "Name one thing in life you wish felt as clear as geometry.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct",
+                "weight": "0.6",
+                "description": "Identifies necessary truth"
+              },
+              {
+                "criterion": "Reflection",
+                "weight": "0.4",
+                "description": "Concrete wish stated"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "math_gate_card"
+          ],
+          "mastery_updates": {
+            "math_mind": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Mathematics as Gateway', we turn this page: 'A Necessary Truth'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Strengthen precise thinking for work and life decisions.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'A Necessary Truth' that others might ponder today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "pl3.l2",
+          "title": "Figures and Forms",
+          "time_minutes": 10,
+          "objectives": [
+            "See how geometry points beyond images."
+          ],
+          "terms_introduced": [
+            "forms"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl3l2_a1",
+              "prompt": "Triangle drawings differ; what stays the same?",
+              "input": {
+                "type": "text",
+                "max_len": 100
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Abstraction insight",
+                "weight": "1.0",
+                "description": "Identifies invariant"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "form_invariant_note"
+          ],
+          "mastery_updates": {
+            "forms_sense": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Mathematics as Gateway', we turn this page: 'Figures and Forms'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Strengthen precise thinking for work and life decisions.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Figures and Forms' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path4",
+      "title": "The Divided Line",
+      "description": "From imagination to intellection.",
+      "estimated_minutes_total": 22,
+      "lessons": [
+        {
+          "id": "pl4.l1",
+          "title": "Four Ways of Seeing",
+          "time_minutes": 12,
+          "objectives": [
+            "Classify statements by cognitive level."
+          ],
+          "terms_introduced": [
+            "divided_line",
+            "doxa",
+            "noesis"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "pl4l1_a1",
+              "instructions": "Place this on the Line",
+              "questions": [
+                {
+                  "stem": "Advertisement claim without data.",
+                  "choices": [
+                    "imagination",
+                    "belief",
+                    "reasoning",
+                    "intellection"
+                  ],
+                  "answer": "imagination"
+                },
+                {
+                  "stem": "Geometric proof about triangles.",
+                  "choices": [
+                    "imagination",
+                    "belief",
+                    "reasoning",
+                    "intellection"
+                  ],
+                  "answer": "reasoning"
+                }
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Placement",
+                "weight": "1.0",
+                "description": "≥4/5 correct in app set"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "line_card"
+          ],
+          "mastery_updates": {
+            "cognition_map": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Divided Line', we turn this page: 'Four Ways of Seeing'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Evaluate sources and raise beliefs toward knowledge.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Four Ways of Seeing' that others might ponder today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "pl4.l2",
+          "title": "Raise a Belief",
+          "time_minutes": 10,
+          "objectives": [
+            "Move one belief up the Line."
+          ],
+          "terms_introduced": [
+            "doxa",
+            "episteme"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl4l2_a1",
+              "prompt": "Pick a belief. What step would raise it toward knowledge?",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Actionable step",
+                "weight": "1.0",
+                "description": "Concrete check or reasoning path"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "belief_raise_note"
+          ],
+          "mastery_updates": {
+            "cognition_progress": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Divided Line', we turn this page: 'Raise a Belief'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Evaluate sources and raise beliefs toward knowledge.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Raise a Belief' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path5",
+      "title": "The Soul",
+      "description": "Reason, spirit, appetite—tune them into harmony.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl5.l1",
+          "title": "Balance the Soul",
+          "time_minutes": 12,
+          "objectives": [
+            "Identify reason/spirit/appetite in a scenario.",
+            "Aim for inner harmony."
+          ],
+          "terms_introduced": [
+            "tripartite_soul",
+            "justice"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "pl5l1_a1",
+              "instructions": "Which part speaks here?",
+              "questions": [
+                {
+                  "stem": "You want to quit early for comfort.",
+                  "choices": [
+                    "appetite",
+                    "spirit",
+                    "reason"
+                  ],
+                  "answer": "appetite"
+                },
+                {
+                  "stem": "You defend a friend from insult.",
+                  "choices": [
+                    "appetite",
+                    "spirit",
+                    "reason"
+                  ],
+                  "answer": "spirit"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "pl5l1_a2",
+              "prompt": "Name one habit to let reason lead kindly.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct IDs",
+                "weight": "0.6",
+                "description": "≥2/2 correct"
+              },
+              {
+                "criterion": "Habit",
+                "weight": "0.4",
+                "description": "Concrete habit named"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "soul_balance_card"
+          ],
+          "mastery_updates": {
+            "soul_harmony": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Soul', we turn this page: 'Balance the Soul'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Balance emotions and motivation with reason.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Balance the Soul' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path6",
+      "title": "Justice",
+      "description": "Harmony within and among us.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl6.l1",
+          "title": "Justice in You, Justice in Us",
+          "time_minutes": 12,
+          "objectives": [
+            "See justice as harmony of parts."
+          ],
+          "terms_introduced": [
+            "justice"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl6l1_a1",
+              "prompt": "Where do you see disharmony (in you or your team)? Name one balancing act.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Balancing act",
+                "weight": "1.0",
+                "description": "Feasible step stated"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "justice_step"
+          ],
+          "mastery_updates": {
+            "justice_practice": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Justice', we turn this page: 'Justice in You, Justice in Us'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Create harmony in teams, family, and self.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Justice in You, Justice in Us' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path7",
+      "title": "The Philosopher-King",
+      "description": "Rethink leadership around wisdom and the Good.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl7.l1",
+          "title": "Who Should Lead?",
+          "time_minutes": 12,
+          "objectives": [
+            "Contrast power-seeking vs wisdom-seeking leadership."
+          ],
+          "terms_introduced": [
+            "philosopher_king",
+            "form_of_good"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "pl7l1_a1",
+              "instructions": "Pick the philosopher-king trait",
+              "questions": [
+                {
+                  "stem": "Prefers truth over popularity.",
+                  "choices": [
+                    "philosopher-king",
+                    "demagogue"
+                  ],
+                  "answer": "philosopher-king"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "pl7l1_a2",
+              "prompt": "Name one way you can lead by wisdom in your circle.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Trait choice",
+                "weight": "0.6",
+                "description": "Correct"
+              },
+              {
+                "criterion": "Leadership step",
+                "weight": "0.4",
+                "description": "Concrete action named"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "leadership_note"
+          ],
+          "mastery_updates": {
+            "leadership_wisdom": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Philosopher-King', we turn this page: 'Who Should Lead?'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Rethink leadership as wisdom-driven service.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Who Should Lead?' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path8",
+      "title": "Love & the Ladder",
+      "description": "From desire to Beauty itself.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl8.l1",
+          "title": "Eros that Elevates",
+          "time_minutes": 12,
+          "objectives": [
+            "Recognize desires that pull you upward."
+          ],
+          "terms_introduced": [
+            "eros",
+            "ladder_of_love"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl8l1_a1",
+              "prompt": "Name one thing you love that improves you. What’s the next rung up?",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Rung named",
+                "weight": "1.0",
+                "description": "Identifies next higher object of love"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "ladder_step"
+          ],
+          "mastery_updates": {
+            "eros_ascent": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Love & the Ladder', we turn this page: 'Eros that Elevates'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Aim desire at higher, lasting goods.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Eros that Elevates' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path9",
+      "title": "Immortality of the Soul",
+      "description": "Consider the soul’s endurance and live accordingly.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl9.l1",
+          "title": "A Long View of Life",
+          "time_minutes": 12,
+          "objectives": [
+            "Follow one Phaedo argument chain.",
+            "Note a life change if the soul endures."
+          ],
+          "terms_introduced": [
+            "immortality",
+            "forms"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "pl9l1_a1",
+              "instructions": "Complete the link",
+              "questions": [
+                {
+                  "stem": "If learning is recollection, then…",
+                  "choices": [
+                    "the soul existed before birth",
+                    "learning creates Forms"
+                  ],
+                  "answer": "the soul existed before birth"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "pl9l1_a2",
+              "prompt": "What would you do differently with a long-view?",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Argument link",
+                "weight": "0.6",
+                "description": "Correct"
+              },
+              {
+                "criterion": "Life change",
+                "weight": "0.4",
+                "description": "Concrete step"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "long_view_note"
+          ],
+          "mastery_updates": {
+            "soul_meaning": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Immortality of the Soul', we turn this page: 'A Long View of Life'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Live meaningfully with long-view courage.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'A Long View of Life' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path10",
+      "title": "The Good",
+      "description": "Find and follow a north star value.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl10.l1",
+          "title": "Your Sun",
+          "time_minutes": 12,
+          "objectives": [
+            "Grasp the analogy of the sun and the Good.",
+            "Name your orienting value."
+          ],
+          "terms_introduced": [
+            "form_of_good",
+            "noesis",
+            "forms"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl10l1_a1",
+              "prompt": "What value lights your choices like the sun lights sight? One phrase.",
+              "input": {
+                "type": "text",
+                "max_len": 80
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "North star named",
+                "weight": "1.0",
+                "description": "Short, clear value stated"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "good_star"
+          ],
+          "mastery_updates": {
+            "orientation_good": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'The Good', we turn this page: 'Your Sun'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Orient choices by a north star value.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Your Sun' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path11",
+      "title": "Rhetoric & Sophistry",
+      "description": "Speak to illuminate, not manipulate.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl11.l1",
+          "title": "Truthful Persuasion",
+          "time_minutes": 12,
+          "objectives": [
+            "Distinguish philosopher from sophist in speech."
+          ],
+          "terms_introduced": [
+            "sophistry",
+            "dialectic"
+          ],
+          "activities": [
+            {
+              "type": "voice_note",
+              "id": "pl11l1_a1",
+              "prompt": "Record a 30-sec truth-first pitch; avoid exaggeration.",
+              "max_seconds": 45
+            },
+            {
+              "type": "reflection",
+              "id": "pl11l1_a2",
+              "prompt": "Name one sophistic trick you avoided.",
+              "input": {
+                "type": "text",
+                "max_len": 100
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Speech made",
+                "weight": "0.6",
+                "description": "Uploaded"
+              },
+              {
+                "criterion": "Trick named",
+                "weight": "0.4",
+                "description": "Correct avoidance"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "academy_speech"
+          ],
+          "mastery_updates": {
+            "rhetoric_truth": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Rhetoric & Sophistry', we turn this page: 'Truthful Persuasion'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Resist manipulation; speak truth well.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Truthful Persuasion' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path12",
+      "title": "Philosophy as Preparation",
+      "description": "Live with steadiness and courage.",
+      "estimated_minutes_total": 12,
+      "lessons": [
+        {
+          "id": "pl12.l1",
+          "title": "Practicing Fearlessness",
+          "time_minutes": 12,
+          "objectives": [
+            "Reframe fear through attachment to truth."
+          ],
+          "terms_introduced": [
+            "philosophy_as_preparation",
+            "immortality"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "pl12l1_a1",
+              "prompt": "Name one small fear you can release this week, and one truth to hold instead.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Fear & truth",
+                "weight": "1.0",
+                "description": "Concrete reframe stated"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "fearless_note"
+          ],
+          "mastery_updates": {
+            "calm_practice": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me into the Academy. In 'Philosophy as Preparation', we turn this page: 'Practicing Fearlessness'. Tell me first what you see; then we shall ask what it truly is.",
+            "outro": "We pause here. Question gently, admit puzzles, and return tomorrow with a clearer eye."
+          },
+          "modern_payoff": "Reduce fear; practice steady calm.",
+          "ai_hooks": {
+            "tutor_hint": "Be Socratic. Ask one pointed question. If the learner falters, offer a short myth or example (<80 words).",
+            "evaluator_hint": "Score briefly against the rubric; note one contradiction or improvement.",
+            "coach_hint": "Propose one small daily practice aligned to the learner’s stated Good (<25 words)."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a 4–6 sentence snippet (e.g., Republic, Symposium, Phaedo) and answer one multiple-choice about its claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask the learner one probing question in Plato’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Practicing Fearlessness' that others might ponder today.",
+            "optional": true
+          }
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "id": "dialectic",
+      "term": "Dialectic",
+      "definition": "Truth-seeking conversation that tests assumptions by questions and answers.",
+      "paths": [
+        "path1",
+        "path4",
+        "path10",
+        "path11"
+      ]
+    },
+    {
+      "id": "socratic_method",
+      "term": "Socratic Method",
+      "definition": "Guided questioning to uncover definitions, contradictions, and clearer views.",
+      "paths": [
+        "path1"
+      ]
+    },
+    {
+      "id": "aporia",
+      "term": "Aporia",
+      "definition": "Productive puzzlement when prior beliefs fail; doorway to insight.",
+      "paths": [
+        "path1",
+        "path2",
+        "path4"
+      ]
+    },
+    {
+      "id": "forms",
+      "term": "Forms (Eide)",
+      "definition": "Eternal, unchanging realities that particulars imperfectly copy.",
+      "paths": [
+        "path2",
+        "path4",
+        "path10"
+      ]
+    },
+    {
+      "id": "doxa",
+      "term": "Doxa",
+      "definition": "Opinion—belief not yet tested or grounded in truth.",
+      "paths": [
+        "path2",
+        "path4"
+      ]
+    },
+    {
+      "id": "episteme",
+      "term": "Epistēmē",
+      "definition": "Knowledge with reasons, anchored in what truly is.",
+      "paths": [
+        "path2",
+        "path3",
+        "path4"
+      ]
+    },
+    {
+      "id": "geometry",
+      "term": "Geometry",
+      "definition": "Mathematical discipline training the mind for necessity and clarity.",
+      "paths": [
+        "path3"
+      ]
+    },
+    {
+      "id": "divided_line",
+      "term": "Divided Line",
+      "definition": "Four levels of cognition: imagination, belief, reasoning, intellection.",
+      "paths": [
+        "path4"
+      ]
+    },
+    {
+      "id": "noesis",
+      "term": "Noēsis",
+      "definition": "Direct intellectual apprehension of Forms; highest knowing.",
+      "paths": [
+        "path4",
+        "path10"
+      ]
+    },
+    {
+      "id": "tripartite_soul",
+      "term": "Tripartite Soul",
+      "definition": "Three parts: reason, spirit, appetite; health is harmony.",
+      "paths": [
+        "path5",
+        "path6"
+      ]
+    },
+    {
+      "id": "justice",
+      "term": "Justice",
+      "definition": "Harmony when each part does its proper work (in soul and city).",
+      "paths": [
+        "path6"
+      ]
+    },
+    {
+      "id": "philosopher_king",
+      "term": "Philosopher-King",
+      "definition": "Ideal ruler guided by knowledge of the Good.",
+      "paths": [
+        "path7"
+      ]
+    },
+    {
+      "id": "eros",
+      "term": "Eros",
+      "definition": "Desire that can ascend from bodies to Beauty itself.",
+      "paths": [
+        "path8"
+      ]
+    },
+    {
+      "id": "ladder_of_love",
+      "term": "Ladder of Love",
+      "definition": "Ascent: one body → all bodies → souls → laws → knowledge → Beauty.",
+      "paths": [
+        "path8"
+      ]
+    },
+    {
+      "id": "form_of_good",
+      "term": "Form of the Good",
+      "definition": "Supreme principle illuminating truth and value, like the sun.",
+      "paths": [
+        "path10"
+      ]
+    },
+    {
+      "id": "immortality",
+      "term": "Immortality of the Soul",
+      "definition": "Arguments for the soul’s survival beyond death.",
+      "paths": [
+        "path9",
+        "path12"
+      ]
+    },
+    {
+      "id": "sophistry",
+      "term": "Sophistry",
+      "definition": "Clever persuasion aimed at winning, not truth.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "academy",
+      "term": "Academy",
+      "definition": "Community seeking wisdom through mathematics and dialectic.",
+      "paths": [
+        "path1",
+        "path3"
+      ]
+    },
+    {
+      "id": "cave",
+      "term": "Allegory of the Cave",
+      "definition": "Myth of ascent from shadows to light—education as liberation.",
+      "paths": [
+        "path2"
+      ]
+    },
+    {
+      "id": "philosophy_as_preparation",
+      "term": "Philosophy as Preparation for Death",
+      "definition": "Freeing the soul from fear by attaching to truth.",
+      "paths": [
+        "path12"
+      ]
+    }
+  ]
+}

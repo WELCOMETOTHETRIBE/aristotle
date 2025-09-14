@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, BookOpen, Users, TrendingUp, Home, GraduationCap } from 'lucide-react';
+import { MessageSquare, BookOpen, Users, TrendingUp, Home, GraduationCap, School } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
@@ -19,6 +19,12 @@ const tabs = [
     activeColor: 'text-primary',
   },
   {
+    name: 'Academy',
+    href: '/academy',
+    icon: School,
+    activeColor: 'text-primary',
+  },
+  {
     name: 'Frameworks',
     href: '/frameworks',
     icon: BookOpen,
@@ -28,12 +34,6 @@ const tabs = [
     name: 'Community',
     href: '/community',
     icon: Users,
-    activeColor: 'text-primary',
-  },
-  {
-    name: 'Progress',
-    href: '/progress',
-    icon: TrendingUp,
     activeColor: 'text-primary',
   },
 ];
