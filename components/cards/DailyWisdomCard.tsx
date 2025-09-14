@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Sparkles, RefreshCw, BookOpen, Quote, Brain, RotateCcw, Settings, Info, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -48,93 +48,59 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     autoRefresh: true,
     preferredFrameworks: ['stoic'], // Default to stoic
     showReflection: true,
-    enableNotifications: true,
+    enableNotifications: false
   });
+  
+  // Add ref to track if wisdom has been loaded today
+  const hasLoadedToday = useRef(false);
 
-  // Load saved settings and user's selected frameworks, then load wisdom
+  // Load settings on mount
   useEffect(() => {
-    const loadSettingsAndFrameworks = async () => {
-      // Load saved settings
-      const savedSettings = localStorage.getItem('dailyWisdomSettings');
-      if (savedSettings) {
-        setSettings(JSON.parse(savedSettings));
-      }
-
-      // Load user's selected frameworks from preferences
+    if (typeof window === 'undefined') return;
+    
+    const savedSettings = localStorage.getItem('dailyWisdomSettings');
+    if (savedSettings) {
       try {
-        const userPrefs = localStorage.getItem('userPreferences');
-        if (userPrefs) {
-          const parsed = JSON.parse(userPrefs);
-          if (parsed.selectedFrameworks && parsed.selectedFrameworks.length > 0) {
-            // Use user's selected frameworks
-            setSettings(prev => ({
-              ...prev,
-              preferredFrameworks: parsed.selectedFrameworks
-            }));
-            console.log('🎯 Using user\'s selected frameworks:', parsed.selectedFrameworks);
-          } else if (parsed.framework) {
-            // Fallback to single framework
-            setSettings(prev => ({
-              ...prev,
-              preferredFrameworks: [parsed.framework]
-            }));
-            console.log('🎯 Using user\'s primary framework:', parsed.framework);
-          }
-        }
+        const parsed = JSON.parse(savedSettings);
+        setSettings(parsed);
       } catch (error) {
-        console.error('Error loading user frameworks:', error);
+        console.error('Error parsing wisdom settings:', error);
       }
-      
-      // Load wisdom immediately after settings are loaded
-      await loadDailyWisdom();
-    };
-
-    loadSettingsAndFrameworks();
+    }
   }, []);
 
-  // Save settings
-  const saveSettings = async (newSettings: WisdomSettings) => {
-    setSettings(newSettings);
-    localStorage.setItem('dailyWisdomSettings', JSON.stringify(newSettings));
+  // Save settings when they change
+  const saveSettings = async () => {
+    if (typeof window === 'undefined') return;
     
-    // Also save framework preference to user profile
     try {
-      const token = localStorage.getItem('auth-token');
-      const response = await fetch('/api/prefs', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(token && { 'Authorization': `Bearer ${token}` }),
-        },
-        body: JSON.stringify({ 
-          preferences: {
-            selectedFrameworks: newSettings.preferredFrameworks,
-            framework: newSettings.preferredFrameworks[0] || null
-          }
-        }),
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        console.error('📱 Mobile Debug - API Error:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData,
-          requestBody: {
-            frameworks: frameworksToUse,
-            date: new Date().toISOString().split('T')[0]
-          }
-        });
-        throw new Error(`API Error: ${response.status} - ${response.statusText}`);
-      }      if (response.ok) {
-        console.log('Framework preferences saved to profile');
-      }
+      localStorage.setItem('dailyWisdomSettings', JSON.stringify(settings));
+      console.log('📚 Wisdom settings saved');
     } catch (error) {
-      console.error('Error saving framework preferences:', error);
+      console.error('Error saving wisdom settings:', error);
     }
   };
 
-  const loadDailyWisdom = async () => {
+  const loadDailyWisdom = async (forceRefresh = false) => {
+    // Check if we already have wisdom for today and don't force refresh
+    if (!forceRefresh && typeof window !== 'undefined') {
+      const today = new Date().toDateString();
+      const dailyWisdomKey = `dailyWisdom_${today}`;
+      const savedWisdom = localStorage.getItem(dailyWisdomKey);
+      
+      if (savedWisdom) {
+        try {
+          const parsedWisdom = JSON.parse(savedWisdom);
+          setWisdom(parsedWisdom);
+          console.log('📚 Using existing daily wisdom for today');
+          return; // Exit early if we have wisdom for today
+        } catch (error) {
+          console.error('Error parsing saved wisdom:', error);
+          // Continue to load new wisdom if parsing fails
+        }
+      }
+    }
+
     setIsLoading(true);
     try {
       // Use user's preferred frameworks from settings
@@ -146,12 +112,14 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
       console.log('📱 Mobile Debug - Settings object:', settings);
       console.log('📱 Mobile Debug - Preferred frameworks:', settings.preferredFrameworks);
       console.log('📱 Mobile Debug - Frameworks to use:', frameworksToUse);      
-      console.log('📱 Mobile Debug - Request body:', {
+      console.log('�� Mobile Debug - Request body:', {
         frameworks: frameworksToUse,
         date: new Date().toISOString().split('T')[0],
         userAgent: navigator.userAgent,
         isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      });      const response = await fetch('/api/generate/daily-wisdom', {
+      });      
+      
+      const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -224,8 +192,11 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     }
   };
 
-  // Load wisdom on mount and check for daily reset
+  // Load wisdom on mount and check for daily reset - FIXED VERSION
   useEffect(() => {
+    // Only load once per day, not on every settings change
+    if (hasLoadedToday.current) return;
+    
     const loadWisdomIfNeeded = () => {
       if (typeof window === 'undefined') return;
       
@@ -242,16 +213,19 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
           const parsedWisdom = JSON.parse(savedWisdom);
           setWisdom(parsedWisdom);
           setIsLoading(false);
+          hasLoadedToday.current = true;
           console.log('📚 Loaded existing daily wisdom for today');
         } catch (error) {
           console.error('Error parsing saved wisdom:', error);
           // Fallback to loading new wisdom
           loadDailyWisdom();
+          hasLoadedToday.current = true;
         }
       } else {
         // No wisdom for today, load new one
         console.log('📚 No wisdom for today, loading new daily wisdom');
         loadDailyWisdom();
+        hasLoadedToday.current = true;
       }
     };
 
@@ -267,432 +241,217 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         // New day detected, clear old wisdom and load new
         console.log('📚 New day detected, loading fresh daily wisdom');
         localStorage.removeItem(`dailyWisdom_${lastCheck}`);
+        hasLoadedToday.current = false; // Reset the flag for new day
         loadDailyWisdom();
         localStorage.setItem('lastDailyWisdomCheck', today);
       }
     }, 60 * 1000); // Check every minute
     
     return () => clearInterval(interval);
-  }, [settings.preferredFrameworks]); // Re-run when frameworks change
+  }, []); // Empty dependency array - only run once on mount
 
-  // Check if current quote is in favorites
-  const isFavorite = () => {
-    if (typeof window === 'undefined' || !wisdom) return false;
-    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
-    return favorites.some((fav: any) => fav.quote === wisdom.quote && fav.author === wisdom.author);
+  // Handle manual refresh
+  const handleRefresh = () => {
+    loadDailyWisdom(true); // Force refresh
   };
 
-  // Toggle favorite status
-  const toggleFavorite = async () => {
-    if (typeof window === 'undefined' || !wisdom) return;
+  // Handle framework toggle
+  const toggleFramework = (frameworkId: string) => {
+    const newFrameworks = settings.preferredFrameworks.includes(frameworkId)
+      ? settings.preferredFrameworks.filter(f => f !== frameworkId)
+      : [...settings.preferredFrameworks, frameworkId];
     
-    const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
-    const currentQuote = { quote: wisdom.quote, author: wisdom.author, framework: wisdom.framework, timestamp: new Date().toISOString() };
-    
-    if (isFavorite()) {
-      // Remove from favorites
-      const newFavorites = favorites.filter((fav: any) => !(fav.quote === wisdom.quote && fav.author === wisdom.author));
-      localStorage.setItem('favoriteQuotes', JSON.stringify(newFavorites));
-      
-      // Log removal to journal
-      const removeLogData = {
-        type: 'quote_unfavorited',
-        content: `Removed from favorites: "${wisdom.quote}" - ${wisdom.author}`,
-        category: 'wisdom',
-        metadata: {
-          quote: wisdom.quote,
-          author: wisdom.author,
-          framework: wisdom.framework,
-          timestamp: new Date().toISOString(),
-        },
-        moduleId: 'daily_wisdom',
-        widgetId: 'daily_wisdom_card',
-      };
-      console.log("📝 Attempting to log quote unfavorited to journal:", removeLogData);
-      const logResult = await logToJournal(removeLogData);
-      console.log("📝 Journal log result:", logResult);
-    } else {
-      // Add to favorites
-      favorites.push(currentQuote);
-      localStorage.setItem('favoriteQuotes', JSON.stringify(favorites));
-      
-      // Log addition to journal
-      const addLogData = {
-        type: 'quote_favorited',
-        content: `Added to favorites: "${wisdom.quote}" - ${wisdom.author}`,
-        category: 'wisdom',
-        metadata: {
-          quote: wisdom.quote,
-          author: wisdom.author,
-          framework: wisdom.framework,
-          timestamp: new Date().toISOString(),
-        },
-        moduleId: 'daily_wisdom',
-        widgetId: 'daily_wisdom_card',
-      };
-      console.log("📝 Attempting to log quote favorited to journal:", addLogData);
-      const logResult = await logToJournal(addLogData);
-      console.log("📝 Journal log result:", logResult);
-    }
-    
-    // Force re-render
-    setWisdom({ ...wisdom });
+    setSettings(prev => ({
+      ...prev,
+      preferredFrameworks: newFrameworks
+    }));
   };
 
-  const getFrameworkColor = (frameworkId: string) => {
-    const colors: { [key: string]: string } = {
-      'stoic': 'from-blue-500 to-indigo-500',
-      'spartan': 'from-red-500 to-orange-500',
-      'bushido': 'from-gray-700 to-gray-900',
-      'monastic': 'from-purple-500 to-violet-500',
-      'berserker': 'from-orange-600 to-red-600',
-      'druid': 'from-green-500 to-emerald-500',
-      'monk': 'from-yellow-500 to-orange-500',
-      'taoist': 'from-green-600 to-green-800',
-      'epicurean': 'from-pink-500 to-purple-500',
-      'aristotelian': 'from-indigo-600 to-blue-600',
-    };
-    return colors[frameworkId] || 'from-purple-500 to-violet-500';
-  };
+  // Save settings when they change
+  useEffect(() => {
+    saveSettings();
+  }, [settings]);
 
-  const getFrameworkEmoji = (frameworkId: string) => {
-    const framework = availableFrameworks.find(f => f.id === frameworkId);
-    return framework?.emoji || '🧠';
-  };
-
-  const getFrameworkName = (frameworkId: string) => {
-    const framework = availableFrameworks.find(f => f.id === frameworkId);
-    return framework?.name || frameworkId;
-  };
-
-  const getNextRefreshTime = () => {
-    if (typeof window === 'undefined') return 'Loading...';
-    
-    const now = new Date();
-    
-    // Calculate next midnight (00:00)
-    const nextMidnight = new Date(now);
-    nextMidnight.setHours(24, 0, 0, 0); // Set to next midnight
-    
-    const timeDiff = nextMidnight.getTime() - now.getTime();
-    const hours = Math.floor(timeDiff / (1000 * 60 * 60));
-    const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
-
-    if (hours > 0) {
-      return `${hours}h ${minutes}m`;
-    } else {
-      return `${minutes}m`;
-    }
-  };
-
-  return (
-    <motion.div
-      className={cn(
-        "p-6 rounded-xl bg-gradient-to-br from-purple-500/10 to-violet-500/10 border border-purple-500/20 backdrop-blur-sm",
-        className
-      )}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
-    >
-      {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-purple-300" />
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-text">Daily Wisdom</h3>
-            <p className="text-sm text-muted">Ancient insights for modern life</p>
+  if (!wisdom) {
+    return (
+      <div className={cn("p-6 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm", className)}>
+        <div className="flex items-center justify-center py-12">
+          <div className="flex items-center gap-3">
+            <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
+            <span className="text-gray-600 dark:text-gray-400">Loading wisdom...</span>
           </div>
         </div>
-        
-        <div className="flex items-center gap-2">
+      </div>
+    );
+  }
+
+  return (
+    <div className={cn("p-6 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm", className)}>
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+          <Sparkles className="w-6 h-6 text-white" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Daily Wisdom</h2>
+          <p className="text-gray-600 dark:text-gray-300">Today's insight for reflection</p>
+        </div>
+        <div className="ml-auto flex items-center gap-2">
           <button
-            onClick={() => setShowInfo(!showInfo)}
-            className="p-2 text-muted hover:text-text transition-colors"
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 disabled:opacity-50"
           >
-            <Info className="w-4 h-4" />
+            <RefreshCw className={cn("w-5 h-5 text-gray-600 dark:text-gray-300", isLoading && "animate-spin")} />
           </button>
           <button
             onClick={() => setShowSettings(!showSettings)}
-            className="p-2 text-muted hover:text-text transition-colors"
+            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
           >
-            <Settings className="w-4 h-4" />
+            <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+          </button>
+          <button
+            onClick={() => setShowInfo(!showInfo)}
+            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
+          >
+            <Info className="w-5 h-5 text-gray-600 dark:text-gray-300" />
           </button>
         </div>
       </div>
-
-      {/* Info Panel */}
-      <AnimatePresence>
-        {showInfo && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4 p-4 bg-surface/50 rounded-lg border border-border/50"
-          >
-            <p className="text-sm text-muted">
-              Each day brings a new piece of wisdom from your selected philosophical traditions. 
-              Take a moment to reflect on how this insight applies to your life today.
-            </p>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Settings Panel */}
       <AnimatePresence>
         {showSettings && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="mb-4 p-4 bg-surface/50 rounded-lg border border-border/50 space-y-4"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden mb-6"
           >
-            <div>
-              <label className="text-sm font-medium text-text mb-2 block">
-                Select Frameworks for Wisdom
-              </label>
-              <p className="text-xs text-muted mb-3">
-                Choose which philosophical traditions you'd like to receive wisdom from
-              </p>
-              <div className="grid grid-cols-2 gap-2">
+            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Framework Preferences</h3>
+              <div className="grid grid-cols-2 gap-3">
                 {availableFrameworks.map((framework) => (
                   <button
                     key={framework.id}
-                    onClick={() => {
-                      const newFrameworks = settings.preferredFrameworks.includes(framework.id)
-                        ? settings.preferredFrameworks.filter(f => f !== framework.id)
-                        : [...settings.preferredFrameworks, framework.id];
-                      saveSettings({ ...settings, preferredFrameworks: newFrameworks });
-                    }}
+                    onClick={() => toggleFramework(framework.id)}
                     className={cn(
-                      "flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition-colors text-left",
+                      "p-3 rounded-lg border transition-all duration-200 text-left",
                       settings.preferredFrameworks.includes(framework.id)
-                        ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
-                        : "bg-surface/50 text-muted border border-border/50 hover:bg-surface"
+                        ? "bg-blue-500/20 border-blue-500/50 text-blue-600 dark:text-blue-400"
+                        : "bg-white/5 border-white/10 text-gray-700 dark:text-gray-300 hover:bg-white/10"
                     )}
                   >
-                    <span className="text-sm">{framework.emoji}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium truncate">{framework.name}</div>
-                      <div className="text-xs opacity-75 truncate">{framework.description}</div>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-medium">{framework.emoji} {framework.name}</span>
+                      <div className={cn(
+                        "w-4 h-4 rounded-full border-2",
+                        settings.preferredFrameworks.includes(framework.id)
+                          ? "bg-blue-500 border-blue-500"
+                          : "border-gray-300 dark:border-gray-600"
+                      )} />
                     </div>
-                    {settings.preferredFrameworks.includes(framework.id) && (
-                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                    )}
+                    <p className="text-xs opacity-75">{framework.description}</p>
                   </button>
                 ))}
               </div>
             </div>
-            
-            <div className="flex items-center justify-between">
-              <label className="text-sm font-medium text-text">
-                Show Reflection Questions
-              </label>
-              <button
-                onClick={() => saveSettings({ ...settings, showReflection: !settings.showReflection })}
-                className={cn(
-                  "w-12 h-6 rounded-full transition-colors",
-                  settings.showReflection ? "bg-purple-500" : "bg-surface/50"
-                )}
-              >
-                <div className={cn(
-                  "w-4 h-4 bg-white rounded-full transition-transform",
-                  settings.showReflection ? "translate-x-7" : "translate-x-1"
-                )} />
-              </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Info Panel */}
+      <AnimatePresence>
+        {showInfo && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden mb-6"
+          >
+            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">About Daily Wisdom</h3>
+              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                <p>• Wisdom refreshes once per day at midnight</p>
+                <p>• Select your preferred philosophical frameworks</p>
+                <p>• Each quote includes a reflection prompt</p>
+                <p>• Use the refresh button to get new wisdom</p>
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Wisdom Content */}
-      <div className="space-y-4">
-        {isLoading ? (
-          <div className="flex items-center justify-center py-8">
-            <div className="flex items-center gap-3">
-              <div className="w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
-              <span className="text-purple-300">Loading wisdom...</span>
-            </div>
-          </div>
-        ) : wisdom ? (
-          <>
-            {/* Quote */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={wisdom.quote}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="relative"
-              >
-                <Quote className="absolute -top-2 -left-2 w-6 h-6 text-purple-400/50" />
-                <div className="flex items-start justify-between pl-6">
-                  <blockquote className="text-lg font-serif italic text-text leading-relaxed flex-1">
-                    "{wisdom.quote}"
-                  </blockquote>
-                  <button
-                    onClick={toggleFavorite}
-                    className={`ml-3 p-1.5 rounded-full transition-all duration-200 flex-shrink-0 ${
-                      isFavorite()
-                        ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
-                        : 'text-muted hover:text-yellow-400 hover:bg-yellow-500/10'
-                    }`}
-                    title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
-                  >
-                    {isFavorite() ? (
-                      <span className="text-lg">★</span>
-                    ) : (
-                      <span className="text-lg">☆</span>
-                    )}
-                  </button>
-                </div>
-              </motion.div>
-            </AnimatePresence>
-          </>
-        ) : (
-          <div className="flex items-center justify-center py-8">
-            <div className="text-center">
-              <div className="text-purple-300 mb-2">Failed to load wisdom</div>
-              <button
-                onClick={loadDailyWisdom}
-                className="text-sm text-purple-400 hover:text-purple-300 underline"
-              >
-                Try again
-              </button>
-            </div>
-          </div>
-        )}
+      <motion.div
+        key={wisdom.quote}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-6"
+      >
+        {/* Quote */}
+        <blockquote className="text-xl leading-relaxed text-gray-800 dark:text-gray-200 italic">
+          "{wisdom.quote}"
+        </blockquote>
 
-        {wisdom && (
-          <>
-            {/* Author and Framework */}
+        {/* Author and Framework */}
         <div className="flex items-center justify-between">
-          <cite className="text-purple-300 font-medium">— {wisdom.author}</cite>
-          <div className="flex items-center gap-2">
-            <div className={cn(
-              "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
-              `bg-gradient-to-r ${getFrameworkColor(wisdom.framework.toLowerCase())} text-white`
-            )}>
-              <span>{getFrameworkEmoji(wisdom.framework.toLowerCase())}</span>
-              <span>{getFrameworkName(wisdom.framework.toLowerCase())}</span>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
+              <Quote className="w-4 h-4 text-white" />
             </div>
-                <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
-                  Resets: {getNextRefreshTime()}
-                </div>
+            <div>
+              <p className="font-semibold text-gray-900 dark:text-white">{wisdom.author}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">{wisdom.framework}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
+            <BookOpen className="w-4 h-4" />
+            <span>Daily</span>
           </div>
         </div>
 
         {/* Reflection */}
-        {settings.showReflection && wisdom.reflection && (
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-4"
-          >
+        {settings.showReflection && (
+          <div className="p-4 bg-white/5 rounded-xl border border-white/10">
             <div className="flex items-center gap-2 mb-2">
-              <Brain className="w-4 h-4 text-purple-400" />
-              <h4 className="text-sm font-semibold text-text">Reflection</h4>
+              <Brain className="w-4 h-4 text-yellow-500" />
+              <span className="font-medium text-gray-900 dark:text-white">Reflection</span>
             </div>
-            <p className="text-sm text-muted leading-relaxed">
-              {wisdom.reflection}
-            </p>
-          </motion.div>
+            <p className="text-gray-700 dark:text-gray-300">{wisdom.reflection}</p>
+          </div>
         )}
 
-        {/* Action Buttons - Compact Design */}
-        <div className="flex items-center gap-2 pt-3">
-              <button
-                onClick={() => {
-                  // Force load new wisdom (bypass daily persistence)
-                  const today = new Date().toDateString();
-                  localStorage.removeItem(`dailyWisdom_${today}`);
-                  loadDailyWisdom();
-                }}
-                disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-500/20 border border-purple-500/30 text-purple-300 rounded-md hover:bg-purple-500/30 transition-colors disabled:opacity-50 text-sm"
-                title="Get new wisdom (bypasses daily persistence)"
-              >
-                {isLoading ? (
-                  <RotateCcw className="w-3.5 h-3.5 animate-spin" />
-                ) : (
-                  <RefreshCw className="w-3.5 h-3.5" />
-                )}
-                New
-              </button>
-          
-          <button
-            onClick={() => {
-              const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
-              if (favorites.length > 0) {
-                // Show a simple modal with favorites
-                const favoritesList = favorites.map((fav: any, index: number) => 
-                  `${index + 1}. "${fav.quote}" - ${fav.author}`
-                ).join('\n\n');
-                
-                // Create a more user-friendly display
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
-                modal.innerHTML = `
-                  <div class="bg-surface border border-border rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-                    <div class="flex items-center justify-between mb-4">
-                      <h3 class="text-lg font-semibold text-text">Your Favorite Quotes</h3>
-                      <button onclick="this.closest('.fixed').remove()" class="text-muted hover:text-text">✕</button>
-                    </div>
-                    <div class="space-y-3">
-                      ${favorites.map((fav: any, index: number) => `
-                        <div class="p-3 bg-surface/50 rounded-lg border border-border/50">
-                          <blockquote class="text-sm italic text-text mb-2">"${fav.quote}"</blockquote>
-                          <div class="flex items-center justify-between">
-                            <cite class="text-xs text-purple-300">— ${fav.author}</cite>
-                            <span class="text-xs text-muted">${fav.framework}</span>
-                          </div>
-                        </div>
-                      `).join('')}
-                    </div>
-                    <div class="mt-4 text-center">
-                      <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                `;
-                document.body.appendChild(modal);
-                
-                // Close on backdrop click
-                modal.addEventListener('click', (e) => {
-                  if (e.target === modal) modal.remove();
-                });
-              } else {
-                alert('No favorite quotes yet. Add some by clicking the star icon!');
-              }
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-surface/60 border border-border/50 text-muted hover:text-text hover:bg-surface transition-colors text-sm"
-            title="View your favorite quotes"
+        {/* Action Buttons */}
+        <div className="flex items-center gap-3">
+          <Link
+            href="/journal"
+            className="flex items-center gap-2 px-4 py-2 bg-blue-500/20 text-blue-600 dark:text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
           >
-            <BookOpen className="w-3.5 h-3.5" />
-            Favorites ({JSON.parse(localStorage.getItem('favoriteQuotes') || '[]').length})
-          </button>
-          
-          <Link 
-            href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
-            onClick={() => {
-              // Scroll to top when navigating to coach page
-              if (typeof window !== 'undefined') {
-                window.scrollTo(0, 0);
-              }
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
-            title="Ask AI to discuss this quote"
-          >
-            <MessageCircle className="w-3.5 h-5" />
-            Ask AI
+            <MessageCircle className="w-4 h-4" />
+            <span>Journal</span>
           </Link>
+          <button
+            onClick={handleRefresh}
+            disabled={isLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-white/10 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-white/20 transition-colors disabled:opacity-50"
+          >
+            <RotateCcw className="w-4 h-4" />
+            <span>New Wisdom</span>
+          </button>
         </div>
-          </>
-        )}
-      </div>
-    </motion.div>
+      </motion.div>
+
+      {/* Loading State */}
+      {isLoading && (
+        <div className="flex items-center justify-center py-8">
+          <div className="flex items-center gap-3">
+            <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
+            <span className="text-gray-600 dark:text-gray-400">Loading wisdom...</span>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
