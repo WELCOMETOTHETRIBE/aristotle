@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { MessageSquare, BookOpen, Users, TrendingUp, Home } from 'lucide-react';
+import { MessageSquare, BookOpen, Users, TrendingUp, Home, GraduationCap } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
@@ -13,9 +13,9 @@ const tabs = [
     activeColor: 'text-primary',
   },
   {
-    name: 'Academy',
-    href: '/academy',
-    icon: MessageSquare,
+    name: 'Lyceum',
+    href: '/lyceum',
+    icon: GraduationCap,
     activeColor: 'text-primary',
   },
   {

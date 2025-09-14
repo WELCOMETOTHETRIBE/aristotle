@@ -4,6 +4,7 @@ import "./globals.css";
 import { QueryProvider } from "@/components/providers/query-provider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { AuthProvider } from "@/lib/auth-context";
+import { LyceumProvider } from "@/lib/lyceum-context";
 import ClickToFeedback from "@/components/ClickToFeedback";
 import DeveloperToolbar from "@/components/DeveloperToolbar";
 import ScrollRestoration from "@/components/ScrollRestoration";
@@ -11,8 +12,8 @@ import ScrollRestoration from "@/components/ScrollRestoration";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EudAimonia Academy - Ancient Wisdom, AI-Powered Growth",
-  description: "A comprehensive wellness system based on ancient philosophical wisdom and modern AI technology",
+  title: "Aristotle's Lyceum - 12-Path Wisdom Journey",
+  description: "Master Aristotle's wisdom through 36 interactive lessons across 12 paths of philosophical study, with AI-powered guidance and personalized learning",
 };
 
 export const viewport = {
@@ -33,13 +34,16 @@ export default function RootLayout({
         <ErrorBoundary>
           <QueryProvider>
             <AuthProvider>
-        <div className="min-h-screen bg-bg">
-          <ScrollRestoration />
-          <ClickToFeedback>
-            {children}
-          </ClickToFeedback>
-          <DeveloperToolbar />
-        </div>            </AuthProvider>
+              <LyceumProvider>
+                <div className="min-h-screen bg-bg">
+                  <ScrollRestoration />
+                  <ClickToFeedback>
+                    {children}
+                  </ClickToFeedback>
+                  <DeveloperToolbar />
+                </div>
+              </LyceumProvider>
+            </AuthProvider>
           </QueryProvider>
         </ErrorBoundary>
       </body>

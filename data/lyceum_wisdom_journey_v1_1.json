@@ -1,0 +1,3185 @@
+{
+  "meta": {
+    "title": "Aristotle’s Lyceum — 12-Path Wisdom Journey",
+    "version": "1.1.0",
+    "authoring_date": "2025-09-14",
+    "philosophical_scope": "Faithful to Aristotle’s core teachings; adapted for modern micro‑learning.",
+    "session_length_minutes": "10–12 avg per lesson",
+    "device_capabilities": [
+      "camera",
+      "microphone",
+      "touch",
+      "text"
+    ],
+    "artifacts_portfolio": "Auto-compiled into a shareable ‘Lyceum Scroll’ certificate.",
+    "ux_enhancements": [
+      "Narrative intros/outros by Aristotle",
+      "Modern payoff highlights per lesson",
+      "Daily virtue check-in loop",
+      "Scholar Mode optional deep-dives",
+      "Agora (optional) share prompts",
+      "Per-lesson AI hook guidance for OpenAI"
+    ]
+  },
+  "ai_prompts": {
+    "tutor_system": "You are Aristotle as an encouraging peripatetic tutor. Teach in 1-3 short prompts at a time, asking precise questions, and require concrete observations before abstract claims. Keep each turn under 80 words. Praise effort, correct gently, connect to eudaimonia.",
+    "evaluator_system": "You are an Aristotelian assessor. Score artifacts using the given rubric. Return JSON with {scores:{criterion:0-1}, notes:'', mastery_deltas:{}}. Be concise, cite terms correctly, and note one improvement.",
+    "coach_system": "You are a practical wisdom (phronēsis) coach. Suggest one tiny habit for tomorrow aligned with the learner's telos and current module. Keep under 50 words."
+  },
+  "certificate": {
+    "requirements": {
+      "completed_paths": 12,
+      "min_lessons_completed": 34,
+      "portfolio_items_required": [
+        "category_book_entry",
+        "logic_card_validity",
+        "refutation_card",
+        "four_causes_card",
+        "field_classification_card",
+        "cosmos_log",
+        "essence_card",
+        "dunamis_to_energeia_log",
+        "first_cause_card",
+        "flourishing_log",
+        "mean_map",
+        "habit_card",
+        "phronesis_card",
+        "ethos_routine",
+        "coach_note",
+        "friendship_map",
+        "citizen_card",
+        "polis_action",
+        "regime_cards",
+        "mini_constitution",
+        "speech_v2",
+        "tragic_map",
+        "micro_scene",
+        "art_flourishing_note"
+      ]
+    },
+    "scoring": {
+      "rubric_average_threshold": 0.8,
+      "mastery_domains": {
+        "logic": 0.6,
+        "science": 0.6,
+        "metaphysics": 0.6,
+        "ethics": 0.6,
+        "politics": 0.6,
+        "rhetoric_poetics": 0.6
+      }
+    },
+    "output": "PDF/HTML scroll with artifacts and glossary unlocked."
+  },
+  "paths": [
+    {
+      "id": "path1",
+      "title": "The Art of Clear Thinking",
+      "description": "Logic tools to see clearly and decide wisely.",
+      "estimated_minutes_total": 32,
+      "lessons": [
+        {
+          "id": "p1.l1",
+          "title": "Ten Categories",
+          "time_minutes": 12,
+          "objectives": [
+            "Identify how statements map to Aristotle’s categories.",
+            "Describe what makes an attribute essential or incidental at a glance."
+          ],
+          "terms_introduced": [
+            "logos",
+            "fallacy"
+          ],
+          "activities": [
+            {
+              "type": "drag_drop_categorize",
+              "id": "p1l1_a1",
+              "instructions": "Drag each object to its best category label.",
+              "items": [
+                "triangle",
+                "red apple",
+                "taller than Bob",
+                "in the park",
+                "running",
+                "five",
+                "metallic",
+                "ownership",
+                "today",
+                "possible"
+              ],
+              "categories": [
+                "substance",
+                "quality",
+                "relation",
+                "place",
+                "action",
+                "quantity",
+                "quality",
+                "possession",
+                "time",
+                "possibility"
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p1l1_a2",
+              "prompt": "In one sentence, what most defines *you* (not an accident)?",
+              "input": {
+                "type": "text",
+                "max_len": 160
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct categorizations",
+                "weight": "0.7",
+                "description": "≥8/10 correct"
+              },
+              {
+                "criterion": "Reflection clarity",
+                "weight": "0.3",
+                "description": "Mentions essence vs accident idea"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8 weighted score"
+          },
+          "artifacts": [
+            "category_book_entry"
+          ],
+          "mastery_updates": {
+            "logic_categories": 0.07
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Art of Clear Thinking', this stop is 'Ten Categories'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Decide faster, argue less, and avoid being misled online.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Ten Categories' in The Art of Clear Thinking that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p1.l2",
+          "title": "Build a Syllogism",
+          "time_minutes": 10,
+          "objectives": [
+            "Assemble a valid syllogism from prompts.",
+            "Differentiate validity from truth."
+          ],
+          "terms_introduced": [
+            "syllogism",
+            "logos"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p1l2_a1",
+              "instructions": "Fill the blanks to make a valid syllogism.",
+              "questions": [
+                {
+                  "stem": "All ___ are mortal. All philosophers are ___. Therefore, all philosophers are mortal.",
+                  "answers": [
+                    "humans",
+                    "human"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p1l2_a2",
+              "prompt": "Can a valid argument still have a false conclusion? Why?",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Validity",
+                "weight": "0.7",
+                "description": "Syllogism structure is correct"
+              },
+              {
+                "criterion": "Concept grasp",
+                "weight": "0.3",
+                "description": "Explains validity vs truth succinctly"
+              }
+            ],
+            "completion_rule": "pass if valid and short explanation present"
+          },
+          "artifacts": [
+            "logic_card_validity"
+          ],
+          "mastery_updates": {
+            "logic_syllogism": 0.08
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Art of Clear Thinking', this stop is 'Build a Syllogism'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Decide faster, argue less, and avoid being misled online.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Build a Syllogism' in The Art of Clear Thinking that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p1.l3",
+          "title": "Spot the Fallacy",
+          "time_minutes": 10,
+          "objectives": [
+            "Identify common reasoning errors in real posts.",
+            "Improve one post by fixing its premise."
+          ],
+          "terms_introduced": [
+            "fallacy"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p1l3_a1",
+              "instructions": "Tap the fallacy you see.",
+              "questions": [
+                {
+                  "stem": "If we allow one exception, chaos follows.",
+                  "choices": [
+                    "slippery slope",
+                    "straw man",
+                    "ad hominem"
+                  ],
+                  "answer": "slippery slope"
+                },
+                {
+                  "stem": "They’re wrong because they’re from rival school.",
+                  "choices": [
+                    "ad hominem",
+                    "appeal to authority",
+                    "false cause"
+                  ],
+                  "answer": "ad hominem"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p1l3_a2",
+              "prompt": "Rewrite one flawed claim so it avoids the fallacy.",
+              "input": {
+                "type": "text",
+                "max_len": 180
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Fallacy ID",
+                "weight": "0.7",
+                "description": "≥2/2 correct"
+              },
+              {
+                "criterion": "Repair quality",
+                "weight": "0.3",
+                "description": "Rewrite addresses the flaw"
+              }
+            ],
+            "completion_rule": "pass if both criteria satisfied"
+          },
+          "artifacts": [
+            "refutation_card"
+          ],
+          "mastery_updates": {
+            "logic_refutation": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Art of Clear Thinking', this stop is 'Spot the Fallacy'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Decide faster, argue less, and avoid being misled online.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Spot the Fallacy' in The Art of Clear Thinking that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path2",
+      "title": "From Opinion to Knowledge",
+      "description": "Move from what ‘people say’ to tested knowledge.",
+      "estimated_minutes_total": 32,
+      "lessons": [
+        {
+          "id": "p2.l1",
+          "title": "From Endoxa to Inquiry",
+          "time_minutes": 10,
+          "objectives": [
+            "Recognize reputable opinions (endoxa).",
+            "Frame a testable question from an endoxon."
+          ],
+          "terms_introduced": [
+            "endoxa"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p2l1_a1",
+              "instructions": "Which is endoxa (reputable)?",
+              "questions": [
+                {
+                  "stem": "Most people think breakfast is healthiest.",
+                  "choices": [
+                    "endoxa",
+                    "demonstration"
+                  ],
+                  "answer": "endoxa"
+                },
+                {
+                  "stem": "Proven by controlled trial.",
+                  "choices": [
+                    "endoxa",
+                    "demonstration"
+                  ],
+                  "answer": "demonstration"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p2l1_a2",
+              "prompt": "Turn one endoxa you hold into a question you could test.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Classification",
+                "weight": "0.6",
+                "description": "Correctly tags examples"
+              },
+              {
+                "criterion": "Inquiry framing",
+                "weight": "0.4",
+                "description": "Question is testable"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "inquiry_card"
+          ],
+          "mastery_updates": {
+            "knowledge_inquiry": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'From Opinion to Knowledge', this stop is 'From Endoxa to Inquiry'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Know when you have proof versus persuasion—make better calls at work and home.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'From Endoxa to Inquiry' in From Opinion to Knowledge that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p2.l2",
+          "title": "Induction: From Cases to Rule",
+          "time_minutes": 12,
+          "objectives": [
+            "Induce a rule from examples.",
+            "Note limits of induction."
+          ],
+          "terms_introduced": [
+            "induction"
+          ],
+          "activities": [
+            {
+              "type": "photo_capture",
+              "id": "p2l2_a1",
+              "instructions": "Snap 3 similar items (e.g., leaves, cups).",
+              "analysis": "ai_assisted"
+            },
+            {
+              "type": "reflection",
+              "id": "p2l2_a2",
+              "prompt": "What common rule do your items suggest? Note one exception risk.",
+              "input": {
+                "type": "text",
+                "max_len": 160
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Observation set",
+                "weight": "0.4",
+                "description": "3 items captured"
+              },
+              {
+                "criterion": "Generalization",
+                "weight": "0.4",
+                "description": "Non-trivial, matches items"
+              },
+              {
+                "criterion": "Limit awareness",
+                "weight": "0.2",
+                "description": "Mentions possible exception"
+              }
+            ],
+            "completion_rule": "pass if total ≥0.8"
+          },
+          "artifacts": [
+            "induction_note"
+          ],
+          "mastery_updates": {
+            "knowledge_induction": 0.07
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'From Opinion to Knowledge', this stop is 'Induction: From Cases to Rule'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Know when you have proof versus persuasion—make better calls at work and home.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Induction: From Cases to Rule' in From Opinion to Knowledge that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p2.l3",
+          "title": "Demonstration vs. Persuasion",
+          "time_minutes": 10,
+          "objectives": [
+            "Distinguish apodeixis from rhetoric.",
+            "Identify epistēmē targets."
+          ],
+          "terms_introduced": [
+            "apodeixis",
+            "episteme",
+            "endoxa"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p2l3_a1",
+              "instructions": "Is this a demonstration?",
+              "questions": [
+                {
+                  "stem": "Triangle angles sum to 180° (Euclidean proof).",
+                  "choices": [
+                    "apodeixis",
+                    "rhetoric"
+                  ],
+                  "answer": "apodeixis"
+                },
+                {
+                  "stem": "Most users prefer A over B in polls.",
+                  "choices": [
+                    "apodeixis",
+                    "rhetoric"
+                  ],
+                  "answer": "rhetoric"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p2l3_a2",
+              "prompt": "Name one thing in your life you want apodeictic certainty about—and one where eikos is enough.",
+              "input": {
+                "type": "text",
+                "max_len": 160
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct distinctions",
+                "weight": "0.7",
+                "description": "≥2/2 correct"
+              },
+              {
+                "criterion": "Use-case insight",
+                "weight": "0.3",
+                "description": "Clear contrast"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "proof_vs_persuasion_card"
+          ],
+          "mastery_updates": {
+            "knowledge_demonstration": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'From Opinion to Knowledge', this stop is 'Demonstration vs. Persuasion'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Know when you have proof versus persuasion—make better calls at work and home.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Demonstration vs. Persuasion' in From Opinion to Knowledge that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path3",
+      "title": "Why Things Exist",
+      "description": "See the four kinds of explanation and purpose.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p3.l1",
+          "title": "Meet the Four Causes",
+          "time_minutes": 12,
+          "objectives": [
+            "Identify four causes for everyday objects.",
+            "Recognize telos in simple cases."
+          ],
+          "terms_introduced": [
+            "four_causes",
+            "telos"
+          ],
+          "activities": [
+            {
+              "type": "photo_capture",
+              "id": "p3l1_a1",
+              "instructions": "Photograph a familiar object (cup, shoe, tool).",
+              "analysis": "ai_assisted"
+            },
+            {
+              "type": "drag_drop_categorize",
+              "id": "p3l1_a2",
+              "instructions": "Match each cause to the object.",
+              "items": [
+                "clay",
+                "cup-shape",
+                "potter",
+                "holding liquids"
+              ],
+              "categories": [
+                "material",
+                "formal",
+                "efficient",
+                "final"
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Cause mapping",
+                "weight": "0.8",
+                "description": "All four correctly matched"
+              },
+              {
+                "criterion": "Photo provided",
+                "weight": "0.2",
+                "description": "Image present"
+              }
+            ],
+            "completion_rule": "pass if mapping correct"
+          },
+          "artifacts": [
+            "four_causes_card"
+          ],
+          "mastery_updates": {
+            "science_causes": 0.08
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Why Things Exist', this stop is 'Meet the Four Causes'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "See purpose in tools and tasks—design your day around ends that matter.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Meet the Four Causes' in Why Things Exist that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p3.l2",
+          "title": "Telos Everywhere?",
+          "time_minutes": 10,
+          "objectives": [
+            "Differentiate genuine purpose from imposed use.",
+            "Apply telos language cautiously."
+          ],
+          "terms_introduced": [
+            "telos"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p3l2_a1",
+              "instructions": "Is this telos or just use?",
+              "questions": [
+                {
+                  "stem": "Knife → cutting.",
+                  "choices": [
+                    "telos",
+                    "mere use"
+                  ],
+                  "answer": "telos"
+                },
+                {
+                  "stem": "Brick → paperweight.",
+                  "choices": [
+                    "telos",
+                    "mere use"
+                  ],
+                  "answer": "mere use"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p3l2_a2",
+              "prompt": "Name one personal telos for today.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Discrimination",
+                "weight": "0.7",
+                "description": "Both correct"
+              },
+              {
+                "criterion": "Reflection",
+                "weight": "0.3",
+                "description": "Concrete telos stated"
+              }
+            ],
+            "completion_rule": "pass if both correct"
+          },
+          "artifacts": [
+            "daily_telos_card"
+          ],
+          "mastery_updates": {
+            "science_telos": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Why Things Exist', this stop is 'Telos Everywhere?'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "See purpose in tools and tasks—design your day around ends that matter.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Telos Everywhere?' in Why Things Exist that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p3.l3",
+          "title": "Causes Speed Round",
+          "time_minutes": 8,
+          "objectives": [
+            "Rapid recognition of causes across domains."
+          ],
+          "terms_introduced": [
+            "four_causes"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p3l3_a1",
+              "instructions": "Quick-match 6 objects to their causes (timed).",
+              "questions": [
+                {
+                  "stem": "Tree growth → ?",
+                  "choices": [
+                    "material",
+                    "formal",
+                    "efficient",
+                    "final"
+                  ],
+                  "answer": "final"
+                },
+                {
+                  "stem": "Sculpture marble → ?",
+                  "choices": [
+                    "material",
+                    "formal",
+                    "efficient",
+                    "final"
+                  ],
+                  "answer": "material"
+                }
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Accuracy",
+                "weight": "1.0",
+                "description": "≥5/6 correct in time"
+              }
+            ],
+            "completion_rule": "pass if ≥5/6 correct"
+          },
+          "artifacts": [
+            "cause_sprint_score"
+          ],
+          "mastery_updates": {
+            "science_causes": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Why Things Exist', this stop is 'Causes Speed Round'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "See purpose in tools and tasks—design your day around ends that matter.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Causes Speed Round' in Why Things Exist that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path4",
+      "title": "Living Nature",
+      "description": "Mindful observation and classification of life.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p4.l1",
+          "title": "Observe & Classify",
+          "time_minutes": 12,
+          "objectives": [
+            "Use visible features to classify a living thing.",
+            "Practice careful description."
+          ],
+          "terms_introduced": [
+            "phusis",
+            "form",
+            "matter"
+          ],
+          "activities": [
+            {
+              "type": "photo_capture",
+              "id": "p4l1_a1",
+              "instructions": "Snap a plant or animal; note shape, parts, motion.",
+              "analysis": "ai_assisted"
+            },
+            {
+              "type": "reflection",
+              "id": "p4l1_a2",
+              "prompt": "List 3 features that distinguish it from a similar kind.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Photo + features",
+                "weight": "0.7",
+                "description": "Image and 3 features present"
+              },
+              {
+                "criterion": "Classification attempt",
+                "weight": "0.3",
+                "description": "Reasonable label provided"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "field_classification_card"
+          ],
+          "mastery_updates": {
+            "science_observation": 0.07
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Living Nature', this stop is 'Observe & Classify'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Improve attention and calm through careful seeing; deepen respect for life.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Observe & Classify' in Living Nature that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p4.l2",
+          "title": "Keys and Differences",
+          "time_minutes": 10,
+          "objectives": [
+            "Build a mini branching key for your specimen."
+          ],
+          "terms_introduced": [
+            "form",
+            "matter"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p4l2_a1",
+              "instructions": "Choose branch points",
+              "questions": [
+                {
+                  "stem": "Leaf simple or compound?",
+                  "choices": [
+                    "simple",
+                    "compound"
+                  ],
+                  "answer": "simple"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p4l2_a2",
+              "prompt": "Write two branch questions you used.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Branch logic",
+                "weight": "0.7",
+                "description": "Clear, observable splits"
+              },
+              {
+                "criterion": "Questions",
+                "weight": "0.3",
+                "description": "Two usable branch questions"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "key_v1_card"
+          ],
+          "mastery_updates": {
+            "science_classification": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Living Nature', this stop is 'Keys and Differences'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Improve attention and calm through careful seeing; deepen respect for life.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Keys and Differences' in Living Nature that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p4.l3",
+          "title": "Form–Matter in Life",
+          "time_minutes": 8,
+          "objectives": [
+            "Differentiate form and matter in your specimen."
+          ],
+          "terms_introduced": [
+            "form",
+            "matter"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p4l3_a1",
+              "prompt": "State its form (what-it-is) and matter (what-it’s-made-of) in one sentence.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct FM statement",
+                "weight": "1.0",
+                "description": "Identifies both correctly"
+              }
+            ],
+            "completion_rule": "pass if correct"
+          },
+          "artifacts": [
+            "form_matter_note"
+          ],
+          "mastery_updates": {
+            "science_hylomorphism": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Living Nature', this stop is 'Form–Matter in Life'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Improve attention and calm through careful seeing; deepen respect for life.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Form–Matter in Life' in Living Nature that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path5",
+      "title": "The Cosmos",
+      "description": "Ancient sky sense, modern awe.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p5.l1",
+          "title": "Sky Watch",
+          "time_minutes": 10,
+          "objectives": [
+            "Notice patterns in the sky.",
+            "Feel cosmic perspective."
+          ],
+          "terms_introduced": [
+            "cosmos"
+          ],
+          "activities": [
+            {
+              "type": "photo_capture",
+              "id": "p5l1_a1",
+              "instructions": "Take a night-sky photo or select a star map.",
+              "analysis": "ai_assisted"
+            },
+            {
+              "type": "reflection",
+              "id": "p5l1_a2",
+              "prompt": "What pattern did you notice (moon, bright star, constellation)?",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Observation",
+                "weight": "0.6",
+                "description": "Photo or map noted"
+              },
+              {
+                "criterion": "Pattern",
+                "weight": "0.4",
+                "description": "One pattern described"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "cosmos_log"
+          ],
+          "mastery_updates": {
+            "cosmos_observation": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Cosmos', this stop is 'Sky Watch'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Gain perspective; reduce stress by remembering your place in a larger order.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Sky Watch' in The Cosmos that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p5.l2",
+          "title": "Aither vs Astrophysics",
+          "time_minutes": 12,
+          "objectives": [
+            "Understand Aristotle’s aither theory and its limits."
+          ],
+          "terms_introduced": [
+            "aither",
+            "cosmos"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p5l2_a1",
+              "instructions": "What did aither explain?",
+              "questions": [
+                {
+                  "stem": "Why stars seem unchanging.",
+                  "choices": [
+                    "aither",
+                    "four causes"
+                  ],
+                  "answer": "aither"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p5l2_a2",
+              "prompt": "One thing Aristotle got right, one he didn’t (re: heavens).",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct concept",
+                "weight": "0.6",
+                "description": "Identifies aither role"
+              },
+              {
+                "criterion": "Contrast",
+                "weight": "0.4",
+                "description": "Right/wrong insight"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "aither_note"
+          ],
+          "mastery_updates": {
+            "cosmos_theory": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Cosmos', this stop is 'Aither vs Astrophysics'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Gain perspective; reduce stress by remembering your place in a larger order.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Aither vs Astrophysics' in The Cosmos that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p5.l3",
+          "title": "Cosmic Telos?",
+          "time_minutes": 8,
+          "objectives": [
+            "Consider purposes at cosmic scale (cautiously)."
+          ],
+          "terms_introduced": [
+            "telos"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p5l3_a1",
+              "prompt": "Does the cosmos have a telos for you personally? One sentence.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Thoughtful reflection",
+                "weight": "1.0",
+                "description": "One-sentence insight"
+              }
+            ],
+            "completion_rule": "pass if present"
+          },
+          "artifacts": [
+            "cosmic_reflection"
+          ],
+          "mastery_updates": {
+            "cosmos_meaning": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Cosmos', this stop is 'Cosmic Telos?'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Gain perspective; reduce stress by remembering your place in a larger order.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Cosmic Telos?' in The Cosmos that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path6",
+      "title": "What Is Real?",
+      "description": "Essence, change, and first principles in daily life.",
+      "estimated_minutes_total": 32,
+      "lessons": [
+        {
+          "id": "p6.l1",
+          "title": "Essence or Accident?",
+          "time_minutes": 10,
+          "objectives": [
+            "Tell essentials from incidentals quickly."
+          ],
+          "terms_introduced": [
+            "ousia",
+            "essence",
+            "accident"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p6l1_a1",
+              "instructions": "Tap ‘essential’ or ‘accidental’.",
+              "questions": [
+                {
+                  "stem": "Triangle has 3 sides.",
+                  "choices": [
+                    "essential",
+                    "accidental"
+                  ],
+                  "answer": "essential"
+                },
+                {
+                  "stem": "Triangle is blue.",
+                  "choices": [
+                    "essential",
+                    "accidental"
+                  ],
+                  "answer": "accidental"
+                }
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Accuracy",
+                "weight": "1.0",
+                "description": "≥5/6 in extended set (app expands)"
+              }
+            ],
+            "completion_rule": "pass if threshold met"
+          },
+          "artifacts": [
+            "essence_card"
+          ],
+          "mastery_updates": {
+            "metaphysics_identity": 0.07
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'What Is Real?', this stop is 'Essence or Accident?'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Understand identity and change—use it to grow without losing yourself.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Essence or Accident?' in What Is Real? that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p6.l2",
+          "title": "Potential → Actual",
+          "time_minutes": 12,
+          "objectives": [
+            "Identify a personal potential and one step to actualize it."
+          ],
+          "terms_introduced": [
+            "potentiality",
+            "actuality"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p6l2_a1",
+              "prompt": "Name one potential (skill/habit) and one action this week to actualize it.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Concrete plan",
+                "weight": "1.0",
+                "description": "Clear step named"
+              }
+            ],
+            "completion_rule": "pass if present"
+          },
+          "artifacts": [
+            "dunamis_to_energeia_log"
+          ],
+          "mastery_updates": {
+            "metaphysics_change": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'What Is Real?', this stop is 'Potential → Actual'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Understand identity and change—use it to grow without losing yourself.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Potential → Actual' in What Is Real? that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p6.l3",
+          "title": "First Cause (Story)",
+          "time_minutes": 10,
+          "objectives": [
+            "Understand the idea of an Unmoved Mover via a domino story."
+          ],
+          "terms_introduced": [
+            "unmoved_mover",
+            "theoria"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p6l3_a1",
+              "instructions": "Where does the chain start? (explain briefly)",
+              "questions": [
+                {
+                  "stem": "In a chain of movers, what stops infinite regress?",
+                  "choices": [
+                    "unmoved mover",
+                    "last domino",
+                    "random chance"
+                  ],
+                  "answer": "unmoved mover"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p6l3_a2",
+              "prompt": "Try one minute of quiet contemplation; note how it felt.",
+              "input": {
+                "type": "text",
+                "max_len": 100
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Concept grasp",
+                "weight": "0.7",
+                "description": "Correctly selects unmoved mover"
+              },
+              {
+                "criterion": "Theōria attempt",
+                "weight": "0.3",
+                "description": "Brief note recorded"
+              }
+            ],
+            "completion_rule": "pass if both present"
+          },
+          "artifacts": [
+            "first_cause_card"
+          ],
+          "mastery_updates": {
+            "metaphysics_firstprinciples": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'What Is Real?', this stop is 'First Cause (Story)'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Understand identity and change—use it to grow without losing yourself.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'First Cause (Story)' in What Is Real? that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path7",
+      "title": "The Good Life",
+      "description": "Happiness as virtuous activity—small habits that add up.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p7.l1",
+          "title": "What Is Happiness?",
+          "time_minutes": 10,
+          "objectives": [
+            "Contrast pleasure, honor, wealth, virtue."
+          ],
+          "terms_introduced": [
+            "eudaimonia"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p7l1_a1",
+              "instructions": "Pick which Aristotle thinks best fits happiness.",
+              "questions": [
+                {
+                  "stem": "Happiness is sustained activity in line with virtue.",
+                  "choices": [
+                    "yes",
+                    "no"
+                  ],
+                  "answer": "yes"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p7l1_a2",
+              "prompt": "Name one activity this week that feels like flourishing (not just pleasure).",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct idea",
+                "weight": "0.6",
+                "description": "Selects virtue activity"
+              },
+              {
+                "criterion": "Reflection",
+                "weight": "0.4",
+                "description": "Concrete flourishing act named"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "flourishing_log"
+          ],
+          "mastery_updates": {
+            "ethics_concepts": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Good Life', this stop is 'What Is Happiness?'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Build habits that actually feel like flourishing, not just quick hits.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'What Is Happiness?' in The Good Life that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p7.l2",
+          "title": "Virtue as a Mean",
+          "time_minutes": 12,
+          "objectives": [
+            "Place virtues between extremes using sliders."
+          ],
+          "terms_introduced": [
+            "arete",
+            "mean"
+          ],
+          "activities": [
+            {
+              "type": "slider",
+              "id": "p7l2_a1",
+              "virtues": [
+                {
+                  "name": "courage",
+                  "min_label": "cowardice",
+                  "max_label": "rashness",
+                  "start": 50
+                },
+                {
+                  "name": "generosity",
+                  "min_label": "stinginess",
+                  "max_label": "wastefulness",
+                  "start": 50
+                }
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Engagement",
+                "weight": "1.0",
+                "description": "All sliders adjusted with short note (app collects)"
+              }
+            ],
+            "completion_rule": "pass if adjusted + note"
+          },
+          "artifacts": [
+            "mean_map"
+          ],
+          "mastery_updates": {
+            "ethics_balance": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Good Life', this stop is 'Virtue as a Mean'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Build habits that actually feel like flourishing, not just quick hits.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Virtue as a Mean' in The Good Life that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p7.l3",
+          "title": "Stable States (Hexis)",
+          "time_minutes": 8,
+          "objectives": [
+            "Turn a good act into a habit."
+          ],
+          "terms_introduced": [
+            "hexis",
+            "ethismos"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p7l3_a1",
+              "prompt": "Choose one tiny habit to repeat daily for 5 days.",
+              "input": {
+                "type": "text",
+                "max_len": 100
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Habit chosen",
+                "weight": "1.0",
+                "description": "Habit stated"
+              }
+            ],
+            "completion_rule": "pass if present"
+          },
+          "artifacts": [
+            "habit_card"
+          ],
+          "mastery_updates": {
+            "ethics_habituation": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'The Good Life', this stop is 'Stable States (Hexis)'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Build habits that actually feel like flourishing, not just quick hits.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Stable States (Hexis)' in The Good Life that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path8",
+      "title": "Practical Wisdom",
+      "description": "Good judgment and habits that stick.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p8.l1",
+          "title": "Judging Well (Phronēsis)",
+          "time_minutes": 12,
+          "objectives": [
+            "Use means–end reasoning in a life scenario."
+          ],
+          "terms_introduced": [
+            "phronesis",
+            "pathos"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p8l1_a1",
+              "instructions": "Choose the mean response",
+              "questions": [
+                {
+                  "stem": "A friend offended you—pick the response closest to the mean.",
+                  "choices": [
+                    "seethe quietly",
+                    "explode at them",
+                    "address calmly, seeking repair"
+                  ],
+                  "answer": "address calmly, seeking repair"
+                }
+              ]
+            },
+            {
+              "type": "reflection",
+              "id": "p8l1_a2",
+              "prompt": "Name one emotion (pathos) that clouds your judgment; one way to balance it.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Scenario choice",
+                "weight": "0.6",
+                "description": "Picks mean-like response"
+              },
+              {
+                "criterion": "Self-insight",
+                "weight": "0.4",
+                "description": "Concrete balancing move"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "phronesis_card"
+          ],
+          "mastery_updates": {
+            "ethics_judgment": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Practical Wisdom', this stop is 'Judging Well (Phronēsis)'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Choose the balanced action under emotion and pressure.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Judging Well (Phronēsis)' in Practical Wisdom that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p8.l2",
+          "title": "Ethos by Design",
+          "time_minutes": 10,
+          "objectives": [
+            "Design a 3-step routine to reinforce character."
+          ],
+          "terms_introduced": [
+            "ethos",
+            "ethismos"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p8l2_a1",
+              "prompt": "Write a 3-step routine you’ll try for 3 days.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Routine clarity",
+                "weight": "1.0",
+                "description": "Three concrete steps written"
+              }
+            ],
+            "completion_rule": "pass if present"
+          },
+          "artifacts": [
+            "ethos_routine"
+          ],
+          "mastery_updates": {
+            "ethics_ethos": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Practical Wisdom', this stop is 'Ethos by Design'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Choose the balanced action under emotion and pressure.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Ethos by Design' in Practical Wisdom that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p8.l3",
+          "title": "Check-in & Coach",
+          "time_minutes": 8,
+          "objectives": [
+            "Receive a tiny-habit nudge aligned with your telos."
+          ],
+          "terms_introduced": [
+            "telos",
+            "phronesis"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p8l3_a1",
+              "prompt": "What is your telos for this week in one phrase?",
+              "input": {
+                "type": "text",
+                "max_len": 80
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Telos clarity",
+                "weight": "1.0",
+                "description": "Short phrase present"
+              }
+            ],
+            "completion_rule": "pass if present"
+          },
+          "artifacts": [
+            "coach_note"
+          ],
+          "mastery_updates": {
+            "ethics_alignment": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Practical Wisdom', this stop is 'Check-in & Coach'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Choose the balanced action under emotion and pressure.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Check-in & Coach' in Practical Wisdom that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path9",
+      "title": "Friendship & Community",
+      "description": "Belonging, citizenship, and small civic acts.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p9.l1",
+          "title": "Kinds of Friendship",
+          "time_minutes": 10,
+          "objectives": [
+            "Identify friendship types and their risks."
+          ],
+          "terms_introduced": [
+            "polis"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p9l1_a1",
+              "instructions": "Classify the friendship",
+              "questions": [
+                {
+                  "stem": "Workout buddy until the free pass ends.",
+                  "choices": [
+                    "utility",
+                    "pleasure",
+                    "virtue"
+                  ],
+                  "answer": "utility"
+                },
+                {
+                  "stem": "Long-time friend who tells you hard truths.",
+                  "choices": [
+                    "utility",
+                    "pleasure",
+                    "virtue"
+                  ],
+                  "answer": "virtue"
+                }
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Classification",
+                "weight": "1.0",
+                "description": "≥2/2 correct (extended set in app)"
+              }
+            ],
+            "completion_rule": "pass threshold"
+          },
+          "artifacts": [
+            "friendship_map"
+          ],
+          "mastery_updates": {
+            "civic_friendship": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Friendship & Community', this stop is 'Kinds of Friendship'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Invest in relationships that make you better and belong.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Kinds of Friendship' in Friendship & Community that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p9.l2",
+          "title": "Citizen & Belonging",
+          "time_minutes": 10,
+          "objectives": [
+            "Understand what makes one a citizen (politēs)."
+          ],
+          "terms_introduced": [
+            "polites",
+            "polis"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p9l2_a1",
+              "prompt": "Name one community where you ‘share in ruling and being ruled’.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Civic insight",
+                "weight": "1.0",
+                "description": "Concrete community named"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "citizen_card"
+          ],
+          "mastery_updates": {
+            "civic_identity": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Friendship & Community', this stop is 'Citizen & Belonging'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Invest in relationships that make you better and belong.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Citizen & Belonging' in Friendship & Community that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p9.l3",
+          "title": "Community Flourishing",
+          "time_minutes": 10,
+          "objectives": [
+            "Propose one act that improves your local polis."
+          ],
+          "terms_introduced": [
+            "eudaimonia",
+            "telos"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p9l3_a1",
+              "prompt": "Suggest one small action that would help your community flourish.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Civic proposal",
+                "weight": "1.0",
+                "description": "Feasible action stated"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "polis_action"
+          ],
+          "mastery_updates": {
+            "civic_action": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Friendship & Community', this stop is 'Community Flourishing'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Invest in relationships that make you better and belong.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Community Flourishing' in Friendship & Community that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path10",
+      "title": "Politics & Justice",
+      "description": "Constitutions, fairness, and principled reform.",
+      "estimated_minutes_total": 34,
+      "lessons": [
+        {
+          "id": "p10.l1",
+          "title": "Regimes at a Glance",
+          "time_minutes": 12,
+          "objectives": [
+            "Match modern examples to regime types."
+          ],
+          "terms_introduced": [
+            "politeia",
+            "democracy",
+            "oligarchy",
+            "aristocracy",
+            "tyranny"
+          ],
+          "activities": [
+            {
+              "type": "quiz",
+              "id": "p10l1_a1",
+              "instructions": "Swipe to match",
+              "questions": [
+                {
+                  "stem": "Power concentrated in a wealthy council.",
+                  "choices": [
+                    "oligarchy",
+                    "democracy",
+                    "tyranny"
+                  ],
+                  "answer": "oligarchy"
+                }
+              ]
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct typing",
+                "weight": "1.0",
+                "description": "≥5/6 correct (extended set)"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "regime_cards"
+          ],
+          "mastery_updates": {
+            "politics_typology": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Politics & Justice', this stop is 'Regimes at a Glance'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Lead small groups fairly; set rules that people accept.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Regimes at a Glance' in Politics & Justice that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p10.l2",
+          "title": "Your Mini-Constitution",
+          "time_minutes": 12,
+          "objectives": [
+            "Draft 3 rules for a fair team/group."
+          ],
+          "terms_introduced": [
+            "politeia",
+            "telos"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p10l2_a1",
+              "prompt": "Write three simple rules for your team/class/family that promote fairness.",
+              "input": {
+                "type": "text",
+                "max_len": 180
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Rule quality",
+                "weight": "1.0",
+                "description": "3 rules, clear & fair"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "mini_constitution"
+          ],
+          "mastery_updates": {
+            "politics_design": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Politics & Justice', this stop is 'Your Mini-Constitution'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Lead small groups fairly; set rules that people accept.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Your Mini-Constitution' in Politics & Justice that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p10.l3",
+          "title": "Justice & Inclusion (Optional)",
+          "time_minutes": 10,
+          "objectives": [
+            "Historical critique of contested doctrines (e.g., ‘natural slave’)."
+          ],
+          "terms_introduced": [
+            "telos"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p10l3_a1",
+              "prompt": "One reform that aligns civic telos with equal dignity today.",
+              "input": {
+                "type": "text",
+                "max_len": 140
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Thoughtful reform",
+                "weight": "1.0",
+                "description": "Concrete, principled"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "justice_note"
+          ],
+          "mastery_updates": {
+            "politics_justice": 0.04
+          },
+          "dependencies": [],
+          "optional": true,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Politics & Justice', this stop is 'Justice & Inclusion (Optional)'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Lead small groups fairly; set rules that people accept.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Justice & Inclusion (Optional)' in Politics & Justice that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path11",
+      "title": "Persuasion & Expression",
+      "description": "Speak with clarity, credibility, and heart.",
+      "estimated_minutes_total": 32,
+      "lessons": [
+        {
+          "id": "p11.l1",
+          "title": "Speak to Be Heard",
+          "time_minutes": 12,
+          "objectives": [
+            "Record a 30-second pitch using logos/ethos/pathos."
+          ],
+          "terms_introduced": [
+            "rhetoric",
+            "logos_rhet",
+            "ethos_rhet",
+            "pathos_rhet"
+          ],
+          "activities": [
+            {
+              "type": "voice_note",
+              "id": "p11l1_a1",
+              "prompt": "Record a 30-second voice note persuading a friend to adopt a good habit.",
+              "max_seconds": 40
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Appeals present",
+                "weight": "1.0",
+                "description": "App detects ≥2 of 3 appeals"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "speech_v1"
+          ],
+          "mastery_updates": {
+            "rhetoric_skill": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Persuasion & Expression', this stop is 'Speak to Be Heard'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Speak clearly and move people without manipulation.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Speak to Be Heard' in Persuasion & Expression that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p11.l2",
+          "title": "The Enthymeme",
+          "time_minutes": 10,
+          "objectives": [
+            "Craft a rhetorical syllogism with an implied premise."
+          ],
+          "terms_introduced": [
+            "enthymeme",
+            "eikos",
+            "endoxa",
+            "apodeixis"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p11l2_a1",
+              "prompt": "Write your claim and the implied premise your audience already accepts (endoxa).",
+              "input": {
+                "type": "text",
+                "max_len": 160
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Clear enthymeme",
+                "weight": "0.7",
+                "description": "Claim + implied premise align"
+              },
+              {
+                "criterion": "Audience fit",
+                "weight": "0.3",
+                "description": "Premise plausible (eikos)"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "enthymeme_card"
+          ],
+          "mastery_updates": {
+            "rhetoric_structure": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Persuasion & Expression', this stop is 'The Enthymeme'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Speak clearly and move people without manipulation.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'The Enthymeme' in Persuasion & Expression that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p11.l3",
+          "title": "Strengthen Your Speech",
+          "time_minutes": 10,
+          "objectives": [
+            "Revise the speech; balance appeals."
+          ],
+          "terms_introduced": [
+            "logos_rhet",
+            "ethos_rhet",
+            "pathos_rhet"
+          ],
+          "activities": [
+            {
+              "type": "voice_note",
+              "id": "p11l3_a1",
+              "prompt": "Re-record your speech after AI tips (clarify one point; add one credible detail).",
+              "max_seconds": 45
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Improvement",
+                "weight": "1.0",
+                "description": "AI detects stronger structure/appeals"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "speech_v2"
+          ],
+          "mastery_updates": {
+            "rhetoric_mastery": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Persuasion & Expression', this stop is 'Strengthen Your Speech'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Speak clearly and move people without manipulation.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Strengthen Your Speech' in Persuasion & Expression that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "path12",
+      "title": "Art, Tragedy & Catharsis",
+      "description": "Learn through stories; feel and think better.",
+      "estimated_minutes_total": 30,
+      "lessons": [
+        {
+          "id": "p12.l1",
+          "title": "Tragic Anatomy",
+          "time_minutes": 12,
+          "objectives": [
+            "Map hamartia, peripeteia, anagnorisis, catharsis on a film/story."
+          ],
+          "terms_introduced": [
+            "poetics",
+            "mimesis",
+            "hamartia",
+            "peripeteia",
+            "anagnorisis",
+            "catharsis"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p12l1_a1",
+              "prompt": "Name the story; briefly label the key moments (error, reversal, recognition, emotional release).",
+              "input": {
+                "type": "text",
+                "max_len": 220
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Correct mapping",
+                "weight": "1.0",
+                "description": "Labels match story moments"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "tragic_map"
+          ],
+          "mastery_updates": {
+            "poetics_analysis": 0.06
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Art, Tragedy & Catharsis', this stop is 'Tragic Anatomy'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Use stories to learn, empathize, and regulate emotion.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Tragic Anatomy' in Art, Tragedy & Catharsis that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p12.l2",
+          "title": "Three-Line Scene",
+          "time_minutes": 10,
+          "objectives": [
+            "Write a micro-scene achieving a mini-catharsis."
+          ],
+          "terms_introduced": [
+            "mimesis",
+            "catharsis",
+            "four_causes"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p12l2_a1",
+              "prompt": "Write 3 lines: setup → reversal → recognition.",
+              "input": {
+                "type": "text",
+                "max_len": 160
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Coherence",
+                "weight": "0.6",
+                "description": "Scene reads as a tiny plot"
+              },
+              {
+                "criterion": "Effect",
+                "weight": "0.4",
+                "description": "Shows reversal/insight"
+              }
+            ],
+            "completion_rule": "pass if ≥0.8"
+          },
+          "artifacts": [
+            "micro_scene"
+          ],
+          "mastery_updates": {
+            "poetics_creation": 0.05
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Art, Tragedy & Catharsis', this stop is 'Three-Line Scene'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Use stories to learn, empathize, and regulate emotion.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Three-Line Scene' in Art, Tragedy & Catharsis that others might find useful today.",
+            "optional": true
+          }
+        },
+        {
+          "id": "p12.l3",
+          "title": "Art and Flourishing",
+          "time_minutes": 8,
+          "objectives": [
+            "Reflect on how art helps regulate emotions and teach virtue."
+          ],
+          "terms_introduced": [
+            "pathos",
+            "eudaimonia"
+          ],
+          "activities": [
+            {
+              "type": "reflection",
+              "id": "p12l3_a1",
+              "prompt": "One way art helps you flourish emotionally.",
+              "input": {
+                "type": "text",
+                "max_len": 120
+              }
+            }
+          ],
+          "assessment": {
+            "rubric": [
+              {
+                "criterion": "Reflection",
+                "weight": "1.0",
+                "description": "Concrete benefit named"
+              }
+            ],
+            "completion_rule": "pass"
+          },
+          "artifacts": [
+            "art_flourishing_note"
+          ],
+          "mastery_updates": {
+            "poetics_wellbeing": 0.04
+          },
+          "dependencies": [],
+          "optional": false,
+          "narrative": {
+            "intro": "Walk with me a moment. In 'Art, Tragedy & Catharsis', this stop is 'Art and Flourishing'. Attend first to what appears; only then say what it is.",
+            "outro": "Enough for now. Practice a little each day; habit shapes character, and character shapes life. We continue when you are ready."
+          },
+          "modern_payoff": "Use stories to learn, empathize, and regulate emotion.",
+          "ai_hooks": {
+            "tutor_hint": "Ask one Socratic question first. If the user stalls, offer a single example. Keep under 80 words.",
+            "evaluator_hint": "Score briefly and point to one improvement. Return mastery deltas suggested by rubric.",
+            "coach_hint": "Suggest a next tiny step aligned with the user’s stated telos."
+          },
+          "scholar_mode": {
+            "title": "Scholar Mode",
+            "estimated_minutes": 5,
+            "exercise": "Read a short primary-text snippet surfaced by the app and answer one multiple-choice question about its main claim.",
+            "ai_prompt": "Summarize the snippet in 2 sentences and ask one probing question in Aristotle’s voice (<60 words)."
+          },
+          "agora": {
+            "prompt": "Share one sentence from 'Art and Flourishing' in Art, Tragedy & Catharsis that others might find useful today.",
+            "optional": true
+          }
+        }
+      ]
+    }
+  ],
+  "glossary": [
+    {
+      "id": "syllogism",
+      "term": "Syllogism",
+      "definition": "Deductive argument of two premises and a conclusion.",
+      "paths": [
+        "path1",
+        "path11"
+      ]
+    },
+    {
+      "id": "logos",
+      "term": "Logos",
+      "definition": "Reasoned argument; structure of thought and speech.",
+      "paths": [
+        "path1",
+        "path11"
+      ]
+    },
+    {
+      "id": "fallacy",
+      "term": "Fallacy",
+      "definition": "Error in reasoning that weakens an argument.",
+      "paths": [
+        "path1"
+      ]
+    },
+    {
+      "id": "endoxa",
+      "term": "Endoxa",
+      "definition": "Reputable beliefs held by the many or the wise.",
+      "paths": [
+        "path2",
+        "path11"
+      ]
+    },
+    {
+      "id": "induction",
+      "term": "Epagōgē (Induction)",
+      "definition": "Reasoning from particulars to a universal.",
+      "paths": [
+        "path2"
+      ]
+    },
+    {
+      "id": "apodeixis",
+      "term": "Apodeixis (Demonstration)",
+      "definition": "Proof that yields scientific knowledge (epistēmē).",
+      "paths": [
+        "path2",
+        "path11"
+      ]
+    },
+    {
+      "id": "episteme",
+      "term": "Epistēmē",
+      "definition": "Scientific knowledge of universals and necessary truths.",
+      "paths": [
+        "path2"
+      ]
+    },
+    {
+      "id": "four_causes",
+      "term": "Four Causes",
+      "definition": "Material, formal, efficient, and final explanations.",
+      "paths": [
+        "path3",
+        "path12"
+      ]
+    },
+    {
+      "id": "telos",
+      "term": "Telos",
+      "definition": "End or purpose toward which a thing tends.",
+      "paths": [
+        "path3",
+        "path7",
+        "path10",
+        "path12"
+      ]
+    },
+    {
+      "id": "phusis",
+      "term": "Phusis (Nature)",
+      "definition": "Intrinsic principle of growth and change.",
+      "paths": [
+        "path4"
+      ]
+    },
+    {
+      "id": "form",
+      "term": "Form (Eidos/Morphē)",
+      "definition": "Defining structure or essence of a thing.",
+      "paths": [
+        "path4",
+        "path6",
+        "path12"
+      ]
+    },
+    {
+      "id": "matter",
+      "term": "Matter (Hulē)",
+      "definition": "Underlying stuff that receives form.",
+      "paths": [
+        "path4",
+        "path6",
+        "path12"
+      ]
+    },
+    {
+      "id": "cosmos",
+      "term": "Cosmos",
+      "definition": "Ordered whole of the universe.",
+      "paths": [
+        "path5"
+      ]
+    },
+    {
+      "id": "aither",
+      "term": "Aither",
+      "definition": "Heavenly element in ancient cosmology.",
+      "paths": [
+        "path5"
+      ]
+    },
+    {
+      "id": "ousia",
+      "term": "Ousia (Substance)",
+      "definition": "Primary reality; what a thing is.",
+      "paths": [
+        "path6",
+        "path12"
+      ]
+    },
+    {
+      "id": "essence",
+      "term": "Essence",
+      "definition": "What-it-is-to-be; defining nature.",
+      "paths": [
+        "path6",
+        "path12"
+      ]
+    },
+    {
+      "id": "accident",
+      "term": "Accident",
+      "definition": "Non-essential property that can change.",
+      "paths": [
+        "path6",
+        "path12"
+      ]
+    },
+    {
+      "id": "potentiality",
+      "term": "Dunamis (Potentiality)",
+      "definition": "Capacity to be otherwise or to become.",
+      "paths": [
+        "path6"
+      ]
+    },
+    {
+      "id": "actuality",
+      "term": "Energeia/Entelecheia (Actuality)",
+      "definition": "Realized state of a potential.",
+      "paths": [
+        "path6"
+      ]
+    },
+    {
+      "id": "eudaimonia",
+      "term": "Eudaimonia",
+      "definition": "Human flourishing; living well.",
+      "paths": [
+        "path7"
+      ]
+    },
+    {
+      "id": "arete",
+      "term": "Aretē (Virtue/Excellence)",
+      "definition": "Excellence of character or function.",
+      "paths": [
+        "path7"
+      ]
+    },
+    {
+      "id": "hexis",
+      "term": "Hexis",
+      "definition": "Stable disposition or state.",
+      "paths": [
+        "path7"
+      ]
+    },
+    {
+      "id": "mean",
+      "term": "Doctrine of the Mean",
+      "definition": "Virtue as a mean between extremes.",
+      "paths": [
+        "path7"
+      ]
+    },
+    {
+      "id": "phronesis",
+      "term": "Phronēsis",
+      "definition": "Practical wisdom guiding right action.",
+      "paths": [
+        "path8"
+      ]
+    },
+    {
+      "id": "ethos",
+      "term": "Ethos",
+      "definition": "Character shaped by habit.",
+      "paths": [
+        "path8",
+        "path11"
+      ]
+    },
+    {
+      "id": "pathos",
+      "term": "Pathos",
+      "definition": "Passion/emotion affecting judgment.",
+      "paths": [
+        "path8",
+        "path11",
+        "path12"
+      ]
+    },
+    {
+      "id": "ethismos",
+      "term": "Ethismos (Habituation)",
+      "definition": "Formation of character through repeated acts.",
+      "paths": [
+        "path8"
+      ]
+    },
+    {
+      "id": "polis",
+      "term": "Polis",
+      "definition": "City-state; natural community for humans.",
+      "paths": [
+        "path9",
+        "path10"
+      ]
+    },
+    {
+      "id": "polites",
+      "term": "Politēs (Citizen)",
+      "definition": "One who shares in ruling and being ruled.",
+      "paths": [
+        "path9"
+      ]
+    },
+    {
+      "id": "politeia",
+      "term": "Politeia (Constitution)",
+      "definition": "Arrangement of offices and ruling principle.",
+      "paths": [
+        "path10"
+      ]
+    },
+    {
+      "id": "democracy",
+      "term": "Democracy",
+      "definition": "Rule by the many (often the poor).",
+      "paths": [
+        "path10"
+      ]
+    },
+    {
+      "id": "oligarchy",
+      "term": "Oligarchy",
+      "definition": "Rule by the few (often the wealthy).",
+      "paths": [
+        "path10"
+      ]
+    },
+    {
+      "id": "aristocracy",
+      "term": "Aristocracy",
+      "definition": "Rule by the virtuous few.",
+      "paths": [
+        "path10"
+      ]
+    },
+    {
+      "id": "tyranny",
+      "term": "Tyranny",
+      "definition": "Corrupt rule of one for private interest.",
+      "paths": [
+        "path10"
+      ]
+    },
+    {
+      "id": "rhetoric",
+      "term": "Rhetoric",
+      "definition": "Art of persuasion in civic contexts.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "ethos_rhet",
+      "term": "Ethos (Rhetoric)",
+      "definition": "Speaker’s credibility and character.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "logos_rhet",
+      "term": "Logos (Rhetoric)",
+      "definition": "Reasoning used in persuasion.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "pathos_rhet",
+      "term": "Pathos (Rhetoric)",
+      "definition": "Emotion used in persuasion.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "enthymeme",
+      "term": "Enthymeme",
+      "definition": "Rhetorical syllogism with implied premise.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "eikos",
+      "term": "Eikos (Likelihood)",
+      "definition": "What seems probable to an audience.",
+      "paths": [
+        "path11"
+      ]
+    },
+    {
+      "id": "poetics",
+      "term": "Poetics",
+      "definition": "Study of tragedy and epic; how art works.",
+      "paths": [
+        "path12"
+      ]
+    },
+    {
+      "id": "mimesis",
+      "term": "Mimesis",
+      "definition": "Imitation/representation in art.",
+      "paths": [
+        "path12"
+      ]
+    },
+    {
+      "id": "catharsis",
+      "term": "Catharsis",
+      "definition": "Purification of emotion through art.",
+      "paths": [
+        "path12"
+      ]
+    },
+    {
+      "id": "hamartia",
+      "term": "Hamartia",
+      "definition": "Tragic error leading to reversal.",
+      "paths": [
+        "path12"
+      ]
+    },
+    {
+      "id": "peripeteia",
+      "term": "Peripeteia",
+      "definition": "Reversal of fortune in a plot.",
+      "paths": [
+        "path12"
+      ]
+    },
+    {
+      "id": "anagnorisis",
+      "term": "Anagnorisis",
+      "definition": "Moment of recognition in a plot.",
+      "paths": [
+        "path12"
+      ]
+    },
+    {
+      "id": "unmoved_mover",
+      "term": "Unmoved Mover",
+      "definition": "First cause of motion; pure actuality.",
+      "paths": [
+        "path6"
+      ]
+    }
+  ],
+  "daily_checkin": {
+    "title": "Peripatetic Daily",
+    "duration_minutes": 2,
+    "purpose": "Sustain flourishing through a tiny reflection or action.",
+    "examples": [
+      "Name one small action toward your telos today.",
+      "What virtue will you practice in the next hour?",
+      "Share one careful observation from your walk."
+    ],
+    "ai_prompt": "In one sentence, praise effort and suggest the next tiny step aligned with the learner’s stated telos. Keep under 25 words."
+  }
+}

@@ -221,6 +221,14 @@ model User {
   lessonProgress LessonProgress[]
   academyMilestones AcademyMilestone[]
   academyModuleProgress AcademyModuleProgress[]
+  
+  // Lyceum relations
+  lyceumUserProgress LyceumUserProgress[]
+  lyceumPathProgress LyceumPathProgress[]
+  lyceumLessonProgress LyceumLessonProgress[]
+  lyceumActivityResponses LyceumActivityResponse[]
+  lyceumEvaluations LyceumEvaluation[]
+  lyceumDailyCheckins LyceumDailyCheckin[]
 }
 
 model Session {
@@ -705,4 +713,190 @@ model AcademyMilestone {
   metadata          Json?    // Additional milestone data
   achievedAt        DateTime @default(now())
   createdAt         DateTime @default(now())
+}
+
+// Lyceum System Models
+
+// Lyceum Path - represents one of the 12 paths of wisdom
+model LyceumPath {
+  id                    String                @id @default(cuid())
+  pathId                String                @unique // e.g., "path1", "path2"
+  title                 String
+  description           String
+  estimatedMinutesTotal Int
+  order                 Int
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  lessons               LyceumLesson[]
+  userProgress          LyceumPathProgress[]
+}
+
+// Lyceum Lesson - individual lessons within a path
+model LyceumLesson {
+  id                    String                @id @default(cuid())
+  lessonId              String                @unique // e.g., "p1.l1", "p1.l2"
+  pathId                String
+  title                 String
+  timeMinutes           Int
+  objectives            String[]              // Learning objectives
+  termsIntroduced       String[]              // Terms introduced in this lesson
+  artifacts             String[]              // Artifacts earned from this lesson
+  masteryUpdates        Json                  // Mastery domain updates
+  dependencies          String[]              // Prerequisite lesson IDs
+  optional              Boolean               @default(false)
+  narrative             Json                  // Intro/outro narrative
+  modernPayoff          String
+  aiHooks               Json                  // AI guidance prompts
+  scholarMode           Json?                 // Optional scholar mode content
+  agora                 Json?                 // Optional agora sharing
+  order                 Int
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  path                  LyceumPath            @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  activities            LyceumActivity[]
+  assessments           LyceumAssessment[]
+  userProgress          LyceumLessonProgress[]
+}
+
+// Lyceum Activity - interactive elements within lessons
+model LyceumActivity {
+  id                    String                @id @default(cuid())
+  lessonId              String
+  activityId            String                // e.g., "p1l1_a1"
+  type                  String                // drag_drop_categorize, reflection, quiz, etc.
+  instructions          String
+  config                Json                  // Activity-specific configuration
+  order                 Int
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  lesson                LyceumLesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userResponses         LyceumActivityResponse[]
+}
+
+// Lyceum Assessment - evaluation criteria for lessons
+model LyceumAssessment {
+  id                    String                @id @default(cuid())
+  lessonId              String
+  rubric                Json                  // Assessment rubric
+  completionRule        String
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  lesson                LyceumLesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userEvaluations       LyceumEvaluation[]
+}
+
+// User Progress Models
+
+// Lyceum User Progress - overall progress tracking
+model LyceumUserProgress {
+  id                    String                @id @default(cuid())
+  userId                String
+  completedLessons      String[]              // Array of completed lesson IDs
+  completedPaths        String[]              // Array of completed path IDs
+  artifacts             String[]              // Array of collected artifacts
+  masteryScores         Json                  // Mastery domain scores
+  currentPath           String?               // Currently active path
+  currentLesson         String?               // Currently active lesson
+  lastAccessed          DateTime?
+  totalTimeSpent        Int                   @default(0) // Total time in minutes
+  dailyCheckins         Int                   @default(0)
+  scholarModeCompleted  String[]              // Array of completed scholar mode lesson IDs
+  agoraShares           String[]              // Array of shared lesson IDs
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pathProgress          LyceumPathProgress[]
+  lessonProgress        LyceumLessonProgress[]
+  activityResponses     LyceumActivityResponse[]
+  evaluations           LyceumEvaluation[]
+  dailyCheckins         LyceumDailyCheckin[]
+}
+
+// Lyceum Path Progress - progress for individual paths
+model LyceumPathProgress {
+  id                    String                @id @default(cuid())
+  userId                String
+  pathId                String
+  completed             Boolean               @default(false)
+  completedLessons      Int                   @default(0)
+  totalLessons          Int
+  progressPercentage    Float                 @default(0)
+  startedAt             DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  path                  LyceumPath            @relation(fields: [pathId], references: [id], onDelete: Cascade)
+  userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
+}
+
+// Lyceum Lesson Progress - progress for individual lessons
+model LyceumLessonProgress {
+  id                    String                @id @default(cuid())
+  userId                String
+  lessonId              String
+  completed             Boolean               @default(false)
+  timeSpent             Int                   @default(0) // Time in minutes
+  startedAt             DateTime?
+  completedAt           DateTime?
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
+  
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lesson                LyceumLesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
+}
+
+// Lyceum Activity Response - user responses to activities
+model LyceumActivityResponse {
+  id                    String                @id @default(cuid())
+  userId                String
+  activityId            String
+  response              Json                  // User's response data
+  submittedAt           DateTime              @default(now())
+  createdAt             DateTime              @default(now())
+  
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activity              LyceumActivity        @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
+}
+
+// Lyceum Evaluation - AI evaluations of user work
+model LyceumEvaluation {
+  id                    String                @id @default(cuid())
+  userId                String
+  assessmentId          String
+  scores                Json                  // Evaluation scores
+  notes                 String                // AI feedback
+  masteryDeltas         Json                  // Mastery updates
+  passed                Boolean
+  improvementSuggestion String?
+  evaluatedAt           DateTime              @default(now())
+  createdAt             DateTime              @default(now())
+  
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessment            LyceumAssessment      @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
+}
+
+// Lyceum Daily Check-in - daily reflection and coaching
+model LyceumDailyCheckin {
+  id                    String                @id @default(cuid())
+  userId                String
+  userTelos             String?               // User's stated purpose
+  reflection            String?               // User's reflection
+  coachingSuggestion    String?               // AI coaching suggestion
+  coachingHabit         String?               // Suggested habit
+  telosAlignment        String?               // Purpose alignment note
+  completedAt           DateTime              @default(now())
+  createdAt             DateTime              @default(now())
+  
+  user                  User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userProgress          LyceumUserProgress    @relation(fields: [userId], references: [userId])
 }
