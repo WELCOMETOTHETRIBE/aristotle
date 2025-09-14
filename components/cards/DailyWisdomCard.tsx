@@ -39,6 +39,68 @@ const availableFrameworks = [
   { id: 'aristotelian', name: 'Aristotelian', emoji: '📚', description: 'Virtue and flourishing' }
 ];
 
+// Helper functions for framework styling
+const getFrameworkColor = (framework: string) => {
+  const colors: Record<string, string> = {
+    'stoicism': 'from-gray-600 to-gray-700',
+    'spartan agōgē': 'from-red-600 to-red-700',
+    'samurai bushidō': 'from-blue-600 to-blue-700',
+    'monastic rule': 'from-purple-600 to-purple-700',
+    'viking berserker': 'from-orange-600 to-orange-700',
+    'celtic druid': 'from-green-600 to-green-700',
+    'tibetan monk': 'from-yellow-600 to-yellow-700',
+    'taoist sage': 'from-teal-600 to-teal-700',
+    'epicurean': 'from-pink-600 to-pink-700',
+    'aristotelian': 'from-indigo-600 to-indigo-700'
+  };
+  return colors[framework] || 'from-gray-600 to-gray-700';
+};
+
+const getFrameworkEmoji = (framework: string) => {
+  const emojis: Record<string, string> = {
+    'stoicism': '🧱',
+    'spartan agōgē': '🛡️',
+    'samurai bushidō': '🗡️',
+    'monastic rule': '⛪',
+    'viking berserker': '⚔️',
+    'celtic druid': '🌿',
+    'tibetan monk': '🧘',
+    'taoist sage': '☯️',
+    'epicurean': '🍇',
+    'aristotelian': '📚'
+  };
+  return emojis[framework] || '📚';
+};
+
+const getFrameworkName = (framework: string) => {
+  const names: Record<string, string> = {
+    'stoicism': 'Stoicism',
+    'spartan agōgē': 'Spartan',
+    'samurai bushidō': 'Bushidō',
+    'monastic rule': 'Monastic',
+    'viking berserker': 'Berserker',
+    'celtic druid': 'Druid',
+    'tibetan monk': 'Monk',
+    'taoist sage': 'Taoist',
+    'epicurean': 'Epicurean',
+    'aristotelian': 'Aristotelian'
+  };
+  return names[framework] || framework;
+};
+
+const getNextRefreshTime = () => {
+  const now = new Date();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  tomorrow.setHours(0, 0, 0, 0);
+  
+  const diff = tomorrow.getTime() - now.getTime();
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  
+  return `${hours}h ${minutes}m`;
+};
+
 export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   const [wisdom, setWisdom] = useState<DailyWisdom | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -70,11 +132,15 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
   }, []);
 
   // Save settings when they change
-  const saveSettings = async () => {
+  const saveSettings = async (newSettings?: WisdomSettings) => {
     if (typeof window === 'undefined') return;
     
     try {
-      localStorage.setItem('dailyWisdomSettings', JSON.stringify(settings));
+      const settingsToSave = newSettings || settings;
+      localStorage.setItem('dailyWisdomSettings', JSON.stringify(settingsToSave));
+      if (newSettings) {
+        setSettings(newSettings);
+      }
       console.log('📚 Wisdom settings saved');
     } catch (error) {
       console.error('Error saving wisdom settings:', error);
@@ -165,15 +231,6 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
         : ['stoic']; // Default fallback
       
       console.log(`🎯 Loading daily wisdom for frameworks:`, frameworksToUse);
-      console.log('📱 Mobile Debug - Settings object:', settings);
-      console.log('📱 Mobile Debug - Preferred frameworks:', settings.preferredFrameworks);
-      console.log('📱 Mobile Debug - Frameworks to use:', frameworksToUse);      
-      console.log('📱 Mobile Debug - Request body:', {
-        frameworks: frameworksToUse,
-        date: new Date().toISOString().split('T')[0],
-        userAgent: navigator.userAgent,
-        isMobile: /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-      });      
       
       const response = await fetch('/api/generate/daily-wisdom', {
         method: 'POST',
@@ -328,247 +385,286 @@ export function DailyWisdomCard({ className }: DailyWisdomCardProps) {
     saveSettings();
   }, [settings]);
 
-  if (!wisdom) {
-    return (
-      <div className={cn("p-6 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm", className)}>
-        <div className="flex items-center justify-center py-12">
-          <div className="flex items-center gap-3">
-            <RefreshCw className="w-6 h-6 animate-spin text-blue-500" />
-            <span className="text-gray-600 dark:text-gray-400">Loading wisdom...</span>
+  return (
+    <div className={cn("p-6 bg-gradient-to-br from-purple-500/10 via-violet-500/10 to-indigo-500/10 border border-purple-500/20 rounded-2xl backdrop-blur-sm", className)}>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-500/30 to-violet-500/30 rounded-xl flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-purple-300" />
+          </div>
+          <div>
+            <h3 className="text-lg font-semibold text-text">Daily Wisdom</h3>
+            <p className="text-sm text-muted">Ancient insights for modern life</p>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={cn("p-6 bg-gradient-to-br from-blue-500/10 via-indigo-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl backdrop-blur-sm", className)}>
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-          <Sparkles className="w-6 h-6 text-white" />
-        </div>
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Daily Wisdom</h2>
-          <p className="text-gray-600 dark:text-gray-300">Today's insight for reflection</p>
-        </div>
-        <div className="ml-auto flex items-center gap-2">
+        
+        <div className="flex items-center gap-2">
           <button
             onClick={handleRefresh}
             disabled={isLoading}
-            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200 disabled:opacity-50"
+            className="p-2 text-muted hover:text-text transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={cn("w-5 h-5 text-gray-600 dark:text-gray-300", isLoading && "animate-spin")} />
-          </button>
-          <button
-            onClick={() => setShowSettings(!showSettings)}
-            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
-          >
-            <Settings className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <RefreshCw className={cn("w-4 h-4", isLoading && "animate-spin")} />
           </button>
           <button
             onClick={() => setShowInfo(!showInfo)}
-            className="p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-all duration-200"
+            className="p-2 text-muted hover:text-text transition-colors"
           >
-            <Info className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+            <Info className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setShowSettings(!showSettings)}
+            className="p-2 text-muted hover:text-text transition-colors"
+          >
+            <Settings className="w-4 h-4" />
           </button>
         </div>
       </div>
-
-      {/* Settings Panel */}
-      <AnimatePresence>
-        {showSettings && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-6"
-          >
-            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Framework Preferences</h3>
-              <div className="grid grid-cols-2 gap-3">
-                {availableFrameworks.map((framework) => (
-                  <button
-                    key={framework.id}
-                    onClick={() => toggleFramework(framework.id)}
-                    className={cn(
-                      "p-3 rounded-lg border transition-all duration-200 text-left",
-                      settings.preferredFrameworks.includes(framework.id)
-                        ? "bg-blue-500/20 border-blue-500/50 text-blue-600 dark:text-blue-400"
-                        : "bg-white/5 border-white/10 text-gray-700 dark:text-gray-300 hover:bg-white/10"
-                    )}
-                  >
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="font-medium">{framework.emoji} {framework.name}</span>
-                      <div className={cn(
-                        "w-4 h-4 rounded-full border-2",
-                        settings.preferredFrameworks.includes(framework.id)
-                          ? "bg-blue-500 border-blue-500"
-                          : "border-gray-300 dark:border-gray-600"
-                      )} />
-                    </div>
-                    <p className="text-xs opacity-75">{framework.description}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* Info Panel */}
       <AnimatePresence>
         {showInfo && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            className="overflow-hidden mb-6"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 p-4 bg-surface/50 rounded-lg border border-border/50"
           >
-            <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">About Daily Wisdom</h3>
-              <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <p>• Wisdom refreshes once per day at midnight</p>
-                <p>• Select your preferred philosophical frameworks</p>
-                <p>• Each quote includes a reflection prompt</p>
-                <p>• Use the refresh button to get new wisdom</p>
+            <p className="text-sm text-muted">
+              Each day brings a new piece of wisdom from your selected philosophical traditions. 
+              Take a moment to reflect on how this insight applies to your life today.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Settings Panel */}
+      <AnimatePresence>
+        {showSettings && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="mb-4 p-4 bg-surface/50 rounded-lg border border-border/50 space-y-4"
+          >
+            <div>
+              <label className="text-sm font-medium text-text mb-2 block">
+                Select Frameworks for Wisdom
+              </label>
+              <p className="text-xs text-muted mb-3">
+                Choose which philosophical traditions you'd like to receive wisdom from
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {availableFrameworks.map((framework) => (
+                  <button
+                    key={framework.id}
+                    onClick={() => {
+                      const newFrameworks = settings.preferredFrameworks.includes(framework.id)
+                        ? settings.preferredFrameworks.filter(f => f !== framework.id)
+                        : [...settings.preferredFrameworks, framework.id];
+                      saveSettings({ ...settings, preferredFrameworks: newFrameworks });
+                    }}
+                    className={cn(
+                      "flex items-center gap-2 p-2 rounded-lg text-xs font-medium transition-colors text-left",
+                      settings.preferredFrameworks.includes(framework.id)
+                        ? "bg-purple-500/20 text-purple-300 border border-purple-500/30"
+                        : "bg-surface/50 text-muted border border-border/50 hover:bg-surface"
+                    )}
+                  >
+                    <span className="text-sm">{framework.emoji}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium truncate">{framework.name}</div>
+                      <div className="text-xs opacity-75 truncate">{framework.description}</div>
+                    </div>
+                    {settings.preferredFrameworks.includes(framework.id) && (
+                      <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    )}
+                  </button>
+                ))}
               </div>
+            </div>
+            
+            <div className="flex items-center justify-between">
+              <label className="text-sm font-medium text-text">
+                Show Reflection Questions
+              </label>
+              <button
+                onClick={() => saveSettings({ ...settings, showReflection: !settings.showReflection })}
+                className={cn(
+                  "w-12 h-6 rounded-full transition-colors",
+                  settings.showReflection ? "bg-purple-500" : "bg-surface/50"
+                )}
+              >
+                <div className={cn(
+                  "w-4 h-4 bg-white rounded-full transition-transform",
+                  settings.showReflection ? "translate-x-7" : "translate-x-1"
+                )} />
+              </button>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* Wisdom Content */}
-      <motion.div
-        key={wisdom.quote}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="space-y-6"
-      >
-        {/* Quote */}
-        <blockquote className="text-xl leading-relaxed text-gray-800 dark:text-gray-200 italic">
-          "{wisdom.quote}"
-        </blockquote>
-
-        {/* Author and Framework */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-              <Quote className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <p className="font-semibold text-gray-900 dark:text-white">{wisdom.author}</p>
-              <p className="text-sm text-gray-600 dark:text-gray-400">{wisdom.framework}</p>
+      <div className="space-y-4">
+        {isLoading ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="flex items-center gap-3">
+              <div className="w-6 h-6 border-2 border-purple-400 border-t-transparent rounded-full animate-spin"></div>
+              <span className="text-purple-300">Loading wisdom...</span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={toggleFavorite}
-              className={cn(
-                "p-2 rounded-lg transition-all duration-200",
-                isFavorite()
-                  ? "text-yellow-500 hover:text-yellow-400"
-                  : "text-gray-400 hover:text-yellow-500"
-              )}
-              title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
-            >
-              <Star className={cn("w-5 h-5", isFavorite() && "fill-current")} />
-            </button>
-            <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-              <BookOpen className="w-4 h-4" />
-              <span>Daily</span>
-            </div>
-          </div>
-        </div>
+        ) : wisdom ? (
+          <>
+            {/* Quote */}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={wisdom.quote}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }}
+                transition={{ duration: 0.3 }}
+                className="relative"
+              >
+                <Quote className="absolute -top-2 -left-2 w-6 h-6 text-purple-400/50" />
+                <div className="flex items-start justify-between pl-6">
+                  <blockquote className="text-lg font-serif italic text-text leading-relaxed flex-1">
+                    "{wisdom.quote}"
+                  </blockquote>
+                  <button
+                    onClick={toggleFavorite}
+                    className={`ml-3 p-1.5 rounded-full transition-all duration-200 flex-shrink-0 ${
+                      isFavorite()
+                        ? 'bg-yellow-500/20 text-yellow-400 hover:bg-yellow-500/30'
+                        : 'text-muted hover:text-yellow-400 hover:bg-yellow-500/10'
+                    }`}
+                    title={isFavorite() ? "Remove from favorites" : "Add to favorites"}
+                  >
+                    {isFavorite() ? (
+                      <span className="text-lg">★</span>
+                    ) : (
+                      <span className="text-lg">☆</span>
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+            </AnimatePresence>
 
-        {/* Reflection */}
-        {settings.showReflection && (
-          <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-            <div className="flex items-center gap-2 mb-2">
-              <Brain className="w-4 h-4 text-yellow-500" />
-              <span className="font-medium text-gray-900 dark:text-white">Reflection</span>
+            {/* Author and Framework */}
+            <div className="flex items-center justify-between">
+              <cite className="text-purple-300 font-medium">— {wisdom.author}</cite>
+              <div className="flex items-center gap-2">
+                <div className={cn(
+                  "inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium",
+                  `bg-gradient-to-r ${getFrameworkColor(wisdom.framework.toLowerCase())} text-white`
+                )}>
+                  <span>{getFrameworkEmoji(wisdom.framework.toLowerCase())}</span>
+                  <span>{getFrameworkName(wisdom.framework.toLowerCase())}</span>
+                </div>
+                <div className="text-xs text-muted bg-surface/60 px-2 py-1 rounded-full">
+                  Resets: {getNextRefreshTime()}
+                </div>
+              </div>
             </div>
-            <p className="text-gray-700 dark:text-gray-300">{wisdom.reflection}</p>
+
+            {/* Reflection */}
+            {settings.showReflection && wisdom.reflection && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="bg-surface/60 backdrop-blur-sm border border-border/50 rounded-lg p-4"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <Brain className="w-4 h-4 text-purple-400" />
+                  <h4 className="text-sm font-semibold text-text">Reflection</h4>
+                </div>
+                <p className="text-sm text-muted leading-relaxed">
+                  {wisdom.reflection}
+                </p>
+              </motion.div>
+            )}
+
+            {/* Action Buttons - Compact Design */}
+            <div className="flex items-center gap-2 pt-3">
+              <button
+                onClick={() => {
+                  const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
+                  if (favorites.length > 0) {
+                    // Show a simple modal with favorites
+                    const modal = document.createElement('div');
+                    modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
+                    modal.innerHTML = `
+                      <div class="bg-surface border border-border rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
+                        <div class="flex items-center justify-between mb-4">
+                          <h3 class="text-lg font-semibold text-text">Your Favorite Quotes</h3>
+                          <button onclick="this.closest('.fixed').remove()" class="text-muted hover:text-text">✕</button>
+                        </div>
+                        <div class="space-y-3">
+                          ${favorites.map((fav: any, index: number) => `
+                            <div class="p-3 bg-surface/50 rounded-lg border border-border/50">
+                              <blockquote class="text-sm italic text-text mb-2">"${fav.quote}"</blockquote>
+                              <div class="flex items-center justify-between">
+                                <cite class="text-xs text-purple-300">— ${fav.author}</cite>
+                                <span class="text-xs text-muted">${fav.framework}</span>
+                              </div>
+                            </div>
+                          `).join('')}
+                        </div>
+                        <div class="mt-4 text-center">
+                          <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
+                            Close
+                          </button>
+                        </div>
+                      </div>
+                    `;
+                    document.body.appendChild(modal);
+                    
+                    // Close on backdrop click
+                    modal.addEventListener('click', (e) => {
+                      if (e.target === modal) modal.remove();
+                    });
+                  } else {
+                    alert('No favorite quotes yet. Add some by clicking the star icon!');
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-surface/60 border border-border/50 text-muted hover:text-text hover:bg-surface transition-colors text-sm"
+                title="View your favorite quotes"
+              >
+                <BookOpen className="w-3.5 h-3.5" />
+                Favorites ({JSON.parse(localStorage.getItem('favoriteQuotes') || '[]').length})
+              </button>
+              
+              <Link 
+                href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
+                onClick={() => {
+                  // Scroll to top when navigating to coach page
+                  if (typeof window !== 'undefined') {
+                    window.scrollTo(0, 0);
+                  }
+                }}
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
+                title="Ask AI to discuss this quote"
+              >
+                <MessageCircle className="w-3.5 h-5" />
+                Ask AI
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <div className="text-purple-300 mb-2">Failed to load wisdom</div>
+              <button
+                onClick={loadDailyWisdom}
+                className="text-sm text-purple-400 hover:text-purple-300 underline"
+              >
+                Try again
+              </button>
+            </div>
           </div>
         )}
-
-        {/* Action Buttons - Compact Design */}
-        <div className="flex items-center gap-2 pt-3">
-          <button
-            onClick={() => {
-              const favorites = JSON.parse(localStorage.getItem('favoriteQuotes') || '[]');
-              if (favorites.length > 0) {
-                // Show a simple modal with favorites
-                const modal = document.createElement('div');
-                modal.className = 'fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4';
-                modal.innerHTML = `
-                  <div class="bg-surface border border-border rounded-xl p-6 max-w-md w-full max-h-[80vh] overflow-y-auto">
-                    <div class="flex items-center justify-between mb-4">
-                      <h3 class="text-lg font-semibold text-text">Your Favorite Quotes</h3>
-                      <button onclick="this.closest('.fixed').remove()" class="text-muted hover:text-text">✕</button>
-                    </div>
-                    <div class="space-y-3">
-                      ${favorites.map((fav: any, index: number) => `
-                        <div class="p-3 bg-surface/50 rounded-lg border border-border/50">
-                          <blockquote class="text-sm italic text-text mb-2">"${fav.quote}"</blockquote>
-                          <div class="flex items-center justify-between">
-                            <cite class="text-xs text-purple-300">— ${fav.author}</cite>
-                            <span class="text-xs text-muted">${fav.framework}</span>
-                          </div>
-                        </div>
-                      `).join('')}
-                    </div>
-                    <div class="mt-4 text-center">
-                      <button onclick="this.closest('.fixed').remove()" class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors">
-                        Close
-                      </button>
-                    </div>
-                  </div>
-                `;
-                document.body.appendChild(modal);
-                
-                // Close on backdrop click
-                modal.addEventListener('click', (e) => {
-                  if (e.target === modal) modal.remove();
-                });
-              } else {
-                alert('No favorite quotes yet. Add some by clicking the star icon!');
-              }
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-surface/60 border border-border/50 text-muted hover:text-text hover:bg-surface transition-colors text-sm"
-            title="View your favorite quotes"
-          >
-            <BookOpen className="w-3.5 h-3.5" />
-            Favorites ({JSON.parse(localStorage.getItem('favoriteQuotes') || '[]').length})
-          </button>
-          
-          <Link 
-            href={`/coach?quote=${encodeURIComponent(wisdom.quote)}&author=${encodeURIComponent(wisdom.author)}&framework=${encodeURIComponent(wisdom.framework)}`}
-            onClick={() => {
-              // Scroll to top when navigating to coach page
-              if (typeof window !== 'undefined') {
-                window.scrollTo(0, 0);
-              }
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-primary to-courage text-white rounded-md hover:from-primary/90 hover:to-courage/90 transition-all duration-200 font-medium text-sm shadow-sm hover:shadow-md transform hover:scale-105"
-            title="Ask AI to discuss this quote"
-          >
-            <MessageCircle className="w-3.5 h-5" />
-            Ask AI
-          </Link>
-        </div>
-      </motion.div>
-
-      {/* Loading State */}
-      {isLoading && (
-        <div className="flex items-center justify-center py-8">
-          <div className="flex items-center gap-3">
-            <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
-            <span className="text-gray-600 dark:text-gray-400">Loading wisdom...</span>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 }
