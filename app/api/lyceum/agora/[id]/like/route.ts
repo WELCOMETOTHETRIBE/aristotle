@@ -1,16 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/lyceum-auth';
+import { prisma } from '@/lib/db';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -29,7 +28,7 @@ export async function POST(
     const existingLike = await prisma.lyceumAgoraLike.findUnique({
       where: {
         userId_postId: {
-          userId: session.user.id,
+          userId: user.id,
           postId: postId
         }
       }
@@ -40,7 +39,7 @@ export async function POST(
       await prisma.lyceumAgoraLike.delete({
         where: {
           userId_postId: {
-            userId: session.user.id,
+            userId: user.id,
             postId: postId
           }
         }
@@ -55,7 +54,7 @@ export async function POST(
       // Like the post
       await prisma.lyceumAgoraLike.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           postId: postId
         }
       });

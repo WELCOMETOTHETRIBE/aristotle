@@ -1,14 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
-import { prisma } from '@/lib/prisma';
+import { getAuthenticatedUser } from '@/lib/lyceum-auth';
+import { prisma } from '@/lib/db';
 import { lyceumAICoach } from '@/lib/lyceum-ai';
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -23,7 +22,7 @@ export async function GET(request: NextRequest) {
     // Get check-in for the specified date
     const checkin = await prisma.lyceumDailyCheckin.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         date: {
           gte: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate()),
           lt: new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate() + 1)
@@ -34,7 +33,7 @@ export async function GET(request: NextRequest) {
     // Get recent check-ins for streak calculation
     const recentCheckins = await prisma.lyceumDailyCheckin.findMany({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         date: {
           gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // Last 30 days
         }
@@ -79,9 +78,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -104,7 +103,7 @@ export async function POST(request: NextRequest) {
     // Check if check-in already exists for this date
     const existingCheckin = await prisma.lyceumDailyCheckin.findFirst({
       where: {
-        userId: session.user.id,
+        userId: user.id,
         date: {
           gte: checkinDate,
           lt: new Date(checkinDate.getTime() + 24 * 60 * 60 * 1000)
@@ -128,7 +127,7 @@ export async function POST(request: NextRequest) {
     // Create the check-in
     const checkin = await prisma.lyceumDailyCheckin.create({
       data: {
-        userId: session.user.id,
+        userId: user.id,
         date: checkinDate,
         telos: telos || 'general flourishing',
         reflection: reflection || '',
@@ -159,9 +158,9 @@ export async function POST(request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 

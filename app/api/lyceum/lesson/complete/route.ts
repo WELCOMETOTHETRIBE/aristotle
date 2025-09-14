@@ -1,15 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
-
-const prisma = new PrismaClient();
+import { prisma } from '@/lib/db';
+import { getAuthenticatedUser } from '@/lib/lyceum-auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -38,7 +35,7 @@ export async function POST(request: NextRequest) {
     if (!userProgress) {
       userProgress = await prisma.lyceumUserProgress.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           completedLessons: [],
           completedPaths: [],
           artifacts: [],
@@ -103,7 +100,7 @@ export async function POST(request: NextRequest) {
     await prisma.lyceumLessonProgress.upsert({
       where: {
         userId_lessonId: {
-          userId: session.user.id,
+          userId: user.id,
           lessonId: lesson.id
         }
       },
@@ -113,7 +110,7 @@ export async function POST(request: NextRequest) {
         completedAt: new Date()
       },
       create: {
-        userId: session.user.id,
+        userId: user.id,
         lessonId: lesson.id,
         completed: true,
         timeSpent: timeSpent || 0,
@@ -128,7 +125,7 @@ export async function POST(request: NextRequest) {
     await prisma.lyceumPathProgress.upsert({
       where: {
         userId_pathId: {
-          userId: session.user.id,
+          userId: user.id,
           pathId: lesson.pathId
         }
       },
@@ -140,7 +137,7 @@ export async function POST(request: NextRequest) {
         completedAt: isPathCompleted ? new Date() : null
       },
       create: {
-        userId: session.user.id,
+        userId: user.id,
         pathId: lesson.pathId,
         completed: isPathCompleted,
         completedLessons: completedLessonsInPath.length,

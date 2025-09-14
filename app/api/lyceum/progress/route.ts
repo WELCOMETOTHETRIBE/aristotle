@@ -1,21 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth-options';
+import { prisma } from '@/lib/db';
+import { getAuthenticatedUser } from '@/lib/lyceum-auth';
 
-const prisma = new PrismaClient();
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     // Get user's Lyceum progress
     let userProgress = await prisma.lyceumUserProgress.findUnique({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       include: {
         pathProgress: {
           include: {
@@ -34,7 +31,7 @@ export async function GET() {
     if (!userProgress) {
       userProgress = await prisma.lyceumUserProgress.create({
         data: {
-          userId: session.user.id,
+          userId: user.id,
           completedLessons: [],
           completedPaths: [],
           artifacts: [],
@@ -84,9 +81,9 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
+    const user = await getAuthenticatedUser(request);
     
-    if (!session?.user?.id) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -106,7 +103,7 @@ export async function POST(request: NextRequest) {
 
     // Update or create user progress
     const userProgress = await prisma.lyceumUserProgress.upsert({
-      where: { userId: session.user.id },
+      where: { userId: user.id },
       update: {
         completedLessons: completedLessons || [],
         completedPaths: completedPaths || [],
@@ -121,7 +118,7 @@ export async function POST(request: NextRequest) {
         lastAccessed: new Date()
       },
       create: {
-        userId: session.user.id,
+        userId: user.id,
         completedLessons: completedLessons || [],
         completedPaths: completedPaths || [],
         artifacts: artifacts || [],
