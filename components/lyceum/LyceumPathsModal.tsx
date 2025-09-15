@@ -30,8 +30,7 @@ interface LyceumPathsModalProps {
 export default function LyceumPathsModal({ onSelectPath, onClose }: LyceumPathsModalProps) {
   const { data, progress, canAccessPath, getPathProgress } = useLyceum();
   
-  console.log('LyceumPathsModal - data:', data);
-  console.log('LyceumPathsModal - progress:', progress);
+  // polished: remove debug logs
 
   const getPathIcon = (pathId: string) => {
     const iconMap: { [key: string]: any } = {
@@ -152,11 +151,8 @@ export default function LyceumPathsModal({ onSelectPath, onClose }: LyceumPathsM
                   : 'border-border/50 bg-surface-2 opacity-60 cursor-not-allowed'
               )}
               onClick={() => {
-                console.log('Path clicked:', path.id, 'isAccessible:', isAccessible);
                 if (isAccessible) {
                   onSelectPath(path.id);
-                } else {
-                  console.log('Path not accessible:', path.id);
                 }
               }}
               whileHover={isAccessible ? { scale: 1.02 } : {}}

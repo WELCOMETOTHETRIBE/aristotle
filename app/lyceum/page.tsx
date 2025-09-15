@@ -61,17 +61,12 @@ export default function LyceumPage() {
   };
 
   const selectPath = (pathId: string) => {
-    console.log('selectPath called with:', pathId);
     setSelectedPath(pathId);
     // Find the first lesson in the path to start with
     const path = data.paths.find(p => p.id === pathId);
-    console.log('Found path:', path);
     if (path && path.lessons.length > 0) {
-      console.log('Setting lesson to:', path.lessons[0].id);
       setSelectedLesson(path.lessons[0].id);
       setModalStep('lesson');
-    } else {
-      console.log('No lessons found in path or path not found');
     }
   };
 
@@ -480,14 +475,14 @@ export default function LyceumPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            className="fixed inset-0 bg-black/60 backdrop-blur-md z-50 flex items-center justify-center p-4"
             onClick={closeModal}
           >
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="bg-surface border border-border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              className="bg-surface border border-border rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
               {modalStep === 'preface' && (
