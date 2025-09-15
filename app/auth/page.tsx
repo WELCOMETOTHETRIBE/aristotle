@@ -146,14 +146,14 @@ export default function AuthPage() {
           className="w-full max-w-md"
         >
           {/* Header */}
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-4">
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-2">
               <Image
                 src="/eudaimonia.png"
                 alt="EudAimonia Academy Logo"
-                width={400}
-                height={400}
-                className="w-96 h-96 object-contain"
+                width={300}
+                height={300}
+                className="w-64 h-64 object-contain"
                 priority
               />
             </div>
