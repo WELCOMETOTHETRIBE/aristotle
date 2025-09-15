@@ -37,8 +37,13 @@ import LyceumGlossary from '@/components/lyceum/LyceumGlossary';
 import LyceumArtifacts from '@/components/lyceum/LyceumArtifacts';
 import LyceumPortfolio from '@/components/lyceum/LyceumPortfolio';
 import LyceumAgora from '@/components/lyceum/LyceumAgora';
+import LyceumPrefaceModal from '@/components/lyceum/LyceumPrefaceModal';
+import LyceumPathsModal from '@/components/lyceum/LyceumPathsModal';
+import LyceumLessonModal from '@/components/lyceum/LyceumLessonModal';
+import LyceumCompletionModal from '@/components/lyceum/LyceumCompletionModal';
 
 type ViewMode = 'overview' | 'paths' | 'progress' | 'lesson' | 'certificate' | 'daily-checkin' | 'glossary' | 'artifacts' | 'portfolio' | 'agora';
+type ModalStep = 'preface' | 'paths' | 'lesson' | 'completion' | null;
 
 export default function LyceumPage() {
   const { data, progress, getOverallProgress, canEarnCertificate } = useLyceum();
@@ -46,27 +51,29 @@ export default function LyceumPage() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
   const [selectedLesson, setSelectedLesson] = useState<string | null>(null);
   const [showMenu, setShowMenu] = useState(false);
+  const [modalStep, setModalStep] = useState<ModalStep>(null);
 
   const overallProgress = getOverallProgress();
   const canEarn = canEarnCertificate();
 
   const startJourney = () => {
-    setViewMode('paths');
+    setModalStep('preface');
   };
 
   const selectPath = (pathId: string) => {
     setSelectedPath(pathId);
-    setViewMode('lesson');
-    // Start with first lesson
-    const path = data.paths.find(p => p.id === pathId);
-    if (path && path.lessons.length > 0) {
-      setSelectedLesson(path.lessons[0].id);
-    }
+    setModalStep('paths');
   };
 
   const selectLesson = (lessonId: string) => {
     setSelectedLesson(lessonId);
-    setViewMode('lesson');
+    setModalStep('lesson');
+  };
+
+  const closeModal = () => {
+    setModalStep(null);
+    setSelectedPath(null);
+    setSelectedLesson(null);
   };
 
   const backToPaths = () => {
@@ -455,6 +462,52 @@ export default function LyceumPage() {
       </main>
 
       <TabBar />
+
+      {/* Modal Overlay */}
+      <AnimatePresence>
+        {modalStep && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={closeModal}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-surface border border-border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {modalStep === 'preface' && (
+                <LyceumPrefaceModal 
+                  onNext={() => setModalStep('paths')}
+                  onClose={closeModal}
+                />
+              )}
+              {modalStep === 'paths' && (
+                <LyceumPathsModal 
+                  onSelectPath={selectPath}
+                  onClose={closeModal}
+                />
+              )}
+              {modalStep === 'lesson' && selectedLesson && (
+                <LyceumLessonModal 
+                  lessonId={selectedLesson}
+                  onComplete={() => setModalStep('completion')}
+                  onClose={closeModal}
+                />
+              )}
+              {modalStep === 'completion' && (
+                <LyceumCompletionModal 
+                  onClose={closeModal}
+                />
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

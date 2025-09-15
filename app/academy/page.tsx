@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Header } from '@/components/nav/Header';
 import { TabBar } from '@/components/nav/TabBar';
 import { 
@@ -33,11 +33,16 @@ import { useAuth } from '@/lib/auth-context';
 import PhilosophersDialogueModal from '@/components/PhilosophersDialogueModal';
 import AcademyWisdomJourney from '@/components/AcademyWisdomJourney';
 import AcademyArtifacts from '@/components/AcademyArtifacts';
+import AcademyPrefaceModal from '@/components/AcademyPrefaceModal';
+import AcademyPathsModal from '@/components/AcademyPathsModal';
+import AcademyLessonModal from '@/components/AcademyLessonModal';
+import AcademyCompletionModal from '@/components/AcademyCompletionModal';
 
 // Import the wisdom journey data
 import academyData from '@/data/academy_wisdom_journey_v1_1.json';
 
 type ViewMode = 'overview' | 'paths' | 'progress' | 'lesson' | 'certificate' | 'daily-checkin' | 'glossary' | 'artifacts' | 'portfolio' | 'agora';
+type ModalStep = 'preface' | 'paths' | 'lesson' | 'completion' | null;
 
 export default function AcademyPage() {
   const { user, loading } = useAuth();
@@ -46,6 +51,7 @@ export default function AcademyPage() {
   const [currentLesson, setCurrentLesson] = useState<any>(null);
   const [showPhilosophersDialogue, setShowPhilosophersDialogue] = useState(false);
   const [userProgress, setUserProgress] = useState<any>({});
+  const [modalStep, setModalStep] = useState<ModalStep>(null);
 
   // Load user progress
   useEffect(() => {
@@ -93,14 +99,18 @@ export default function AcademyPage() {
 
   const startPath = (path: any) => {
     setSelectedPath(path);
-    const firstIncompleteLesson = path.lessons.find((lesson: any) => !userProgress[lesson.id]?.completed);
-    if (firstIncompleteLesson) {
-      setCurrentLesson(firstIncompleteLesson);
-      setViewMode('lesson');
-    } else {
-      setCurrentLesson(path.lessons[0]);
-      setViewMode('lesson');
-    }
+    setModalStep('preface');
+  };
+
+  const startLesson = (lesson: any) => {
+    setCurrentLesson(lesson);
+    setModalStep('lesson');
+  };
+
+  const closeModal = () => {
+    setModalStep(null);
+    setSelectedPath(null);
+    setCurrentLesson(null);
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -720,6 +730,60 @@ export default function AcademyPage() {
       />
 
       <TabBar />
+
+      {/* Modal Overlay */}
+      <AnimatePresence>
+        {modalStep && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={closeModal}
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="bg-surface border border-border rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {modalStep === 'preface' && selectedPath && (
+                <AcademyPrefaceModal 
+                  path={selectedPath}
+                  onNext={() => setModalStep('paths')}
+                  onClose={closeModal}
+                />
+              )}
+              {modalStep === 'paths' && selectedPath && (
+                <AcademyPathsModal 
+                  path={selectedPath}
+                  userProgress={userProgress}
+                  onSelectLesson={startLesson}
+                  onClose={closeModal}
+                />
+              )}
+              {modalStep === 'lesson' && currentLesson && selectedPath && (
+                <AcademyLessonModal 
+                  lesson={currentLesson}
+                  path={selectedPath}
+                  userProgress={userProgress}
+                  onComplete={(lessonId: string, data: any) => {
+                    saveProgress({ ...userProgress, [lessonId]: data });
+                    setModalStep('completion');
+                  }}
+                  onClose={closeModal}
+                />
+              )}
+              {modalStep === 'completion' && (
+                <AcademyCompletionModal 
+                  onClose={closeModal}
+                />
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
