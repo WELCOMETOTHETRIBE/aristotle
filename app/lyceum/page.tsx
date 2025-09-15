@@ -61,8 +61,18 @@ export default function LyceumPage() {
   };
 
   const selectPath = (pathId: string) => {
+    console.log('selectPath called with:', pathId);
     setSelectedPath(pathId);
-    setModalStep('paths');
+    // Find the first lesson in the path to start with
+    const path = data.paths.find(p => p.id === pathId);
+    console.log('Found path:', path);
+    if (path && path.lessons.length > 0) {
+      console.log('Setting lesson to:', path.lessons[0].id);
+      setSelectedLesson(path.lessons[0].id);
+      setModalStep('lesson');
+    } else {
+      console.log('No lessons found in path or path not found');
+    }
   };
 
   const selectLesson = (lessonId: string) => {
