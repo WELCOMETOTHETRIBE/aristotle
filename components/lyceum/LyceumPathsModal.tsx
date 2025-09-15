@@ -29,6 +29,9 @@ interface LyceumPathsModalProps {
 
 export default function LyceumPathsModal({ onSelectPath, onClose }: LyceumPathsModalProps) {
   const { data, progress, canAccessPath, getPathProgress } = useLyceum();
+  
+  console.log('LyceumPathsModal - data:', data);
+  console.log('LyceumPathsModal - progress:', progress);
 
   const getPathIcon = (pathId: string) => {
     const iconMap: { [key: string]: any } = {
